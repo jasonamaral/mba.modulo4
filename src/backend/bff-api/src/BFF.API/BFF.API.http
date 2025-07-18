@@ -1,0 +1,24 @@
+@BFF.API_HostAddress = http://localhost:5005
+
+### Health Check
+GET {{BFF.API_HostAddress}}/health
+
+### Health Check Detalhado
+GET {{BFF.API_HostAddress}}/api/health
+
+### Status da API
+GET {{BFF.API_HostAddress}}/api/health/status
+
+### Swagger OpenAPI
+GET {{BFF.API_HostAddress}}/swagger/v1/swagger.json
+
+### Swagger UI
+GET {{BFF.API_HostAddress}}/swagger
+
+### Dashboard do Aluno (Requer JWT)
+GET {{BFF.API_HostAddress}}/api/dashboard/aluno
+Authorization: Bearer {token}
+
+### Dashboard do Admin (Requer JWT)
+GET {{BFF.API_HostAddress}}/api/dashboard/admin
+Authorization: Bearer {token}
