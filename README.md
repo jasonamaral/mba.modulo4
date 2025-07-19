@@ -34,14 +34,37 @@ graph TB
     end
     
     subgraph "Backend for Frontend"
-        BFF[BFF API<br/>porta: 5000]
+        BFF[BFF API<br/>porta: 5000<br/>Clean Architecture]
     end
     
-    subgraph "Microserviços"
-        Auth[Auth API<br/>porta: 5001/7001]
-        Conteudo[Conteudo API<br/>porta: 5002/7002]
-        Alunos[Alunos API<br/>porta: 5003/7003]
-        Pagamentos[Pagamentos API<br/>porta: 5004/7004]
+    subgraph "Microserviços - Clean Architecture"
+        subgraph "Auth API (5001/7001)"
+            AuthAPI[API Layer]
+            AuthApp[Application Layer]
+            AuthDomain[Domain Layer]
+            AuthInfra[Infrastructure Layer]
+        end
+        
+        subgraph "Conteudo API (5002/7002)"
+            ConteudoAPI[API Layer]
+            ConteudoApp[Application Layer]
+            ConteudoDomain[Domain Layer]
+            ConteudoInfra[Infrastructure Layer]
+        end
+        
+        subgraph "Alunos API (5003/7003)"
+            AlunosAPI[API Layer]
+            AlunosApp[Application Layer]
+            AlunosDomain[Domain Layer]
+            AlunosInfra[Infrastructure Layer]
+        end
+        
+        subgraph "Pagamentos API (5004/7004)"
+            PagamentosAPI[API Layer]
+            PagamentosApp[Application Layer]
+            PagamentosDomain[Domain Layer]
+            PagamentosInfra[Infrastructure Layer]
+        end
     end
     
     subgraph "Infraestrutura"
@@ -51,19 +74,36 @@ graph TB
     end
     
     Angular --> BFF
-    BFF --> Auth
-    BFF --> Conteudo
-    BFF --> Alunos
-    BFF --> Pagamentos
     
-    Pagamentos --> RabbitMQ
-    Alunos --> RabbitMQ
-    Auth --> RabbitMQ
+    BFF --> AuthAPI
+    BFF --> ConteudoAPI
+    BFF --> AlunosAPI
+    BFF --> PagamentosAPI
     
-    Auth --> SQLServer
-    Conteudo --> SQLServer
-    Alunos --> SQLServer
-    Pagamentos --> SQLServer
+    AuthAPI --> AuthApp
+    AuthApp --> AuthDomain
+    AuthInfra --> AuthDomain
+    
+    ConteudoAPI --> ConteudoApp
+    ConteudoApp --> ConteudoDomain
+    ConteudoInfra --> ConteudoDomain
+    
+    AlunosAPI --> AlunosApp
+    AlunosApp --> AlunosDomain
+    AlunosInfra --> AlunosDomain
+    
+    PagamentosAPI --> PagamentosApp
+    PagamentosApp --> PagamentosDomain
+    PagamentosInfra --> PagamentosDomain
+    
+    PagamentosInfra --> RabbitMQ
+    AlunosInfra --> RabbitMQ
+    AuthInfra --> RabbitMQ
+    
+    AuthInfra --> SQLServer
+    ConteudoInfra --> SQLServer
+    AlunosInfra --> SQLServer
+    PagamentosInfra --> SQLServer
     
     BFF --> Redis
 ```
@@ -77,6 +117,35 @@ graph TB
 - ✅ **Health Checks**: Monitoramento de saúde dos serviços
 - ✅ **JWT Authentication**: Autenticação centralizada
 - ✅ **Clean Architecture**: DDD, SOLID, CQRS
+
+### Estrutura Clean Architecture por Microserviço
+
+Cada microserviço segue a **Clean Architecture** com as seguintes camadas:
+
+#### 📁 **API Layer** (Controllers, Middleware)
+- Controllers REST
+- Middleware de autenticação
+- Configuração de Swagger
+- Validação de entrada
+
+#### 📁 **Application Layer** (Use Cases, Services)
+- DTOs de entrada/saída
+- Interfaces de serviços
+- Handlers de comandos/queries (CQRS)
+- Validação de negócio
+
+#### 📁 **Domain Layer** (Entities, Value Objects)
+- Entidades de domínio
+- Value Objects
+- Interfaces de repositórios
+- Eventos de domínio
+- Regras de negócio
+
+#### 📁 **Infrastructure Layer** (Data, External Services)
+- Implementação de repositórios
+- Contexto do Entity Framework
+- Integração com RabbitMQ
+- Configurações de banco de dados
 
 ## 🤔 Por que Scripts Auxiliares?
 
@@ -176,6 +245,7 @@ Após ~5 minutos de inicialização:
 - ✅ Emissão e validação de tokens JWT
 - ✅ Gerenciamento de roles (Admin/Aluno)
 - ✅ Refresh tokens
+- 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5001/swagger
 
 ### Conteudo API (porta 5002/7002)
@@ -184,6 +254,7 @@ Após ~5 minutos de inicialização:
 - ✅ CRUD de aulas
 - ✅ Gerenciamento de materiais didáticos
 - ✅ Estrutura curricular
+- 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5002/swagger
 
 ### Alunos API (porta 5003/7003)
@@ -193,6 +264,7 @@ Após ~5 minutos de inicialização:
 - ✅ Geração de certificados
 - ✅ Histórico acadêmico
 - ✅ Consumo de eventos de pagamento
+- 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5003/swagger
 
 ### Pagamentos API (porta 5004/7004)
@@ -202,6 +274,7 @@ Após ~5 minutos de inicialização:
 - ✅ Webhooks de confirmação
 - ✅ Emissão de eventos
 - ✅ Histórico de transações
+- 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5004/swagger
 
 ### BFF API (porta 5000)
@@ -211,6 +284,7 @@ Após ~5 minutos de inicialização:
 - ✅ Cache distribuído (Redis)
 - ✅ Rate limiting
 - ✅ Circuit breaker
+- 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: http://localhost:5000/swagger
 
 ## 🏗️ Infraestrutura
@@ -478,6 +552,41 @@ As configurações atuais são para **desenvolvimento/demonstração**:
 ```
 mba.modulo4/
 ├── src/backend/          # Microserviços .NET
+│   ├── auth-api/         # Auth.API.sln
+│   │   ├── src/
+│   │   │   ├── Auth.API/           # API Layer
+│   │   │   ├── Auth.Application/   # Application Layer
+│   │   │   ├── Auth.Domain/        # Domain Layer
+│   │   │   └── Auth.Infrastructure/# Infrastructure Layer
+│   │   └── tests/
+│   ├── alunos-api/       # Alunos.API.sln
+│   │   ├── src/
+│   │   │   ├── Alunos.API/
+│   │   │   ├── Alunos.Application/
+│   │   │   ├── Alunos.Domain/
+│   │   │   └── Alunos.Infrastructure/
+│   │   └── tests/
+│   ├── conteudo-api/     # Conteudo.API.sln
+│   │   ├── src/
+│   │   │   ├── Conteudo.API/
+│   │   │   ├── Conteudo.Application/
+│   │   │   ├── Conteudo.Domain/
+│   │   │   └── Conteudo.Infrastructure/
+│   │   └── tests/
+│   ├── pagamentos-api/   # Pagamentos.API.sln
+│   │   ├── src/
+│   │   │   ├── Pagamentos.API/
+│   │   │   ├── Pagamentos.Application/
+│   │   │   ├── Pagamentos.Domain/
+│   │   │   └── Pagamentos.Infrastructure/
+│   │   └── tests/
+│   └── bff-api/          # BFF.API.sln
+│       ├── src/
+│       │   ├── BFF.API/
+│       │   ├── BFF.Application/
+│       │   ├── BFF.Domain/
+│       │   └── BFF.Infrastructure/
+│       └── tests/
 ├── src/frontend/         # Angular 18 SPA
 ├── scripts/              # Scripts de automação
 ├── config/               # Configurações
@@ -491,6 +600,34 @@ mba.modulo4/
 - Implementar **health checks** em novas APIs
 - Documentar com **Swagger/OpenAPI**
 - Usar **async/await** para operações I/O
+
+### Padrões de Projeto Implementados
+
+#### 🏗️ **Clean Architecture**
+- **Dependency Inversion**: Camadas internas não dependem de camadas externas
+- **Separation of Concerns**: Cada camada tem responsabilidade específica
+- **Testability**: Fácil mock e teste unitário
+
+#### 📋 **CQRS (Command Query Responsibility Segregation)**
+- **Commands**: Operações que modificam estado
+- **Queries**: Operações que apenas consultam dados
+- **Handlers**: Processamento específico para cada comando/query
+
+#### 🎯 **Domain-Driven Design (DDD)**
+- **Entities**: Objetos com identidade única
+- **Value Objects**: Objetos imutáveis sem identidade
+- **Aggregates**: Conjuntos de entidades relacionadas
+- **Domain Events**: Eventos que representam mudanças no domínio
+
+#### 🔄 **Repository Pattern**
+- **Interfaces**: Definidas na camada de domínio
+- **Implementações**: Na camada de infraestrutura
+- **Abstração**: Desacoplamento entre domínio e dados
+
+#### 📡 **Event-Driven Architecture**
+- **RabbitMQ**: Message broker para comunicação assíncrona
+- **Domain Events**: Eventos de domínio publicados
+- **Event Handlers**: Processamento de eventos
 
 ## 📚 Documentação Adicional
 
