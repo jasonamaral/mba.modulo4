@@ -1,0 +1,185 @@
+services:
+  # Infraestrutura
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: plataforma-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - plataforma-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: plataforma-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - plataforma-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: plataforma-sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: PlataformaEducacional123!
+      MSSQL_PID: Express
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - plataforma-network
+
+  # Microserviços
+  auth-api:
+    build:
+      context: ./src/backend/auth-api
+      dockerfile: Dockerfile
+    container_name: plataforma-auth-api
+    ports:
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5001
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AuthDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
+      - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
+      - JwtSettings__Issuer=PlataformaEducacional
+      - JwtSettings__Audience=PlataformaEducacional
+      - JwtSettings__ExpiryMinutes=15
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    networks:
+      - plataforma-network
+
+  conteudo-api:
+    build:
+      context: ./src/backend/conteudo-api
+      dockerfile: Dockerfile
+    container_name: plataforma-conteudo-api
+    ports:
+      - "5002:5002"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5002
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ConteudoDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
+      - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
+      - JwtSettings__Issuer=PlataformaEducacional
+      - JwtSettings__Audience=PlataformaEducacional
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - auth-api
+    networks:
+      - plataforma-network
+
+  alunos-api:
+    build:
+      context: ./src/backend/alunos-api
+      dockerfile: Dockerfile
+    container_name: plataforma-alunos-api
+    ports:
+      - "5003:5003"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5003
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AlunosDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
+      - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
+      - JwtSettings__Issuer=PlataformaEducacional
+      - JwtSettings__Audience=PlataformaEducacional
+      - ExternalApis__ConteudoApi=http://conteudo-api:5002
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - auth-api
+    networks:
+      - plataforma-network
+
+  pagamentos-api:
+    build:
+      context: ./src/backend/pagamentos-api
+      dockerfile: Dockerfile
+    container_name: plataforma-pagamentos-api
+    ports:
+      - "5004:5004"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5004
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=PagamentosDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
+      - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
+      - JwtSettings__Issuer=PlataformaEducacional
+      - JwtSettings__Audience=PlataformaEducacional
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - auth-api
+    networks:
+      - plataforma-network
+
+  bff-api:
+    build:
+      context: ./src/backend/bff-api
+      dockerfile: Dockerfile
+    container_name: plataforma-bff-api
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
+      - JwtSettings__Issuer=PlataformaEducacional
+      - JwtSettings__Audience=PlataformaEducacional
+      - Redis__ConnectionString=redis:6379
+      - ApiSettings__AuthApiUrl=http://auth-api:5001
+      - ApiSettings__ConteudoApiUrl=http://conteudo-api:5002
+      - ApiSettings__AlunosApiUrl=http://alunos-api:5003
+      - ApiSettings__PagamentosApiUrl=http://pagamentos-api:5004
+    depends_on:
+      - redis
+      - auth-api
+      - conteudo-api
+      - alunos-api
+      - pagamentos-api
+    networks:
+      - plataforma-network
+
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: plataforma-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - bff-api
+    networks:
+      - plataforma-network
+
+networks:
+  plataforma-network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  redis_data:
+  sqlserver_data: 

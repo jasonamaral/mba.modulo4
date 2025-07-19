@@ -75,7 +75,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerConfiguration();
 }
 
-app.UseHttpsRedirection();
+// Remover HTTPS redirection
+// app.UseHttpsRedirection();
 
 app.UseCors("AllowedOrigins");
 

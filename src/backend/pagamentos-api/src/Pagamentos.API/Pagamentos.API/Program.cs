@@ -99,7 +99,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerConfiguration();
 }
 
-app.UseHttpsRedirection();
+// Remover HTTPS redirection
+// app.UseHttpsRedirection();
 
 app.UseCors("AllowSpecificOrigins");
 
@@ -111,7 +112,7 @@ app.UseAuthorization();
 // {
 //     app.UseHangfireDashboard("/hangfire", new DashboardOptions
 //     {
-//         Authorization = new[] { new HangfireAuthorizationFilter() }
+//     Authorization = new[] { new HangfireAuthorizationFilter() }
 //     });
 // }
 

@@ -52,7 +52,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseSwaggerConfiguration();
 
-app.UseHttpsRedirection();
+// Remover HTTPS redirection
+// app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
