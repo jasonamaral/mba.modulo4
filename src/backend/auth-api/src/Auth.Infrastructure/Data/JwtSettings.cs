@@ -1,4 +1,4 @@
-namespace Auth.API.Settings;
+namespace Auth.Infrastructure.Data;
 
 public class JwtSettings
 {
@@ -7,4 +7,4 @@ public class JwtSettings
     public string Audience { get; set; } = string.Empty;
     public int AccessTokenExpirationMinutes { get; set; } = 15;
     public int RefreshTokenExpirationDays { get; set; } = 7;
-}
+} 
