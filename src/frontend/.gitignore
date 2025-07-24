@@ -27,7 +27,7 @@ out-tsc/
 Thumbs.db
 
 # Environment files
-src/environments/environment*.ts
+# src/environments/environment*.ts
 
 # Testing
 coverage/
