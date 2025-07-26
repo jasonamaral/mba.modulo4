@@ -8,9 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configurações
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
+
+// HttpClient para comunicação com outras APIs
+builder.Services.AddHttpClient();
 
 // Services
 builder.Services.AddScoped<BFF.Application.Interfaces.Services.IDashboardService, BFF.Infrastructure.Services.DashboardService>();
+
+// Configuração global do JSON
+builder.Services.AddJsonConfiguration();
 
 // Controllers
 builder.Services.AddControllers();

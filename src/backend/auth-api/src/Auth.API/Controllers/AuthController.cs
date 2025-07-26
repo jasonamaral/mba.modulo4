@@ -1,191 +1,248 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
+using Auth.API.Models.Requests;
+using Auth.API.Models.Responses;
+using Auth.Application.Interfaces;
+using Auth.Application.DTOs;
 
 namespace Auth.API.Controllers;
 
+/// <summary>
+/// Controller de autenticação
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
 public class AuthController : ControllerBase
 {
+    private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
+
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+    {
+        _authService = authService;
+        _logger = logger;
+    }
+
     /// <summary>
     /// Registra um novo usuário no sistema
     /// </summary>
-    /// <param name="model">Dados do usuário para registro</param>
+    /// <param name="request">Dados do usuário para registro</param>
     /// <returns>Confirmação de registro</returns>
     [HttpPost("registro")]
     [ProducesResponseType(typeof(AuthResponse), 200)]
     [ProducesResponseType(typeof(ApiError), 400)]
-    public IActionResult Registro([FromBody] RegistroRequest model)
+    public async Task<IActionResult> Registro([FromBody] RegistroRequest request)
     {
-        if (!ModelState.IsValid)
+        try
         {
-            return BadRequest(new ApiError 
-            { 
-                Message = "Dados inválidos",
-                Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiError
+                {
+                    Message = "Dados inválidos",
+                    Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage),
+                    ErrorCode = "VALIDATION_ERROR"
+                });
+            }
+
+            var registerDto = new RegisterRequestDto
+            {
+                Email = request.Email,
+                Password = request.Senha,
+                Nome = request.Nome,
+                DataNascimento = request.DataNascimento,
+                EhAdministrador = request.EhAdministrador
+            };
+
+            var result = await _authService.RegisterAsync(registerDto);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ApiError
+                {
+                    Message = result.Message,
+                    Details = result.Errors,
+                    ErrorCode = "REGISTRATION_ERROR"
+                });
+            }
+
+            var response = new AuthResponse
+            {
+                Success = true,
+                Message = result.Message,
+                AccessToken = result.Token,
+                RefreshToken = result.RefreshToken,
+                ExpiresAt = result.ExpiresAt,
+                Endpoint = "registro"
+            };
+
+            if (result.User != null)
+            {
+                response.User = new UserInfo
+                {
+                    Id = result.User.Id,
+                    Email = result.User.Email,
+                    Nome = result.User.Nome,
+                    Roles = result.User.Roles
+                };
+            }
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao registrar usuário: {Email}", request.Email);
+            return StatusCode(500, new ApiError
+            {
+                Message = "Erro interno do servidor",
+                ErrorCode = "INTERNAL_ERROR"
             });
         }
-
-        return Ok(new AuthResponse 
-        { 
-            Success = true,
-            Message = "Usuário registrado com sucesso!",
-            Endpoint = "registro"
-        });
     }
 
     /// <summary>
     /// Autentica um usuário no sistema
     /// </summary>
-    /// <param name="model">Credenciais do usuário</param>
+    /// <param name="request">Credenciais do usuário</param>
     /// <returns>Token de autenticação</returns>
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponse), 200)]
     [ProducesResponseType(typeof(ApiError), 401)]
-    public IActionResult Login([FromBody] LoginRequest model)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        if (!ModelState.IsValid)
+        try
         {
-            return BadRequest(new ApiError 
-            { 
-                Message = "Dados inválidos",
-                Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiError
+                {
+                    Message = "Dados inválidos",
+                    Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage),
+                    ErrorCode = "VALIDATION_ERROR"
+                });
+            }
+
+            var loginDto = new LoginRequestDto
+            {
+                Email = request.Email,
+                Senha = request.Senha
+            };
+
+            var result = await _authService.LoginAsync(loginDto);
+
+            if (!result.Success)
+            {
+                return Unauthorized(new ApiError
+                {
+                    Message = result.Message,
+                    Details = result.Errors,
+                    ErrorCode = "AUTHENTICATION_ERROR"
+                });
+            }
+
+            var response = new AuthResponse
+            {
+                Success = true,
+                Message = result.Message,
+                AccessToken = result.Token,
+                RefreshToken = result.RefreshToken,
+                ExpiresAt = result.ExpiresAt,
+                Endpoint = "login"
+            };
+
+            if (result.User != null)
+            {
+                response.User = new UserInfo
+                {
+                    Id = result.User.Id,
+                    Email = result.User.Email,
+                    Nome = result.User.Nome,
+                    Roles = result.User.Roles
+                };
+            }
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao fazer login: {Email}", request.Email);
+            return StatusCode(500, new ApiError
+            {
+                Message = "Erro interno do servidor",
+                ErrorCode = "INTERNAL_ERROR"
             });
         }
-
-        return Ok(new AuthResponse 
-        { 
-            Success = true,
-            Message = "Login realizado com sucesso!",
-            Endpoint = "login"
-        });
     }
 
     /// <summary>
     /// Renova o token de autenticação
     /// </summary>
-    /// <param name="model">Token de refresh</param>
+    /// <param name="request">Token de refresh</param>
     /// <returns>Novo token de autenticação</returns>
     [HttpPost("refresh-token")]
     [ProducesResponseType(typeof(AuthResponse), 200)]
     [ProducesResponseType(typeof(ApiError), 401)]
-    public IActionResult RefreshToken([FromBody] RefreshTokenRequest model)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
-        if (!ModelState.IsValid)
+        try
         {
-            return BadRequest(new ApiError 
-            { 
-                Message = "Dados inválidos",
-                Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiError
+                {
+                    Message = "Dados inválidos",
+                    Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage),
+                    ErrorCode = "VALIDATION_ERROR"
+                });
+            }
+
+            var refreshDto = new RefreshTokenRequestDto
+            {
+                RefreshToken = request.RefreshToken
+            };
+
+            var result = await _authService.RefreshTokenAsync(refreshDto);
+
+            if (!result.Success)
+            {
+                return Unauthorized(new ApiError
+                {
+                    Message = result.Message,
+                    Details = result.Errors,
+                    ErrorCode = "TOKEN_REFRESH_ERROR"
+                });
+            }
+
+            var response = new AuthResponse
+            {
+                Success = true,
+                Message = result.Message,
+                AccessToken = result.Token,
+                RefreshToken = result.RefreshToken,
+                ExpiresAt = result.ExpiresAt,
+                Endpoint = "refresh-token"
+            };
+
+            if (result.User != null)
+            {
+                response.User = new UserInfo
+                {
+                    Id = result.User.Id,
+                    Email = result.User.Email,
+                    Nome = result.User.Nome,
+                    Roles = result.User.Roles
+                };
+            }
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao renovar token");
+            return StatusCode(500, new ApiError
+            {
+                Message = "Erro interno do servidor",
+                ErrorCode = "INTERNAL_ERROR"
             });
         }
-
-        return Ok(new AuthResponse 
-        { 
-            Success = true,
-            Message = "Token renovado com sucesso!",
-            Endpoint = "refresh-token"
-        });
     }
 }
-
-#region DTOs
-
-public class RegistroRequest
-{
-    /// <summary>
-    /// Nome do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Nome é obrigatório")]
-    [StringLength(100, ErrorMessage = "Nome deve ter no máximo 100 caracteres")]
-    public string Nome { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Email do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Email é obrigatório")]
-    [EmailAddress(ErrorMessage = "Email inválido")]
-    public string Email { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Senha do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Senha é obrigatória")]
-    [StringLength(100, MinimumLength = 6, ErrorMessage = "Senha deve ter entre 6 e 100 caracteres")]
-    public string Senha { get; set; } = string.Empty;
-}
-
-public class LoginRequest
-{
-    /// <summary>
-    /// Email do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Email é obrigatório")]
-    [EmailAddress(ErrorMessage = "Email inválido")]
-    public string Email { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Senha do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Senha é obrigatória")]
-    public string Senha { get; set; } = string.Empty;
-}
-
-public class RefreshTokenRequest
-{
-    /// <summary>
-    /// Token de refresh
-    /// </summary>
-    [Required(ErrorMessage = "Token de refresh é obrigatório")]
-    public string RefreshToken { get; set; } = string.Empty;
-}
-
-public class AuthResponse
-{
-    /// <summary>
-    /// Indica se a operação foi bem-sucedida
-    /// </summary>
-    public bool Success { get; set; }
-
-    /// <summary>
-    /// Mensagem da resposta
-    /// </summary>
-    public string Message { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Endpoint chamado (para teste)
-    /// </summary>
-    public string Endpoint { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Token de acesso JWT
-    /// </summary>
-    public string? AccessToken { get; set; }
-
-    /// <summary>
-    /// Token de refresh
-    /// </summary>
-    public string? RefreshToken { get; set; }
-
-    /// <summary>
-    /// Data de expiração do token
-    /// </summary>
-    public DateTime? ExpiresAt { get; set; }
-}
-
-public class ApiError
-{
-    /// <summary>
-    /// Mensagem de erro
-    /// </summary>
-    public string Message { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Detalhes do erro
-    /// </summary>
-    public IEnumerable<string>? Details { get; set; }
-}
-
-#endregion
