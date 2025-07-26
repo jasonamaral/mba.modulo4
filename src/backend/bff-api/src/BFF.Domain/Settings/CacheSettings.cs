@@ -1,4 +1,4 @@
-namespace BFF.API.Settings;
+namespace BFF.Domain.Settings;
 
 public class CacheSettings
 {
