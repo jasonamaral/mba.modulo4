@@ -28,84 +28,65 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 A plataforma é composta por **5 microserviços independentes** + **1 BFF** + **1 Frontend**, cada um com seu próprio banco de dados e responsabilidades específicas:
 
 ```mermaid
-graph TB
-    subgraph "Frontend"
-        Angular[Angular 18 SPA<br/>Porta: 4200]
+flowchart TD
+    %% NÍVEL 1: FRONT
+    subgraph Front["🖥️ Front"]
+        Frontend[🌐 Angular 18 SPA<br/>📍 Porta: 4200]
     end
     
-    subgraph "Backend for Frontend"
-        BFF[BFF API<br/>porta: 5000<br/>Clean Architecture]
+    %% NÍVEL 2: BFF
+    subgraph BFF_Layer["🔗 BFF"]
+        BFF[🔗 BFF API<br/>📍 Porta: 5000<br/>🏗️ Gateway]
     end
     
-    subgraph "Microserviços - Clean Architecture"
-        subgraph "Auth API (5001/7001)"
-            AuthAPI[API Layer]
-            AuthApp[Application Layer]
-            AuthDomain[Domain Layer]
-            AuthInfra[Infrastructure Layer]
-        end
-        
-        subgraph "Conteudo API (5002/7002)"
-            ConteudoAPI[API Layer]
-            ConteudoApp[Application Layer]
-            ConteudoDomain[Domain Layer]
-            ConteudoInfra[Infrastructure Layer]
-        end
-        
-        subgraph "Alunos API (5003/7003)"
-            AlunosAPI[API Layer]
-            AlunosApp[Application Layer]
-            AlunosDomain[Domain Layer]
-            AlunosInfra[Infrastructure Layer]
-        end
-        
-        subgraph "Pagamentos API (5004/7004)"
-            PagamentosAPI[API Layer]
-            PagamentosApp[Application Layer]
-            PagamentosDomain[Domain Layer]
-            PagamentosInfra[Infrastructure Layer]
-        end
+    %% NÍVEL 3: MICROSERVIÇOS
+    subgraph Microservicos["🚀 Microserviços"]
+        Auth[🔐 Auth API<br/>📍 5001/7001<br/>🔑 Autenticação]
+        Conteudo[📚 Conteudo API<br/>📍 5002/7002<br/>📖 Cursos & Aulas]
+        Alunos[🎓 Alunos API<br/>📍 5003/7003<br/>👨‍🎓 Matrículas]
+        Pagamentos[💳 Pagamentos API<br/>📍 5004/7004<br/>💰 Transações]
     end
     
-    subgraph "Infraestrutura"
-        RabbitMQ[RabbitMQ<br/>porta: 5672/15672]
-        SQLServer[SQL Server<br/>porta: 1433]
-        Redis[Redis<br/>porta: 6379]
+    %% NÍVEL 4: INFRAESTRUTURA
+    subgraph Infra["🏗️ Infra"]
+        RabbitMQ[🐰 RabbitMQ<br/>📍 5672/15672<br/>📨 Message Broker]
+        SQLServer[🗄️ SQL Server<br/>📍 1433<br/>💾 Database]
+        Redis[🔴 Redis<br/>📍 6379<br/>⚡ Cache]
     end
     
-    Angular --> BFF
+    %% CONEXÕES ENTRE NÍVEIS
+    Frontend --> BFF
     
-    BFF --> AuthAPI
-    BFF --> ConteudoAPI
-    BFF --> AlunosAPI
-    BFF --> PagamentosAPI
+    BFF --> Auth
+    BFF --> Conteudo
+    BFF --> Alunos
+    BFF --> Pagamentos
     
-    AuthAPI --> AuthApp
-    AuthApp --> AuthDomain
-    AuthInfra --> AuthDomain
-    
-    ConteudoAPI --> ConteudoApp
-    ConteudoApp --> ConteudoDomain
-    ConteudoInfra --> ConteudoDomain
-    
-    AlunosAPI --> AlunosApp
-    AlunosApp --> AlunosDomain
-    AlunosInfra --> AlunosDomain
-    
-    PagamentosAPI --> PagamentosApp
-    PagamentosApp --> PagamentosDomain
-    PagamentosInfra --> PagamentosDomain
-    
-    PagamentosInfra --> RabbitMQ
-    AlunosInfra --> RabbitMQ
-    AuthInfra --> RabbitMQ
-    
-    AuthInfra --> SQLServer
-    ConteudoInfra --> SQLServer
-    AlunosInfra --> SQLServer
-    PagamentosInfra --> SQLServer
-    
+    Auth --> RabbitMQ
+    Auth --> SQLServer
+    Conteudo --> SQLServer
+    Alunos --> RabbitMQ
+    Alunos --> SQLServer
+    Pagamentos --> RabbitMQ
+    Pagamentos --> SQLServer
     BFF --> Redis
+    
+    %% ESTILOS DOS SUBGRAFOS
+    classDef frontGroup fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    classDef bffGroup fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+    classDef microGroup fill:#e8f5e8,stroke:#388e3c,stroke-width:3px
+    classDef infraGroup fill:#fff3e0,stroke:#f57c00,stroke-width:3px
+    
+    %% ESTILOS DOS NÓDULOS
+    classDef frontend fill:#bbdefb,stroke:#1976d2,stroke-width:2px,color:#000
+    classDef bff fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef microservice fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef infrastructure fill:#ffe0b2,stroke:#f57c00,stroke-width:2px,color:#000
+    
+    class Frontend frontend
+    class BFF bff
+    class Auth,Conteudo,Alunos,Pagamentos microservice
+    class RabbitMQ,SQLServer,Redis infrastructure
 ```
 
 ### Princípios Arquiteturais
