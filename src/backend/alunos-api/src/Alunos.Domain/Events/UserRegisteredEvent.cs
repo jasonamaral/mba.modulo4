@@ -5,7 +5,11 @@ namespace Alunos.Domain.Events;
 /// </summary>
 public class UserRegisteredEvent
 {
-    public UserRegisteredEvent(Guid userId, string email, string nome, DateTime dataNascimento, bool ehAdministrador, DateTime dataCadastro)
+    public UserRegisteredEvent()
+    {
+    }
+
+    public UserRegisteredEvent(string userId, string email, string nome, DateTime dataNascimento, bool ehAdministrador, DateTime dataCadastro)
     {
         UserId = userId;
         Email = email;
@@ -18,7 +22,7 @@ public class UserRegisteredEvent
     /// <summary>
     /// ID do usuário no sistema de autenticação
     /// </summary>
-    public Guid UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
 
     /// <summary>
     /// Email do usuário

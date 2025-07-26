@@ -1,7 +1,10 @@
 using Auth.API.Extensions;
 using Auth.Application.Interfaces;
 using Auth.Application.Services;
+using Auth.Application.Settings;
+using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
+using Auth.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -63,6 +66,8 @@ builder.Services.AddAuthentication(options =>
 
 // Application Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEventPublisher, EventPublisher>();
+builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
 
 // Controllers
 builder.Services.AddControllers();

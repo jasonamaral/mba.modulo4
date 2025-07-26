@@ -1,9 +1,11 @@
+using Auth.Application.Interfaces;
+using Auth.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Infrastructure.Data;
 
-public class AuthDbContext : IdentityDbContext<ApplicationUser>
+public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
     {

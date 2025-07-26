@@ -32,7 +32,8 @@ public class UserRegisteredEventHandler
             _logger.LogInformation("Processando evento UserRegistered para usuário: {UserId}", evento.UserId);
 
             // Verificar se já existe um aluno com este código de usuário
-            var alunoExistente = await _alunoRepository.GetByCodigoUsuarioAsync(evento.UserId);
+            var userIdGuid = Guid.Parse(evento.UserId);
+            var alunoExistente = await _alunoRepository.GetByCodigoUsuarioAsync(userIdGuid);
             if (alunoExistente != null)
             {
                 _logger.LogWarning("Aluno já existe para o usuário: {UserId}", evento.UserId);
@@ -41,7 +42,7 @@ public class UserRegisteredEventHandler
 
             // Criar novo perfil de aluno
             var novoAluno = new Aluno(
-                codigoUsuarioAutenticacao: evento.UserId,
+                codigoUsuarioAutenticacao: userIdGuid,
                 nome: evento.Nome,
                 email: evento.Email,
                 dataNascimento: evento.DataNascimento

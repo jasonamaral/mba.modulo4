@@ -1,6 +1,8 @@
 using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
-using Auth.Infrastructure.Data;
+using Auth.Application.Settings;
+using Auth.Domain.Entities;
+using Auth.Domain.Events;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,20 +18,23 @@ namespace Auth.Application.Services;
 public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly AuthDbContext _context;
+    private readonly IAuthDbContext _context;
     private readonly ILogger<AuthService> _logger;
     private readonly JwtSettings _jwtSettings;
+    private readonly IEventPublisher _eventPublisher;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
-        AuthDbContext context,
+        IAuthDbContext context,
         ILogger<AuthService> logger,
-        IOptions<JwtSettings> jwtSettings)
+        IOptions<JwtSettings> jwtSettings,
+        IEventPublisher eventPublisher)
     {
         _userManager = userManager;
         _context = context;
         _logger = logger;
         _jwtSettings = jwtSettings.Value;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
@@ -75,11 +80,20 @@ public class AuthService : IAuthService
             var roleName = request.EhAdministrador ? "Administrador" : "Usuario";
             await _userManager.AddToRoleAsync(user, roleName);
 
-            // TODO: Publicar evento para criar perfil do aluno (se não for administrador)
+            // Publicar evento para criar perfil do aluno (se não for administrador)
             if (!request.EhAdministrador)
             {
-                // var userRegisteredEvent = new Auth.Domain.Events.UserRegisteredEvent(...);
-                // await _eventPublisher.PublishAsync(userRegisteredEvent);
+                var userRegisteredEvent = new UserRegisteredEvent
+                {
+                    UserId = user.Id,
+                    Email = user.Email ?? "",
+                    Nome = user.Nome,
+                    DataNascimento = user.DataNascimento,
+                    DataCadastro = user.DataCadastro,
+                    EhAdministrador = request.EhAdministrador
+                };
+                
+                await _eventPublisher.PublishAsync(userRegisteredEvent);
             }
 
             // Gerar tokens
