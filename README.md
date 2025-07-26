@@ -28,84 +28,92 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 A plataforma é composta por **5 microserviços independentes** + **1 BFF** + **1 Frontend**, cada um com seu próprio banco de dados e responsabilidades específicas:
 
 ```mermaid
-graph TB
-    subgraph "Frontend"
-        Angular[Angular 18 SPA<br/>Porta: 4200]
+flowchart TD
+    %% NÍVEL 1: FRONT
+    subgraph Front["🖥️ Front"]
+        Frontend[🌐 Angular 18 SPA<br/>📍 Porta: 4200]
     end
     
-    subgraph "Backend for Frontend"
-        BFF[BFF API<br/>porta: 5000<br/>Clean Architecture]
+    %% NÍVEL 2: BFF
+    subgraph BFF_Layer["🔗 BFF"]
+        BFF[🔗 BFF API<br/>📍 Porta: 5000<br/>🏗️ Gateway]
     end
     
-    subgraph "Microserviços - Clean Architecture"
-        subgraph "Auth API (5001/7001)"
-            AuthAPI[API Layer]
-            AuthApp[Application Layer]
-            AuthDomain[Domain Layer]
-            AuthInfra[Infrastructure Layer]
-        end
+    %% NÍVEL 3: MICROSERVIÇOS EM COLUNAS ALINHADAS
+    subgraph Microservicos["🚀 Microserviços"]
+        Auth[🔐 Auth API<br/>📍 5001/7001<br/>🔑 Autenticação]
+        Conteudo[📚 Conteudo API<br/>📍 5002/7002<br/>📖 Cursos & Aulas]
+        Alunos[🎓 Alunos API<br/>📍 5003/7003<br/>👨‍🎓 Matrículas]
+        Pagamentos[💳 Pagamentos API<br/>📍 5004/7004<br/>💰 Transações]
+    end
+    
+    %% NÍVEL 4: INFRAESTRUTURA ALINHADA VERTICALMENTE
+    subgraph Infra["🏗️ Infra"]
+        AuthDB[🗄️ Auth DB<br/>📍 SQL Server]
+        ConteudoDB[🗄️ Conteudo DB<br/>📍 SQL Server]
+        AlunosDB[🗄️ Alunos DB<br/>📍 SQL Server]
+        PagamentosDB[🗄️ Pagamentos DB<br/>📍 SQL Server]
         
-        subgraph "Conteudo API (5002/7002)"
-            ConteudoAPI[API Layer]
-            ConteudoApp[Application Layer]
-            ConteudoDomain[Domain Layer]
-            ConteudoInfra[Infrastructure Layer]
-        end
+        AuthMQ[🐰 Auth MQ<br/>📍 RabbitMQ]
+        AlunosMQ[🐰 Alunos MQ<br/>📍 RabbitMQ]
+        PagamentosMQ[🐰 Pagamentos MQ<br/>📍 RabbitMQ]
         
-        subgraph "Alunos API (5003/7003)"
-            AlunosAPI[API Layer]
-            AlunosApp[Application Layer]
-            AlunosDomain[Domain Layer]
-            AlunosInfra[Infrastructure Layer]
-        end
-        
-        subgraph "Pagamentos API (5004/7004)"
-            PagamentosAPI[API Layer]
-            PagamentosApp[Application Layer]
-            PagamentosDomain[Domain Layer]
-            PagamentosInfra[Infrastructure Layer]
-        end
+        Cache[🔴 Redis<br/>📍 6379<br/>⚡ Cache]
     end
     
-    subgraph "Infraestrutura"
-        RabbitMQ[RabbitMQ<br/>porta: 5672/15672]
-        SQLServer[SQL Server<br/>porta: 1433]
-        Redis[Redis<br/>porta: 6379]
-    end
+    %% CONEXÕES PRINCIPAIS (RETAS)
+    Frontend --> BFF
     
-    Angular --> BFF
+    BFF --> Auth
+    BFF --> Conteudo
+    BFF --> Alunos
+    BFF --> Pagamentos
     
-    BFF --> AuthAPI
-    BFF --> ConteudoAPI
-    BFF --> AlunosAPI
-    BFF --> PagamentosAPI
+    %% CONEXÕES DIRETAS E RETAS (SEM SOBREPOSIÇÃO)
+    Auth --> AuthDB
+    Auth --> AuthMQ
     
-    AuthAPI --> AuthApp
-    AuthApp --> AuthDomain
-    AuthInfra --> AuthDomain
+    Conteudo --> ConteudoDB
     
-    ConteudoAPI --> ConteudoApp
-    ConteudoApp --> ConteudoDomain
-    ConteudoInfra --> ConteudoDomain
+    Alunos --> AlunosDB
+    Alunos --> AlunosMQ
     
-    AlunosAPI --> AlunosApp
-    AlunosApp --> AlunosDomain
-    AlunosInfra --> AlunosDomain
+    Pagamentos --> PagamentosDB
+    Pagamentos --> PagamentosMQ
     
-    PagamentosAPI --> PagamentosApp
-    PagamentosApp --> PagamentosDomain
-    PagamentosInfra --> PagamentosDomain
+    BFF --> Cache
     
-    PagamentosInfra --> RabbitMQ
-    AlunosInfra --> RabbitMQ
-    AuthInfra --> RabbitMQ
+    %% ESTILOS DOS SUBGRAFOS
+    classDef frontGroup fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    classDef bffGroup fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+    classDef microGroup fill:#e8f5e8,stroke:#388e3c,stroke-width:3px
+    classDef infraGroup fill:#fff3e0,stroke:#f57c00,stroke-width:3px
     
-    AuthInfra --> SQLServer
-    ConteudoInfra --> SQLServer
-    AlunosInfra --> SQLServer
-    PagamentosInfra --> SQLServer
+    %% ESTILOS DOS NÓDULOS
+    classDef frontend fill:#bbdefb,stroke:#1976d2,stroke-width:2px,color:#000
+    classDef bff fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef microservice fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef infrastructure fill:#ffe0b2,stroke:#f57c00,stroke-width:2px,color:#000
     
-    BFF --> Redis
+    %% ESTILOS DAS CONEXÕES (CORES DISTINTAS)
+    linkStyle 0 stroke:#1976d2,stroke-width:3px
+    linkStyle 1 stroke:#e91e63,stroke-width:2px
+    linkStyle 2 stroke:#4caf50,stroke-width:2px
+    linkStyle 3 stroke:#2196f3,stroke-width:2px
+    linkStyle 4 stroke:#ff9800,stroke-width:2px
+    linkStyle 5 stroke:#e91e63,stroke-width:2px
+    linkStyle 6 stroke:#ff6b6b,stroke-width:2px
+    linkStyle 7 stroke:#4caf50,stroke-width:2px
+    linkStyle 8 stroke:#2196f3,stroke-width:2px
+    linkStyle 9 stroke:#42a5f5,stroke-width:2px
+    linkStyle 10 stroke:#ff9800,stroke-width:2px
+    linkStyle 11 stroke:#ffa726,stroke-width:2px
+    linkStyle 12 stroke:#9c27b0,stroke-width:2px
+    
+    class Frontend frontend
+    class BFF bff
+    class Auth,Conteudo,Alunos,Pagamentos microservice
+    class AuthDB,ConteudoDB,AlunosDB,PagamentosDB,AuthMQ,AlunosMQ,PagamentosMQ,Cache infrastructure
 ```
 
 ### Princípios Arquiteturais
@@ -387,11 +395,6 @@ docker-compose up -d auth-api
 
 ## 📊 Monitoramento
 
-### Verificar Status do Sistema
-```powershell
-.\scripts\status.ps1
-```
-
 ### Logs dos Serviços
 ```bash
 # Ver todos os logs
@@ -514,17 +517,6 @@ docker-compose restart auth-api alunos-api pagamentos-api
 # http://localhost:7004/swagger (Pagamentos API)
 ```
 
-## 📈 Performance e Escalabilidade
-
-### Configurações de Produção
-```bash
-# Configurar para produção
-export ASPNETCORE_ENVIRONMENT=Production
-
-# Escalar serviços
-docker-compose up -d --scale auth-api=2 --scale alunos-api=2
-```
-
 ### Monitoramento de Recursos
 ```bash
 # Ver uso detalhado
@@ -629,30 +621,6 @@ mba.modulo4/
 - **Domain Events**: Eventos de domínio publicados
 - **Event Handlers**: Processamento de eventos
 
-## 📚 Documentação Adicional
-
-- [Arquitetura de Microserviços](docs/arquitetura-microsservicos.md)
-- [Diagrama de Banco de Dados](docs/diagrama-banco-dados.md)
-- [Guia de Desenvolvimento](docs/desenvolvimento-passo-a-passo.md)
-
 ## 📝 Licença
 
 Este projeto é para fins educacionais (MBA DevXpert - Módulo 4).
-
----
-
-## ✅ Quick Start Checklist
-
-- [ ] Docker Desktop instalado e rodando
-- [ ] Repositório clonado
-- [ ] Executar `.\scripts\start-all.ps1`
-- [ ] Aguardar ~5 minutos
-- [ ] Acessar http://localhost:4200
-- [ ] Verificar http://localhost:15672 (RabbitMQ)
-- [ ] Testar APIs via Swagger
-
-**🎉 Se chegou até aqui, sua Plataforma Educacional está rodando!**
-
----
-
-**Desenvolvido com ❤️ para o MBA DevXpert - Módulo 4** 

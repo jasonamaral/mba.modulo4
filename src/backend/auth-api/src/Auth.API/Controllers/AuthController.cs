@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
+using Auth.Application.DTOs;
+using Auth.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.API.Controllers;
 
@@ -9,183 +10,148 @@ namespace Auth.API.Controllers;
 [Produces("application/json")]
 public class AuthController : ControllerBase
 {
+    private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
+
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+    {
+        _authService = authService;
+        _logger = logger;
+    }
+
     /// <summary>
     /// Registra um novo usuário no sistema
     /// </summary>
-    /// <param name="model">Dados do usuário para registro</param>
-    /// <returns>Confirmação de registro</returns>
+    /// <param name="request">Dados do usuário para registro</param>
+    /// <returns>Confirmação de registro com tokens</returns>
     [HttpPost("registro")]
-    [ProducesResponseType(typeof(AuthResponse), 200)]
-    [ProducesResponseType(typeof(ApiError), 400)]
-    public IActionResult Registro([FromBody] RegistroRequest model)
+    [ProducesResponseType(typeof(AuthResponseDto), 200)]
+    [ProducesResponseType(typeof(AuthResponseDto), 400)]
+    public async Task<IActionResult> Registro([FromBody] RegisterRequestDto request)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new ApiError 
+            return BadRequest(new AuthResponseDto 
             { 
+                Success = false,
                 Message = "Dados inválidos",
-                Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                Errors = [.. ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)]
             });
         }
 
-        return Ok(new AuthResponse 
-        { 
-            Success = true,
-            Message = "Usuário registrado com sucesso!",
-            Endpoint = "registro"
-        });
+        var result = await _authService.RegisterAsync(request);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+
+        return BadRequest(result);
     }
 
     /// <summary>
     /// Autentica um usuário no sistema
     /// </summary>
-    /// <param name="model">Credenciais do usuário</param>
+    /// <param name="request">Credenciais do usuário</param>
     /// <returns>Token de autenticação</returns>
     [HttpPost("login")]
-    [ProducesResponseType(typeof(AuthResponse), 200)]
-    [ProducesResponseType(typeof(ApiError), 401)]
-    public IActionResult Login([FromBody] LoginRequest model)
+    [ProducesResponseType(typeof(AuthResponseDto), 200)]
+    [ProducesResponseType(typeof(AuthResponseDto), 401)]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new ApiError 
+            return BadRequest(new AuthResponseDto 
             { 
+                Success = false,
                 Message = "Dados inválidos",
-                Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                Errors = [.. ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)]
             });
         }
 
-        return Ok(new AuthResponse 
-        { 
-            Success = true,
-            Message = "Login realizado com sucesso!",
-            Endpoint = "login"
-        });
+        var result = await _authService.LoginAsync(request);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+
+        return Unauthorized(result);
     }
 
     /// <summary>
     /// Renova o token de autenticação
     /// </summary>
-    /// <param name="model">Token de refresh</param>
+    /// <param name="request">Token de refresh</param>
     /// <returns>Novo token de autenticação</returns>
     [HttpPost("refresh-token")]
-    [ProducesResponseType(typeof(AuthResponse), 200)]
-    [ProducesResponseType(typeof(ApiError), 401)]
-    public IActionResult RefreshToken([FromBody] RefreshTokenRequest model)
+    [ProducesResponseType(typeof(AuthResponseDto), 200)]
+    [ProducesResponseType(typeof(AuthResponseDto), 401)]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new ApiError 
+            return BadRequest(new AuthResponseDto 
             { 
+                Success = false,
                 Message = "Dados inválidos",
-                Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
             });
         }
 
-        return Ok(new AuthResponse 
-        { 
-            Success = true,
-            Message = "Token renovado com sucesso!",
-            Endpoint = "refresh-token"
-        });
+        var result = await _authService.RefreshTokenAsync(request);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+
+        return Unauthorized(result);
+    }
+
+    /// <summary>
+    /// Faz logout do usuário
+    /// </summary>
+    /// <returns>Confirmação de logout</returns>
+    [HttpPost("logout")]
+    [Authorize]
+    [ProducesResponseType(200)]
+    public async Task<IActionResult> Logout()
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userId))
+        {
+            return BadRequest(new { Message = "Usuário não identificado" });
+        }
+
+        var result = await _authService.LogoutAsync(userId);
+        
+        if (result)
+        {
+            return Ok(new { Message = "Logout realizado com sucesso" });
+        }
+
+        return BadRequest(new { Message = "Erro ao realizar logout" });
+    }
+
+    /// <summary>
+    /// Valida um token JWT
+    /// </summary>
+    /// <param name="token">Token a ser validado</param>
+    /// <returns>Resultado da validação</returns>
+    [HttpPost("validate-token")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(401)]
+    public async Task<IActionResult> ValidateToken([FromBody] string token)
+    {
+        var isValid = await _authService.ValidateTokenAsync(token);
+        
+        if (isValid)
+        {
+            return Ok(new { Valid = true, Message = "Token válido" });
+        }
+
+        return Unauthorized(new { Valid = false, Message = "Token inválido" });
     }
 }
-
-#region DTOs
-
-public class RegistroRequest
-{
-    /// <summary>
-    /// Nome do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Nome é obrigatório")]
-    [StringLength(100, ErrorMessage = "Nome deve ter no máximo 100 caracteres")]
-    public string Nome { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Email do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Email é obrigatório")]
-    [EmailAddress(ErrorMessage = "Email inválido")]
-    public string Email { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Senha do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Senha é obrigatória")]
-    [StringLength(100, MinimumLength = 6, ErrorMessage = "Senha deve ter entre 6 e 100 caracteres")]
-    public string Senha { get; set; } = string.Empty;
-}
-
-public class LoginRequest
-{
-    /// <summary>
-    /// Email do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Email é obrigatório")]
-    [EmailAddress(ErrorMessage = "Email inválido")]
-    public string Email { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Senha do usuário
-    /// </summary>
-    [Required(ErrorMessage = "Senha é obrigatória")]
-    public string Senha { get; set; } = string.Empty;
-}
-
-public class RefreshTokenRequest
-{
-    /// <summary>
-    /// Token de refresh
-    /// </summary>
-    [Required(ErrorMessage = "Token de refresh é obrigatório")]
-    public string RefreshToken { get; set; } = string.Empty;
-}
-
-public class AuthResponse
-{
-    /// <summary>
-    /// Indica se a operação foi bem-sucedida
-    /// </summary>
-    public bool Success { get; set; }
-
-    /// <summary>
-    /// Mensagem da resposta
-    /// </summary>
-    public string Message { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Endpoint chamado (para teste)
-    /// </summary>
-    public string Endpoint { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Token de acesso JWT
-    /// </summary>
-    public string? AccessToken { get; set; }
-
-    /// <summary>
-    /// Token de refresh
-    /// </summary>
-    public string? RefreshToken { get; set; }
-
-    /// <summary>
-    /// Data de expiração do token
-    /// </summary>
-    public DateTime? ExpiresAt { get; set; }
-}
-
-public class ApiError
-{
-    /// <summary>
-    /// Mensagem de erro
-    /// </summary>
-    public string Message { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Detalhes do erro
-    /// </summary>
-    public IEnumerable<string>? Details { get; set; }
-}
-
-#endregion
