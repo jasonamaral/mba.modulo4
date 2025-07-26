@@ -39,7 +39,7 @@ flowchart TD
         BFF[🔗 BFF API<br/>📍 Porta: 5000<br/>🏗️ Gateway]
     end
     
-    %% NÍVEL 3: MICROSERVIÇOS
+    %% NÍVEL 3: MICROSERVIÇOS EM COLUNAS ALINHADAS
     subgraph Microservicos["🚀 Microserviços"]
         Auth[🔐 Auth API<br/>📍 5001/7001<br/>🔑 Autenticação]
         Conteudo[📚 Conteudo API<br/>📍 5002/7002<br/>📖 Cursos & Aulas]
@@ -47,14 +47,21 @@ flowchart TD
         Pagamentos[💳 Pagamentos API<br/>📍 5004/7004<br/>💰 Transações]
     end
     
-    %% NÍVEL 4: INFRAESTRUTURA
+    %% NÍVEL 4: INFRAESTRUTURA ALINHADA VERTICALMENTE
     subgraph Infra["🏗️ Infra"]
-        RabbitMQ[🐰 RabbitMQ<br/>📍 5672/15672<br/>📨 Message Broker]
-        SQLServer[🗄️ SQL Server<br/>📍 1433<br/>💾 Database]
-        Redis[🔴 Redis<br/>📍 6379<br/>⚡ Cache]
+        AuthDB[🗄️ Auth DB<br/>📍 SQL Server]
+        ConteudoDB[🗄️ Conteudo DB<br/>📍 SQL Server]
+        AlunosDB[🗄️ Alunos DB<br/>📍 SQL Server]
+        PagamentosDB[🗄️ Pagamentos DB<br/>📍 SQL Server]
+        
+        AuthMQ[🐰 Auth MQ<br/>📍 RabbitMQ]
+        AlunosMQ[🐰 Alunos MQ<br/>📍 RabbitMQ]
+        PagamentosMQ[🐰 Pagamentos MQ<br/>📍 RabbitMQ]
+        
+        Cache[🔴 Redis<br/>📍 6379<br/>⚡ Cache]
     end
     
-    %% CONEXÕES ENTRE NÍVEIS
+    %% CONEXÕES PRINCIPAIS (RETAS)
     Frontend --> BFF
     
     BFF --> Auth
@@ -62,14 +69,19 @@ flowchart TD
     BFF --> Alunos
     BFF --> Pagamentos
     
-    Auth --> RabbitMQ
-    Auth --> SQLServer
-    Conteudo --> SQLServer
-    Alunos --> RabbitMQ
-    Alunos --> SQLServer
-    Pagamentos --> RabbitMQ
-    Pagamentos --> SQLServer
-    BFF --> Redis
+    %% CONEXÕES DIRETAS E RETAS (SEM SOBREPOSIÇÃO)
+    Auth --> AuthDB
+    Auth --> AuthMQ
+    
+    Conteudo --> ConteudoDB
+    
+    Alunos --> AlunosDB
+    Alunos --> AlunosMQ
+    
+    Pagamentos --> PagamentosDB
+    Pagamentos --> PagamentosMQ
+    
+    BFF --> Cache
     
     %% ESTILOS DOS SUBGRAFOS
     classDef frontGroup fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
@@ -83,10 +95,25 @@ flowchart TD
     classDef microservice fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
     classDef infrastructure fill:#ffe0b2,stroke:#f57c00,stroke-width:2px,color:#000
     
+    %% ESTILOS DAS CONEXÕES (CORES DISTINTAS)
+    linkStyle 0 stroke:#1976d2,stroke-width:3px
+    linkStyle 1 stroke:#e91e63,stroke-width:2px
+    linkStyle 2 stroke:#4caf50,stroke-width:2px
+    linkStyle 3 stroke:#2196f3,stroke-width:2px
+    linkStyle 4 stroke:#ff9800,stroke-width:2px
+    linkStyle 5 stroke:#e91e63,stroke-width:2px
+    linkStyle 6 stroke:#ff6b6b,stroke-width:2px
+    linkStyle 7 stroke:#4caf50,stroke-width:2px
+    linkStyle 8 stroke:#2196f3,stroke-width:2px
+    linkStyle 9 stroke:#42a5f5,stroke-width:2px
+    linkStyle 10 stroke:#ff9800,stroke-width:2px
+    linkStyle 11 stroke:#ffa726,stroke-width:2px
+    linkStyle 12 stroke:#9c27b0,stroke-width:2px
+    
     class Frontend frontend
     class BFF bff
     class Auth,Conteudo,Alunos,Pagamentos microservice
-    class RabbitMQ,SQLServer,Redis infrastructure
+    class AuthDB,ConteudoDB,AlunosDB,PagamentosDB,AuthMQ,AlunosMQ,PagamentosMQ,Cache infrastructure
 ```
 
 ### Princípios Arquiteturais
