@@ -395,11 +395,6 @@ docker-compose up -d auth-api
 
 ## 📊 Monitoramento
 
-### Verificar Status do Sistema
-```powershell
-.\scripts\status.ps1
-```
-
 ### Logs dos Serviços
 ```bash
 # Ver todos os logs
@@ -522,17 +517,6 @@ docker-compose restart auth-api alunos-api pagamentos-api
 # http://localhost:7004/swagger (Pagamentos API)
 ```
 
-## 📈 Performance e Escalabilidade
-
-### Configurações de Produção
-```bash
-# Configurar para produção
-export ASPNETCORE_ENVIRONMENT=Production
-
-# Escalar serviços
-docker-compose up -d --scale auth-api=2 --scale alunos-api=2
-```
-
 ### Monitoramento de Recursos
 ```bash
 # Ver uso detalhado
@@ -637,30 +621,6 @@ mba.modulo4/
 - **Domain Events**: Eventos de domínio publicados
 - **Event Handlers**: Processamento de eventos
 
-## 📚 Documentação Adicional
-
-- [Arquitetura de Microserviços](docs/arquitetura-microsservicos.md)
-- [Diagrama de Banco de Dados](docs/diagrama-banco-dados.md)
-- [Guia de Desenvolvimento](docs/desenvolvimento-passo-a-passo.md)
-
 ## 📝 Licença
 
 Este projeto é para fins educacionais (MBA DevXpert - Módulo 4).
-
----
-
-## ✅ Quick Start Checklist
-
-- [ ] Docker Desktop instalado e rodando
-- [ ] Repositório clonado
-- [ ] Executar `.\scripts\start-all.ps1`
-- [ ] Aguardar ~5 minutos
-- [ ] Acessar http://localhost:4200
-- [ ] Verificar http://localhost:15672 (RabbitMQ)
-- [ ] Testar APIs via Swagger
-
-**🎉 Se chegou até aqui, sua Plataforma Educacional está rodando!**
-
----
-
-**Desenvolvido com ❤️ para o MBA DevXpert - Módulo 4** 
