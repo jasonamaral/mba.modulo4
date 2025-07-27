@@ -6,6 +6,7 @@ using Alunos.Application.Services;
 using Alunos.Infrastructure.Data;
 using Alunos.Infrastructure.Repositories;
 using Alunos.Infrastructure.Services;
+using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,23 +14,32 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 
-// Configurar Entity Framework
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? "Data Source=alunos.db";
+// Configurar Mapster
+TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
 
-builder.Services.AddDbContext<AlunosDbContext>(options =>
-    options.UseSqlite(connectionString));
+// Configurar Entity Framework - Configuração condicional baseada no ambiente
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var isDevelopment = builder.Environment.IsDevelopment();
 
-// Configurar Repositórios
+if (isDevelopment)
+{
+    // SQLite para desenvolvimento
+    builder.Services.AddDbContext<AlunosDbContext>(options =>
+        options.UseSqlite(connectionString ?? "Data Source=../../../../data/alunos-dev.db"));
+}
+else
+{
+    // SQL Server para produção
+    builder.Services.AddDbContext<AlunosDbContext>(options =>
+        options.UseSqlServer(connectionString ?? "Server=localhost;Database=AlunosDB;Trusted_Connection=true;TrustServerCertificate=true;"));
+}
+
 builder.Services.AddScoped<IAlunoRepository, AlunoRepository>();
 
-// Configurar Application Services
 builder.Services.AddScoped<IAlunoAppService, AlunoAppService>();
 
-// Configurar Swagger
 builder.Services.AddSwaggerConfiguration();
 
 // Configurar JWT
@@ -50,17 +60,34 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
             ClockSkew = TimeSpan.Zero
         };
+
+        // Adicionar eventos para debug
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Falha na autenticação: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("Token validado com sucesso");
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                Console.WriteLine($"Challenge: {context.Error}, {context.ErrorDescription}");
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
 
-// Configurar Event Handlers
 builder.Services.AddScoped<UserRegisteredEventHandler>();
 
-// Configurar Background Services
 builder.Services.AddHostedService<UserRegisteredEventConsumer>();
 
-// Configurar CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -71,12 +98,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configurar Health Check
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseSwaggerConfiguration();
 
 // Remover HTTPS redirection
@@ -89,7 +114,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Configurar Health Check
 app.MapHealthChecks("/health");
 
 // Inicializar banco de dados

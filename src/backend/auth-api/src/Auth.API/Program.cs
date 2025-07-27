@@ -10,18 +10,32 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configurações
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-// Entity Framework
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? "Data Source=auth.db";
+// Configurar Mapster
+TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
 
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseSqlite(connectionString));
+// Entity Framework - Configuração condicional baseada no ambiente
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var isDevelopment = builder.Environment.IsDevelopment();
+
+if (isDevelopment)
+{
+    // SQLite para desenvolvimento
+    builder.Services.AddDbContext<AuthDbContext>(options =>
+        options.UseSqlite(connectionString ?? "Data Source=../../../../data/auth-dev.db"));
+}
+else
+{
+    // SQL Server para produção
+    builder.Services.AddDbContext<AuthDbContext>(options =>
+        options.UseSqlServer(connectionString ?? "Server=localhost;Database=AuthDB;Trusted_Connection=true;TrustServerCertificate=true;"));
+}
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

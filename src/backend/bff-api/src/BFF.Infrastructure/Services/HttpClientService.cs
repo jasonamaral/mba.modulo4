@@ -22,7 +22,7 @@ public class HttpClientService : IHttpClientService
         _httpClient = httpClientFactory.CreateClient("ApiClient");
         _resilienceSettings = resilienceOptions.Value;
         _logger = logger;
-        
+
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -34,19 +34,16 @@ public class HttpClientService : IHttpClientService
     {
         try
         {
-            _logger.LogInformation("Fazendo requisição GET para: {Endpoint}", endpoint);
-            
             var response = await _httpClient.GetAsync(endpoint);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<T>(content, _jsonOptions);
             }
-            
-            _logger.LogWarning("Requisição GET falhou para {Endpoint}. Status: {StatusCode}", 
-                endpoint, response.StatusCode);
-            
+
+            _logger.LogWarning("Requisição GET falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
+
             return null;
         }
         catch (Exception ex)
@@ -56,28 +53,25 @@ public class HttpClientService : IHttpClientService
         }
     }
 
-    public async Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest request) 
-        where TRequest : class 
+    public async Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest request)
+        where TRequest : class
         where TResponse : class
     {
         try
         {
-            _logger.LogInformation("Fazendo requisição POST para: {Endpoint}", endpoint);
-            
             var json = JsonSerializer.Serialize(request, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            
+
             var response = await _httpClient.PostAsync(endpoint, content);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<TResponse>(responseContent, _jsonOptions);
             }
-            
-            _logger.LogWarning("Requisição POST falhou para {Endpoint}. Status: {StatusCode}", 
-                endpoint, response.StatusCode);
-            
+
+            _logger.LogWarning("Requisição POST falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
+
             return null;
         }
         catch (Exception ex)
@@ -87,28 +81,25 @@ public class HttpClientService : IHttpClientService
         }
     }
 
-    public async Task<TResponse?> PutAsync<TRequest, TResponse>(string endpoint, TRequest request) 
-        where TRequest : class 
+    public async Task<TResponse?> PutAsync<TRequest, TResponse>(string endpoint, TRequest request)
+        where TRequest : class
         where TResponse : class
     {
         try
         {
-            _logger.LogInformation("Fazendo requisição PUT para: {Endpoint}", endpoint);
-            
             var json = JsonSerializer.Serialize(request, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            
+
             var response = await _httpClient.PutAsync(endpoint, content);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<TResponse>(responseContent, _jsonOptions);
             }
-            
-            _logger.LogWarning("Requisição PUT falhou para {Endpoint}. Status: {StatusCode}", 
-                endpoint, response.StatusCode);
-            
+
+            _logger.LogWarning("Requisição PUT falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
+
             return null;
         }
         catch (Exception ex)
@@ -122,18 +113,15 @@ public class HttpClientService : IHttpClientService
     {
         try
         {
-            _logger.LogInformation("Fazendo requisição DELETE para: {Endpoint}", endpoint);
-            
             var response = await _httpClient.DeleteAsync(endpoint);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 return true;
             }
-            
-            _logger.LogWarning("Requisição DELETE falhou para {Endpoint}. Status: {StatusCode}", 
-                endpoint, response.StatusCode);
-            
+
+            _logger.LogWarning("Requisição DELETE falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
+
             return false;
         }
         catch (Exception ex)
@@ -142,4 +130,4 @@ public class HttpClientService : IHttpClientService
             return false;
         }
     }
-} 
+}

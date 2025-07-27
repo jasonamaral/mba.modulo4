@@ -51,7 +51,14 @@ public class AuthController : ControllerBase
                 Password = request.Senha,
                 Nome = request.Nome,
                 DataNascimento = request.DataNascimento,
-                EhAdministrador = request.EhAdministrador
+                EhAdministrador = request.EhAdministrador,
+                CPF = request.CPF,
+                Telefone = request.Telefone,
+                Genero = request.Genero,
+                Cidade = request.Cidade,
+                Estado = request.Estado,
+                CEP = request.CEP,
+                Foto = request.Foto
             };
 
             var result = await _authService.RegisterAsync(registerDto);

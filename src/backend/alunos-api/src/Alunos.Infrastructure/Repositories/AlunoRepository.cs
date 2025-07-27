@@ -81,7 +81,7 @@ public class AlunoRepository : IAlunoRepository
     public async Task<bool> ExisteEmailAsync(string email, Guid? excluirId = null)
     {
         var query = _context.Alunos.Where(a => a.Email == email);
-        
+
         if (excluirId.HasValue)
             query = query.Where(a => a.Id != excluirId.Value);
 
@@ -119,4 +119,4 @@ public class AlunoRepository : IAlunoRepository
     {
         return await _context.SaveChangesAsync();
     }
-} 
+}

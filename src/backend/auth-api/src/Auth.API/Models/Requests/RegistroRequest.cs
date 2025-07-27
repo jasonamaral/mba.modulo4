@@ -19,6 +19,28 @@ public class RegistroRequest : IValidatableObject
     [Required(ErrorMessage = "Data de nascimento é obrigatória")]
     public DateTime DataNascimento { get; set; }
 
+    [Required(ErrorMessage = "CPF é obrigatório")]
+    [StringLength(14, MinimumLength = 11, ErrorMessage = "CPF deve ter entre 11 e 14 caracteres")]
+    public string CPF { get; set; } = string.Empty;
+
+    [StringLength(20, ErrorMessage = "Telefone deve ter no máximo 20 caracteres")]
+    public string Telefone { get; set; } = string.Empty;
+
+    [StringLength(20, ErrorMessage = "Gênero deve ter no máximo 20 caracteres")]
+    public string Genero { get; set; } = string.Empty;
+
+    [StringLength(100, ErrorMessage = "Cidade deve ter no máximo 100 caracteres")]
+    public string Cidade { get; set; } = string.Empty;
+
+    [StringLength(50, ErrorMessage = "Estado deve ter no máximo 50 caracteres")]
+    public string Estado { get; set; } = string.Empty;
+
+    [StringLength(10, ErrorMessage = "CEP deve ter no máximo 10 caracteres")]
+    public string CEP { get; set; } = string.Empty;
+
+    [StringLength(500, ErrorMessage = "URL da foto deve ter no máximo 500 caracteres")]
+    public string? Foto { get; set; }
+
     public bool EhAdministrador { get; set; } = false;
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -30,7 +52,7 @@ public class RegistroRequest : IValidatableObject
         }
     }
 
-    private int CalcularIdade(DateTime nascimento)
+    private static int CalcularIdade(DateTime nascimento)
     {
         var hoje = DateTime.Today;
         var idade = hoje.Year - nascimento.Year;

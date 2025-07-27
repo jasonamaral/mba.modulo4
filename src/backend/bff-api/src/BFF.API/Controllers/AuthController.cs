@@ -1,12 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
-using System.Text;
-using BFF.API.Settings;
-using Microsoft.Extensions.Options;
-using BFF.Domain.DTOs;
+using BFF.API.Extensions;
 using BFF.API.Models.Request;
 using BFF.API.Models.Response;
-using BFF.API.Extensions;
+using BFF.API.Settings;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Text;
+using System.Text.Json;
 
 namespace BFF.API.Controllers;
 
@@ -22,11 +21,11 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         IOptions<ApiSettings> apiSettings,
         ILogger<AuthController> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("ApiClient");
         _apiSettings = apiSettings.Value;
         _logger = logger;
     }
@@ -41,7 +40,6 @@ public class AuthController : ControllerBase
     {
         try
         {
-
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -84,7 +82,6 @@ public class AuthController : ControllerBase
     {
         try
         {
-
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -127,7 +124,6 @@ public class AuthController : ControllerBase
     {
         try
         {
-
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 

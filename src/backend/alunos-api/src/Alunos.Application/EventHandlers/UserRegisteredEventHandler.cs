@@ -5,9 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Alunos.Application.EventHandlers;
 
-/// <summary>
-/// Handler para processar evento de usuário registrado
-/// </summary>
 public class UserRegisteredEventHandler
 {
     private readonly IAlunoRepository _alunoRepository;
@@ -21,22 +18,16 @@ public class UserRegisteredEventHandler
         _logger = logger;
     }
 
-    /// <summary>
-    /// Processa o evento de usuário registrado criando o perfil do aluno
-    /// </summary>
-    /// <param name="evento">Evento com dados do usuário</param>
     public async Task HandleAsync(UserRegisteredEvent evento)
     {
         try
         {
-            _logger.LogInformation("Processando evento UserRegistered para usuário: {UserId}", evento.UserId);
 
             // Verificar se já existe um aluno com este código de usuário
             var userIdGuid = Guid.Parse(evento.UserId);
             var alunoExistente = await _alunoRepository.GetByCodigoUsuarioAsync(userIdGuid);
             if (alunoExistente != null)
             {
-                _logger.LogWarning("Aluno já existe para o usuário: {UserId}", evento.UserId);
                 return;
             }
 
@@ -45,15 +36,19 @@ public class UserRegisteredEventHandler
                 codigoUsuarioAutenticacao: userIdGuid,
                 nome: evento.Nome,
                 email: evento.Email,
-                dataNascimento: evento.DataNascimento
+                cpf: evento.CPF,
+                dataNascimento: evento.DataNascimento,
+                telefone: evento.Telefone,
+                genero: evento.Genero,
+                cidade: evento.Cidade,
+                estado: evento.Estado,
+                cep: evento.CEP
             );
 
             // Salvar no repositório
             await _alunoRepository.AddAsync(novoAluno);
             await _alunoRepository.SaveChangesAsync();
 
-            _logger.LogInformation("Perfil de aluno criado com sucesso para usuário: {UserId}, AlunoId: {AlunoId}", 
-                evento.UserId, novoAluno.Id);
         }
         catch (Exception ex)
         {
@@ -61,4 +56,4 @@ public class UserRegisteredEventHandler
             throw;
         }
     }
-} 
+}

@@ -15,7 +15,6 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext
     {
         base.OnModelCreating(builder);
 
-        // Configurações específicas do ApplicationUser podem ser adicionadas aqui
         builder.Entity<ApplicationUser>(entity =>
         {
             entity.Property(e => e.Nome).IsRequired().HasMaxLength(100);
@@ -24,4 +23,4 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext
             entity.Property(e => e.Ativo).IsRequired();
         });
     }
-} 
+}

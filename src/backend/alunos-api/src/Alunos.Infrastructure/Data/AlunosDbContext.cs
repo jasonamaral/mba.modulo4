@@ -67,4 +67,4 @@ public class AlunosDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }
-} 
+}

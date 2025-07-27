@@ -59,6 +59,13 @@ public class AuthService : IAuthService
                 Email = request.Email,
                 Nome = request.Nome,
                 DataNascimento = request.DataNascimento,
+                CPF = request.CPF,
+                Telefone = request.Telefone,
+                Genero = request.Genero,
+                Cidade = request.Cidade,
+                Estado = request.Estado,
+                CEP = request.CEP,
+                Foto = request.Foto,
                 DataCadastro = DateTime.UtcNow,
                 Ativo = true,
                 EmailConfirmed = true
@@ -89,6 +96,13 @@ public class AuthService : IAuthService
                     Email = user.Email ?? "",
                     Nome = user.Nome,
                     DataNascimento = user.DataNascimento,
+                    CPF = user.CPF,
+                    Telefone = user.Telefone,
+                    Genero = user.Genero,
+                    Cidade = user.Cidade,
+                    Estado = user.Estado,
+                    CEP = user.CEP,
+                    Foto = user.Foto,
                     DataCadastro = user.DataCadastro,
                     EhAdministrador = request.EhAdministrador
                 };
@@ -117,6 +131,16 @@ public class AuthService : IAuthService
                     Id = user.Id,
                     Email = user.Email ?? "",
                     Nome = user.Nome,
+                    DataNascimento = user.DataNascimento,
+                    CPF = user.CPF,
+                    Telefone = user.Telefone,
+                    Genero = user.Genero,
+                    Cidade = user.Cidade,
+                    Estado = user.Estado,
+                    CEP = user.CEP,
+                    Foto = user.Foto,
+                    DataCadastro = user.DataCadastro,
+                    Ativo = user.Ativo,
                     Roles = [roleName]
                 }
             };
@@ -182,6 +206,16 @@ public class AuthService : IAuthService
                     Id = user.Id,
                     Email = user.Email ?? "",
                     Nome = user.Nome,
+                    DataNascimento = user.DataNascimento,
+                    CPF = user.CPF,
+                    Telefone = user.Telefone,
+                    Genero = user.Genero,
+                    Cidade = user.Cidade,
+                    Estado = user.Estado,
+                    CEP = user.CEP,
+                    Foto = user.Foto,
+                    DataCadastro = user.DataCadastro,
+                    Ativo = user.Ativo,
                     Roles = roles.ToList()
                 }
             };
@@ -238,6 +272,16 @@ public class AuthService : IAuthService
                     Id = user.Id,
                     Email = user.Email ?? "",
                     Nome = user.Nome,
+                    DataNascimento = user.DataNascimento,
+                    CPF = user.CPF,
+                    Telefone = user.Telefone,
+                    Genero = user.Genero,
+                    Cidade = user.Cidade,
+                    Estado = user.Estado,
+                    CEP = user.CEP,
+                    Foto = user.Foto,
+                    DataCadastro = user.DataCadastro,
+                    Ativo = user.Ativo,
                     Roles = roles.ToList()
                 }
             };

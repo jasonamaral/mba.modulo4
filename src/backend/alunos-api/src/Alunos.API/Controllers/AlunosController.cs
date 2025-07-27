@@ -53,8 +53,7 @@ public class AlunosController : ControllerBase
     {
         try
         {
-            var alunos = await _alunoAppService.ListarAlunosAsync(
-                pagina, tamanhoPagina, filtro, ordenacao, direcao);
+            var alunos = await _alunoAppService.ListarAlunosAsync(                pagina, tamanhoPagina, filtro, ordenacao, direcao);
 
             return Ok(alunos);
         }
@@ -212,6 +211,43 @@ public class AlunosController : ControllerBase
         {
             _logger.LogError(ex, "Erro interno ao verificar existência do aluno {AlunoId}", id);
             return StatusCode(500);
+        }
+    }
+
+    #endregion
+
+    #region Endpoint de Teste
+
+    /// <summary>
+    /// Endpoint de teste para verificar autenticação JWT
+    /// </summary>
+    /// <returns>Informações do usuário autenticado</returns>
+    [HttpGet("teste-auth")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult TesteAuth()
+    {
+        try
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            var name = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+            var roles = User.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            return Ok(new
+            {
+                UserId = userId,
+                Email = email,
+                Name = name,
+                Roles = roles,
+                Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
+                IsAuthenticated = User.Identity?.IsAuthenticated ?? false
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro no teste de autenticação");
+            return StatusCode(500, new { message = "Erro interno do servidor" });
         }
     }
 

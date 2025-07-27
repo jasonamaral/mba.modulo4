@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Polly;
 using Polly.Extensions.Http;
+using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,9 @@ builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSet
 builder.Services.Configure<CacheSettings>(builder.Configuration.GetSection("CacheSettings"));
 builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection("RedisSettings"));
 builder.Services.Configure<ResilienceSettings>(builder.Configuration.GetSection("ResilienceSettings"));
+
+// Configurar Mapster
+TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
 
 // Redis Cache
 var redisSettings = builder.Configuration.GetSection("RedisSettings").Get<RedisSettings>();
@@ -68,6 +72,26 @@ if (jwtSettings != null)
                 ValidIssuer = jwtSettings.Issuer,
                 ValidAudience = jwtSettings.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+            };
+
+            // Adicionar eventos para debug
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    Console.WriteLine($"BFF - Falha na autenticação: {context.Exception.Message}");
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    Console.WriteLine("BFF - Token validado com sucesso");
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    Console.WriteLine($"BFF - Challenge: {context.Error}, {context.ErrorDescription}");
+                    return Task.CompletedTask;
+                }
             };
         });
 }

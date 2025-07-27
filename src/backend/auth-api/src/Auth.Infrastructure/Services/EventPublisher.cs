@@ -33,7 +33,6 @@ public class EventPublisher : IEventPublisher, IDisposable
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            // Declarar exchange para eventos da plataforma
             var exchangeName = _configuration["RabbitMQ:ExchangeName"] ?? "plataforma.events";
             _channel.ExchangeDeclare(exchange: exchangeName, type: ExchangeType.Topic, durable: true);
         }
@@ -50,7 +49,7 @@ public class EventPublisher : IEventPublisher, IDisposable
         {
             var eventName = typeof(T).Name;
             var routingKey = $"usuario.registrado";
-            
+
             var message = JsonConvert.SerializeObject(eventData);
             var body = Encoding.UTF8.GetBytes(message);
 
@@ -60,14 +59,7 @@ public class EventPublisher : IEventPublisher, IDisposable
             properties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
             var exchangeName = _configuration["RabbitMQ:ExchangeName"] ?? "plataforma.events";
-            _channel.BasicPublish(
-                exchange: exchangeName,
-                routingKey: routingKey,
-                basicProperties: properties,
-                body: body);
-
-            _logger.LogInformation("Evento {EventName} publicado com sucesso. RoutingKey: {RoutingKey}", 
-                eventName, routingKey);
+            _channel.BasicPublish(exchange: exchangeName, routingKey: routingKey, basicProperties: properties, body: body);
 
             await Task.CompletedTask;
         }
@@ -85,4 +77,4 @@ public class EventPublisher : IEventPublisher, IDisposable
         _channel?.Dispose();
         _connection?.Dispose();
     }
-} 
+}

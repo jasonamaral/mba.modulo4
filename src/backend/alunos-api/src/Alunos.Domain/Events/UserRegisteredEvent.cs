@@ -1,51 +1,51 @@
 namespace Alunos.Domain.Events;
 
-/// <summary>
-/// Evento recebido quando um usuário é registrado na Auth API
-/// </summary>
 public class UserRegisteredEvent
 {
     public UserRegisteredEvent()
     {
     }
 
-    public UserRegisteredEvent(string userId, string email, string nome, DateTime dataNascimento, bool ehAdministrador, DateTime dataCadastro)
+    public UserRegisteredEvent(string userId, string email, string nome, string cpf, DateTime dataNascimento, string telefone, string genero, string cidade, string estado, string cep, string? foto, bool ehAdministrador, DateTime dataCadastro)
     {
         UserId = userId;
         Email = email;
         Nome = nome;
+        CPF = cpf;
         DataNascimento = dataNascimento;
+        Telefone = telefone;
+        Genero = genero;
+        Cidade = cidade;
+        Estado = estado;
+        CEP = cep;
+        Foto = foto;
         EhAdministrador = ehAdministrador;
         DataCadastro = dataCadastro;
     }
 
-    /// <summary>
-    /// ID do usuário no sistema de autenticação
-    /// </summary>
     public string UserId { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Email do usuário
-    /// </summary>
     public string Email { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Nome completo do usuário
-    /// </summary>
     public string Nome { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Data de nascimento
-    /// </summary>
+    public string CPF { get; set; } = string.Empty;
+
     public DateTime DataNascimento { get; set; }
 
-    /// <summary>
-    /// Se é administrador (não cria perfil de aluno)
-    /// </summary>
+    public string Telefone { get; set; } = string.Empty;
+
+    public string Genero { get; set; } = string.Empty;
+
+    public string Cidade { get; set; } = string.Empty;
+
+    public string Estado { get; set; } = string.Empty;
+
+    public string CEP { get; set; } = string.Empty;
+
+    public string? Foto { get; set; }
+
     public bool EhAdministrador { get; set; }
 
-    /// <summary>
-    /// Data do cadastro
-    /// </summary>
     public DateTime DataCadastro { get; set; }
-} 
+}

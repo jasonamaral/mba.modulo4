@@ -23,11 +23,11 @@ public class AlunosController : ControllerBase
     private readonly ILogger<AlunosController> _logger;
 
     public AlunosController(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         IOptions<ApiSettings> apiSettings,
         ILogger<AlunosController> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("ApiClient");
         _apiSettings = apiSettings.Value;
         _logger = logger;
     }
@@ -49,7 +49,9 @@ public class AlunosController : ControllerBase
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            _httpClient.DefaultRequestHeaders.Authorization =                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Authorization = 
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             // Fazer chamada para Alunos API
             var response = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}");
@@ -66,6 +68,9 @@ public class AlunosController : ControllerBase
             }
             else
             {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Erro ao buscar perfil do aluno via BFF: {UserId}. Status: {StatusCode}, Content: {Content}", 
+                    userId, response.StatusCode, errorContent);
                 return StatusCode((int)response.StatusCode, "Erro ao buscar perfil do aluno");
             }
         }
@@ -97,6 +102,7 @@ public class AlunosController : ControllerBase
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+            _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = 
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
@@ -139,7 +145,9 @@ public class AlunosController : ControllerBase
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            _httpClient.DefaultRequestHeaders.Authorization =                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Authorization = 
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var alunoResponse = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}");
             
