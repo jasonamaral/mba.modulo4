@@ -14,6 +14,12 @@ using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configurar Kestrel para usar apenas HTTP em desenvolvimento
+if (builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://localhost:5001");
+}
+
 // Configurações
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
@@ -116,7 +122,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+// Removido UseHttpsRedirection para desenvolvimento
+// app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
