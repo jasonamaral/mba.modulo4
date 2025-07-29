@@ -13,7 +13,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Conteudo.API.Controllers;
 
 [Route("api/[controller]")]
-//[Authorize]
+[Authorize]
 [Produces("application/json")]
 public class CursosController : MainController
 {

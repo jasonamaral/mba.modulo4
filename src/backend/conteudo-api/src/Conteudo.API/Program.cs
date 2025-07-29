@@ -65,4 +65,7 @@ app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", DateTime = Date
     .WithName("HealthCheck")
     .WithOpenApi();
 
+// Migration Helper
+app.UseDbMigrationHelper();
+
 app.Run();

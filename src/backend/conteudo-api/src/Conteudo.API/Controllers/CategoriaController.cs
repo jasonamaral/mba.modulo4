@@ -6,12 +6,13 @@ using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
 using Core.Notification;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Conteudo.API.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [Produces("application/json")]
     public class CategoriaController : MainController
     {
