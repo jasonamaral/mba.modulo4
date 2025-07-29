@@ -3,22 +3,23 @@ WORKDIR /app
 EXPOSE 5002
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
+WORKDIR /
 
 # Copiar arquivos de projeto
-COPY ["src/Conteudo.API/Conteudo.API.csproj", "src/Conteudo.API/"]
-COPY ["src/Conteudo.Application/Conteudo.Application.csproj", "src/Conteudo.Application/"]
-COPY ["src/Conteudo.Domain/Conteudo.Domain.csproj", "src/Conteudo.Domain/"]
-COPY ["src/Conteudo.Infrastructure/Conteudo.Infrastructure.csproj", "src/Conteudo.Infrastructure/"]
+COPY ["conteudo-api/src/Conteudo.API/Conteudo.API.csproj", "conteudo-api/src/Conteudo.API/"]
+COPY ["conteudo-api/src/Conteudo.Application/Conteudo.Application.csproj", "conteudo-api/src/Conteudo.Application/"]
+COPY ["conteudo-api/src/Conteudo.Domain/Conteudo.Domain.csproj", "conteudo-api/src/Conteudo.Domain/"]
+COPY ["conteudo-api/src/Conteudo.Infrastructure/Conteudo.Infrastructure.csproj", "conteudo-api/src/Conteudo.Infrastructure/"]
+COPY ["building-blocks/core/Core.csproj", "building-blocks/core/"]
 
 # Restaurar dependências
-RUN dotnet restore "src/Conteudo.API/Conteudo.API.csproj"
+RUN dotnet restore "conteudo-api/src/Conteudo.API/Conteudo.API.csproj"
 
 # Copiar código fonte
 COPY . .
 
 # Build da aplicação
-WORKDIR "/src/src/Conteudo.API"
+WORKDIR "/conteudo-api/src/Conteudo.API"
 RUN dotnet build "Conteudo.API.csproj" -c Release -o /app/build
 
 FROM build AS publish

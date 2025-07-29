@@ -1,4 +1,7 @@
+using Conteudo.API.Configuration;
 using Conteudo.API.Extensions;
+using Conteudo.Application.Commands;
+using Conteudo.Application.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -21,6 +24,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!))
         };
     });
+
+builder.AddDbContextConfiguration();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CadastrarCursoCommand).Assembly));
+
+builder.Services.RegisterServices();
+
+builder.Services.AddAutoMapper(typeof(CursoMap));
 
 // Configurar Controllers
 builder.Services.AddControllers();

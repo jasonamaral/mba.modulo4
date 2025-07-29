@@ -1,0 +1,21 @@
+using Conteudo.Domain.Common;
+using Conteudo.Domain.Entities;
+
+namespace Conteudo.Domain.Interfaces.Repositories;
+
+public interface ICursoRepository : IRepository<Curso>
+{
+    Task<IEnumerable<Curso>> ObterTodosAsync(bool includeAulas = false);
+    Task<Curso?> ObterPorIdAsync(Guid id, bool includeAulas = false, bool noTracking = true);
+    Task<IEnumerable<Curso>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false);
+    Task<IEnumerable<Curso>> ObterAtivosAsync(bool includeAulas = false);
+    Task<IEnumerable<Curso>> ObterPorPesquisaAsync(string searchTerm, bool includeAulas = false);
+    Task<bool> ExistePorIdAsync(Guid id);
+    Task<bool> ExistePorNomeAsync(string nome, Guid? excludeId = null);
+    void Adicionar(Curso curso);
+    void Atualizar(Curso curso);
+    void Deletar(Curso curso);
+    Task<int> ContarAsync();
+    Task<int> ContarAtivosAsync();
+    Task<int> CountByCategoriaAsync(Guid categoriaId);
+} 

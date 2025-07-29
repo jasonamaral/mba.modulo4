@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\core\Core.csproj" />
     <ProjectReference Include="..\Conteudo.Domain\Conteudo.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="15.0.1" />
-    <PackageReference Include="MediatR" Version="13.0.0" />
+	  <PackageReference Include="AutoMapper" Version="12.0.1" />
+	<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -1,6 +1,6 @@
 using Conteudo.Domain.Entities;
 
-namespace Conteudo.Application.Interfaces.Repositories;
+namespace Conteudo.Domain.Interfaces.Repositories;
 
 public interface IAulaRepository
 {

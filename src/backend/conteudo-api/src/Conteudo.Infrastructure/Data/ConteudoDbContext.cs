@@ -1,9 +1,11 @@
+using Conteudo.Domain.Common;
 using Conteudo.Domain.Entities;
+using Core.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conteudo.Infrastructure.Data;
 
-public class ConteudoDbContext : DbContext
+public class ConteudoDbContext : DbContext, IUnitOfWork
 {
     public ConteudoDbContext(DbContextOptions<ConteudoDbContext> options) : base(options) { }
 
@@ -258,17 +260,22 @@ public class ConteudoDbContext : DbContext
     private void UpdateTimestamps()
     {
         var entries = ChangeTracker.Entries()
-            .Where(e => e.Entity is Domain.Common.Entidade && 
+            .Where(e => e.Entity is Entidade && 
                        (e.State == EntityState.Added || e.State == EntityState.Modified));
 
         foreach (var entry in entries)
         {
-            var entity = (Domain.Common.Entidade)entry.Entity;
+            var entity = (Entidade)entry.Entity;
             
             if (entry.State == EntityState.Modified)
             {
                 entity.AtualizarDataModificacao();
             }
         }
+    }
+
+    public async Task<bool> Commit()
+    {
+        return await SaveChangesAsync() > 0;
     }
 } 
