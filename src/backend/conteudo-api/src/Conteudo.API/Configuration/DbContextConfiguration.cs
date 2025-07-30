@@ -7,21 +7,10 @@ namespace Conteudo.API.Configuration
     {
         public static WebApplicationBuilder AddDbContextConfiguration(this WebApplicationBuilder builder)
         {
-            if (builder.Environment.IsProduction())
+            builder.Services.AddDbContext<ConteudoDbContext>(opt =>
             {
-                builder.Services.AddDbContext<ConteudoDbContext>(opt =>
-                {
-                    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-                });
-            }
-            else
-            {
-                builder.Services.AddDbContext<ConteudoDbContext>(opt =>
-                {
-                    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-                    opt.EnableSensitiveDataLogging();
-                });
-            }
+                opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             return builder;
         }

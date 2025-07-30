@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Conteudo.API.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize] TODO: verificar como implementar autenticação e autorização
     [Produces("application/json")]
     public class CategoriaController : MainController
     {
