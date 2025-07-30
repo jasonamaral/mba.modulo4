@@ -1,9 +1,5 @@
-namespace Alunos.Domain.Common
+namespace Alunos.Domain.Common;
+
+public interface IRaizAgregacao
 {
-    /// <summary>
-    /// Interface marcadora para identificar raízes de agregado no domínio
-    /// </summary>
-    public interface IRaizAgregacao
-    {
-    }
-} 
+}

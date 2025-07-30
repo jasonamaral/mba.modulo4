@@ -1,0 +1,15 @@
+namespace BFF.Domain.DTOs;
+
+public class AulaDto
+{
+    public Guid Id { get; set; }
+    public Guid CursoId { get; set; }
+    public string Nome { get; set; } = string.Empty;
+    public string Descricao { get; set; } = string.Empty;
+    public int Ordem { get; set; }
+    public int DuracaoMinutos { get; set; }
+    public string VideoUrl { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}

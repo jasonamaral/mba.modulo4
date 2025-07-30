@@ -4,11 +4,9 @@ public class AuthResponseDto
 {
     public bool Success { get; set; }
     public string Message { get; set; } = string.Empty;
-    public Guid? UserId { get; set; }
-    public string? Nome { get; set; }
-    public string? Email { get; set; }
-    public string? AccessToken { get; set; }
-    public string? RefreshToken { get; set; }
-    public DateTime? ExpiresAt { get; set; }
-    public List<string>? Errors { get; set; }
-} 
+    public string Token { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
+    public DateTime ExpiresAt { get; set; }
+    public UserDto? User { get; set; }
+    public List<string> Errors { get; set; } = new();
+}

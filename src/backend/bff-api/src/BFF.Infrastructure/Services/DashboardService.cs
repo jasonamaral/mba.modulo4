@@ -1,27 +1,46 @@
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
+using BFF.Domain.Settings;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BFF.Infrastructure.Services;
 
 public class DashboardService : IDashboardService
 {
+    private readonly ICacheService _cacheService;
+    private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DashboardService> _logger;
 
-    public DashboardService(ILogger<DashboardService> logger)
+    public DashboardService(
+        ICacheService cacheService,
+        IOptions<CacheSettings> cacheOptions,
+        ILogger<DashboardService> logger)
     {
+        _cacheService = cacheService;
+        _cacheSettings = cacheOptions.Value;
         _logger = logger;
     }
 
     public async Task<DashboardAlunoDto> GetDashboardAlunoAsync(Guid userId)
     {
-        _logger.LogInformation("Carregando dashboard do aluno {UserId}", userId);
+        var cacheKey = $"dashboard:aluno:{userId}";
+        
+        // Tenta buscar do cache primeiro
+        var cachedData = await _cacheService.GetAsync<DashboardAlunoDto>(cacheKey);
+        if (cachedData != null)
+        {
+            _logger.LogInformation("Dashboard do aluno {UserId} recuperado do cache", userId);
+            return cachedData;
+        }
+
+        _logger.LogInformation("Carregando dashboard do aluno {UserId} dos microsserviços", userId);
 
         // TODO: Substituir por chamadas reais aos microsserviços
         // Por enquanto, dados mock para demonstração
         await Task.Delay(100); // Simula chamada assíncrona
 
-        return new DashboardAlunoDto
+        var dashboardData = new DashboardAlunoDto
         {
             Aluno = new AlunoDto
             {
@@ -102,17 +121,35 @@ public class DashboardService : IDashboardService
                 HorasEstudadas = 45
             }
         };
+
+        // Salva no cache usando a configuração específica para dashboard
+        await _cacheService.SetAsync(cacheKey, dashboardData, _cacheSettings.DashboardExpiration);
+        
+        _logger.LogInformation("Dashboard do aluno {UserId} salvo no cache por {Minutes} minutos", 
+            userId, _cacheSettings.DashboardExpiration.TotalMinutes);
+
+        return dashboardData;
     }
 
     public async Task<DashboardAdminDto> GetDashboardAdminAsync()
     {
-        _logger.LogInformation("Carregando dashboard do admin");
+        var cacheKey = "dashboard:admin";
+        
+        // Tenta buscar do cache primeiro
+        var cachedData = await _cacheService.GetAsync<DashboardAdminDto>(cacheKey);
+        if (cachedData != null)
+        {
+            _logger.LogInformation("Dashboard do admin recuperado do cache");
+            return cachedData;
+        }
+
+        _logger.LogInformation("Carregando dashboard do admin dos microsserviços");
 
         // TODO: Substituir por chamadas reais aos microsserviços
         // Por enquanto, dados mock para demonstração
         await Task.Delay(100); // Simula chamada assíncrona
 
-        return new DashboardAdminDto
+        var dashboardData = new DashboardAdminDto
         {
             EstatisticasAlunos = new EstatisticasAlunosDto
             {
@@ -196,5 +233,13 @@ public class DashboardService : IDashboardService
                 }
             }
         };
+
+        // Salva no cache usando a configuração específica para dashboard
+        await _cacheService.SetAsync(cacheKey, dashboardData, _cacheSettings.DashboardExpiration);
+        
+        _logger.LogInformation("Dashboard do admin salvo no cache por {Minutes} minutos", 
+            _cacheSettings.DashboardExpiration.TotalMinutes);
+
+        return dashboardData;
     }
 } 

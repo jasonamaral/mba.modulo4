@@ -1,55 +1,68 @@
 using Auth.API.Extensions;
 using Auth.Application.Interfaces;
 using Auth.Application.Services;
+using Auth.Application.Settings;
+using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
+using Auth.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar JWT
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-builder.Services.Configure<JwtSettings>(jwtSettings);
-
-// Configurar Entity Framework
-builder.Services.AddDbContext<AuthDbContext>(options =>
+// Configurar Kestrel para usar apenas HTTP em desenvolvimento
+if (builder.Environment.IsDevelopment())
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    var isDevelopment = builder.Environment.IsDevelopment();
-    
-    if (isDevelopment)
-    {
-        // SQLite para desenvolvimento
-        options.UseSqlite(connectionString);
-    }
-    else
-    {
-        // SQL Server para produção
-        options.UseSqlServer(connectionString);
-    }
-});
+    builder.WebHost.UseUrls("http://localhost:5001");
+}
 
-// Configurar Identity
+// Configurações
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+// Configurar Mapster
+TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
+
+// Entity Framework - Configuração condicional baseada no ambiente
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var isDevelopment = builder.Environment.IsDevelopment();
+
+if (isDevelopment)
+{
+    // SQLite para desenvolvimento
+    builder.Services.AddDbContext<AuthDbContext>(options =>
+        options.UseSqlite(connectionString ?? "Data Source=../../../../data/auth-dev.db"));
+}
+else
+{
+    // SQL Server para produção
+    builder.Services.AddDbContext<AuthDbContext>(options =>
+        options.UseSqlServer(connectionString ?? "Server=localhost;Database=AuthDB;Trusted_Connection=true;TrustServerCertificate=true;"));
+}
+
+// Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
+    // Configurações de senha
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 8;
-    
+    options.Password.RequiredLength = 6;
+
+    // Configurações de usuário
     options.User.RequireUniqueEmail = true;
     options.SignIn.RequireConfirmedEmail = false;
 })
 .AddEntityFrameworkStores<AuthDbContext>()
 .AddDefaultTokenProviders();
 
-// Configurar JWT Authentication
-var jwtSettingsConfig = jwtSettings.Get<JwtSettings>();
-var key = Encoding.ASCII.GetBytes(jwtSettingsConfig?.SecretKey ?? "default-key");
+// JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"] ?? "MinhaChaveSecretaSuperSegura123456789";
 
 builder.Services.AddAuthentication(options =>
 {
@@ -58,88 +71,98 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = true,
-        ValidIssuer = jwtSettingsConfig?.Issuer,
         ValidateAudience = true,
-        ValidAudience = jwtSettingsConfig?.Audience,
         ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"] ?? "Auth.API",
+        ValidAudience = jwtSettings["Audience"] ?? "Auth.API.Users",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero
     };
 });
 
-// Configurar Controllers
+// Application Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEventPublisher, EventPublisher>();
+builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
+
+// Controllers
 builder.Services.AddControllers();
 
-// Configurar Swagger
+// Swagger
 builder.Services.AddSwaggerConfiguration();
 
-// Configurar CORS
+// CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
-// Configurar serviços da aplicação
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-// Configurar HttpContextAccessor
-builder.Services.AddHttpContextAccessor();
+// Health Checks
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-// Configurar pipeline
-app.UseSwaggerConfiguration();
+// Configure pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth API v1");
+        c.RoutePrefix = "swagger";
+    });
+}
 
-app.UseCors();
+// Removido UseHttpsRedirection para desenvolvimento
+// app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
-// Health Check
-app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", DateTime = DateTime.UtcNow }))
-    .WithName("HealthCheck")
-    .WithOpenApi();
+app.MapHealthChecks("/health");
 
-// Seed inicial do banco de dados
+// Inicializar banco de dados
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     
-    await context.Database.MigrateAsync();
-    await SeedDataAsync(userManager, roleManager);
+    await InitializeDatabaseAsync(context, userManager, roleManager);
 }
 
 app.Run();
 
-// Método para seed inicial
-static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 {
+    // Criar banco se não existir
+    await context.Database.EnsureCreatedAsync();
+
     // Criar roles se não existirem
-    if (!await roleManager.RoleExistsAsync("Administrador"))
+    string[] roles = { "Administrador", "Usuario" };
+    foreach (var role in roles)
     {
-        await roleManager.CreateAsync(new IdentityRole("Administrador"));
-    }
-    
-    if (!await roleManager.RoleExistsAsync("Usuario"))
-    {
-        await roleManager.CreateAsync(new IdentityRole("Usuario"));
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
     }
 
-    // Criar usuário administrador padrão se não existir
-    var adminEmail = "admin@plataforma.com";
+    // Criar usuário admin padrão se não existir
+    const string adminEmail = "admin@auth.api";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     
     if (adminUser == null)
@@ -148,14 +171,12 @@ static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleMa
         {
             UserName = adminEmail,
             Email = adminEmail,
-            Nome = "Administrador",
+            Nome = "Administrador do Sistema",
             DataNascimento = new DateTime(1990, 1, 1),
-            DataCadastro = DateTime.UtcNow,
-            Ativo = true,
             EmailConfirmed = true
         };
 
-        var result = await userManager.CreateAsync(adminUser, "Teste123@");
+        var result = await userManager.CreateAsync(adminUser, "Admin@123");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(adminUser, "Administrador");
