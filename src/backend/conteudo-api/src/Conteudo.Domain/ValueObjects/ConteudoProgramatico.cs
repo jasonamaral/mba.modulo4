@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Conteudo.Domain.ValueObjects;
 
 public class ConteudoProgramatico

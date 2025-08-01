@@ -1,22 +1,34 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Conteudo.Application.Interfaces.Services;
+using AutoMapper;
+using Conteudo.API.Controllers.Base;
+using Conteudo.Application.Commands;
 using Conteudo.Application.DTOs;
+using Conteudo.Application.Interfaces.Services;
+using Core.Communication;
+using Core.Mediator;
+using Core.Notification;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace Conteudo.API.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-[Authorize]
+//[Authorize] TODO: verificar como implementar autenticação e autorização
 [Produces("application/json")]
-public class CursosController : ControllerBase
+public class CursosController : MainController
 {
     private readonly ICursoAppService _cursoAppService;
+    private readonly IMediatorHandler _mediator;
+    private readonly IMapper _mapper;
 
-    public CursosController(ICursoAppService cursoAppService)
+    public CursosController(INotificador notificador
+                           , ICursoAppService cursoAppService
+                           , IMediatorHandler mediator
+                           , IMapper mapper) : base(notificador)
     {
         _cursoAppService = cursoAppService;
+        _mediator = mediator;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -27,12 +39,12 @@ public class CursosController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<CursoDto>), 200)]
     [ProducesResponseType(typeof(ApiError), 400)]
-    public async Task<IActionResult> GetCursos([FromQuery] bool includeAulas = false)
+    public async Task<IActionResult> ObterCursos([FromQuery] bool includeAulas = false)
     {
         try
         {
-            var cursos = await _cursoAppService.GetAllAsync(includeAulas);
-            return Ok(cursos);
+            var cursos = await _cursoAppService.ObterTodosAsync(includeAulas);
+            return RespostaPadraoApi(data: cursos);
         }
         catch (Exception ex)
         {
@@ -49,17 +61,17 @@ public class CursosController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(CursoDto), 200)]
     [ProducesResponseType(typeof(ApiError), 404)]
-    public async Task<IActionResult> GetCurso(
+    public async Task<IActionResult> ObterCurso(
         [FromRoute] Guid id, 
         [FromQuery] bool includeAulas = false)
     {
         try
         {
-            var curso = await _cursoAppService.GetByIdAsync(id, includeAulas);
+            var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas);
             if (curso == null)
                 return NotFound(new ApiError { Message = "Curso não encontrado" });
 
-            return Ok(curso);
+            return RespostaPadraoApi(data: curso);
         }
         catch (Exception ex)
         {
@@ -143,31 +155,22 @@ public class CursosController : ControllerBase
     /// Cadastra um novo curso
     /// </summary>
     /// <param name="dto">Dados do curso</param>
-    /// <returns>ID do curso criado</returns>
+    /// Retorna `ApiSuccess` em caso de sucesso ou `ApiError` em caso de erro.
     [HttpPost]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(CursoCreatedResponse), 201)]
+    //[Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(ApiSuccess), 201)]
     [ProducesResponseType(typeof(ApiError), 400)]
     public async Task<IActionResult> CadastrarCurso([FromBody] CadastroCursoDto dto)
     {
         try
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ApiError 
-                { 
-                    Message = "Dados inválidos",
-                    Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
-                });
-            }
-
-            var cursoId = await _cursoAppService.CadastrarCursoAsync(dto);
-            return CreatedAtAction(nameof(GetCurso), new { id = cursoId }, new CursoCreatedResponse { Id = cursoId });
+            var command = _mapper.Map<CadastrarCursoCommand>(dto);
+            return RespostaPadraoApi(await _mediator.EnviarComando(command));
         }
         catch (Exception ex)
         {
             return BadRequest(new ApiError { Message = ex.Message });
-        }
+        } 
     }
 
     /// <summary>
@@ -175,10 +178,9 @@ public class CursosController : ControllerBase
     /// </summary>
     /// <param name="id">ID do curso</param>
     /// <param name="dto">Dados atualizados do curso</param>
-    /// <returns>Dados do curso atualizado</returns>
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(CursoDto), 200)]
+    //[Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(ApiSuccess), 200)]
     [ProducesResponseType(typeof(ApiError), 400)]
     [ProducesResponseType(typeof(ApiError), 404)]
     public async Task<IActionResult> AtualizarCurso([FromRoute] Guid id, [FromBody] AtualizarCursoDto dto)
@@ -186,19 +188,14 @@ public class CursosController : ControllerBase
         try
         {
             if (!ModelState.IsValid)
-            {
-                return BadRequest(new ApiError 
-                { 
-                    Message = "Dados inválidos",
-                    Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
-                });
-            }
+                return RespostaPadraoApi(ModelState);
 
             if (id != dto.Id)
                 return BadRequest(new ApiError { Message = "ID do curso não confere" });
 
-            var curso = await _cursoAppService.AtualizarCursoAsync(dto);
-            return Ok(curso);
+            var command = _mapper.Map<AtualizarCursoCommand>(dto);
+            
+            return RespostaPadraoApi(await _mediator.EnviarComando(command));
         }
         catch (ArgumentException ex)
         {
@@ -300,7 +297,7 @@ public class CursosController : ControllerBase
     {
         try
         {
-            var curso = await _cursoAppService.GetByIdAsync(id, includeAulas: true);
+            var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas: true);
             if (curso == null)
                 return NotFound(new ApiError { Message = "Curso não encontrado" });
 
@@ -324,7 +321,7 @@ public class CursosController : ControllerBase
     {
         try
         {
-            var curso = await _cursoAppService.GetByIdAsync(id);
+            var curso = await _cursoAppService.ObterPorIdAsync(id);
             if (curso == null)
                 return NotFound(new ApiError { Message = "Curso não encontrado" });
 
@@ -361,7 +358,7 @@ public class CursosController : ControllerBase
     {
         try
         {
-            var curso = await _cursoAppService.GetByIdAsync(id);
+            var curso = await _cursoAppService.ObterPorIdAsync(id);
             if (curso == null)
                 return NotFound(new ApiError { Message = "Curso não encontrado" });
 
@@ -395,17 +392,6 @@ public class ConteudoProgramaticoDto
     public string Recursos { get; set; } = string.Empty;
     public string Avaliacao { get; set; } = string.Empty;
     public string Bibliografia { get; set; } = string.Empty;
-}
-
-public class ApiError
-{
-    public string Message { get; set; } = string.Empty;
-    public IEnumerable<string>? Details { get; set; }
-}
-
-public class ApiSuccess
-{
-    public string Message { get; set; } = string.Empty;
 }
 
 #endregion 

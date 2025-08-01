@@ -1,16 +1,54 @@
 using BFF.API.Extensions;
 using BFF.API.Settings;
+using BFF.Domain.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Polly;
+using Polly.Extensions.Http;
+using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configurações
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
+builder.Services.Configure<CacheSettings>(builder.Configuration.GetSection("CacheSettings"));
+builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection("RedisSettings"));
+builder.Services.Configure<ResilienceSettings>(builder.Configuration.GetSection("ResilienceSettings"));
+
+// Configurar Mapster
+TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
+
+// Redis Cache
+var redisSettings = builder.Configuration.GetSection("RedisSettings").Get<RedisSettings>();
+if (redisSettings != null && !string.IsNullOrEmpty(redisSettings.ConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisSettings.ConnectionString;
+        options.InstanceName = redisSettings.KeyPrefix;
+    });
+}
+else
+{
+    // Fallback para cache em memória se Redis não estiver disponível
+    builder.Services.AddMemoryCache();
+}
+
+// HttpClient para comunicação com outras APIs com Polly
+var resilienceSettings = builder.Configuration.GetSection("ResilienceSettings").Get<ResilienceSettings>();
+builder.Services.AddHttpClient("ApiClient")
+    .AddPolicyHandler(GetRetryPolicy(resilienceSettings))
+    .AddPolicyHandler(GetCircuitBreakerPolicy(resilienceSettings));
 
 // Services
+builder.Services.AddScoped<BFF.Application.Interfaces.Services.ICacheService, BFF.Infrastructure.Services.CacheService>();
+builder.Services.AddScoped<BFF.Application.Interfaces.Services.IHttpClientService, BFF.Infrastructure.Services.HttpClientService>();
 builder.Services.AddScoped<BFF.Application.Interfaces.Services.IDashboardService, BFF.Infrastructure.Services.DashboardService>();
+
+// Configuração global do JSON
+builder.Services.AddJsonConfiguration();
 
 // Controllers
 builder.Services.AddControllers();
@@ -34,6 +72,26 @@ if (jwtSettings != null)
                 ValidIssuer = jwtSettings.Issuer,
                 ValidAudience = jwtSettings.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+            };
+
+            // Adicionar eventos para debug
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    Console.WriteLine($"BFF - Falha na autenticação: {context.Exception.Message}");
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    Console.WriteLine("BFF - Token validado com sucesso");
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    Console.WriteLine($"BFF - Challenge: {context.Error}, {context.ErrorDescription}");
+                    return Task.CompletedTask;
+                }
             };
         });
 }
@@ -88,3 +146,40 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 app.Run();
+
+// Métodos auxiliares para políticas de resiliência
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ResilienceSettings? settings)
+{
+    var retryCount = settings?.RetryCount ?? 3;
+    var timeout = settings?.TimeoutDuration ?? TimeSpan.FromSeconds(30);
+    
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(
+            retryCount,
+            retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+            onRetry: (outcome, timespan, retryCount, context) =>
+            {
+                Console.WriteLine($"Tentativa {retryCount} em {timespan}s");
+            });
+}
+
+static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy(ResilienceSettings? settings)
+{
+    var threshold = settings?.CircuitBreakerThreshold ?? 3;
+    var duration = settings?.CircuitBreakerDuration ?? TimeSpan.FromSeconds(30);
+    
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .CircuitBreakerAsync(
+            threshold,
+            duration,
+            onBreak: (exception, duration) =>
+            {
+                Console.WriteLine($"Circuit breaker aberto por {duration}s");
+            },
+            onReset: () =>
+            {
+                Console.WriteLine("Circuit breaker fechado");
+            });
+}

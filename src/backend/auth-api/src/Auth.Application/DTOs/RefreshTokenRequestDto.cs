@@ -4,6 +4,6 @@ namespace Auth.Application.DTOs;
 
 public class RefreshTokenRequestDto
 {
-    [Required(ErrorMessage = "Token de refresh é obrigatório")]
+    [Required(ErrorMessage = "Refresh token é obrigatório")]
     public string RefreshToken { get; set; } = string.Empty;
 } 

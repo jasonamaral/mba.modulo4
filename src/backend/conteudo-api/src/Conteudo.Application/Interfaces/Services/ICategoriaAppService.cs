@@ -4,8 +4,8 @@ namespace Conteudo.Application.Interfaces.Services;
 
 public interface ICategoriaAppService
 {
-    Task<IEnumerable<CategoriaDto>> GetAllAsync(bool includeCursos = false);
-    Task<CategoriaDto?> GetByIdAsync(Guid id, bool includeCursos = false);
+    Task<IEnumerable<CategoriaDto>> ObterTodasCategoriasAsync();
+    Task<CategoriaDto?> ObterPorIdAsync(Guid id);
     Task<IEnumerable<CategoriaDto>> GetAtivasAsync(bool includeCursos = false);
     Task<IEnumerable<CategoriaDto>> GetOrderedAsync(bool includeCursos = false);
     Task<Guid> CadastrarCategoriaAsync(CadastroCategoriaDto dto);

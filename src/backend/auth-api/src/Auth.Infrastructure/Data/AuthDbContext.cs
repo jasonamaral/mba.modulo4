@@ -1,9 +1,11 @@
+using Auth.Application.Interfaces;
+using Auth.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Infrastructure.Data;
 
-public class AuthDbContext : IdentityDbContext<ApplicationUser>
+public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
     {
@@ -13,7 +15,6 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
-        // Configurações específicas do ApplicationUser podem ser adicionadas aqui
         builder.Entity<ApplicationUser>(entity =>
         {
             entity.Property(e => e.Nome).IsRequired().HasMaxLength(100);
@@ -22,4 +23,4 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(e => e.Ativo).IsRequired();
         });
     }
-} 
+}
