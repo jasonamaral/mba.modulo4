@@ -1,5 +1,5 @@
-using Conteudo.Domain.Common;
 using Conteudo.Domain.Entities;
+using Core.Data;
 
 namespace Conteudo.Domain.Interfaces.Repositories;
 

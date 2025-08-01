@@ -1,6 +1,9 @@
 ﻿using Conteudo.API.Extensions;
 using Conteudo.Application.Commands;
 using Conteudo.Application.Mappings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Conteudo.API.Configuration
 {
@@ -17,6 +20,7 @@ namespace Conteudo.API.Configuration
                 .AddMediatRConfiguration()
                 .AddServicesConfiguration()
                 .AddAutoMapperConfiguration()
+                .AddJwtConfiguration()
                 .AddSwaggerConfigurationExtension();
         }
 
@@ -77,6 +81,37 @@ namespace Conteudo.API.Configuration
         private static WebApplicationBuilder AddSwaggerConfigurationExtension(this WebApplicationBuilder builder)
         {
             builder.Services.AddSwaggerConfiguration();
+            return builder;
+        }
+
+        private static WebApplicationBuilder AddJwtConfiguration(this WebApplicationBuilder builder)
+        {
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+
+            // Configura autenticação JWT
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = jwtSettings["Issuer"],     
+                    ValidAudience = jwtSettings["Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]!)
+                    ),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+            builder.Services.AddAuthorization();
             return builder;
         }
     }

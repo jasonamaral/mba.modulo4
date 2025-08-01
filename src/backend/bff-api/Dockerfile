@@ -3,22 +3,23 @@ WORKDIR /app
 EXPOSE 5000
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
+WORKDIR /
 
 # Copiar arquivos de projeto
-COPY ["src/BFF.API/BFF.API.csproj", "src/BFF.API/"]
-COPY ["src/BFF.Application/BFF.Application.csproj", "src/BFF.Application/"]
-COPY ["src/BFF.Domain/BFF.Domain.csproj", "src/BFF.Domain/"]
-COPY ["src/BFF.Infrastructure/BFF.Infrastructure.csproj", "src/BFF.Infrastructure/"]
+COPY ["bff-api/src/BFF.API/BFF.API.csproj", "bff-api/src/BFF.API/"]
+COPY ["bff-api/src/BFF.Application/BFF.Application.csproj", "bff-api/src/BFF.Application/"]
+COPY ["bff-api/src/BFF.Domain/BFF.Domain.csproj", "bff-api/src/BFF.Domain/"]
+COPY ["bff-api/src/BFF.Infrastructure/BFF.Infrastructure.csproj", "bff-api/src/BFF.Infrastructure/"]
+COPY ["building-blocks/core/Core.csproj", "building-blocks/core/"]
 
 # Restaurar dependências
-RUN dotnet restore "src/BFF.API/BFF.API.csproj"
+RUN dotnet restore "bff-api/src/BFF.API/BFF.API.csproj"
 
 # Copiar código fonte
 COPY . .
 
 # Build da aplicação
-WORKDIR "/src/src/BFF.API"
+WORKDIR "/bff-api/src/BFF.API"
 RUN dotnet build "BFF.API.csproj" -c Release -o /app/build
 
 FROM build AS publish

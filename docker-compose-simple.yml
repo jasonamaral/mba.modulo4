@@ -130,14 +130,15 @@ services:
 
   bff-api:
     build:
-      context: ./src/backend/bff-api
-      dockerfile: Dockerfile
+        context: ./src/backend
+        dockerfile: bff-api/Dockerfile
     container_name: plataforma-bff-api
     ports:
       - "5000:5000"
+      - "7000:7000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_URLS=http://+:5000;http://+:7000
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users

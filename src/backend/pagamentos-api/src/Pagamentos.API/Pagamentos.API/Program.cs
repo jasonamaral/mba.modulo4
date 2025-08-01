@@ -136,4 +136,9 @@ if (app.Environment.IsDevelopment())
     }
 }
 
+// Health Check
+app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", DateTime = DateTime.UtcNow }))
+    .WithName("HealthCheck")
+    .WithOpenApi();
+
 app.Run();

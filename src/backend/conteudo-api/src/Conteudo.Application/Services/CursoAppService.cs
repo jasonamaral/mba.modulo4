@@ -33,55 +33,5 @@ namespace Conteudo.Application.Services
         {
             throw new NotImplementedException();
         }
-
-        public Task<Guid> CadastrarCursoAsync(CadastroCursoDto dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<CursoDto> AtualizarCursoAsync(AtualizarCursoDto dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task AtivarCursoAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DesativarCursoAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task ExcluirCursoAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> ExisteAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> ExistePorNomeAsync(string nome, Guid? excludeId = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> ContarCursosAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> ContarCursosAtivosAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> ContarCursosPorCategoriaAsync(Guid categoriaId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

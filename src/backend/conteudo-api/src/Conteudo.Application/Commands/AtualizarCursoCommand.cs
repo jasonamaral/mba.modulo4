@@ -1,4 +1,5 @@
 ﻿using Core.Messages;
+using Core.Communication;
 using FluentValidation;
 
 namespace Conteudo.Application.Commands
@@ -27,8 +28,8 @@ namespace Conteudo.Application.Commands
 
         public override bool EhValido()
         {
-            ValidationResult = new AtualizarCursoCommandValidator().Validate(this);
-            return ValidationResult.IsValid;
+            CommandResult = new CommandResult(new AtualizarCursoCommandValidator().Validate(this));
+            return CommandResult.Success;
         }
     }
     public class AtualizarCursoCommandValidator : AbstractValidator<AtualizarCursoCommand>

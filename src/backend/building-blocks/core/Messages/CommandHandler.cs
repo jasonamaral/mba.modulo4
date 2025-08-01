@@ -1,27 +1,28 @@
-﻿using Core.Data;
+﻿using Core.Communication;
+using Core.Data;
 using FluentValidation.Results;
 
 namespace Core.Messages
 {
     public abstract class CommandHandler
     {
-        protected ValidationResult ValidationResult;
+        protected CommandResult CommandResult;
 
         protected CommandHandler()
         {
-            ValidationResult = new ValidationResult();
+            CommandResult = new CommandResult(new ValidationResult());
         }
 
         protected void AdicionarErro(string mensagem)
         {
-            ValidationResult.Errors.Add(new ValidationFailure(string.Empty, mensagem));
+            CommandResult.AdicionarErro(string.Empty, mensagem);
         }
 
-        protected async Task<ValidationResult> PersistirDados(IUnitOfWork uow)
+        protected async Task<CommandResult> PersistirDados(IUnitOfWork uow)
         {
             if (!await uow.Commit()) AdicionarErro("Houve um erro ao persistir os dados");
 
-            return ValidationResult;
+            return CommandResult;
         }
     }
 }

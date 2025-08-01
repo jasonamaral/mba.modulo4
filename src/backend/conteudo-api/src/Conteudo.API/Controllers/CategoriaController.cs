@@ -6,13 +6,14 @@ using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
 using Core.Notification;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace Conteudo.API.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize] TODO: verificar como implementar autenticação e autorização
+    [Authorize]
     [Produces("application/json")]
     public class CategoriaController : MainController
     {
@@ -35,7 +36,7 @@ namespace Conteudo.API.Controllers
         /// <param name="id">ID do curso</param>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ApiSuccess), 200)]
-        [ProducesResponseType(typeof(ApiError), 404)]
+        [ProducesResponseType(typeof(ResponseResult), 404)]
         public async Task<IActionResult> ObterPorId(Guid id)
         {
             try
@@ -43,13 +44,13 @@ namespace Conteudo.API.Controllers
                 var categoria = await _categoriaAppService.ObterPorIdAsync(id);
              
                 if (categoria == null)
-                    return NotFound(new ApiError { Message = "Categoria não encontrada." });
+                    return RespostaPadraoApi(HttpStatusCode.NotFound, "Categoria não encontrada.");
 
                 return RespostaPadraoApi(data: categoria);
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiError { Message = ex.Message });
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -67,7 +68,7 @@ namespace Conteudo.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiError { Message = ex.Message });
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -75,21 +76,20 @@ namespace Conteudo.API.Controllers
         /// Cadastra uma nova categoria.
         /// </summary>
         /// <param name="dto">Dados da categoria</param>
-        /// Retorna `ApiSuccess` em caso de sucesso ou `ApiError` em caso de erro.
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Administrador")]
         [ProducesResponseType(typeof(ApiSuccess), 201)]
-        [ProducesResponseType(typeof(ApiError), 400)]
+        [ProducesResponseType(typeof(ResponseResult), 400)]
         public async Task<IActionResult> CadastrarCategoria([FromBody] CadastroCategoriaDto dto)
         {
             try
             {
                 var command = _mapper.Map<CadastrarCategoriaCommand>(dto);
-                return RespostaPadraoApi(await _mediator.EnviarComando(command));
+                return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.EnviarComando(command));
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiError { Message = ex.Message });
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
             }
         }
     }

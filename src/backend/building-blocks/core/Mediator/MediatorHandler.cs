@@ -1,4 +1,5 @@
-﻿using Core.Messages;
+﻿using Core.Communication;
+using Core.Messages;
 using FluentValidation.Results;
 using MediatR;
 
@@ -14,6 +15,12 @@ namespace Core.Mediator
         }
 
         public async Task<ValidationResult> EnviarComando<T>(T comando) where T : Command
+        {
+            var result = await _mediator.Send(comando);
+            return result.ObterValidationResult();
+        }
+
+        public async Task<CommandResult> ExecutarComando<T>(T comando) where T : Command
         {
             return await _mediator.Send(comando);
         }

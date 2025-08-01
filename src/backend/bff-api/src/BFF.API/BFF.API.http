@@ -1,4 +1,4 @@
-@BFF.API_HostAddress = http://localhost:5005
+@BFF.API_HostAddress = http://localhost:5000
 
 ### Health Check
 GET {{BFF.API_HostAddress}}/health

@@ -2,6 +2,8 @@ namespace BFF.Application.Interfaces.Services;
 
 public interface IHttpClientService
 {
+    public HttpClient GetHttpClient();
+    public void SetBaseAddress(string baseAddress);
     Task<T?> GetAsync<T>(string endpoint) where T : class;
     Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest request) 
         where TRequest : class 

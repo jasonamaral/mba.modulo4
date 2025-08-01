@@ -14,22 +14,28 @@ namespace Conteudo.API.Controllers.Base
         {
             if (!notificador.TemErros())
             {
-                return new ObjectResult(new ApiSuccess
-                {
-                    Message = message ?? "Operação realizada com sucesso",
+                return new ObjectResult(new ResponseResult
+                {   
+                    Status = (int)statusCode,
+                    Title = message ?? "Operação realizada com sucesso",
+                    Errors = new(),
                     Data = data
-                })
-                {
-                    StatusCode = (int)statusCode
-                };
-                    
+                });  
             }
 
-            return BadRequest(new ApiError
+            return BadRequest(new ResponseResult
             {
-                Details = notificador.ObterErros(),
-                Message = message ?? "Ocorreu um ou mais erros durante a operação",
+                Status = (int)HttpStatusCode.BadRequest,
+                Title = message ?? "Ocorreu um ou mais erros durante a operação",
+                Errors = new ResponseErrorMessages
+                {
+                    Mensagens = notificador.ObterErros()
+                }
             });
+        }
+        protected ActionResult RespostaPadraoApi(HttpStatusCode statusCode, string message)
+        {
+            return RespostaPadraoApi(statusCode, null, message);
         }
 
         protected ActionResult RespostaPadraoApi(ModelStateDictionary modelState)
@@ -50,6 +56,16 @@ namespace Conteudo.API.Controllers.Base
             }
 
             return RespostaPadraoApi();
+        }
+
+        protected ActionResult RespostaPadraoApi(CommandResult result)
+        {
+            foreach (var erro in result.ObterErros())
+            {
+                notificador.AdicionarErro(erro.ErrorMessage);
+            }
+
+            return RespostaPadraoApi(data: result.Data);
         }
 
     }

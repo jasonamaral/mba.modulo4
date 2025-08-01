@@ -22,12 +22,16 @@ namespace Conteudo.API.Configuration
         {
             using var scope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<ConteudoDbContext>();
+            var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
-            await EnsureSeedData(context);
+            if (env.IsDevelopment())
+            {
+                await EnsureSeedData(context);
+            }
         }
 
         private static async Task EnsureSeedData(ConteudoDbContext context)
-        {
+        {   
             await context.Database.EnsureDeletedAsync();
             await context.Database.MigrateAsync();
 

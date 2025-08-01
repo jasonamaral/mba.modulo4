@@ -1,4 +1,4 @@
-using Conteudo.Domain.Common;
+using Core.DomainObjects;
 
 namespace Conteudo.Domain.Entities;
 

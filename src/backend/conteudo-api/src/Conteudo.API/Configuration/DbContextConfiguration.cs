@@ -6,12 +6,21 @@ namespace Conteudo.API.Configuration
     public static class DbContextConfiguration
     {
         public static WebApplicationBuilder AddDbContextConfiguration(this WebApplicationBuilder builder)
-        {
-            builder.Services.AddDbContext<ConteudoDbContext>(opt =>
+        {   
+            if (builder.Environment.IsDevelopment())
             {
-                opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-
+                builder.Services.AddDbContext<ConteudoDbContext>(opt =>
+                {
+                    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+                });
+            } 
+            else
+            {
+                builder.Services.AddDbContext<ConteudoDbContext>(opt =>
+                {
+                    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                });
+            }
             return builder;
         }
     }
