@@ -1,4 +1,4 @@
-namespace Conteudo.Domain.Common;
+namespace Core.DomainObjects;
 
 /// <summary>
 /// Marker interface para identificar raízes de agregação

@@ -1,4 +1,4 @@
-@Auth.API_HostAddress = https://localhost:5002
+@Auth.API_HostAddress = http://localhost:5001
 
 ### Health Check
 GET {{Auth.API_HostAddress}}/health

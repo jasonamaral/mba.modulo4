@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Conteudo.Domain.Common;
+namespace Core.DomainObjects;
 
 public abstract class Entidade
 {

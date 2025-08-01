@@ -30,6 +30,11 @@ public class HttpClientService : IHttpClientService
         };
     }
 
+    public HttpClient GetHttpClient()
+    {
+        return _httpClient;
+    }
+
     public async Task<T?> GetAsync<T>(string endpoint) where T : class
     {
         try
@@ -128,6 +133,18 @@ public class HttpClientService : IHttpClientService
         {
             _logger.LogError(ex, "Erro na requisição DELETE para {Endpoint}", endpoint);
             return false;
+        }
+    }
+    public void SetBaseAddress(string baseAddress)
+    {
+        if (Uri.TryCreate(baseAddress, UriKind.Absolute, out var uri))
+        {
+            _httpClient.BaseAddress = uri;
+        }
+        else
+        {
+            _logger.LogError("Endereço base inválido: {BaseAddress}", baseAddress);
+            throw new ArgumentException("Endereço base inválido", nameof(baseAddress));
         }
     }
 }

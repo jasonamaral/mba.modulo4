@@ -1,5 +1,5 @@
-using Conteudo.Domain.Common;
 using Conteudo.Domain.ValueObjects;
+using Core.DomainObjects;
 
 namespace Conteudo.Domain.Entities;
 

@@ -1,17 +1,18 @@
-﻿using Conteudo.Domain.Interfaces.Repositories;
-using Conteudo.Domain.Entities;
+﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Interfaces.Repositories;
+using Core.Communication;
 using Core.Messages;
-using FluentValidation.Results;
 using MediatR;
 
 namespace Conteudo.Application.Commands
 {
-    public class CategoriaHandler(ICategoriaRepository categoriaRepository) : CommandHandler, IRequestHandler<CadastrarCategoriaCommand, ValidationResult>
+    public class CategoriaHandler(ICategoriaRepository categoriaRepository) : CommandHandler
+        , IRequestHandler<CadastrarCategoriaCommand, CommandResult>
     {
-        public async Task<ValidationResult> Handle(CadastrarCategoriaCommand request, CancellationToken cancellationToken)
+        public async Task<CommandResult> Handle(CadastrarCategoriaCommand request, CancellationToken cancellationToken)
         {
             if (!request.EhValido())
-                return request.ValidationResult;
+                return request.CommandResult;
 
             var categoria = new Categoria(
                    request.Nome,
@@ -23,8 +24,8 @@ namespace Conteudo.Application.Commands
 
             if (await categoriaRepository.ExistePorNome(categoria.Nome))
             {
-                request.ValidationResult.Errors.Add(new ValidationFailure(nameof(request.Nome), "Já existe uma categoria com este nome."));
-                return request.ValidationResult;
+                request.CommandResult.AdicionarErro(nameof(request.Nome), "Já existe uma categoria com este nome.");
+                return request.CommandResult;
             }
 
             categoriaRepository.Adicionar(categoria);

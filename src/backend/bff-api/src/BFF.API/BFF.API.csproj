@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\core\Core.csproj" />
     <ProjectReference Include="..\BFF.Application\BFF.Application.csproj" />
     <ProjectReference Include="..\BFF.Infrastructure\BFF.Infrastructure.csproj" />
   </ItemGroup>

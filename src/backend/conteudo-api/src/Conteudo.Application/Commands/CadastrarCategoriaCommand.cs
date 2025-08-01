@@ -1,4 +1,5 @@
-﻿using Core.Messages;
+﻿using Core.Communication;
+using Core.Messages;
 using FluentValidation;
 
 namespace Conteudo.Application.Commands
@@ -13,8 +14,8 @@ namespace Conteudo.Application.Commands
 
         public override bool EhValido()
         {
-            ValidationResult = new CadastrarCategoriaCommandValidator().Validate(this);
-            return ValidationResult.IsValid;
+            CommandResult = new CommandResult(new CadastrarCategoriaCommandValidator().Validate(this));
+            return CommandResult.Success;
         }
     }
     public class CadastrarCategoriaCommandValidator : AbstractValidator<CadastrarCategoriaCommand>

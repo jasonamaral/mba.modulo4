@@ -1,6 +1,6 @@
-﻿using Core.Data;
+﻿using Core.DomainObjects;
 
-namespace Conteudo.Domain.Common
+namespace Core.Data
 {
     public interface IRepository<T> : IDisposable where T : IRaizAgregacao
     {

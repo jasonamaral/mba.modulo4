@@ -1,4 +1,5 @@
-﻿using Core.Messages;
+﻿using Core.Communication;
+using Core.Messages;
 using FluentValidation;
 
 namespace Conteudo.Application.Commands
@@ -28,8 +29,8 @@ namespace Conteudo.Application.Commands
 
         public override bool EhValido()
         {
-            ValidationResult = new CadastrarCursoCommandValidator().Validate(this);
-            return ValidationResult.IsValid;
+            CommandResult = new CommandResult(new CadastrarCursoCommandValidator().Validate(this));
+            return CommandResult.Success;
         }
     }
 

@@ -14,11 +14,12 @@ using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar Kestrel para usar apenas HTTP em desenvolvimento
-if (builder.Environment.IsDevelopment())
+
+builder.WebHost.ConfigureKestrel(options =>
 {
-    builder.WebHost.UseUrls("http://localhost:5001");
-}
+    // Ignora HTTPS, escuta apenas porta 5001 em qualquer IP
+    options.ListenAnyIP(5001);
+});
 
 // Configurações
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -34,7 +35,7 @@ if (isDevelopment)
 {
     // SQLite para desenvolvimento
     builder.Services.AddDbContext<AuthDbContext>(options =>
-        options.UseSqlite(connectionString ?? "Data Source=../../../../data/auth-dev.db"));
+        options.UseSqlite(connectionString ?? "Data Source=../../../../../data/auth-dev.db"));
 }
 else
 {

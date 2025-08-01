@@ -1,6 +1,6 @@
-using Conteudo.Domain.Common;
 using Conteudo.Domain.Entities;
 using Core.Data;
+using Core.DomainObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conteudo.Infrastructure.Data;

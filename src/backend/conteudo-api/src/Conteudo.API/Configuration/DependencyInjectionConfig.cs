@@ -4,9 +4,9 @@ using Conteudo.Application.Services;
 using Conteudo.Domain.Interfaces.Repositories;
 using Conteudo.Infrastructure.Data;
 using Conteudo.Infrastructure.Repositories;
+using Core.Communication;
 using Core.Mediator;
 using Core.Utils;
-using FluentValidation.Results;
 using MediatR;
 
 namespace Conteudo.API.Configuration
@@ -19,9 +19,9 @@ namespace Conteudo.API.Configuration
             services.AddScoped<IMediatorHandler, MediatorHandler>();
 
             // Commands
-            services.AddScoped<IRequestHandler<CadastrarCursoCommand, ValidationResult>, CursoHandler>();
-            services.AddScoped<IRequestHandler<CadastrarCategoriaCommand, ValidationResult>, CategoriaHandler>();
-            services.AddScoped<IRequestHandler<AtualizarCursoCommand, ValidationResult>, CursoHandler>();
+            services.AddScoped<IRequestHandler<CadastrarCursoCommand, CommandResult>, CursoHandler>();
+            services.AddScoped<IRequestHandler<CadastrarCategoriaCommand, CommandResult>, CategoriaHandler>();
+            services.AddScoped<IRequestHandler<AtualizarCursoCommand, CommandResult>, CursoHandler>();
 
             // Services
             services.AddScoped<ICursoAppService, CursoAppService>();

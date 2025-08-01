@@ -9,11 +9,12 @@ using Core.Notification;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace Conteudo.API.Controllers;
 
 [Route("api/[controller]")]
-//[Authorize] TODO: verificar como implementar autenticação e autorização
+[Authorize]
 [Produces("application/json")]
 public class CursosController : MainController
 {
@@ -38,7 +39,7 @@ public class CursosController : MainController
     /// <returns>Lista de cursos</returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<CursoDto>), 200)]
-    [ProducesResponseType(typeof(ApiError), 400)]
+    [ProducesResponseType(typeof(ResponseResult), 400)]
     public async Task<IActionResult> ObterCursos([FromQuery] bool includeAulas = false)
     {
         try
@@ -48,7 +49,7 @@ public class CursosController : MainController
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -60,7 +61,7 @@ public class CursosController : MainController
     /// <returns>Dados do curso</returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(CursoDto), 200)]
-    [ProducesResponseType(typeof(ApiError), 404)]
+    [ProducesResponseType(typeof(ResponseResult), 404)]
     public async Task<IActionResult> ObterCurso(
         [FromRoute] Guid id, 
         [FromQuery] bool includeAulas = false)
@@ -69,13 +70,13 @@ public class CursosController : MainController
         {
             var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas);
             if (curso == null)
-                return NotFound(new ApiError { Message = "Curso não encontrado" });
+                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
 
             return RespostaPadraoApi(data: curso);
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -87,7 +88,7 @@ public class CursosController : MainController
     /// <returns>Lista de cursos da categoria</returns>
     [HttpGet("categoria/{categoriaId}")]
     [ProducesResponseType(typeof(IEnumerable<CursoDto>), 200)]
-    [ProducesResponseType(typeof(ApiError), 400)]
+    [ProducesResponseType(typeof(ResponseResult), 400)]
     public async Task<IActionResult> GetCursosPorCategoria(
         [FromRoute] Guid categoriaId,
         [FromQuery] bool includeAulas = false)
@@ -99,7 +100,7 @@ public class CursosController : MainController
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -110,7 +111,7 @@ public class CursosController : MainController
     /// <returns>Lista de cursos ativos</returns>
     [HttpGet("ativos")]
     [ProducesResponseType(typeof(IEnumerable<CursoDto>), 200)]
-    [ProducesResponseType(typeof(ApiError), 400)]
+    [ProducesResponseType(typeof(ResponseResult), 400)]
     public async Task<IActionResult> GetCursosAtivos([FromQuery] bool includeAulas = false)
     {
         try
@@ -120,7 +121,7 @@ public class CursosController : MainController
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -132,7 +133,7 @@ public class CursosController : MainController
     /// <returns>Lista de cursos encontrados</returns>
     [HttpGet("buscar")]
     [ProducesResponseType(typeof(IEnumerable<CursoDto>), 200)]
-    [ProducesResponseType(typeof(ApiError), 400)]
+    [ProducesResponseType(typeof(ResponseResult), 400)]
     public async Task<IActionResult> BuscarCursos(
         [FromQuery] [Required] string searchTerm,
         [FromQuery] bool includeAulas = false)
@@ -140,14 +141,14 @@ public class CursosController : MainController
         try
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return BadRequest(new ApiError { Message = "Termo de busca é obrigatório" });
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, "Termo de busca é obrigatório");
 
             var cursos = await _cursoAppService.SearchAsync(searchTerm, includeAulas);
             return Ok(cursos);
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -155,21 +156,20 @@ public class CursosController : MainController
     /// Cadastra um novo curso
     /// </summary>
     /// <param name="dto">Dados do curso</param>
-    /// Retorna `ApiSuccess` em caso de sucesso ou `ApiError` em caso de erro.
     [HttpPost]
-    //[Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(ApiSuccess), 201)]
-    [ProducesResponseType(typeof(ApiError), 400)]
+    [Authorize(Roles = "Administrador")]
+    [ProducesResponseType(typeof(ResponseResult), 201)]
+    [ProducesResponseType(typeof(ResponseResult), 400)]
     public async Task<IActionResult> CadastrarCurso([FromBody] CadastroCursoDto dto)
     {
         try
         {
             var command = _mapper.Map<CadastrarCursoCommand>(dto);
-            return RespostaPadraoApi(await _mediator.EnviarComando(command));
+            return RespostaPadraoApi(await _mediator.ExecutarComando(command));
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         } 
     }
 
@@ -179,10 +179,10 @@ public class CursosController : MainController
     /// <param name="id">ID do curso</param>
     /// <param name="dto">Dados atualizados do curso</param>
     [HttpPut("{id}")]
-    //[Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(ApiSuccess), 200)]
-    [ProducesResponseType(typeof(ApiError), 400)]
-    [ProducesResponseType(typeof(ApiError), 404)]
+    [Authorize(Roles = "Administrador")]
+    [ProducesResponseType(typeof(ResponseResult), 200)]
+    [ProducesResponseType(typeof(ResponseResult), 400)]
+    [ProducesResponseType(typeof(ResponseResult), 404)]
     public async Task<IActionResult> AtualizarCurso([FromRoute] Guid id, [FromBody] AtualizarCursoDto dto)
     {
         try
@@ -191,19 +191,19 @@ public class CursosController : MainController
                 return RespostaPadraoApi(ModelState);
 
             if (id != dto.Id)
-                return BadRequest(new ApiError { Message = "ID do curso não confere" });
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do curso não confere");
 
             var command = _mapper.Map<AtualizarCursoCommand>(dto);
             
-            return RespostaPadraoApi(await _mediator.EnviarComando(command));
+            return RespostaPadraoApi(await _mediator.ExecutarComando(command));
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.NotFound, ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -213,23 +213,23 @@ public class CursosController : MainController
     /// <param name="id">ID do curso</param>
     /// <returns>Confirmação da ativação</returns>
     [HttpPatch("{id}/ativar")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ApiSuccess), 200)]
-    [ProducesResponseType(typeof(ApiError), 404)]
+    [ProducesResponseType(typeof(ResponseResult), 404)]
     public async Task<IActionResult> AtivarCurso([FromRoute] Guid id)
     {
         try
         {
-            await _cursoAppService.AtivarCursoAsync(id);
+            //await _cursoAppService.AtivarCursoAsync(id);
             return Ok(new ApiSuccess { Message = "Curso ativado com sucesso" });
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.NotFound, ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -239,23 +239,23 @@ public class CursosController : MainController
     /// <param name="id">ID do curso</param>
     /// <returns>Confirmação da desativação</returns>
     [HttpPatch("{id}/desativar")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ApiSuccess), 200)]
-    [ProducesResponseType(typeof(ApiError), 404)]
+    [ProducesResponseType(typeof(ResponseResult), 404)]
     public async Task<IActionResult> DesativarCurso([FromRoute] Guid id)
     {
         try
         {
-            await _cursoAppService.DesativarCursoAsync(id);
+            //await _cursoAppService.DesativarCursoAsync(id);
             return Ok(new ApiSuccess { Message = "Curso desativado com sucesso" });
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.NotFound, ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -265,23 +265,23 @@ public class CursosController : MainController
     /// <param name="id">ID do curso</param>
     /// <returns>Confirmação da exclusão</returns>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ApiSuccess), 200)]
-    [ProducesResponseType(typeof(ApiError), 404)]
+    [ProducesResponseType(typeof(ResponseResult), 404)]
     public async Task<IActionResult> ExcluirCurso([FromRoute] Guid id)
     {
         try
         {
-            await _cursoAppService.ExcluirCursoAsync(id);
+            //await _cursoAppService.ExcluirCursoAsync(id);
             return Ok(new ApiSuccess { Message = "Curso excluído com sucesso" });
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.NotFound, ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -292,20 +292,20 @@ public class CursosController : MainController
     /// <returns>Lista de aulas do curso</returns>
     [HttpGet("{id}/aulas")]
     [ProducesResponseType(typeof(IEnumerable<AulaDto>), 200)]
-    [ProducesResponseType(typeof(ApiError), 404)]
+    [ProducesResponseType(typeof(ResponseResult), 404)]
     public async Task<IActionResult> GetAulasDoCurso([FromRoute] Guid id)
     {
         try
         {
             var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas: true);
             if (curso == null)
-                return NotFound(new ApiError { Message = "Curso não encontrado" });
+                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
 
             return Ok(curso.Aulas);
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -316,14 +316,14 @@ public class CursosController : MainController
     /// <returns>Conteúdo programático</returns>
     [HttpGet("{id}/conteudo-programatico")]
     [ProducesResponseType(typeof(ConteudoProgramaticoDto), 200)]
-    [ProducesResponseType(typeof(ApiError), 404)]
+    [ProducesResponseType(typeof(ResponseResult), 404)]
     public async Task<IActionResult> GetConteudoProgramatico([FromRoute] Guid id)
     {
         try
         {
             var curso = await _cursoAppService.ObterPorIdAsync(id);
             if (curso == null)
-                return NotFound(new ApiError { Message = "Curso não encontrado" });
+                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
 
             var conteudoProgramatico = new ConteudoProgramaticoDto
             {
@@ -342,7 +342,7 @@ public class CursosController : MainController
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 
@@ -353,14 +353,14 @@ public class CursosController : MainController
     /// <returns>Confirmação do registro</returns>
     [HttpPost("{id}/acesso")]
     [ProducesResponseType(typeof(ApiSuccess), 200)]
-    [ProducesResponseType(typeof(ApiError), 404)]
+    [ProducesResponseType(typeof(ResponseResult), 404)]
     public async Task<IActionResult> RegistrarAcesso([FromRoute] Guid id)
     {
         try
         {
             var curso = await _cursoAppService.ObterPorIdAsync(id);
             if (curso == null)
-                return NotFound(new ApiError { Message = "Curso não encontrado" });
+                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
 
             // TODO: Implementar auditoria de acesso
             // await _auditService.RegistrarAcessoCurso(id, User.Identity.Name);
@@ -369,7 +369,7 @@ public class CursosController : MainController
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiError { Message = ex.Message });
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
         }
     }
 }

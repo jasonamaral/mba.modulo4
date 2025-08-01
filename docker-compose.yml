@@ -133,7 +133,7 @@ services:
       - "7003:7003"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=https://+:5003;http://+:7003
+      - ASPNETCORE_URLS=http://+:5003;http://+:7003
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PlataformaEducacional123!
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AlunosDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
       - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
@@ -154,7 +154,7 @@ services:
     networks:
       - plataforma-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7003/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -169,7 +169,7 @@ services:
       - "7004:7004"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=https://+:5004;http://+:7004
+      - ASPNETCORE_URL=http://+:5004;http://+:7004
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PlataformaEducacional123!
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=PagamentosDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
       - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
@@ -189,29 +189,30 @@ services:
     networks:
       - plataforma-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7004/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5004/health"]
       interval: 30s
       timeout: 10s
       retries: 3
 
   bff-api:
     build:
-      context: ./src/backend/bff-api
-      dockerfile: Dockerfile
+        context: ./src/backend
+        dockerfile: bff-api/Dockerfile
     container_name: plataforma-bff-api
     ports:
       - "5000:5000"
+      - "7000:7000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_URLS=http://+:5000;http://+:7000
       - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
       - JwtSettings__Issuer=PlataformaEducacional
       - JwtSettings__Audience=PlataformaEducacional
       - Redis__ConnectionString=redis:6379
-      - ApiSettings__AuthApiUrl=http://auth-api:7001
-      - ApiSettings__ConteudoApiUrl=http://conteudo-api:7002
-      - ApiSettings__AlunosApiUrl=http://alunos-api:7003
-      - ApiSettings__PagamentosApiUrl=http://pagamentos-api:7004
+      - ApiSettings__AuthApiUrl=http://auth-api:5001
+      - ApiSettings__ConteudoApiUrl=http://conteudo-api:5002
+      - ApiSettings__AlunosApiUrl=http://alunos-api:5003
+      - ApiSettings__PagamentosApiUrl=http://pagamentos-api:5004
     depends_on:
       redis:
         condition: service_healthy

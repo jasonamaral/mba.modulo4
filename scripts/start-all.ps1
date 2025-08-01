@@ -1,5 +1,7 @@
-# Plataforma Educacional - Script de Inicializacao (Windows PowerShell)
-# Execucao: .\scripts\start-all.ps1
+param(
+    [switch]$ForceBuild,
+    [switch]$CleanBuild
+)
 
 Write-Host "Iniciando Plataforma Educacional..." -ForegroundColor Green
 Write-Host "=================================================" -ForegroundColor Cyan
@@ -25,7 +27,7 @@ catch {
     exit 1
 }
 
-# Verificar se arquivos docker-compose existem
+# Escolher compose file
 $composeFile = ""
 if (Test-Path "docker-compose-simple.yml") {
     $composeFile = "docker-compose-simple.yml"
@@ -35,8 +37,17 @@ if (Test-Path "docker-compose-simple.yml") {
     Write-Host "Usando docker-compose.yml (PRODUCAO)" -ForegroundColor Green
 } else {
     Write-Host "Arquivo docker-compose nao encontrado." -ForegroundColor Red
-    Write-Host "Caminho atual: $(Get-Location)" -ForegroundColor Yellow
     exit 1
+}
+
+# Limpeza total se CleanBuild estiver ativo
+if ($CleanBuild) {
+    Write-Host "Limpando containers e imagens antigas..." -ForegroundColor Red
+    docker-compose -f $composeFile down --volumes --remove-orphans
+    $oldImages = docker images -q "mbamodulo4-*"
+    if ($oldImages) {
+        docker rmi -f $oldImages
+    }
 }
 
 # Criar pasta data se não existir (para SQLite)
@@ -70,7 +81,10 @@ foreach ($service in $services) {
     }
 }
 
-if ($missingImages.Count -gt 0) {
+if ($ForceBuild -or $CleanBuild) {
+    Write-Host "Reconstruindo todas as imagens..." -ForegroundColor Yellow
+    docker-compose -f $composeFile build --no-cache --parallel
+} elseif ($missingImages.Count -gt 0) {
     Write-Host "Construindo imagens faltantes: $($missingImages -join ', ')" -ForegroundColor Yellow
     $buildServices = $missingImages -join " "
     docker-compose -f $composeFile build --parallel $buildServices
@@ -205,6 +219,10 @@ if ($missingFrontend.Count -gt 0) {
 }
 
 Write-Host ""
+Write-Host "Recriando todos os containers para garantir ambiente limpo..." -ForegroundColor Yellow
+docker-compose -f $composeFile up -d --force-recreate
+
+Write-Host ""
 Write-Host "Sistema iniciado com sucesso!" -ForegroundColor Green
 Write-Host "=================================================" -ForegroundColor Cyan
 Write-Host "URLs de Acesso:" -ForegroundColor White
@@ -234,4 +252,4 @@ Write-Host ""
 Write-Host "Para ver logs: docker-compose -f $composeFile logs -f [service_name]" -ForegroundColor Yellow
 Write-Host "Para parar tudo: docker-compose -f $composeFile down" -ForegroundColor Red
 Write-Host ""
-Write-Host "NOTA: Sistema rodando em modo DESENVOLVIMENTO com SQLite" -ForegroundColor Yellow 
+Write-Host "NOTA: Sistema rodando em modo DESENVOLVIMENTO com SQLite" -ForegroundColor Yellow
