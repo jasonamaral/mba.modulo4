@@ -4,10 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
+using System.Text.Json;
 
 namespace Alunos.Infrastructure.Services;
 
@@ -87,8 +87,8 @@ public class UserRegisteredEventConsumer : BackgroundService
 
                 try
                 {
-                    var userRegisteredEvent = JsonConvert.DeserializeObject<UserRegisteredEvent>(message);
-                    
+                    var userRegisteredEvent = JsonSerializer.Deserialize<UserRegisteredEvent>(message);
+
                     if (userRegisteredEvent != null && !userRegisteredEvent.EhAdministrador)
                     {
                         using var scope = _serviceProvider.CreateScope();

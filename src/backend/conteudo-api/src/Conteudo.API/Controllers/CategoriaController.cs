@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Conteudo.API.Controllers.Base;
+﻿using Conteudo.API.Controllers.Base;
 using Conteudo.Application.Commands;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
@@ -9,6 +8,7 @@ using Core.Notification;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
+using Mapster;
 
 namespace Conteudo.API.Controllers
 {
@@ -19,15 +19,13 @@ namespace Conteudo.API.Controllers
     {
         private readonly IMediatorHandler _mediator;
         private readonly ICategoriaAppService _categoriaAppService;
-        private readonly IMapper _mapper;
+        
         public CategoriaController(INotificador notificador
                                   , IMediatorHandler mediator
-                                  , ICategoriaAppService categoriaAppService
-                                  , IMapper mapper) : base(notificador)
+                                  , ICategoriaAppService categoriaAppService) : base(notificador)
         {
             _mediator = mediator;
             _categoriaAppService = categoriaAppService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -84,7 +82,7 @@ namespace Conteudo.API.Controllers
         {
             try
             {
-                var command = _mapper.Map<CadastrarCategoriaCommand>(dto);
+                var command = dto.Adapt<CadastrarCategoriaCommand>();
                 return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.EnviarComando(command));
             }
             catch (Exception ex)

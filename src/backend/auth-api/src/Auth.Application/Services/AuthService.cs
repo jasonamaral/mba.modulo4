@@ -3,11 +3,13 @@ using Auth.Application.Interfaces;
 using Auth.Application.Settings;
 using Auth.Domain.Entities;
 using Auth.Domain.Events;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NetDevPack.Security.Jwt.Core.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -22,22 +24,29 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly JwtSettings _jwtSettings;
     private readonly IEventPublisher _eventPublisher;
+    private readonly IJwtService _jwtService;
+    private readonly IHttpContextAccessor _accessor;
+
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         IAuthDbContext context,
         ILogger<AuthService> logger,
         IOptions<JwtSettings> jwtSettings,
-        IEventPublisher eventPublisher)
+        IEventPublisher eventPublisher,
+        IJwtService jwksService,
+        IHttpContextAccessor accessor)
     {
         _userManager = userManager;
         _context = context;
         _logger = logger;
         _jwtSettings = jwtSettings.Value;
         _eventPublisher = eventPublisher;
+        _jwtService = jwksService;
+        _accessor = accessor;
     }
 
-    public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
+    public async Task<AuthResponseDto> RegistrarAsync(RegisterRequestDto request)
     {
         try
         {
@@ -106,13 +115,13 @@ public class AuthService : IAuthService
                     DataCadastro = user.DataCadastro,
                     EhAdministrador = request.EhAdministrador
                 };
-                
+
                 await _eventPublisher.PublishAsync(userRegisteredEvent);
             }
 
             // Gerar tokens
-            var accessToken = await GenerateJwtTokenAsync(user);
-            var refreshToken = GenerateRefreshToken();
+            var accessToken = await GerarJwtTokenAsync(user);
+            var refreshToken = GerarRefreshToken();
 
             // Salvar refresh token
             user.RefreshToken = refreshToken;
@@ -183,8 +192,8 @@ public class AuthService : IAuthService
             }
 
             // Gerar tokens
-            var accessToken = await GenerateJwtTokenAsync(user);
-            var refreshToken = GenerateRefreshToken();
+            var accessToken = await GerarJwtTokenAsync(user);
+            var refreshToken = GerarRefreshToken();
 
             // Salvar refresh token
             user.RefreshToken = refreshToken;
@@ -249,8 +258,8 @@ public class AuthService : IAuthService
             }
 
             // Gerar novos tokens
-            var accessToken = await GenerateJwtTokenAsync(user);
-            var refreshToken = GenerateRefreshToken();
+            var accessToken = await GerarJwtTokenAsync(user);
+            var refreshToken = GerarRefreshToken();
 
             // Atualizar refresh token
             user.RefreshToken = refreshToken;
@@ -298,41 +307,41 @@ public class AuthService : IAuthService
         }
     }
 
-    private async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
+    private async Task<string> GerarJwtTokenAsync(ApplicationUser user)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
-        var roles = await _userManager.GetRolesAsync(user);
+        var userRoles = await _userManager.GetRolesAsync(user);
+        var identityClaims = new ClaimsIdentity();
+        identityClaims.AddClaims(await _userManager.GetClaimsAsync(user));
+        identityClaims.AddClaims(userRoles.Select(s => new Claim("role", s)));
 
-        var claims = new List<Claim>
+        identityClaims.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+        identityClaims.AddClaim(new Claim(JwtRegisteredClaimNames.Email, user.Email!));
+        identityClaims.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+        identityClaims.AddClaim(new Claim(JwtRegisteredClaimNames.Name, user.Nome));
+
+        var currentIssuer =   $"{_accessor.HttpContext!.Request.Scheme}://{_accessor.HttpContext!.Request.Host}";
+        var handler = new JwtSecurityTokenHandler();
+        var key = await _jwtService.GetCurrentSigningCredentials();
+        var securityToken = handler.CreateToken(new SecurityTokenDescriptor
         {
-            new(ClaimTypes.NameIdentifier, user.Id),
-            new(ClaimTypes.Email, user.Email ?? ""),
-            new(ClaimTypes.Name, user.Nome),
-            new("userId", user.Id)
-        };
-
-        // Adicionar roles como claims
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
+            Issuer = currentIssuer,
+            SigningCredentials = key,
+            Subject = identityClaims,
+            NotBefore = DateTime.UtcNow,
             Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = _jwtSettings.Issuer,
-            Audience = _jwtSettings.Audience
-        };
+            IssuedAt = DateTime.UtcNow,
+            TokenType = "at+jwt"
+        });
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        var encodedJwt = handler.WriteToken(securityToken);
+        return encodedJwt;
     }
 
-    private static string GenerateRefreshToken()
+    private static string GerarRefreshToken()
     {
         var randomNumber = new byte[32];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
     }
-} 
+}

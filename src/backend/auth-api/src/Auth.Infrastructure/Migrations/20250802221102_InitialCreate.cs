@@ -32,6 +32,13 @@ namespace Auth.Infrastructure.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Nome = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     DataNascimento = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CPF = table.Column<string>(type: "TEXT", maxLength: 14, nullable: false),
+                    Telefone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Genero = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Cidade = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Estado = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    CEP = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    Foto = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     DataCadastro = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
                     RefreshToken = table.Column<string>(type: "TEXT", nullable: true),
@@ -54,6 +61,25 @@ namespace Auth.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SecurityKeys",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    KeyId = table.Column<string>(type: "TEXT", nullable: true),
+                    Type = table.Column<string>(type: "TEXT", nullable: true),
+                    Use = table.Column<string>(type: "TEXT", nullable: true),
+                    Parameters = table.Column<string>(type: "TEXT", nullable: true),
+                    IsRevoked = table.Column<bool>(type: "INTEGER", nullable: false),
+                    RevokedReason = table.Column<string>(type: "TEXT", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SecurityKeys", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -217,6 +243,9 @@ namespace Auth.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "SecurityKeys");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

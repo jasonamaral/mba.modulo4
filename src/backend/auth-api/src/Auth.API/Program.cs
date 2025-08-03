@@ -5,15 +5,10 @@ using Auth.Application.Settings;
 using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -27,65 +22,16 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 // Configurar Mapster
 TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
 
-// Entity Framework - Configuração condicional baseada no ambiente
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var isDevelopment = builder.Environment.IsDevelopment();
+// Configurações separadas por responsabilidade (SRP)
+builder.Services.AddDatabaseConfiguration(builder.Configuration, builder.Environment);
+builder.Services.AddIdentityConfiguration();
+builder.Services.AddJwtConfiguration(builder.Configuration);
+builder.Services.AddJwksConfiguration();
 
-if (isDevelopment)
-{
-    // SQLite para desenvolvimento
-    builder.Services.AddDbContext<AuthDbContext>(options =>
-        options.UseSqlite(connectionString ?? "Data Source=../../../../../data/auth-dev.db"));
-}
-else
-{
-    // SQL Server para produção
-    builder.Services.AddDbContext<AuthDbContext>(options =>
-        options.UseSqlServer(connectionString ?? "Server=localhost;Database=AuthDB;Trusted_Connection=true;TrustServerCertificate=true;"));
-}
+builder.Services.AddAuthorization();
+builder.Services.AddMemoryCache();
 
-// Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    // Configurações de senha
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
-
-    // Configurações de usuário
-    options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedEmail = false;
-})
-.AddEntityFrameworkStores<AuthDbContext>()
-.AddDefaultTokenProviders();
-
-// JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? "MinhaChaveSecretaSuperSegura123456789";
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"] ?? "Auth.API",
-        ValidAudience = jwtSettings["Audience"] ?? "Auth.API.Users",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
-// Application Services
+// Application Services (DIP - dependendo de abstrações)
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
@@ -127,7 +73,7 @@ if (app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
-
+app.UseJwksDiscovery();
 app.UseAuthentication();
 app.UseAuthorization();
 

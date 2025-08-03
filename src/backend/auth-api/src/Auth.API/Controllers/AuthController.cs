@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
                 Foto = request.Foto
             };
 
-            var result = await _authService.RegisterAsync(registerDto);
+            var result = await _authService.RegistrarAsync(registerDto);
 
             if (!result.Success)
             {

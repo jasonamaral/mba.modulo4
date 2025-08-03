@@ -1,9 +1,9 @@
 using Auth.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System.Text;
+using System.Text.Json;
 
 namespace Auth.Infrastructure.Services;
 
@@ -50,7 +50,7 @@ public class EventPublisher : IEventPublisher, IDisposable
             var eventName = typeof(T).Name;
             var routingKey = $"usuario.registrado";
 
-            var message = JsonConvert.SerializeObject(eventData);
+            var message = JsonSerializer.Serialize(eventData);
             var body = Encoding.UTF8.GetBytes(message);
 
             var properties = _channel.CreateBasicProperties();

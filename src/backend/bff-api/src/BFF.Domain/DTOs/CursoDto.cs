@@ -4,14 +4,29 @@ public class CursoDto
 {
     public Guid Id { get; set; }
     public string Nome { get; set; } = string.Empty;
-    public string Descricao { get; set; } = string.Empty;
-    public string Categoria { get; set; } = string.Empty;
-    public decimal Preco { get; set; }
-    public int CargaHoraria { get; set; }
-    public int TotalAulas { get; set; }
-    public string Status { get; set; } = string.Empty;
-    public string ImagemCapa { get; set; } = string.Empty;
-    public List<AulaDto> Aulas { get; set; } = new();
+    public decimal Valor { get; set; }
+    public bool Ativo { get; set; }
+    public DateTime ValidoAte { get; set; }
+    public string CategoriaId { get; set; } = string.Empty;
+    public string NomeCategoria { get; set; } = string.Empty;
+    public int DuracaoHoras { get; set; }
+    public string Nivel { get; set; } = string.Empty;
+    public string IimagemUrl { get; set; } = string.Empty;
+    public string Instrutor { get; set; } = string.Empty;
+    public int VagasMaximas { get; set; }
+    public int VagasOcupadas { get; set; }
+    public int VagasDisponiveis { get; set; }
+    public bool PodeSerMatriculado { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public string Resumo { get; set; } = string.Empty;
+    public string Descricao { get; set; } = string.Empty;
+    public string Objetivos { get; set; } = string.Empty;
+    public string PreRequisitos { get; set; } = string.Empty;
+    public string PublicoAlvo { get; set; } = string.Empty;
+    public string Metodologia { get; set; } = string.Empty;
+    public string Recursos { get; set; } = string.Empty;
+    public string Avaliacao { get; set; } = string.Empty;
+    public string Bibliografia { get; set; } = string.Empty;
+    public List<AulaDto> Aulas { get; set; } = new();
 }

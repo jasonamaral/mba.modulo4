@@ -1,22 +1,22 @@
-﻿using AutoMapper;
-using Conteudo.Application.DTOs;
+﻿using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Conteudo.Domain.Interfaces.Repositories;
+using Mapster;
 
 namespace Conteudo.Application.Services
 {
-    public class CursoAppService(ICursoRepository cursoRepository, IMapper mapper) : ICursoAppService
+    public class CursoAppService(ICursoRepository cursoRepository) : ICursoAppService
     {
         public async Task<IEnumerable<CursoDto>> ObterTodosAsync(bool includeAulas = false)
         {
             var cursos = await cursoRepository.ObterTodosAsync(includeAulas);
-            return mapper.Map<IEnumerable<CursoDto>>(cursos);
+            return cursos.Adapt<IEnumerable<CursoDto>>();
         }
 
         public async Task<CursoDto?> ObterPorIdAsync(Guid id, bool includeAulas = false)
         {
             var curso = await cursoRepository.ObterPorIdAsync(id, includeAulas);
-            return mapper.Map<CursoDto>(curso);
+            return curso?.Adapt<CursoDto>();
         }
 
         public Task<IEnumerable<CursoDto>> GetByCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)

@@ -60,7 +60,7 @@ public class AlunosController : ControllerBase
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                
-                return Ok(JsonSerializer.Deserialize<AlunoPerfil>(responseContent));
+                return Ok(JsonSerializer.Deserialize<AlunoPerfil>(responseContent, JsonExtensions.GlobalJsonOptions));
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -111,7 +111,7 @@ public class AlunosController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return Ok(JsonSerializer.Deserialize<AlunoPerfil>(responseContent));
+                return Ok(JsonSerializer.Deserialize<AlunoPerfil>(responseContent, JsonExtensions.GlobalJsonOptions));
             }
             else
             {
@@ -157,7 +157,7 @@ public class AlunosController : ControllerBase
             }
 
             var alunoContent = await alunoResponse.Content.ReadAsStringAsync();
-            var aluno = JsonSerializer.Deserialize<AlunoPerfil>(alunoContent);
+            var aluno = JsonSerializer.Deserialize<AlunoPerfil>(alunoContent, JsonExtensions.GlobalJsonOptions);
 
             var matriculasResponse = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/{aluno?.Id}/matriculas");
 

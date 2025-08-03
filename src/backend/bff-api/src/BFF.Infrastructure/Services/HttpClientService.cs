@@ -7,6 +7,10 @@ using System.Text.Json;
 
 namespace BFF.Infrastructure.Services;
 
+/// <summary>
+/// Implementação do serviço HTTP usando HttpClient nativo
+/// Segue os princípios SOLID e Clean Code
+/// </summary>
 public class HttpClientService : IHttpClientService
 {
     private readonly HttpClient _httpClient;
@@ -35,6 +39,20 @@ public class HttpClientService : IHttpClientService
         return _httpClient;
     }
 
+    public void SetBaseAddress(string baseAddress)
+    {
+        if (Uri.TryCreate(baseAddress, UriKind.Absolute, out var uri))
+        {
+            _httpClient.BaseAddress = uri;
+            _logger.LogInformation("Endereço base configurado: {BaseAddress}", baseAddress);
+        }
+        else
+        {
+            _logger.LogError("Endereço base inválido: {BaseAddress}", baseAddress);
+            throw new ArgumentException("Endereço base inválido", nameof(baseAddress));
+        }
+    }
+
     public async Task<T?> GetAsync<T>(string endpoint) where T : class
     {
         try
@@ -44,11 +62,12 @@ public class HttpClientService : IHttpClientService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<T>(content, _jsonOptions);
+                var result = JsonSerializer.Deserialize<T>(content, _jsonOptions);
+                
+                return result;
             }
 
             _logger.LogWarning("Requisição GET falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
-
             return null;
         }
         catch (Exception ex)
@@ -72,11 +91,13 @@ public class HttpClientService : IHttpClientService
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<TResponse>(responseContent, _jsonOptions);
+                var result = JsonSerializer.Deserialize<TResponse>(responseContent, _jsonOptions);
+                
+                _logger.LogDebug("Requisição POST bem-sucedida para {Endpoint}", endpoint);
+                return result;
             }
 
             _logger.LogWarning("Requisição POST falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
-
             return null;
         }
         catch (Exception ex)
@@ -100,11 +121,13 @@ public class HttpClientService : IHttpClientService
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<TResponse>(responseContent, _jsonOptions);
+                var result = JsonSerializer.Deserialize<TResponse>(responseContent, _jsonOptions);
+                
+                _logger.LogDebug("Requisição PUT bem-sucedida para {Endpoint}", endpoint);
+                return result;
             }
 
             _logger.LogWarning("Requisição PUT falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
-
             return null;
         }
         catch (Exception ex)
@@ -122,11 +145,11 @@ public class HttpClientService : IHttpClientService
 
             if (response.IsSuccessStatusCode)
             {
+                _logger.LogDebug("Requisição DELETE bem-sucedida para {Endpoint}", endpoint);
                 return true;
             }
 
             _logger.LogWarning("Requisição DELETE falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
-
             return false;
         }
         catch (Exception ex)
@@ -135,16 +158,10 @@ public class HttpClientService : IHttpClientService
             return false;
         }
     }
-    public void SetBaseAddress(string baseAddress)
+
+    public void Dispose()
     {
-        if (Uri.TryCreate(baseAddress, UriKind.Absolute, out var uri))
-        {
-            _httpClient.BaseAddress = uri;
-        }
-        else
-        {
-            _logger.LogError("Endereço base inválido: {BaseAddress}", baseAddress);
-            throw new ArgumentException("Endereço base inválido", nameof(baseAddress));
-        }
+        _httpClient?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

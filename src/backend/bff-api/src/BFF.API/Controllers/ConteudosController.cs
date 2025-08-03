@@ -2,8 +2,10 @@
 using BFF.API.Services;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
+using BFF.API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace BFF.API.Controllers
 {
@@ -41,13 +43,21 @@ namespace BFF.API.Controllers
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            var curso = await _conteudoService.ObterCursoPorId(cursoId, token);
-            if (curso == null)
+            var response = await _conteudoService.ObterCursoPorId(cursoId, token);
+            if (response?.Data == null)
             {
                 return NotFound($"Curso com Id {cursoId} não encontrado.");
             }
-            await _cacheService.SetAsync(cacheKey, curso, TimeSpan.FromMinutes(30));
-            return Ok(curso);
+
+            // Extrai o CursoDto do ResponseResult
+            var curso = JsonSerializer.Deserialize<CursoDto>(response.Data.GetRawText(), JsonExtensions.GlobalJsonOptions);
+            if (curso != null)
+            {
+                await _cacheService.SetAsync(cacheKey, curso, TimeSpan.FromMinutes(30));
+                return Ok(curso);
+            }
+
+            return StatusCode(500, "Erro ao processar dados do curso.");
         }
 
         /// <summary>
@@ -64,13 +74,21 @@ namespace BFF.API.Controllers
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            var cursos = await _conteudoService.ObterTodosCursos(token);
-            if (cursos == null)
+            var response = await _conteudoService.ObterTodosCursos(token);
+            if (response == null || response.Data!.ValueKind == JsonValueKind.Null)
             {
                 return NotFound("Nenhum curso encontrado.");
             }
-            await _cacheService.SetAsync(cacheKey, cursos, TimeSpan.FromMinutes(30));
-            return Ok(cursos);
+
+            // Extrai a lista de CursoDto do ResponseResult
+            var cursos = JsonSerializer.Deserialize<IEnumerable<CursoDto>>(response!.Data!.GetRawText(), JsonExtensions.GlobalJsonOptions);
+            if (cursos != null)
+            {
+                await _cacheService.SetAsync(cacheKey, cursos, TimeSpan.FromMinutes(30));
+                return Ok(cursos);
+            }
+
+            return StatusCode(500, "Erro ao processar dados dos cursos.");
         }
 
         /// <summary>

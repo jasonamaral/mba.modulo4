@@ -87,11 +87,8 @@ public class DashboardService : IDashboardService
                     Id = Guid.NewGuid(),
                     Nome = "C# Avançado",
                     Descricao = "Conceitos avançados de C#",
-                    Categoria = "Programação",
-                    Preco = 149.99m,
-                    CargaHoraria = 30,
-                    TotalAulas = 15,
-                    Status = "Ativo",
+                    CategoriaId = "Programação",
+                    Valor = 149.99m,
                     CreatedAt = DateTime.UtcNow.AddDays(-15),
                     UpdatedAt = DateTime.UtcNow
                 }
