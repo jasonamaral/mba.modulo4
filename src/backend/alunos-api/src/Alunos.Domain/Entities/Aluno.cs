@@ -1,229 +1,211 @@
-using Alunos.Domain.Common;
+using Alunos.Domain.ValueObjects;
+using Core.DomainObjects;
+using Core.DomainValidations;
+using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.Domain.Entities;
 
-public class Aluno : Entidade, IRaizAgregacao
+public class Aluno : Common.Entidade, IRaizAgregacao
 {
-    public Guid CodigoUsuarioAutenticacao { get; private set; }
-
+    #region Atributos
+    public Guid CodigoUsuarioAutenticacao { get; }
     public string Nome { get; private set; }
-
     public string Email { get; private set; }
-
-    public string CPF { get; private set; }
-
+    public string Cpf { get; }
     public DateTime DataNascimento { get; private set; }
+    public string Contato { get; private set; }
+    public bool Ativo { get; private set; }
 
-    public string Telefone { get; private set; }
-
-    public string Genero { get; private set; }
-
-    public string Cidade { get; private set; }
-
-    public string Estado { get; private set; }
-
-    public string CEP { get; private set; }
-
-    public bool IsAtivo { get; private set; }
-
-    private readonly List<MatriculaCurso> _matriculasCursos = new();
-
+    private readonly List<MatriculaCurso> _matriculasCursos = [];
     public IReadOnlyCollection<MatriculaCurso> MatriculasCursos => _matriculasCursos.AsReadOnly();
+    #endregion
 
-    protected Aluno() : base()
-    {
-        Nome = string.Empty;
-        Email = string.Empty;
-        Telefone = string.Empty;
-        Genero = string.Empty;
-        Cidade = string.Empty;
-        Estado = string.Empty;
-        CEP = string.Empty;
-    }
+    #region CTOR
+    // EF Compatibility
+    protected Aluno() { }
 
-    public Aluno(
-        Guid codigoUsuarioAutenticacao,
+    public Aluno(Guid codigoUsuarioAutenticacao,
         string nome,
         string email,
         string cpf,
-        DateTime dataNascimento,
-        string telefone = "",
-        string genero = "",
-        string cidade = "",
-        string estado = "",
-        string cep = "") : base()
+        DateTime dataNascimento) 
     {
-        ValidarDadosObrigatorios(nome, email, cpf);
-        ValidarIdade(dataNascimento);
-        ValidarEmail(email);
-        ValidarCPF(cpf);
-
         CodigoUsuarioAutenticacao = codigoUsuarioAutenticacao;
-        Nome = nome.Trim();
-        Email = email.Trim().ToLowerInvariant();
-        CPF = cpf.Trim();
+        Nome = nome?.Trim() ?? string.Empty;
+        Email = email?.Trim().ToLowerInvariant() ?? string.Empty;
+        Cpf = cpf?.Trim() ?? string.Empty;
         DataNascimento = dataNascimento.Date;
-        Telefone = telefone?.Trim() ?? string.Empty;
-        Genero = genero?.Trim() ?? string.Empty;
-        Cidade = cidade?.Trim() ?? string.Empty;
-        Estado = estado?.Trim() ?? string.Empty;
-        CEP = cep?.Trim() ?? string.Empty;
-        IsAtivo = true;
+
+        ValidarIntegridadeAluno();
     }
+    #endregion
 
-    public void AtualizarDados(
-        string nome,
-        string email,
-        string cpf,
-        DateTime dataNascimento,
-        string telefone = "",
-        string genero = "",
-        string cidade = "",
-        string estado = "",
-        string cep = "")
+    #region Métodos
+    #region Manipuladores de Aluno
+    internal void AtivarAluno() => Ativo = true;
+    internal void InativarAluno() => Ativo = false;
+
+    internal void AtualizarNomeAluno(string nome)
     {
-        ValidarDadosObrigatorios(nome, email, cpf);
-        ValidarIdade(dataNascimento);
-        ValidarEmail(email);
-        ValidarCPF(cpf);
-
+        ValidarIntegridadeAluno(novoNome: nome ?? string.Empty);
         Nome = nome.Trim();
+    }
+
+    internal void AtualizarEmailAluno(string email)
+    {
+        ValidarIntegridadeAluno(novoEmail: email ?? string.Empty);
         Email = email.Trim().ToLowerInvariant();
-        CPF = cpf.Trim();
-        DataNascimento = dataNascimento.Date;
-        Telefone = telefone?.Trim() ?? string.Empty;
-        Genero = genero?.Trim() ?? string.Empty;
-        Cidade = cidade?.Trim() ?? string.Empty;
-        Estado = estado?.Trim() ?? string.Empty;
-        CEP = cep?.Trim() ?? string.Empty;
-
-        SetUpdatedAt();
     }
 
-    public void Ativar()
+    internal void AtualizarContatoAluno(string contato)
     {
-        IsAtivo = true;
-        SetUpdatedAt();
+        ValidarIntegridadeAluno(novoContato: contato ?? string.Empty);
+        Contato = contato.Trim();
     }
 
-    public void Desativar()
+    public void AtualizarDataNascimento(DateTime dataNascimento)
     {
-        IsAtivo = false;
-        SetUpdatedAt();
+        ValidarIntegridadeAluno(novaDataNascimento: dataNascimento);
+        DataNascimento = dataNascimento;
     }
+    #endregion
 
-    public void AdicionarMatricula(MatriculaCurso matricula)
+    #region Manipuladores de MatriculaCurso
+    public MatriculaCurso ObterMatriculaPorCursoId(Guid cursoId)
     {
-        if (matricula == null)
-            throw new ArgumentNullException(nameof(matricula));
+        var matriculaCurso = _matriculasCursos.FirstOrDefault(m => m.CursoId == cursoId);
+        if (matriculaCurso == null) { throw new DomainException("Matrícula pelo Curso não foi localizada"); }
 
-        if (!IsAtivo)
-            throw new InvalidOperationException("Não é possível matricular um aluno inativo.");
-
-        var matriculaExistente = _matriculasCursos.FirstOrDefault(m => m.CursoId == matricula.CursoId);
-        if (matriculaExistente != null)
-            throw new InvalidOperationException("Aluno já possui matrícula neste curso.");
-
-        _matriculasCursos.Add(matricula);
-        SetUpdatedAt();
+        return matriculaCurso;
     }
 
-    public void RemoverMatricula(Guid matriculaId)
+    public MatriculaCurso ObterMatriculaCursoPeloId(Guid matriculaCursoId)
     {
-        var matricula = _matriculasCursos.FirstOrDefault(m => m.Id == matriculaId);
-        if (matricula == null)
-            throw new ArgumentException("Matrícula não encontrada.", nameof(matriculaId));
+        var matriculaCurso = _matriculasCursos.FirstOrDefault(m => m.Id == matriculaCursoId);
+        if (matriculaCurso == null) { throw new DomainException("Matrícula não foi localizada"); }
 
-        _matriculasCursos.Remove(matricula);
-        SetUpdatedAt();
+        return matriculaCurso;
     }
 
-    public MatriculaCurso ObterMatricula(Guid matriculaId)
+    public void MatricularAlunoEmCurso(Guid cursoId, string nomeCurso, decimal valor, string observacao)
     {
-        var matricula = _matriculasCursos.FirstOrDefault(m => m.Id == matriculaId);
-        if (matricula == null)
-            throw new ArgumentException("Matrícula não encontrada.", nameof(matriculaId));
+        if (_matriculasCursos.Any(m => m.CursoId == cursoId)) { throw new DomainException("Aluno já está matriculado neste curso"); }
+        if (!Ativo) { throw new DomainException("Aluno inativo não pode ser matriculado em cursos"); }
 
-        return matricula;
+        var novaMatricula = new MatriculaCurso(Id, cursoId, nomeCurso, valor, observacao);
+        _matriculasCursos.Add(novaMatricula);
     }
 
-    public MatriculaCurso ObterMatriculaPorCurso(Guid cursoId)
+    internal void AtualizarNotaFinalCurso(Guid matriculaCursoId, byte notaFinal)
     {
-        return _matriculasCursos.FirstOrDefault(m => m.CursoId == cursoId);
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.AtualizarNotaFinalCurso(notaFinal);
     }
 
-    public bool EstaMatriculadoNoCurso(Guid cursoId)
+    public void AtualizarPagamentoMatricula(Guid matriculaCursoId)
     {
-        return _matriculasCursos.Any(m => m.CursoId == cursoId);
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.RegistrarPagamentoMatricula();
     }
 
-    public int CalcularIdade()
+    public void AtualizarAbandonoMatricula(Guid matriculaCursoId)
     {
-        var hoje = DateTime.Today;
-        var idade = hoje.Year - DataNascimento.Year;
-
-        if (DataNascimento.Date > hoje.AddYears(-idade))
-            idade--;
-
-        return idade;
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.RegistrarAbandonoMatricula();
     }
 
-    private static void ValidarDadosObrigatorios(string nome, string email, string cpf)
+    public void ConcluirCurso(Guid matriculaCursoId)
     {
-        if (string.IsNullOrWhiteSpace(nome))
-            throw new ArgumentException("Nome é obrigatório.", nameof(nome));
-
-        if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("Email é obrigatório.", nameof(email));
-
-        if (string.IsNullOrWhiteSpace(cpf))
-            throw new ArgumentException("CPF é obrigatório.", nameof(cpf));
-
-        if (nome.Length < 2)
-            throw new ArgumentException("Nome deve ter pelo menos 2 caracteres.", nameof(nome));
-
-        if (nome.Length > 100)
-            throw new ArgumentException("Nome deve ter no máximo 100 caracteres.", nameof(nome));
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.ConcluirCurso();
     }
 
-    private static void ValidarCPF(string cpf)
+    internal void AtualizarObservacoes(Guid matriculaCursoId, string observacao)
     {
-        if (cpf.Length < 11 || cpf.Length > 14)
-            throw new ArgumentException("CPF deve ter entre 11 e 14 caracteres.", nameof(cpf));
-
-        // Remove caracteres não numéricos
-        var cpfNumerico = new string(cpf.Where(char.IsDigit).ToArray());
-
-        if (cpfNumerico.Length != 11)
-            throw new ArgumentException("CPF deve conter 11 dígitos numéricos.", nameof(cpf));
-
-        // Validação básica de CPF (verificar se não são todos os mesmos dígitos)
-        if (cpfNumerico.All(c => c == cpfNumerico[0]))
-            throw new ArgumentException("CPF inválido.", nameof(cpf));
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.AtualizarObservacoes(observacao);
     }
+    #endregion
 
-    private static void ValidarIdade(DateTime dataNascimento)
+    #region Manipuladores de HistoricoAprendizado
+    public void RegistrarHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId, string nomeAula, byte cargaHoraria, DateTime? dataTermino = null)
     {
-        if (dataNascimento.Date > DateTime.Today)
-            throw new ArgumentException("Data de nascimento não pode ser futura.", nameof(dataNascimento));
-
-        var idade = DateTime.Today.Year - dataNascimento.Year;
-        if (dataNascimento.Date > DateTime.Today.AddYears(-idade))
-            idade--;
-
-        if (idade < 16)
-            throw new ArgumentException("Aluno deve ter pelo menos 16 anos.", nameof(dataNascimento));
-
-        if (idade > 100)
-            throw new ArgumentException("Data de nascimento inválida.", nameof(dataNascimento));
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.RegistrarHistoricoAprendizado(aulaId, nomeAula, cargaHoraria, dataTermino);
     }
 
-    private static void ValidarEmail(string email)
+    public HistoricoAprendizado ObterHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId)
     {
-        if (!email.Contains('@') || !email.Contains('.'))
-            throw new ArgumentException("Email deve ter formato válido.", nameof(email));
-
-        if (email.Length > 200)
-            throw new ArgumentException("Email deve ter no máximo 200 caracteres.", nameof(email));
+        var matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        var historico = matriculaCurso.HistoricoAprendizado.FirstOrDefault(h => h.AulaId == aulaId);
+        //if (historico == null) { throw new DomainException("Histórico de aprendizado não foi localizado"); }
+        return historico;
     }
+    #endregion
+
+    #region Manipuladores de Certificado
+    public void RequisitarCertificadoConclusao(Guid matriculaCursoId, byte notaFinal, string pathCertificado, string nomeInstrutor)
+    {
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.RequisitarCertificadoConclusao(notaFinal, pathCertificado, nomeInstrutor);
+    }
+
+    public void ComunicarDataEmissaoCertificado(Guid matriculaCursoId, DateTime dataEmissao)
+    {
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.ComunicarDataEmissaoCertificado(dataEmissao);
+    }
+
+    public void AtualizarCargaHoraria(Guid matriculaCursoId, short cargaHoraria)
+    {
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.AtualizarCargaHoraria(cargaHoraria);
+    }
+
+    public void AtualizarPathCertificado(Guid matriculaCursoId, string path)
+    {
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.AtualizarPathCertificado(path);
+    }
+
+    public void AtualizarNomeInstrutor(Guid matriculaCursoId, string nomeInstrutor)
+    {
+        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        matriculaCurso.AtualizarNomeInstrutor(nomeInstrutor);
+    }
+    #endregion
+
+    private void ValidarIntegridadeAluno(string novoNome = null, 
+        string novoEmail = null, 
+        string novoContato = null, 
+        DateTime? novaDataNascimento = null)
+    {
+        novoNome ??= Nome;
+        novoEmail ??= Email;
+        novoContato ??= Contato;
+        novaDataNascimento ??= DataNascimento;
+
+        var validacao = new ResultadoValidacao<Aluno>();
+
+        ValidacaoGuid.DeveSerValido(CodigoUsuarioAutenticacao, "Código de identificação deve ser informado", validacao);
+        ValidacaoTexto.DevePossuirConteudo(novoNome, "Nome não pode ser nulo ou vazio", validacao);
+        ValidacaoTexto.DevePossuirTamanho(novoNome, 3, 100, "Nome deve ter entre 3 e 100 caracteres", validacao);
+        ValidacaoTexto.DevePossuirConteudo(novoEmail, "Email não pode ser nulo ou vazio", validacao);
+        ValidacaoTexto.DevePossuirTamanho(novoEmail, 3, 100, "Email deve ter entre 3 e 100 caracteres", validacao);
+        ValidacaoTexto.DeveAtenderRegex(novoEmail, @"^[\w\.\-]+@([\w\-]+\.)+[\w\-]{2,}$", "Email informado é inválido", validacao);
+        ValidacaoTexto.DevePossuirConteudo(Cpf, "CPF não pode ser nulo ou vazio", validacao);
+        ValidacaoTexto.DeveSerCpfValido(Cpf, "CPF informado é inválido", validacao);
+        ValidacaoData.DeveSerValido(novaDataNascimento.Value, "Data de nascimento deve ser válida", validacao);
+        ValidacaoData.DeveSerMenorQue(novaDataNascimento.Value, DateTime.Now, "Data de nascimento não pode ser superior à data atual", validacao);
+
+        if (!string.IsNullOrWhiteSpace(novoContato))
+        {
+            ValidacaoTexto.DevePossuirTamanho(novoContato, 1, 25, "Contato deve ter entre 1 e 25 caracteres", validacao);
+        }
+
+        validacao.DispararExcecaoDominioSeInvalido();
+    }
+    #endregion
+
+    public override string ToString() => $"{Nome} (Email: {Email})";
 }
