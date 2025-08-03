@@ -71,7 +71,7 @@ public class AuthService : IAuthService
                 EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(user, request.Password);
+            var result = await _userManager.CreateAsync(user, request.Senha);
 
             if (!result.Succeeded)
             {
