@@ -7,6 +7,8 @@ using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Mapster;
+using Core.Notification;
+using Core.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,9 +34,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddMemoryCache();
 
 // Application Services (DIP - dependendo de abstrações)
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<AuthService, AuthService>();
 builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
+
+// Notification
+builder.Services.RegisterNotification();
 
 // Controllers
 builder.Services.AddControllers();
@@ -87,7 +92,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    
+
     await InitializeDatabaseAsync(context, userManager, roleManager);
 }
 
@@ -111,7 +116,7 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
     // Criar usuário admin padrão se não existir
     const string adminEmail = "admin@auth.api";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
-    
+
     if (adminUser == null)
     {
         adminUser = new ApplicationUser
@@ -123,7 +128,7 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
             EmailConfirmed = true
         };
 
-        var result = await userManager.CreateAsync(adminUser, "Admin@123");
+        var result = await userManager.CreateAsync(adminUser, "Teste@123");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(adminUser, "Administrador");

@@ -38,7 +38,7 @@ public class ApplicationUser : IdentityUser
 
     public bool Ativo { get; set; } = true;
 
-    public string? RefreshToken { get; set; }
+    public Guid? RefreshToken { get; set; }
 
     public DateTime? RefreshTokenExpiryTime { get; set; }
 }

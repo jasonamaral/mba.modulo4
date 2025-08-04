@@ -1,3 +1,4 @@
+using Auth.Application.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -5,11 +6,12 @@ namespace Auth.API.Extensions;
 
 public static class JwtExtensions
 {
-    public static IServiceCollection AddJwtConfiguration(
-        this IServiceCollection services, 
-        IConfiguration configuration)
+    public static IServiceCollection AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
+        var appSettingSection = configuration.GetSection("AppTokenSettings");
+
         var jwtSettings = configuration.GetSection("JwtSettings");
+        services.Configure<AppTokenSettings>(appSettingSection);
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -27,4 +29,4 @@ public static class JwtExtensions
 
         return services;
     }
-} 
+}

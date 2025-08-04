@@ -6,7 +6,7 @@ using Alunos.Application.Services;
 using Alunos.Infrastructure.Data;
 using Alunos.Infrastructure.Repositories;
 using Alunos.Infrastructure.Services;
-using Api.Core.Identidade;
+using Core.Identidade;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NetDevPack.Security.JwtExtensions;
 
-namespace Api.Core.Identidade;
+namespace Core.Identidade;
 
 public static class JwtConfig
 {
@@ -15,6 +15,11 @@ public static class JwtConfig
 
         var appSettings = appSettingsSection.Get<AppSettings>();
 
+        if (appSettings == null || string.IsNullOrEmpty(appSettings.AutenticacaoJwksUrl))
+        {
+            throw new InvalidOperationException("AppSettings:AutenticacaoJwksUrl não foi configurado corretamente.");
+        }
+
         services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -24,7 +29,7 @@ public static class JwtConfig
             x.RequireHttpsMetadata = false;
             x.BackchannelHttpHandler = new HttpClientHandler { ServerCertificateCustomValidationCallback = delegate { return true; } };
             x.SaveToken = true;
-            x.SetJwksOptions(new JwkOptions(appSettings!.AutenticacaoJwksUrl));
+            x.SetJwksOptions(new JwkOptions(appSettings.AutenticacaoJwksUrl));
         });
     }
 

@@ -6,9 +6,9 @@ namespace Auth.API.Extensions;
 
 public static class IdentityExtensions
 {
-    public static IServiceCollection AddIdentityConfiguration(
-        this IServiceCollection services)
+    public static IServiceCollection AddIdentityConfiguration(this IServiceCollection services)
     {
+        
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
             options.Password.RequireDigit = true;
@@ -24,4 +24,4 @@ public static class IdentityExtensions
 
         return services;
     }
-} 
+}

@@ -4,8 +4,7 @@ namespace Auth.API.Extensions;
 
 public static class JwksExtensions
 {
-    public static IServiceCollection AddJwksConfiguration(
-        this IServiceCollection services)
+    public static IServiceCollection AddJwksConfiguration(this IServiceCollection services)
     {
         services.AddJwksManager()
                 .UseJwtValidation()
@@ -13,4 +12,4 @@ public static class JwksExtensions
 
         return services;
     }
-} 
+}

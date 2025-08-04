@@ -1,7 +1,6 @@
-﻿using Api.Core.Identidade;
+﻿using Core.Identidade;
 using Conteudo.API.Extensions;
 using Conteudo.Application.Commands;
-using Conteudo.Application.Mappings;
 using Mapster;
 
 namespace Conteudo.API.Configuration

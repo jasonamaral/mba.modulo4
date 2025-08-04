@@ -1,4 +1,4 @@
-﻿using Api.Core.Identidade;
+﻿using Core.Identidade;
 using Mapster;
 using Pagamentos.API.Extensions;
 using Pagamentos.Application.Commands;

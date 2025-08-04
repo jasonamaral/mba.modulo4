@@ -14,6 +14,7 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext,
     }
 
     public DbSet<KeyMaterial> SecurityKeys { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
