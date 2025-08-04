@@ -1,5 +1,4 @@
-﻿using Conteudo.Application.Commands.AtualizarCurso;
-using Conteudo.Domain.Entities;
+﻿using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Conteudo.Domain.ValueObjects;
 using Core.Communication;
@@ -7,9 +6,9 @@ using Core.Mediator;
 using Core.Messages;
 using MediatR;
 
-namespace Conteudo.Application.Commands.CadastrarCurso
+namespace Conteudo.Application.Commands.AtualizarCurso
 {
-    public class AlterarCursoCommandHandler(IMediatorHandler mediatorHandler,
+    public class AtualizarCursoCommandHandler(IMediatorHandler mediatorHandler,
         ICursoRepository cursoRepository,
         ICategoriaRepository categoriaRepository) : IRequestHandler<AtualizarCursoCommand, CommandResult>
     {

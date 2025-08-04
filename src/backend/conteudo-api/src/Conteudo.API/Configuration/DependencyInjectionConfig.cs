@@ -25,7 +25,7 @@ namespace Conteudo.API.Configuration
             services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
             services.AddScoped<IRequestHandler<CadastrarCursoCommand, CommandResult>, CadastrarCursoCommandHandler>();
             services.AddScoped<IRequestHandler<CadastrarCategoriaCommand, CommandResult>, CadastrarCategoriaCommandHandler>();
-            services.AddScoped<IRequestHandler<AtualizarCursoCommand, CommandResult>, AlterarCursoCommandHandler>();
+            services.AddScoped<IRequestHandler<AtualizarCursoCommand, CommandResult>, AtualizarCursoCommandHandler>();
 
             // Services
             services.AddScoped<ICursoAppService, CursoAppService>();
