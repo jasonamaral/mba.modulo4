@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using Conteudo.API.Controllers.Base;
 using Conteudo.Application.Commands;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
 using Core.Notification;
-using Microsoft.AspNetCore.Mvc;
+using Core.Services.Controllers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace Conteudo.API.Controllers
@@ -35,8 +35,8 @@ namespace Conteudo.API.Controllers
         /// </summary>
         /// <param name="id">ID do curso</param>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ApiSuccess), 200)]
-        [ProducesResponseType(typeof(ResponseResult), 404)]
+        [ProducesResponseType(typeof(ResponseResult<CategoriaDto>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
         public async Task<IActionResult> ObterPorId(Guid id)
         {
             try
@@ -59,6 +59,7 @@ namespace Conteudo.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<CategoriaDto>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         public async Task<IActionResult> ObterTodos()
         {
             try
@@ -78,8 +79,8 @@ namespace Conteudo.API.Controllers
         /// <param name="dto">Dados da categoria</param>
         [HttpPost]
         [Authorize(Roles = "Administrador")]
-        [ProducesResponseType(typeof(ApiSuccess), 201)]
-        [ProducesResponseType(typeof(ResponseResult), 400)]
+        [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         public async Task<IActionResult> CadastrarCategoria([FromBody] CadastroCategoriaDto dto)
         {
             try

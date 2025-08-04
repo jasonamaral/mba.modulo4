@@ -29,7 +29,12 @@ namespace Conteudo.Application.Commands
             }
 
             categoriaRepository.Adicionar(categoria);
-            return await PersistirDados(categoriaRepository.UnitOfWork);
+            var result = await PersistirDados(categoriaRepository.UnitOfWork);
+            if (result.Success)
+            {
+                result.Data = categoria.Id;
+            }
+            return result;
         }
     }
 }

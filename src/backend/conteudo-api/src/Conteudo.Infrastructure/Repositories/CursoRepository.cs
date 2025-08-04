@@ -1,6 +1,8 @@
 ﻿using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Conteudo.Infrastructure.Data;
+using Core.Communication;
+using Core.Communication.Filters;
 using Core.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +12,38 @@ namespace Conteudo.Infrastructure.Repositories
     {   
         private readonly DbSet<Curso> _curso = dbContext.Set<Curso>();
         public IUnitOfWork UnitOfWork => dbContext;
+
+        public async Task<PagedResult<Curso>> ObterTodosAsync(CursoFilter filter)
+        {
+            var query = _curso.AsQueryable();
+
+            if (filter.IncludeAulas)
+                query = query.Include(c => c.Aulas);
+
+            if (!string.IsNullOrEmpty(filter.Query))
+                query = query.Where(c => c.Nome.Contains(filter.Query));
+
+            if (filter.Ativos)
+                query = query.Where(c => c.Ativo);
+
+            var totalResults = await query.CountAsync();
+
+            var cursos = await query
+                .OrderBy(c => c.Nome)
+                .Skip(filter.PageSize * (filter.PageIndex - 1))
+                .Take(filter.PageSize)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return new PagedResult<Curso>
+            {
+                Items = cursos,
+                PageIndex = filter.PageIndex,
+                PageSize = filter.PageSize,
+                TotalResults = totalResults,
+                Query = filter.Query
+            };
+        }
         public async Task<IEnumerable<Curso>> ObterTodosAsync(bool includeAulas = false)
         {   
             var query = _curso.AsQueryable();
@@ -94,7 +128,7 @@ namespace Conteudo.Infrastructure.Repositories
             return await _curso.CountAsync(c => c.Ativo);
         }
 
-        public async Task<int> CountByCategoriaAsync(Guid categoriaId)
+        public async Task<int> ContarPorCategoriaAsync(Guid categoriaId)
         {
             return await _curso.CountAsync(c => c.CategoriaId == categoriaId);
         }

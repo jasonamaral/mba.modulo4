@@ -2,75 +2,126 @@
 using BFF.API.Services;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
+using Core.Communication;
+using Core.Communication.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Text.Json;
 
 namespace BFF.API.Controllers
 {
     /// <summary>
     /// Controller de Conteudos no BFF - Orquestra chamadas para Conteudo.API
     /// </summary>
-    [Authorize]
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
-    public class ConteudosController : ControllerBase
+    public class ConteudosController(IConteudoService conteudoService
+                                    , ICacheService cacheService) : ControllerBase
     {
-        private readonly IConteudoService _conteudoService;
-        private readonly ICacheService _cacheService;
-        public ConteudosController(IConteudoService conteudoService, ICacheService cacheService)
-        {
-            _conteudoService = conteudoService;
-            _cacheService = cacheService;
-        }
+        private readonly IConteudoService _conteudoService = conteudoService;
+        private readonly ICacheService _cacheService = cacheService;
 
         /// <summary>
-        /// Obter dados de um curso pelo Id
+        /// Obtém um curso por ID
         /// </summary>
-        [HttpGet("cursos/{cursoId:guid}")]
-        public async Task<IActionResult> ObterCursoPorId(Guid cursoId)
+        /// <param name="cursoId">ID do curso</param>
+        /// <param name="includeAulas">Se deve incluir aulas na resposta</param>
+        /// <returns>Dados do curso</returns>
+        [HttpGet("{cursoId}")]
+        [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        public async Task<IActionResult> ObterCurso([FromRoute] Guid cursoId, [FromQuery] bool includeAulas = false)
         {
             if (cursoId == Guid.Empty)
             {
                 return BadRequest("Id do curso inválido.");
             }
-            var cacheKey = $"Curso_{cursoId}";
-            var cachedCurso = await _cacheService.GetAsync<CursoDto>(cacheKey);
+            var cacheKey = $"Curso_{cursoId}_IncludeAulas_{includeAulas}";
+            var cachedCurso = await _cacheService.GetAsync<ResponseResult<CursoDto>>(cacheKey);
+
             if (cachedCurso != null)
             {
                 return Ok(cachedCurso);
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            var curso = await _conteudoService.ObterCursoPorId(cursoId, token);
-            if (curso == null)
+            var resultado = await _conteudoService.ObterCursoPorId(cursoId, token);
+
+            if (resultado.Status == (int)HttpStatusCode.OK)
             {
-                return NotFound($"Curso com Id {cursoId} não encontrado.");
+                await _cacheService.SetAsync(cacheKey, resultado, TimeSpan.FromMinutes(30));
+                return Ok(resultado);
             }
-            await _cacheService.SetAsync(cacheKey, curso, TimeSpan.FromMinutes(30));
-            return Ok(curso);
+            if (resultado.Status == (int)HttpStatusCode.NotFound)
+            {
+                return NotFound(resultado);
+            }
+
+            return BadRequest(resultado);
         }
 
         /// <summary>
         /// Obter todos os cursos
         /// </summary>
+        /// <param name="filter">Filtro para paginação e busca</param>
         [HttpGet("cursos")]
-        public async Task<IActionResult> ObterTodosCursos()
+        [ProducesResponseType(typeof(ResponseResult<PagedResult<CursoDto>>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        public async Task<IActionResult> ObterTodosCursos([FromQuery] CursoFilter filter)
         {
-            var cacheKey = "TodosCursos";
-            var cachedCursos = await _cacheService.GetAsync<IEnumerable<CursoDto>>(cacheKey);
+            var cacheKey = $"TodosCursos_Filtro:{JsonSerializer.Serialize(filter)}";
+            var cachedCursos = await _cacheService.GetAsync<ResponseResult<PagedResult<CursoDto>>>(cacheKey);
+
             if (cachedCursos != null)
-            {
                 return Ok(cachedCursos);
-            }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            var cursos = await _conteudoService.ObterTodosCursos(token);
-            if (cursos == null)
+
+            var resultado = await _conteudoService.ObterTodosCursos(token, filter);
+
+            if (resultado.Status == (int)HttpStatusCode.OK)
             {
-                return NotFound("Nenhum curso encontrado.");
+                await _cacheService.SetAsync(cacheKey, resultado, TimeSpan.FromMinutes(30));
+                return Ok(resultado);
             }
-            await _cacheService.SetAsync(cacheKey, cursos, TimeSpan.FromMinutes(30));
-            return Ok(cursos);
+            return BadRequest(resultado);
+        }
+
+        /// <summary>
+        /// Obtém cursos por categoria
+        /// </summary>
+        /// <param name="categoriaId">ID da categoria</param>
+        /// <param name="includeAulas">Se deve incluir aulas na resposta</param>
+        /// <returns>Lista de cursos da categoria</returns>
+        [HttpGet("categoria/{categoriaId}")]
+        [ProducesResponseType(typeof(ResponseResult<IEnumerable<CursoDto>>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
+        {
+            try
+            {   
+                var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+                var resultado = await _conteudoService.ObterPorCategoriaIdAsync(token, categoriaId, includeAulas);
+
+                if (resultado.Status == (int)HttpStatusCode.OK)
+                {
+                    return Ok(resultado);
+                }
+                if (resultado.Status == (int)HttpStatusCode.NotFound)
+                {
+                    return NotFound(resultado);
+                }
+
+                return BadRequest(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -78,16 +129,18 @@ namespace BFF.API.Controllers
         /// </summary>
         [Authorize(Roles = "Administrador")]
         [HttpPost("cursos")]
+        [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         public async Task<IActionResult> AdicionarCurso([FromBody] CursoCriarRequest curso)
         {
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
             var response = await _conteudoService.AdicionarCurso(curso, token);
-            if (response == null)
-            {
-                return StatusCode(500, "Erro ao adicionar curso.");
-            }
-            return CreatedAtAction(nameof(AdicionarCurso), new { cursoId = response.Data }, response);
+
+            if (response.Status == (int)HttpStatusCode.BadRequest)
+                return BadRequest(response);
+
+            return StatusCode(response.Status, response);
         }
 
         /// <summary>
@@ -95,20 +148,31 @@ namespace BFF.API.Controllers
         /// </summary>
         [Authorize(Roles = "Administrador")]
         [HttpPut("cursos/{cursoId}")]
+        [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
         public async Task<IActionResult> AtualizarCurso(Guid cursoId, [FromBody] AtualizarCursoRequest curso)
         {
             if (cursoId == Guid.Empty)
-            {
-                return BadRequest("Id do curso inválido.");
-            }
+                return BadRequest(new ResponseResult<string>
+                {
+                    Status = (int)HttpStatusCode.BadRequest,
+                    Errors = new ResponseErrorMessages
+                    {
+                        Mensagens = new List<string> { "Id do curso inválido." }
+                    }
+                });
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
             var response = await _conteudoService.AtualizarCurso(cursoId, curso, token);
-            if (response == null)
-            {
-                return NotFound($"Curso com Id {cursoId} não encontrado.");
-            }
+
+            if (response.Status == (int)HttpStatusCode.NotFound)
+                return NotFound(response);
+
+            if (response.Status == (int)HttpStatusCode.BadRequest)
+                return BadRequest(response);
+
             return Ok(response);
         }
     }

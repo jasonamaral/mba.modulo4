@@ -3,7 +3,6 @@ using Conteudo.Domain.Interfaces.Repositories;
 using Conteudo.Domain.ValueObjects;
 using Core.Communication;
 using Core.Messages;
-using FluentValidation.Results;
 using MediatR;
 
 namespace Conteudo.Application.Commands
@@ -109,7 +108,13 @@ namespace Conteudo.Application.Commands
             }
 
             cursoRepository.Atualizar(curso);
-            return await PersistirDados(cursoRepository.UnitOfWork);
+            var result = await PersistirDados(cursoRepository.UnitOfWork);
+
+            if (result.Success)
+            {
+                result.Data = request;
+            }
+            return result;
         }
     }
 }

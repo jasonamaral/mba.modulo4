@@ -2,6 +2,7 @@
 using Conteudo.Application.Commands;
 using Conteudo.Application.DTOs;
 using Conteudo.Domain.Entities;
+using Core.Communication;
 
 namespace Conteudo.Application.Mappings
 {
@@ -41,6 +42,14 @@ namespace Conteudo.Application.Mappings
                 opt => opt.MapFrom(src => src.Aulas));
 
             CreateMap<Aula, AulaDto>();
+
+            CreateMap<PagedResult<CursoDto>, PagedResult<Curso>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))
+                .ForMember(dest => dest.PageIndex, opt => opt.MapFrom(src => src.PageIndex))
+                .ForMember(dest => dest.PageSize, opt => opt.MapFrom(src => src.PageSize))
+                .ForMember(dest => dest.TotalResults, opt => opt.MapFrom(src => src.TotalResults))
+                .ForMember(dest => dest.Query, opt => opt.MapFrom(src => src.Query))
+                .ReverseMap();
         }
     }
 }
