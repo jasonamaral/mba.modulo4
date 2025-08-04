@@ -1,6 +1,6 @@
 ﻿using Core.Messages;
 
-namespace Core.Mediator.AlunoCommands;
+namespace Alunos.Application.Commands.MatricularAluno;
 public class MatricularAlunoCommand : CommandRaiz
 {
     public Guid AlunoId { get; init; }

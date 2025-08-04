@@ -1,8 +1,5 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.API.Controllers;
 

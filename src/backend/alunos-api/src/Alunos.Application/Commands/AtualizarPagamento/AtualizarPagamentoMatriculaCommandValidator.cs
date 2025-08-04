@@ -1,5 +1,4 @@
-﻿using Core.Mediator.AlunoCommands;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Alunos.Application.Commands.AtualizarPagamento
 {

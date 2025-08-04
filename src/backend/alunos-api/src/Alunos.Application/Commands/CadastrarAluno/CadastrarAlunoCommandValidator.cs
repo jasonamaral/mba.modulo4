@@ -1,4 +1,4 @@
-﻿using Core.Mediator.AlunoCommands;
+﻿using Alunos.Application.Commands.CadastrarAluno;
 using FluentValidation;
 
 namespace Plataforma.Educacao.Aluno.Application.Commands.CadastrarAluno;

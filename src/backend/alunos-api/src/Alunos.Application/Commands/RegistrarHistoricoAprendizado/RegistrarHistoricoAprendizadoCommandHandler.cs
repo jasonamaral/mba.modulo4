@@ -6,8 +6,7 @@ using Core.SharedDtos.Conteudo;
 using Alunos.Domain.Entities;
 using Alunos.Domain.ValueObjects;
 using Core.Messages;
-using Core.Mediator.AlunoCommands;
-using Core.Mediator.AlunoEvents;
+using Alunos.Application.Events.RegistrarProblemaHistorico;
 
 namespace Alunos.Application.Commands.RegistrarHistoricoAprendizado;
 public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoRepository, 

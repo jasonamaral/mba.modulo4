@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-
-namespace Alunos.API.Controllers;
+﻿namespace Alunos.API.Controllers;
 
 public partial class AlunoController
 {

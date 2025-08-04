@@ -5,7 +5,6 @@ using Alunos.Domain.Interfaces;
 using Core.Mediator;
 using Alunos.Domain.Entities;
 using Core.Messages;
-using Core.Mediator.AlunoCommands;
 
 namespace Alunos.Application.Commands.CadastrarAluno;
 public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMediatorHandler mediatorHandler) : IRequestHandler<CadastrarAlunoCommand, CommandResult>

@@ -1,6 +1,6 @@
 ﻿using Core.Messages;
 
-namespace Core.Mediator.AlunoCommands;
+namespace Alunos.Application.Commands.CadastrarAluno;
 public class CadastrarAlunoCommand : CommandRaiz
 {
     public Guid AlunoId { get; private set; }

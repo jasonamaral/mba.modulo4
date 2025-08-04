@@ -1,7 +1,7 @@
 ﻿using Core.Messages;
 using Core.SharedDtos.Conteudo;
 
-namespace Core.Mediator.AlunoCommands;
+namespace Alunos.Application.Commands.RegistrarHistoricoAprendizado;
 public class RegistrarHistoricoAprendizadoCommand : CommandRaiz
 {
     public Guid AlunoId { get; private set; }

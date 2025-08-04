@@ -1,7 +1,6 @@
 ﻿using Alunos.Domain.Interfaces;
 using Core.Communication;
 using Core.Mediator;
-using Core.Mediator.AlunoCommands;
 using Core.Messages;
 using MediatR;
 

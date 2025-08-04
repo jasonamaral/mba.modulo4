@@ -1,6 +1,6 @@
 ﻿using Core.Messages;
 
-namespace Core.Mediator.AlunoEvents;
+namespace Alunos.Application.Events.RegistrarProblemaHistorico;
 public class RegistrarProblemaHistoricoAprendizadoEvent : EventRaiz
 {
     public Guid AlunoId { get; init; }

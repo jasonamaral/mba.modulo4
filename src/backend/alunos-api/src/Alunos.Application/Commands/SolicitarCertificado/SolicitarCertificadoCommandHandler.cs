@@ -3,7 +3,6 @@ using Core.Mediator;
 using Alunos.Domain.Interfaces;
 using Core.Communication;
 using Core.Messages;
-using Core.Mediator.AlunoCommands;
 
 namespace Alunos.Application.Commands.SolicitarCertificado;
 public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository, 
