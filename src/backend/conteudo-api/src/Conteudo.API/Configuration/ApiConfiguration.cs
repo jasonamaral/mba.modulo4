@@ -1,5 +1,5 @@
 ﻿using Conteudo.API.Extensions;
-using Conteudo.Application.Commands;
+using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

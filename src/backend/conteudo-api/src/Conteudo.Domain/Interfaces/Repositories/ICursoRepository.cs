@@ -15,9 +15,9 @@ public interface ICursoRepository : IRepository<Curso>
     Task<IEnumerable<Curso>> ObterPorPesquisaAsync(string searchTerm, bool includeAulas = false);
     Task<bool> ExistePorIdAsync(Guid id);
     Task<bool> ExistePorNomeAsync(string nome, Guid? excludeId = null);
-    void Adicionar(Curso curso);
-    void Atualizar(Curso curso);
-    void Deletar(Curso curso);
+    Task Adicionar(Curso curso);
+    Task Atualizar(Curso curso);
+    Task Deletar(Curso curso);
     Task<int> ContarAsync();
     Task<int> ContarAtivosAsync();
     Task<int> ContarPorCategoriaAsync(Guid categoriaId);

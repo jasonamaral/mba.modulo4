@@ -1,3 +1,4 @@
+using Core.SharedDtos.Conteudo;
 using Conteudo.Application.DTOs;
 using Core.Communication;
 using Core.Communication.Filters;

@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
-using Conteudo.Application.Commands;
+using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
-using Core.Notification;
+using Core.Messages;
 using Core.Services.Controllers;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -15,20 +16,14 @@ namespace Conteudo.API.Controllers
     [Route("api/[controller]")]
     [Authorize]
     [Produces("application/json")]
-    public class CategoriaController : MainController
-    {
-        private readonly IMediatorHandler _mediator;
-        private readonly ICategoriaAppService _categoriaAppService;
-        private readonly IMapper _mapper;
-        public CategoriaController(INotificador notificador
-                                  , IMediatorHandler mediator
+    public class CategoriaController(IMediatorHandler mediator
                                   , ICategoriaAppService categoriaAppService
-                                  , IMapper mapper) : base(notificador)
-        {
-            _mediator = mediator;
-            _categoriaAppService = categoriaAppService;
-            _mapper = mapper;
-        }
+                                  , IMapper mapper
+                                  , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications)
+    {
+        private readonly IMediatorHandler _mediator = mediator;
+        private readonly ICategoriaAppService _categoriaAppService = categoriaAppService;
+        private readonly IMapper _mapper = mapper;
 
         /// <summary>
         /// Retorna uma categoria pelo ID.
@@ -86,7 +81,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = _mapper.Map<CadastrarCategoriaCommand>(dto);
-                return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.EnviarComando(command));
+                return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
             {

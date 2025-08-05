@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
-using Conteudo.Application.Commands;
+using Conteudo.Application.Commands.AtualizarCurso;
+using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.DTOs;
 using Conteudo.Domain.Entities;
+using Core.SharedDtos.Conteudo;
 using Core.Communication;
 
 namespace Conteudo.Application.Mappings

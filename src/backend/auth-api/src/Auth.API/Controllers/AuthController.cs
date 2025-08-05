@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
             var registerDto = new RegisterRequestDto
             {
                 Email = request.Email,
-                Password = request.Senha,
+                Senha = request.Senha,
                 Nome = request.Nome,
                 DataNascimento = request.DataNascimento,
                 EhAdministrador = request.EhAdministrador,

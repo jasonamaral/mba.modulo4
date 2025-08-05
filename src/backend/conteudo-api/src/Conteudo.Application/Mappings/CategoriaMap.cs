@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Conteudo.Application.Commands;
+using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.DTOs;
 using Conteudo.Domain.Entities;
 
@@ -15,6 +15,5 @@ namespace Conteudo.Application.Mappings
 
             CreateMap<CadastroCategoriaDto, CadastrarCategoriaCommand>().ReverseMap();
         }
-
     }
 }

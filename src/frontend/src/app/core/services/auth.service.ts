@@ -4,6 +4,14 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
+export interface RegisterRequest {
+  nome: string;
+  email: string;
+  senha: string;
+  dataNascimento: Date;
+  cPF: string;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -40,6 +48,18 @@ export class AuthService {
     if (storedUser) {
       this.currentUserSubject.next(JSON.parse(storedUser));
     }
+  }
+
+  register(register: RegisterRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/registro`, register)
+      .pipe(
+        tap(response => {
+          // Store token and user info
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        })
+      );
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -82,10 +102,6 @@ export class AuthService {
   hasAnyRole(roles: string[]): boolean {
     const user = this.getCurrentUser();
     return user?.roles?.some(role => roles.includes(role)) || false;
-  }
-
-  register(userData: any): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/register`, userData);
   }
 
   resetPassword(email: string): Observable<any> {

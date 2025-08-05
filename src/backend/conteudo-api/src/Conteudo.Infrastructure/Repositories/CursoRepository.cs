@@ -56,7 +56,7 @@ namespace Conteudo.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Curso?> ObterPorIdAsync(Guid id, bool includeAulas = false, bool noTracking = true)
+        public async Task<Curso> ObterPorIdAsync(Guid id, bool includeAulas = false, bool noTracking = true)
         {
             var query = _curso.AsQueryable();
 
@@ -103,19 +103,21 @@ namespace Conteudo.Infrastructure.Repositories
             return await _curso.AnyAsync(c => c.Nome == nome && (excludeId == null || c.Id != excludeId));
         }
 
-        public void Adicionar(Curso curso)
+        public async Task Adicionar(Curso curso)
         {
-            _curso.Add(curso);
+            await _curso.AddAsync(curso);
         }
 
-        public void Atualizar(Curso curso)
+        public async Task Atualizar(Curso curso)
         {
             _curso.Update(curso);
+            await Task.CompletedTask; 
         }
 
-        public void Deletar(Curso curso)
+        public async Task Deletar(Curso curso)
         {
             _curso.Remove(curso);
+            await Task.CompletedTask;
         }
 
         public async Task<int> ContarAsync()

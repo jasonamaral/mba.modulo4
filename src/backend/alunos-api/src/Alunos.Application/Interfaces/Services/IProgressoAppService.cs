@@ -1,4 +1,4 @@
-using Alunos.Application.DTOs;
+using Alunos.Application.DTOs.Review;
 
 namespace Alunos.Application.Interfaces.Services;
 

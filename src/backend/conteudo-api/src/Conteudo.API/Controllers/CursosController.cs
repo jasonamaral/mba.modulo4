@@ -1,15 +1,17 @@
 using AutoMapper;
-using Conteudo.Application.Commands;
+using Conteudo.Application.Commands.AtualizarCurso;
+using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Communication.Filters;
 using Core.Mediator;
-using Core.Notification;
+using Core.Messages;
 using Core.Services.Controllers;
+using Core.SharedDtos.Conteudo;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 namespace Conteudo.API.Controllers;
@@ -17,10 +19,10 @@ namespace Conteudo.API.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [Produces("application/json")]
-public class CursosController(INotificador notificador
-                           , ICursoAppService cursoAppService
+public class CursosController(ICursoAppService cursoAppService
                            , IMediatorHandler mediator
-                           , IMapper mapper) : MainController(notificador)
+                           , IMapper mapper
+                           , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications)
 {
     private readonly ICursoAppService _cursoAppService = cursoAppService;
     private readonly IMediatorHandler _mediator = mediator;

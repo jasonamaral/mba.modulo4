@@ -1,8 +1,7 @@
 using Alunos.API.Extensions;
-using Alunos.Application.EventHandlers;
-using Alunos.Application.Interfaces.Repositories;
 using Alunos.Application.Interfaces.Services;
 using Alunos.Application.Services;
+using Alunos.Domain.Interfaces;
 using Alunos.Infrastructure.Data;
 using Alunos.Infrastructure.Repositories;
 using Alunos.Infrastructure.Services;
@@ -26,13 +25,13 @@ var isDevelopment = builder.Environment.IsDevelopment();
 if (isDevelopment)
 {
     // SQLite para desenvolvimento
-    builder.Services.AddDbContext<AlunosDbContext>(options =>
+    builder.Services.AddDbContext<AlunoDbContext>(options =>
         options.UseSqlite(connectionString ?? "Data Source=../../../../data/alunos-dev.db"));
 }
 else
 {
     // SQL Server para produção
-    builder.Services.AddDbContext<AlunosDbContext>(options =>
+    builder.Services.AddDbContext<AlunoDbContext>(options =>
         options.UseSqlServer(connectionString ?? "Server=localhost;Database=AlunosDB;Trusted_Connection=true;TrustServerCertificate=true;"));
 }
 
@@ -84,9 +83,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<UserRegisteredEventHandler>();
+builder.Services.AddScoped<RegistrarUsuarioEventHandler>();
 
-builder.Services.AddHostedService<UserRegisteredEventConsumer>();
+builder.Services.AddHostedService<RegistrarUsuarioEventConsumer>();
 
 builder.Services.AddCors(options =>
 {
@@ -119,7 +118,7 @@ app.MapHealthChecks("/health");
 // Inicializar banco de dados
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AlunosDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<AlunoDbContext>();
     await context.Database.EnsureCreatedAsync();
 }
 

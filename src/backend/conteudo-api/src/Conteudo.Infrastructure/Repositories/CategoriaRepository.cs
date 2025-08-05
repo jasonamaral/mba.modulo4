@@ -31,10 +31,12 @@ namespace Conteudo.Infrastructure.Repositories
                 .AsNoTracking()
                 .AnyAsync(c => EF.Functions.Like(c.Nome, nome));
         }
-        public void Adicionar(Categoria categoria)
+
+        public async Task Adicionar(Categoria categoria)
         {
-            _categoria.Add(categoria);
+            await _categoria.AddAsync(categoria);
         }
+
         public void Dispose()
         {
             dbContext?.Dispose();

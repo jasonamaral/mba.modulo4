@@ -22,7 +22,7 @@ public class EventPublisher : IEventPublisher, IDisposable
         var factory = new ConnectionFactory()
         {
             HostName = _configuration["RabbitMQ:Host"] ?? "localhost",
-            Port = int.Parse(_configuration["RabbitMQ:Port"] ?? "5672"),
+            Port = int.Parse(_configuration["RabbitMQ:Port"] ?? "15672"),
             UserName = _configuration["RabbitMQ:Username"] ?? "admin",
             Password = _configuration["RabbitMQ:Password"] ?? "admin123",
             VirtualHost = _configuration["RabbitMQ:VirtualHost"] ?? "/"
