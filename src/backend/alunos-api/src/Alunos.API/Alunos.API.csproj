@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\building-blocks\core\Core.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\MessageBus\MessageBus.csproj" />
     <ProjectReference Include="..\Alunos.Application\Alunos.Application.csproj" />
     <ProjectReference Include="..\Alunos.Infrastructure\Alunos.Infrastructure.csproj" />
   </ItemGroup>

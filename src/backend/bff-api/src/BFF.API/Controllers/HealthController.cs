@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Core.Notification;
 
 namespace BFF.API.Controllers;
 
@@ -7,8 +8,11 @@ namespace BFF.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class HealthController : ControllerBase
+public class HealthController : BffController
 {
+    public HealthController(INotificador notificador) : base(notificador)
+    {
+    }
     /// <summary>
     /// Verifica se a API está funcionando
     /// </summary>
@@ -16,13 +20,15 @@ public class HealthController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        return Ok(new
+        var healthData = new
         {
             status = "healthy",
             timestamp = DateTime.UtcNow,
             version = "1.0.0",
             service = "BFF API"
-        });
+        };
+        
+        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, healthData, "API funcionando normalmente");
     }
 
     /// <summary>
@@ -32,7 +38,7 @@ public class HealthController : ControllerBase
     [HttpGet("status")]
     public IActionResult GetStatus()
     {
-        return Ok(new
+        var statusData = new
         {
             api = "BFF API",
             version = "1.0.0",
@@ -41,6 +47,8 @@ public class HealthController : ControllerBase
             uptime = DateTime.UtcNow,
             status = "running",
             description = "Backend for Frontend API - Orquestração dos Microsserviços da Plataforma Educacional"
-        });
+        };
+        
+        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, statusData, "Status da API obtido com sucesso");
     }
 } 

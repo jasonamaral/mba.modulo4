@@ -1,11 +1,12 @@
-using Core.Controller;
 using Auth.API.Models.Requests;
 using Auth.Application.Services;
 using Auth.Domain.Entities;
 using Core.Communication;
+using Core.Controller;
 using Core.Messages;
 using Core.Messages.Integration;
 using Core.Notification;
+using MessageBus;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -21,11 +22,13 @@ public class AuthController : MainController
 {
     private readonly AuthService _authService;
     private readonly ILogger<AuthController> _logger;
+    private readonly IMessageBus _bus;
 
-    public AuthController(AuthService authService, ILogger<AuthController> logger, INotificador notificador) : base(notificador)
+    public AuthController(AuthService authService, ILogger<AuthController> logger, INotificador notificador, IMessageBus bus) : base(notificador)
     {
         _authService = authService;
         _logger = logger;
+        _bus = bus;
     }
 
     /// <summary>
@@ -42,6 +45,7 @@ public class AuthController : MainController
 
         var user = new ApplicationUser
         {
+            Nome = registroRequest.Nome,
             UserName = registroRequest.Email,
             Email = registroRequest.Email,
             EmailConfirmed = true
@@ -61,10 +65,10 @@ public class AuthController : MainController
             return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(registroRequest.Email));
         }
 
-        //foreach (var error in result.Errors)
-        //{
-        //    AdicionarErroProcessamento(error.Description);
-        //}
+        foreach (var error in result.Errors)
+        {
+            Notificador.AdicionarErro(error.Description);
+        }
 
         return RespostaPadraoApi();
     }
@@ -90,9 +94,11 @@ public class AuthController : MainController
 
         if (result.IsLockedOut)
         {
+            Notificador.AdicionarErro("Usuário temporariamente bloqueado por tentativas inválidas");
             return RespostaPadraoApi(HttpStatusCode.Forbidden, "Usuário temporariamente bloqueado por tentativas inválidas");
         }
 
+        Notificador.AdicionarErro("Usuário ou Senha incorretos");
         return RespostaPadraoApi(HttpStatusCode.BadRequest, "Usuário ou Senha incorretos");
     }
 
@@ -107,13 +113,18 @@ public class AuthController : MainController
     public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
     {
         if (string.IsNullOrEmpty(refreshToken))
+        {
+            Notificador.AdicionarErro("Refresh Token inválido.");
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "Refresh Token inválido.");
+        }
 
         var token = await _authService.ObterRefreshToken(Guid.Parse(refreshToken));
 
         if (token is null)
-
+        {
+            Notificador.AdicionarErro("Refresh Token expirado");
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "Refresh Token expirado");
+        }
 
         return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(token.Username));
     }
@@ -122,11 +133,25 @@ public class AuthController : MainController
     {
         var usuario = await _authService.UserManager.FindByEmailAsync(registroRequest.Email);
 
-        var usuarioRegistrado = new UsuarioRegistradoIntegrationEvent(Guid.Parse(usuario!.Id), registroRequest.Nome, registroRequest.Email, registroRequest.CPF);
+        var usuarioRegistrado = new UsuarioRegistradoIntegrationEvent(
+             Guid.Parse(usuario!.Id),
+             registroRequest.Nome,
+             registroRequest.Email,
+             registroRequest.CPF,
+             registroRequest.DataNascimento,
+             registroRequest.Telefone,
+             registroRequest.Genero,
+             registroRequest.Cidade,
+             registroRequest.Estado,
+             registroRequest.CEP,
+             registroRequest.Foto,
+             registroRequest.EhAdministrador,
+             DateTime.Now
+         );
 
         try
         {
-            return await Task.FromResult(new ResponseMessage(new FluentValidation.Results.ValidationResult())); // await _bus.RequestAsync<UsuarioRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
+            return await _bus.RequestAsync<UsuarioRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
         }
         catch
         {

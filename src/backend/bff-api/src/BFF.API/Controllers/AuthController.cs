@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Text;
 using System.Text.Json;
+using Core.Notification;
 
 namespace BFF.API.Controllers;
 
@@ -14,7 +15,7 @@ namespace BFF.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController : BffController
 {
     private readonly HttpClient _httpClient;
     private readonly ApiSettings _apiSettings;
@@ -23,7 +24,8 @@ public class AuthController : ControllerBase
     public AuthController(
         IHttpClientFactory httpClientFactory,
         IOptions<ApiSettings> apiSettings,
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger,
+        INotificador notificador) : base(notificador)
     {
         _httpClient = httpClientFactory.CreateClient("ApiClient");
         _apiSettings = apiSettings.Value;
@@ -45,30 +47,12 @@ public class AuthController : ControllerBase
 
             var response = await _httpClient.PostAsync($"{_apiSettings.AuthApiUrl}/api/auth/registro", content);
 
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            if (response.IsSuccessStatusCode)
-            {
-                try
-                {
-                    var authResponse = JsonSerializer.Deserialize<AuthResponse>(responseContent, JsonExtensions.GlobalJsonOptions);
-                    return Ok(authResponse);
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogError(ex, "Erro ao deserializar resposta da Auth API no registro. Response: {Response}", responseContent);
-                    return StatusCode(500, new { error = "Erro interno do servidor - falha na deserialização" });
-                }
-            }
-            else
-            {
-                return StatusCode((int)response.StatusCode, responseContent);
-            }
+            return await ProcessarRespostaApi(response, "Usuário registrado com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar registro via BFF para: {Email}", request.Email);
-            return StatusCode(500, new { error = "Erro interno do servidor" });
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
 
@@ -87,30 +71,12 @@ public class AuthController : ControllerBase
 
             var response = await _httpClient.PostAsync($"{_apiSettings.AuthApiUrl}/api/auth/login", content);
 
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            if (response.IsSuccessStatusCode)
-            {
-                try
-                {
-                    var authResponse = JsonSerializer.Deserialize<AuthResponse>(responseContent, JsonExtensions.GlobalJsonOptions);
-                    return Ok(authResponse);
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogError(ex, "Erro ao deserializar resposta da Auth API no login. Response: {Response}", responseContent);
-                    return StatusCode(500, new { error = "Erro interno do servidor - falha na deserialização" });
-                }
-            }
-            else
-            {
-                return StatusCode((int)response.StatusCode, responseContent);
-            }
+            return await ProcessarRespostaApi(response, "Login realizado com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar login via BFF para: {Email}", request.Email);
-            return StatusCode(500, new { error = "Erro interno do servidor" });
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
 
@@ -129,30 +95,12 @@ public class AuthController : ControllerBase
 
             var response = await _httpClient.PostAsync($"{_apiSettings.AuthApiUrl}/api/auth/refresh-token", content);
 
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            if (response.IsSuccessStatusCode)
-            {
-                try
-                {
-                    var authResponse = JsonSerializer.Deserialize<AuthResponse>(responseContent, JsonExtensions.GlobalJsonOptions);
-                    return Ok(authResponse);
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogError(ex, "Erro ao deserializar resposta da Auth API no refresh token. Response: {Response}", responseContent);
-                    return StatusCode(500, new { error = "Erro interno do servidor - falha na deserialização" });
-                }
-            }
-            else
-            {
-                return StatusCode((int)response.StatusCode, responseContent);
-            }
+            return await ProcessarRespostaApi(response, "Token renovado com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar refresh token via BFF");
-            return StatusCode(500, new { error = "Erro interno do servidor" });
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
 }

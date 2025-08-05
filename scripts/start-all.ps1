@@ -121,49 +121,6 @@ if ($missingInfra.Count -gt 0) {
     Write-Host "Toda infraestrutura ja esta rodando!" -ForegroundColor Green
 }
 
-Write-Host "Configurando RabbitMQ..." -ForegroundColor Magenta
-# Configurar RabbitMQ via API REST
-$rabbitmqBase = "http://localhost:15672/api"
-$cred = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("admin:admin123"))
-$headers = @{ Authorization = "Basic $cred"; "Content-Type" = "application/json" }
-
-try {
-    # Criar exchange
-    $exchangeBody = @{ type = "topic"; durable = $true } | ConvertTo-Json
-    Invoke-RestMethod -Uri "$rabbitmqBase/exchanges/%2F/plataforma.events" -Method Put -Headers $headers -Body $exchangeBody
-
-    # Criar filas
-    $queueBody = @{ durable = $true; auto_delete = $false } | ConvertTo-Json
-    
-    Invoke-RestMethod -Uri "$rabbitmqBase/queues/%2F/pagamento-confirmado" -Method Put -Headers $headers -Body $queueBody
-    Invoke-RestMethod -Uri "$rabbitmqBase/queues/%2F/matricula-realizada" -Method Put -Headers $headers -Body $queueBody
-    Invoke-RestMethod -Uri "$rabbitmqBase/queues/%2F/certificado-gerado" -Method Put -Headers $headers -Body $queueBody
-    Invoke-RestMethod -Uri "$rabbitmqBase/queues/%2F/usuario-registrado" -Method Put -Headers $headers -Body $queueBody
-    Invoke-RestMethod -Uri "$rabbitmqBase/queues/%2F/curso-finalizado" -Method Put -Headers $headers -Body $queueBody
-
-    # Criar bindings
-    $bindingBody = @{ routing_key = "pagamento.confirmado" } | ConvertTo-Json
-    Invoke-RestMethod -Uri "$rabbitmqBase/bindings/%2F/e/plataforma.events/q/pagamento-confirmado" -Method Post -Headers $headers -Body $bindingBody
-    
-    $bindingBody = @{ routing_key = "matricula.realizada" } | ConvertTo-Json
-    Invoke-RestMethod -Uri "$rabbitmqBase/bindings/%2F/e/plataforma.events/q/matricula-realizada" -Method Post -Headers $headers -Body $bindingBody
-    
-    $bindingBody = @{ routing_key = "certificado.gerado" } | ConvertTo-Json
-    Invoke-RestMethod -Uri "$rabbitmqBase/bindings/%2F/e/plataforma.events/q/certificado-gerado" -Method Post -Headers $headers -Body $bindingBody
-    
-    $bindingBody = @{ routing_key = "usuario.registrado" } | ConvertTo-Json
-    Invoke-RestMethod -Uri "$rabbitmqBase/bindings/%2F/e/plataforma.events/q/usuario-registrado" -Method Post -Headers $headers -Body $bindingBody
-    
-    $bindingBody = @{ routing_key = "curso.finalizado" } | ConvertTo-Json
-    Invoke-RestMethod -Uri "$rabbitmqBase/bindings/%2F/e/plataforma.events/q/curso-finalizado" -Method Post -Headers $headers -Body $bindingBody
-
-    Write-Host "RabbitMQ configurado com sucesso!" -ForegroundColor Green
-}
-catch {
-    Write-Host "Erro ao configurar RabbitMQ: $($_.Exception.Message)" -ForegroundColor Yellow
-    Write-Host "Continuando com a inicializacao..." -ForegroundColor Yellow
-}
-
 Write-Host "Verificando microservicos..." -ForegroundColor Blue
 $apiServices = @("auth-api", "conteudo-api", "alunos-api", "pagamentos-api")
 $missingApis = @()

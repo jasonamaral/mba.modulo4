@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using BFF.API.Extensions;
 using BFF.API.Models.Response;
 using BFF.API.Models.Request;
+using Core.Notification;
 
 namespace BFF.API.Controllers;
 
@@ -16,7 +17,7 @@ namespace BFF.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class AlunosController : ControllerBase
+public class AlunosController : BffController
 {
     private readonly HttpClient _httpClient;
     private readonly ApiSettings _apiSettings;
@@ -25,7 +26,8 @@ public class AlunosController : ControllerBase
     public AlunosController(
         IHttpClientFactory httpClientFactory,
         IOptions<ApiSettings> apiSettings,
-        ILogger<AlunosController> logger)
+        ILogger<AlunosController> logger,
+        INotificador notificador) : base(notificador)
     {
         _httpClient = httpClientFactory.CreateClient("ApiClient");
         _apiSettings = apiSettings.Value;
@@ -45,7 +47,7 @@ public class AlunosController : ControllerBase
             var userId = User.GetUserId();
             if (userId == Guid.Empty)
             {
-                return Unauthorized("Token inválido");
+                return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
@@ -56,28 +58,17 @@ public class AlunosController : ControllerBase
             // Fazer chamada para Alunos API
             var response = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}");
 
-            if (response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-               
-                return Ok(JsonSerializer.Deserialize<AlunoPerfil>(responseContent, JsonExtensions.GlobalJsonOptions));
+                return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Perfil do aluno não encontrado. O perfil pode estar sendo criado.");
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return NotFound(new { message = "Perfil do aluno não encontrado. O perfil pode estar sendo criado." });
-            }
-            else
-            {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning("Erro ao buscar perfil do aluno via BFF: {UserId}. Status: {StatusCode}, Content: {Content}", 
-                    userId, response.StatusCode, errorContent);
-                return StatusCode((int)response.StatusCode, "Erro ao buscar perfil do aluno");
-            }
+
+            return await ProcessarRespostaApi(response, "Perfil do aluno obtido com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar busca de perfil via BFF");
-            return StatusCode(500, new { error = "Erro interno do servidor" });
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
 
@@ -95,7 +86,7 @@ public class AlunosController : ControllerBase
             var userId = User.GetUserId();
             if (userId == Guid.Empty)
             {
-                return Unauthorized("Token inválido");
+                return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
             }
 
             var json = JsonSerializer.Serialize(request);
@@ -108,23 +99,12 @@ public class AlunosController : ControllerBase
 
             var response = await _httpClient.PutAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}", content);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                return Ok(JsonSerializer.Deserialize<AlunoPerfil>(responseContent, JsonExtensions.GlobalJsonOptions));
-            }
-            else
-            {
-                _logger.LogWarning("Erro ao atualizar perfil do aluno via BFF: {UserId}. Status: {StatusCode}", 
-                    userId, response.StatusCode);
-                var errorContent = await response.Content.ReadAsStringAsync();
-                return StatusCode((int)response.StatusCode, errorContent);
-            }
+            return await ProcessarRespostaApi(response, "Perfil do aluno atualizado com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar atualização de perfil via BFF");
-            return StatusCode(500, new { error = "Erro interno do servidor" });
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
 
@@ -141,7 +121,7 @@ public class AlunosController : ControllerBase
             var userId = User.GetUserId();
             if (userId == Guid.Empty)
             {
-                return Unauthorized("Token inválido");
+                return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
@@ -153,7 +133,7 @@ public class AlunosController : ControllerBase
             
             if (!alunoResponse.IsSuccessStatusCode)
             {
-                return NotFound(new { message = "Perfil do aluno não encontrado" });
+                return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Perfil do aluno não encontrado");
             }
 
             var alunoContent = await alunoResponse.Content.ReadAsStringAsync();
@@ -161,20 +141,12 @@ public class AlunosController : ControllerBase
 
             var matriculasResponse = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/{aluno?.Id}/matriculas");
 
-            if (matriculasResponse.IsSuccessStatusCode)
-            {
-                var responseContent = await matriculasResponse.Content.ReadAsStringAsync();
-                return Ok(responseContent);
-            }
-            else
-            {
-                return StatusCode((int)matriculasResponse.StatusCode, "Erro ao buscar matrículas");
-            }
+            return await ProcessarRespostaApi(matriculasResponse, "Matrículas obtidas com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar busca de matrículas via BFF");
-            return StatusCode(500, new { error = "Erro interno do servidor" });
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
 }

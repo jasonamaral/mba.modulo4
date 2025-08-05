@@ -1,5 +1,6 @@
 ﻿using BFF.API.Services;
 using BFF.Application.Interfaces.Services;
+using Core.Notification;
 
 namespace BFF.API.Configuration
 {
@@ -8,6 +9,9 @@ namespace BFF.API.Configuration
         public static void RegisterServices(this IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            // Serviços de Core
+            services.AddScoped<INotificador, Notificador>();
 
             // Serviços de API
             services.AddScoped<IConteudoService, ConteudoService>();

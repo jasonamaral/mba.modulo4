@@ -2,6 +2,7 @@ using BFF.Application.Interfaces.Services;
 using BFF.API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Core.Notification;
 
 namespace BFF.API.Controllers;
 
@@ -11,12 +12,13 @@ namespace BFF.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class DashboardController : ControllerBase
+public class DashboardController : BffController
 {
     private readonly IDashboardService _dashboardService;
     private readonly ILogger<DashboardController> _logger;
 
-    public DashboardController(IDashboardService dashboardService, ILogger<DashboardController> logger)
+    public DashboardController(IDashboardService dashboardService, ILogger<DashboardController> logger, INotificador notificador)
+        : base(notificador)
     {
         _dashboardService = dashboardService;
         _logger = logger;
@@ -35,16 +37,16 @@ public class DashboardController : ControllerBase
             var userId = User.GetUserId();
             if (userId == Guid.Empty)
             {
-                return Unauthorized("Token inválido");
+                return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
             }
 
             var dashboard = await _dashboardService.GetDashboardAlunoAsync(userId);
-            return Ok(dashboard);
+            return RespostaPadraoApi(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do aluno obtido com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar requisição de dashboard do aluno");
-            return StatusCode(500, new { error = "Erro interno do servidor" });
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
 
@@ -59,12 +61,12 @@ public class DashboardController : ControllerBase
         try
         {
             var dashboard = await _dashboardService.GetDashboardAdminAsync();
-            return Ok(dashboard);
+            return RespostaPadraoApi(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do administrador obtido com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar requisição de dashboard do admin");
-            return StatusCode(500, new { error = "Erro interno do servidor" });
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
 } 

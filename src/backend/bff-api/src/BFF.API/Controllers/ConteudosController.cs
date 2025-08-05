@@ -6,6 +6,7 @@ using BFF.API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using Core.Notification;
 
 namespace BFF.API.Controllers
 {
@@ -15,11 +16,12 @@ namespace BFF.API.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class ConteudosController : ControllerBase
+    public class ConteudosController : BffController
     {
         private readonly IConteudoService _conteudoService;
         private readonly ICacheService _cacheService;
-        public ConteudosController(IConteudoService conteudoService, ICacheService cacheService)
+        public ConteudosController(IConteudoService conteudoService, ICacheService cacheService, INotificador notificador) 
+            : base(notificador)
         {
             _conteudoService = conteudoService;
             _cacheService = cacheService;
@@ -33,20 +35,21 @@ namespace BFF.API.Controllers
         {
             if (cursoId == Guid.Empty)
             {
-                return BadRequest("Id do curso inválido.");
+                return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do curso inválido.");
             }
+            
             var cacheKey = $"Curso_{cursoId}";
             var cachedCurso = await _cacheService.GetAsync<CursoDto>(cacheKey);
             if (cachedCurso != null)
             {
-                return Ok(cachedCurso);
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, cachedCurso, "Curso obtido do cache com sucesso");
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
             var response = await _conteudoService.ObterCursoPorId(cursoId, token);
             if (response?.Data == null)
             {
-                return NotFound($"Curso com Id {cursoId} não encontrado.");
+                return ProcessarErro(System.Net.HttpStatusCode.NotFound, $"Curso com Id {cursoId} não encontrado.");
             }
 
             // Extrai o CursoDto do ResponseResult
@@ -54,10 +57,10 @@ namespace BFF.API.Controllers
             if (curso != null)
             {
                 await _cacheService.SetAsync(cacheKey, curso, TimeSpan.FromMinutes(30));
-                return Ok(curso);
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, curso, "Curso obtido com sucesso");
             }
 
-            return StatusCode(500, "Erro ao processar dados do curso.");
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao processar dados do curso.");
         }
 
         /// <summary>
@@ -70,14 +73,14 @@ namespace BFF.API.Controllers
             var cachedCursos = await _cacheService.GetAsync<IEnumerable<CursoDto>>(cacheKey);
             if (cachedCursos != null)
             {
-                return Ok(cachedCursos);
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, cachedCursos, "Cursos obtidos do cache com sucesso");
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
             var response = await _conteudoService.ObterTodosCursos(token);
             if (response == null || response.Data!.ValueKind == JsonValueKind.Null)
             {
-                return NotFound("Nenhum curso encontrado.");
+                return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Nenhum curso encontrado.");
             }
 
             // Extrai a lista de CursoDto do ResponseResult
@@ -85,10 +88,10 @@ namespace BFF.API.Controllers
             if (cursos != null)
             {
                 await _cacheService.SetAsync(cacheKey, cursos, TimeSpan.FromMinutes(30));
-                return Ok(cursos);
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, cursos, "Cursos obtidos com sucesso");
             }
 
-            return StatusCode(500, "Erro ao processar dados dos cursos.");
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao processar dados dos cursos.");
         }
 
         /// <summary>
@@ -103,9 +106,9 @@ namespace BFF.API.Controllers
             var response = await _conteudoService.AdicionarCurso(curso, token);
             if (response == null)
             {
-                return StatusCode(500, "Erro ao adicionar curso.");
+                return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao adicionar curso.");
             }
-            return CreatedAtAction(nameof(AdicionarCurso), new { cursoId = response.Data }, response);
+            return RespostaPadraoApi(System.Net.HttpStatusCode.Created, response.Data, "Curso criado com sucesso");
         }
 
         /// <summary>
@@ -117,7 +120,7 @@ namespace BFF.API.Controllers
         {
             if (cursoId == Guid.Empty)
             {
-                return BadRequest("Id do curso inválido.");
+                return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do curso inválido.");
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
@@ -125,9 +128,9 @@ namespace BFF.API.Controllers
             var response = await _conteudoService.AtualizarCurso(cursoId, curso, token);
             if (response == null)
             {
-                return NotFound($"Curso com Id {cursoId} não encontrado.");
+                return ProcessarErro(System.Net.HttpStatusCode.NotFound, $"Curso com Id {cursoId} não encontrado.");
             }
-            return Ok(response);
+            return RespostaPadraoApi(System.Net.HttpStatusCode.OK, response.Data, "Curso atualizado com sucesso");
         }
     }
 }

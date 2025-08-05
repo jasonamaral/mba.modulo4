@@ -47,6 +47,8 @@ builder.Services.AddControllers();
 // Swagger
 builder.Services.AddSwaggerConfiguration();
 
+builder.Services.AddMessageBusConfiguration(builder.Configuration);
+
 // CORS
 builder.Services.AddCors(options =>
 {

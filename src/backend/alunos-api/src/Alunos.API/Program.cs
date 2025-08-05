@@ -1,4 +1,5 @@
 using Alunos.API.Extensions;
+using Alunos.Application.Commands;
 using Alunos.Application.EventHandlers;
 using Alunos.Application.Interfaces.Repositories;
 using Alunos.Application.Interfaces.Services;
@@ -8,8 +9,10 @@ using Alunos.Infrastructure.Repositories;
 using Alunos.Infrastructure.Services;
 using Core.Identidade;
 using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -19,6 +22,12 @@ builder.Services.AddControllers();
 
 // Configurar Mapster
 TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
+
+// Configurar MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegistrarClienteCommand>());
+
+// Configurar Mediator
+builder.Services.AddMediatorConfiguration();
 
 // Configurar Entity Framework - Configuração condicional baseada no ambiente
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -49,7 +58,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<UserRegisteredEventHandler>();
 
-builder.Services.AddHostedService<UserRegisteredEventConsumer>();
+builder.Services.AddMessageBusConfiguration(builder.Configuration);
+
 
 builder.Services.AddCors(options =>
 {

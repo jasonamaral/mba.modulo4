@@ -9,6 +9,7 @@ namespace Core.Controller;
 [ApiController]
 public abstract class MainController(INotificador notificador) : ControllerBase
 {
+    protected INotificador Notificador => notificador;
     protected ActionResult RespostaPadraoApi(HttpStatusCode statusCode = HttpStatusCode.OK, object? data = null, string? message = null)
     {
         if (!notificador.TemErros())
