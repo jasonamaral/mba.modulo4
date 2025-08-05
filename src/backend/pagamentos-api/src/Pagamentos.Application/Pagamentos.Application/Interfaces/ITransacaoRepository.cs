@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Pagamentos.Domain.Entities;
 
 namespace Pagamentos.Application.Interfaces

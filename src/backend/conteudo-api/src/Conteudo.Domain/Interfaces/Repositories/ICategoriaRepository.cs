@@ -7,6 +7,6 @@ public interface ICategoriaRepository : IRepository<Categoria>
 {
     Task<IEnumerable<Categoria>> ObterTodosAsync();
     Task<Categoria?> ObterPorIdAsync(Guid id);
-    void Adicionar(Categoria categoria);
+    Task Adicionar(Categoria categoria);
     Task<bool> ExistePorNome(string nome);
 } 

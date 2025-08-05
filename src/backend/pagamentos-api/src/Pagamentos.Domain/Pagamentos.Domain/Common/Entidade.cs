@@ -1,5 +1,3 @@
-using System;
-
 namespace Pagamentos.Domain.Common
 {
     public abstract class Entidade

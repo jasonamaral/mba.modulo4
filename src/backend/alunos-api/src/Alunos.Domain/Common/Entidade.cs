@@ -2,29 +2,32 @@ namespace Alunos.Domain.Common;
 
 public abstract class Entidade
 {
+    #region Atributos
     public Guid Id { get; protected set; }
 
-    public DateTime CreatedAt { get; protected set; }
+    public DateTime DataCriacao { get; protected set; }
 
-    public DateTime UpdatedAt { get; protected set; }
+    public DateTime DataAlteracao { get; protected set; }
+    #endregion
 
+    #region CTOR
     protected Entidade()
     {
         Id = Guid.NewGuid();
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
+        DataCriacao = DateTime.UtcNow;
     }
 
     protected Entidade(Guid id)
     {
         Id = id;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
+        DataCriacao = DateTime.UtcNow;
     }
+    #endregion
 
-    protected void SetUpdatedAt()
+    #region Métodos
+    public void RegistrarDataAlteracao()
     {
-        UpdatedAt = DateTime.UtcNow;
+        DataAlteracao = DateTime.UtcNow;
     }
 
     public override bool Equals(object obj)
@@ -46,6 +49,11 @@ public abstract class Entidade
         return Id.GetHashCode();
     }
 
+    public override string ToString()
+    {
+        return $"{GetType().Name} [Id={Id}]";
+    }
+
     public static bool operator ==(Entidade left, Entidade right)
     {
         return Equals(left, right);
@@ -55,4 +63,5 @@ public abstract class Entidade
     {
         return !Equals(left, right);
     }
+    #endregion
 }

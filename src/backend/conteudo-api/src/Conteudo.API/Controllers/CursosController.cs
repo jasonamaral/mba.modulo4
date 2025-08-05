@@ -1,11 +1,15 @@
 using AutoMapper;
 using Conteudo.API.Controllers.Base;
-using Conteudo.Application.Commands;
+using Conteudo.Application.Commands.AtualizarCurso;
+using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
+using Core.Messages;
 using Core.Notification;
+using Core.SharedDtos.Conteudo;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -25,7 +29,8 @@ public class CursosController : MainController
     public CursosController(INotificador notificador
                            , ICursoAppService cursoAppService
                            , IMediatorHandler mediator
-                           , IMapper mapper) : base(notificador)
+                           , IMapper mapper
+                           , INotificationHandler<DomainNotificacaoRaiz> notifications) : base(notificador, notifications)
     {
         _cursoAppService = cursoAppService;
         _mediator = mediator;

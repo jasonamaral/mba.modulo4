@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Conteudo.Domain.Interfaces.Repositories;
+using Core.SharedDtos.Conteudo;
 
 namespace Conteudo.Application.Services
 {

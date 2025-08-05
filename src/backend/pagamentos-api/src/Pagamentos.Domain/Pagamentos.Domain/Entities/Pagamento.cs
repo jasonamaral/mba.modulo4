@@ -1,4 +1,3 @@
-using System;
 using Pagamentos.Domain.Common;
 
 namespace Pagamentos.Domain.Entities
