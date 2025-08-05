@@ -1,6 +1,6 @@
 ﻿namespace Core.Communication
 {
-    public class ResponseResult
+    public class ResponseResult<T>
     {
         public ResponseResult()
         {
@@ -9,7 +9,7 @@
 
         public string Title { get; set; }
         public int Status { get; set; }
-        public dynamic? Data { get; set; }
+        public T? Data { get; set; }
         public ResponseErrorMessages Errors { get; set; }
     }
 

@@ -17,4 +17,11 @@ public class DomainNotificacaoRaiz : INotification
         Chave = key;
         Valor = value;
     }
+    public DomainNotificacaoRaiz(string key, string value)
+    {
+        DataHora = DateTime.Now;
+        NotificacaoId = Guid.NewGuid();
+        Chave = key;
+        Valor = value;
+    }
 }

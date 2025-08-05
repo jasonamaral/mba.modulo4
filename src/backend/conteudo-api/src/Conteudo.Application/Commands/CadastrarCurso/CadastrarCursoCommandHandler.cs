@@ -8,12 +8,11 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.CadastrarCurso;
 public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
-    ICursoRepository cursoRepository, 
-    ICategoriaRepository categoriaRepository) : IRequestHandler<CadastrarCursoCommand, CommandResult>
+                                        ICursoRepository cursoRepository, 
+                                        ICategoriaRepository categoriaRepository) : IRequestHandler<CadastrarCursoCommand, CommandResult>
 {
     private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
     private readonly ICursoRepository _cursoRepository = cursoRepository;
-    private readonly ICategoriaRepository _categoriaRepository = categoriaRepository;
     private Guid _raizAgregacao;
 
     public async Task<CommandResult> Handle(CadastrarCursoCommand request, CancellationToken cancellationToken)

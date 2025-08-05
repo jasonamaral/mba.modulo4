@@ -2,11 +2,18 @@
 using Conteudo.Application.Interfaces.Services;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.SharedDtos.Conteudo;
+using Core.Communication;
+using Core.Communication.Filters;
 
 namespace Conteudo.Application.Services
 {
     public class CursoAppService(ICursoRepository cursoRepository, IMapper mapper) : ICursoAppService
     {
+        public async Task<PagedResult<CursoDto>> ObterTodosAsync(CursoFilter filter)
+        {
+            var cursos = await cursoRepository.ObterTodosAsync(filter);
+            return mapper.Map<PagedResult<CursoDto>>(cursos);
+        }
         public async Task<IEnumerable<CursoDto>> ObterTodosAsync(bool includeAulas = false)
         {
             var cursos = await cursoRepository.ObterTodosAsync(includeAulas);
@@ -19,19 +26,10 @@ namespace Conteudo.Application.Services
             return mapper.Map<CursoDto>(curso);
         }
 
-        public Task<IEnumerable<CursoDto>> GetByCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
+        public async Task<IEnumerable<CursoDto>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<CursoDto>> GetAtivosAsync(bool includeAulas = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<CursoDto>> SearchAsync(string searchTerm, bool includeAulas = false)
-        {
-            throw new NotImplementedException();
+            var cursos = await cursoRepository.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
+            return mapper.Map<IEnumerable<CursoDto>>(cursos);
         }
     }
 }

@@ -12,6 +12,7 @@ public class DomainNotificacaoHandler : INotificationHandler<DomainNotificacaoRa
         await Task.CompletedTask;
     }
 
+    public List<string> ObterMensagens() => _notificacoes.Select(n => n.Valor).ToList();
     public List<DomainNotificacaoRaiz> ObterNotificacoes() => _notificacoes;
     public bool TemNotificacao() => _notificacoes.Count > 0;
     public void Limpar() => _notificacoes.Clear();

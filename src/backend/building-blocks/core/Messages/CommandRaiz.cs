@@ -13,6 +13,7 @@ public abstract class CommandRaiz : IRequest<CommandResult>
     protected CommandRaiz()
     {
         DataHora = DateTime.UtcNow;
+        CommandResult = new CommandResult();
     }
 
     public void DefinirRaizAgregacao(Guid raizAgregacao)
