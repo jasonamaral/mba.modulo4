@@ -36,7 +36,6 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
             .HasColumnName("NomeCurso")
             .HasColumnType(DatabaseTypeConstant.Varchar)
             .HasMaxLength(200)
-            .UseCollation(DatabaseTypeConstant.Collate)
             .IsRequired();
 
         builder.Property(x => x.Valor)
@@ -66,8 +65,7 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
         builder.Property(x => x.Observacao)
             .HasColumnName("Observacao")
             .HasColumnType(DatabaseTypeConstant.Varchar)
-            .HasMaxLength(2000)
-            .UseCollation(DatabaseTypeConstant.Collate);
+            .HasMaxLength(2000);
 
         builder.OwnsMany(x => x.HistoricoAprendizado, ha =>
         {

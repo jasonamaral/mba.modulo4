@@ -1,13 +1,17 @@
 using Alunos.API.Extensions;
+using Alunos.Application.Commands;
 using Alunos.Application.Interfaces.Services;
 using Alunos.Application.Services;
 using Alunos.Domain.Interfaces;
 using Alunos.Infrastructure.Data;
 using Alunos.Infrastructure.Repositories;
 using Alunos.Infrastructure.Services;
+using Core.Identidade;
 using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -17,6 +21,12 @@ builder.Services.AddControllers();
 
 // Configurar Mapster
 TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
+
+// Configurar MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegistrarClienteCommand>());
+
+// Configurar Mediator
+builder.Services.AddMediatorConfiguration();
 
 // Configurar Entity Framework - Configuração condicional baseada no ambiente
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -39,53 +49,19 @@ builder.Services.AddScoped<IAlunoRepository, AlunoRepository>();
 
 builder.Services.AddScoped<IAlunoAppService, AlunoAppService>();
 
+// Registrar o serviço de integração
+builder.Services.AddScoped<IRegistroUsuarioIntegrationService, RegistroUsuarioIntegrationService>();
+
 builder.Services.AddSwaggerConfiguration();
 
-// Configurar JWT
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"];
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
-            ClockSkew = TimeSpan.Zero
-        };
-
-        // Adicionar eventos para debug
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine($"Falha na autenticação: {context.Exception.Message}");
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                Console.WriteLine("Token validado com sucesso");
-                return Task.CompletedTask;
-            },
-            OnChallenge = context =>
-            {
-                Console.WriteLine($"Challenge: {context.Error}, {context.ErrorDescription}");
-                return Task.CompletedTask;
-            }
-        };
-    });
+builder.Services.AddJwtConfiguration(builder.Configuration);
 
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<RegistrarUsuarioEventHandler>();
 
-builder.Services.AddHostedService<RegistrarUsuarioEventConsumer>();
+builder.Services.AddMessageBusConfiguration(builder.Configuration);
+
 
 builder.Services.AddCors(options =>
 {

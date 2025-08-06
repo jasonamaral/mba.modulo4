@@ -31,7 +31,6 @@ public class CertificadoConfiguration : IEntityTypeConfiguration<Certificado>
             .HasColumnName("NomeCurso")
             .HasColumnType(DatabaseTypeConstant.Varchar)
             .HasMaxLength(200)
-            .UseCollation(DatabaseTypeConstant.Collate)
             .IsRequired();
 
         builder.Property(x => x.DataSolicitacao)
@@ -56,14 +55,12 @@ public class CertificadoConfiguration : IEntityTypeConfiguration<Certificado>
             .HasColumnName("PathCertificado")
             .HasColumnType(DatabaseTypeConstant.Varchar)
             .HasMaxLength(1024)
-            .UseCollation(DatabaseTypeConstant.Collate)
             .IsRequired();
 
         builder.Property(x => x.NomeInstrutor)
             .HasColumnName("NomeInstrutor")
             .HasColumnType(DatabaseTypeConstant.Varchar)
             .HasMaxLength(100)
-            .UseCollation(DatabaseTypeConstant.Collate)
             .IsRequired();
 
         builder.Property(x => x.DataCriacao)

@@ -7,7 +7,7 @@ public class CadastrarAlunoCommandValidator : AbstractValidator<CadastrarAlunoCo
 {
     public CadastrarAlunoCommandValidator()
     {
-        RuleFor(c => c.AlunoId).NotEqual(Guid.Empty).WithMessage("Id do aluno inválido.");
+        RuleFor(c => c.Id).NotEqual(Guid.Empty).WithMessage("Id do aluno inválido.");
         RuleFor(c => c.Nome).NotEmpty().WithMessage("Nome é obrigatório.");
         RuleFor(c => c.Nome).NotEmpty().WithMessage("Nome é obrigatório.");
         RuleFor(c => c.Email).NotEmpty().WithMessage("Email é obrigatório.").EmailAddress().WithMessage("Email inválido.");

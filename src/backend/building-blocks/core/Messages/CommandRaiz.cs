@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using MediatR;
 
 namespace Core.Messages;
+
 public abstract class CommandRaiz : IRequest<CommandResult>
 {
     public Guid RaizAgregacao { get; internal set; }
@@ -13,7 +14,8 @@ public abstract class CommandRaiz : IRequest<CommandResult>
     protected CommandRaiz()
     {
         DataHora = DateTime.UtcNow;
-        CommandResult = new CommandResult();
+        Validacao = new ValidationResult();
+        CommandResult = new CommandResult(Validacao);
     }
 
     public void DefinirRaizAgregacao(Guid raizAgregacao)
@@ -27,5 +29,6 @@ public abstract class CommandRaiz : IRequest<CommandResult>
     }
 
     public ICollection<string> Erros => Validacao?.Errors?.Select(e => e.ErrorMessage).ToList() ?? new List<string>();
+
     public virtual bool EhValido() => Validacao == null || Validacao.IsValid;
 }

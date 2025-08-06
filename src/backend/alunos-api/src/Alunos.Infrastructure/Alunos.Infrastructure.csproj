@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Alunos.Domain\Alunos.Domain.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\core\Core.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\MessageBus\MessageBus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -11,8 +13,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
-    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
   </ItemGroup>
 

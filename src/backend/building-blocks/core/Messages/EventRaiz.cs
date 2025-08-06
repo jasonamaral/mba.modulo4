@@ -2,7 +2,7 @@
 using MediatR;
 
 namespace Core.Messages;
-//public class Event : Message, INotification
+
 public class EventRaiz : INotification
 {
     public Guid RaizAgregacao { get; internal set; }
@@ -26,5 +26,6 @@ public class EventRaiz : INotification
     }
 
     public ICollection<string> Erros => Validacao?.Errors?.Select(e => e.ErrorMessage).ToList() ?? [];
+
     public virtual bool EhValido() => Validacao == null || Validacao.IsValid;
 }

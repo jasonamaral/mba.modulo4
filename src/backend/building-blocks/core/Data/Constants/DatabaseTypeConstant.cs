@@ -1,4 +1,5 @@
 ﻿namespace Core.Data.Constants;
+
 public static class DatabaseTypeConstant
 {
     public const string Collate = "Latin1_General_CI_AI";

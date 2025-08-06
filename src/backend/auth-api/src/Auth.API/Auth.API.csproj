@@ -21,10 +21,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.12.1" />
+    <PackageReference Include="NetDevPack.Security.Jwt.AspNetCore" Version="8.2.2" />
+    <PackageReference Include="NetDevPack.Security.Jwt.Store.EntityFrameworkCore" Version="8.2.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\core\Core.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\MessageBus\MessageBus.csproj" />
     <ProjectReference Include="..\Auth.Application\Auth.Application.csproj" />
     <ProjectReference Include="..\Auth.Infrastructure\Auth.Infrastructure.csproj" />
   </ItemGroup>

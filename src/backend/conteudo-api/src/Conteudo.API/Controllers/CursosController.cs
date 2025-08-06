@@ -1,4 +1,3 @@
-using AutoMapper;
 using Conteudo.Application.Commands.AtualizarCurso;
 using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.DTOs;
@@ -13,6 +12,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Mapster;
 
 namespace Conteudo.API.Controllers;
 
@@ -21,12 +21,10 @@ namespace Conteudo.API.Controllers;
 [Produces("application/json")]
 public class CursosController(ICursoAppService cursoAppService
                            , IMediatorHandler mediator
-                           , IMapper mapper
                            , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications)
 {
     private readonly ICursoAppService _cursoAppService = cursoAppService;
     private readonly IMediatorHandler _mediator = mediator;
-    private readonly IMapper _mapper = mapper;
 
     /// <summary>
     /// Obtém um curso por ID
@@ -113,7 +111,7 @@ public class CursosController(ICursoAppService cursoAppService
     {
         try
         {
-            var command = _mapper.Map<CadastrarCursoCommand>(dto);
+            var command = dto.Adapt<CadastrarCursoCommand>();
             return RespostaPadraoApi<Guid>(await _mediator.ExecutarComando(command));
         }
         catch (Exception ex)
@@ -142,7 +140,7 @@ public class CursosController(ICursoAppService cursoAppService
             if (id != dto.Id)
                 return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do curso não confere");
 
-            var command = _mapper.Map<AtualizarCursoCommand>(dto);
+            var command = dto.Adapt<AtualizarCursoCommand>();
             
             return RespostaPadraoApi<CursoDto>(await _mediator.ExecutarComando(command));
         }

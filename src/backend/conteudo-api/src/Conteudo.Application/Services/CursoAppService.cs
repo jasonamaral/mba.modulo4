@@ -1,35 +1,35 @@
-﻿using AutoMapper;
-using Conteudo.Application.Interfaces.Services;
+﻿using Conteudo.Application.Interfaces.Services;
 using Conteudo.Domain.Interfaces.Repositories;
-using Core.SharedDtos.Conteudo;
 using Core.Communication;
 using Core.Communication.Filters;
+using Core.SharedDtos.Conteudo;
+using Mapster;
 
-namespace Conteudo.Application.Services
+namespace Conteudo.Application.Services;
+
+public class CursoAppService(ICursoRepository cursoRepository) : ICursoAppService
 {
-    public class CursoAppService(ICursoRepository cursoRepository, IMapper mapper) : ICursoAppService
+    public async Task<PagedResult<CursoDto>> ObterTodosAsync(CursoFilter filter)
     {
-        public async Task<PagedResult<CursoDto>> ObterTodosAsync(CursoFilter filter)
-        {
-            var cursos = await cursoRepository.ObterTodosAsync(filter);
-            return mapper.Map<PagedResult<CursoDto>>(cursos);
-        }
-        public async Task<IEnumerable<CursoDto>> ObterTodosAsync(bool includeAulas = false)
-        {
-            var cursos = await cursoRepository.ObterTodosAsync(includeAulas);
-            return mapper.Map<IEnumerable<CursoDto>>(cursos);
-        }
+        var cursos = await cursoRepository.ObterTodosAsync(filter);
+        return cursos.Adapt<PagedResult<CursoDto>>();
+    }
 
-        public async Task<CursoDto?> ObterPorIdAsync(Guid id, bool includeAulas = false)
-        {
-            var curso = await cursoRepository.ObterPorIdAsync(id, includeAulas);
-            return mapper.Map<CursoDto>(curso);
-        }
+    public async Task<IEnumerable<CursoDto>> ObterTodosAsync(bool includeAulas = false)
+    {
+        var cursos = await cursoRepository.ObterTodosAsync(includeAulas);
+        return cursos.Adapt<IEnumerable<CursoDto>>();
+    }
 
-        public async Task<IEnumerable<CursoDto>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
-        {
-            var cursos = await cursoRepository.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
-            return mapper.Map<IEnumerable<CursoDto>>(cursos);
-        }
+    public async Task<CursoDto?> ObterPorIdAsync(Guid id, bool includeAulas = false)
+    {
+        var curso = await cursoRepository.ObterPorIdAsync(id, includeAulas);
+        return curso?.Adapt<CursoDto>();
+    }
+
+    public async Task<IEnumerable<CursoDto>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
+    {
+        var cursos = await cursoRepository.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
+        return cursos.Adapt<IEnumerable<CursoDto>>();
     }
 }

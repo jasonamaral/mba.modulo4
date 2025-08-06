@@ -56,14 +56,14 @@ public static class AlunoConfiguration
             else
             {
                 var connection = new SqliteConnection(stringConexao);
-                connection.CreateCollation(DatabaseTypeConstant.Collate, (x, y) =>
+                connection.CreateCollation("NOCASE", (x, y) =>
                 {
                     if (x == null && y == null) return 0;
                     if (x == null) return -1;
                     if (y == null) return 1;
 
-                    // Comparação ignorando maiúsculas/minúsculas e acentos
-                    return string.Compare(x, y, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace);
+                    // Comparação ignorando maiúsculas/minúsculas
+                    return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
                 });
 
                 o.UseSqlite(connection);

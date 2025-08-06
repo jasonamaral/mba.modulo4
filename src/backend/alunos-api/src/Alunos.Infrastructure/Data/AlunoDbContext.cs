@@ -22,7 +22,7 @@ public class AlunoDbContext(DbContextOptions<AlunoDbContext> options) : DbContex
         {
             if (property.GetMaxLength() == null)
             {
-                property.SetMaxLength(0); // To force errors in execution
+                property.SetMaxLength(0); 
             }
         }
 

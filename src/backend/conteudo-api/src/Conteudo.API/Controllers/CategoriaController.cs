@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using Conteudo.Application.Commands.CadastrarCategoria;
+﻿using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using Core.Services.Controllers;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,12 +18,10 @@ namespace Conteudo.API.Controllers
     [Produces("application/json")]
     public class CategoriaController(IMediatorHandler mediator
                                   , ICategoriaAppService categoriaAppService
-                                  , IMapper mapper
                                   , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications)
     {
         private readonly IMediatorHandler _mediator = mediator;
         private readonly ICategoriaAppService _categoriaAppService = categoriaAppService;
-        private readonly IMapper _mapper = mapper;
 
         /// <summary>
         /// Retorna uma categoria pelo ID.
@@ -37,7 +35,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var categoria = await _categoriaAppService.ObterPorIdAsync(id);
-             
+
                 if (categoria == null)
                     return RespostaPadraoApi(HttpStatusCode.NotFound, "Categoria não encontrada.");
 
@@ -80,7 +78,7 @@ namespace Conteudo.API.Controllers
         {
             try
             {
-                var command = _mapper.Map<CadastrarCategoriaCommand>(dto);
+                var command = dto.Adapt<CadastrarCategoriaCommand>();
                 return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)

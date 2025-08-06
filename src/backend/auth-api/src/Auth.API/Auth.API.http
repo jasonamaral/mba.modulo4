@@ -59,7 +59,7 @@ Content-Type: application/json
 
 {
   "email": "admin@auth.api",
-  "senha": "Admin@123"
+  "senha": "Teste@123"
 }
 
 ### Renovar token (substitua o refreshToken pelo valor recebido no login)

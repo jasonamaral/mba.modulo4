@@ -58,38 +58,11 @@ builder.Services.AddScoped<IReembolsoRepository, ReembolsoRepository>();
 builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 builder.Services.AddScoped<IWebhookRepository, WebhookRepository>();
 
-// TODO: Adicionar demais serviços
-// builder.Services.AddScoped<IPaymentGatewayService, PaymentGatewayService>();
-// builder.Services.AddScoped<IWebhookService, WebhookService>();
-// builder.Services.AddMediatR(typeof(ProcessarPagamentoCommandHandler));
 
 // Configuração do Swagger
 builder.Services.AddSwaggerConfiguration();
 
-// Configuração do Hangfire (TODO: Implementar)
-// builder.Services.AddHangfire(configuration => configuration
-//     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-//     .UseSimpleAssemblyNameTypeSerializer()
-//     .UseRecommendedSerializerSettings()
-//     .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// builder.Services.AddHangfireServer();
-
-// Configuração do HttpClient para integração com outras APIs
-builder.Services.AddHttpClient("AlunosAPI", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:AlunosApiUrl"]);
-});
-
-builder.Services.AddHttpClient("ConteudoAPI", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:ConteudoApiUrl"]);
-});
-
-builder.Services.AddHttpClient("AuthAPI", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:AuthApiUrl"]);
-});
 
 var app = builder.Build();
 
@@ -107,14 +80,6 @@ app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// TODO: Configurar Hangfire Dashboard
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseHangfireDashboard("/hangfire", new DashboardOptions
-//     {
-//     Authorization = new[] { new HangfireAuthorizationFilter() }
-//     });
-// }
 
 app.MapControllers();
 

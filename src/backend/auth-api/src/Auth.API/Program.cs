@@ -4,16 +4,12 @@ using Auth.Application.Services;
 using Auth.Application.Settings;
 using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
-using Auth.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Mapster;
+using Core.Notification;
+using Core.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -27,74 +23,34 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 // Configurar Mapster
 TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
 
-// Entity Framework - Configuração condicional baseada no ambiente
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var isDevelopment = builder.Environment.IsDevelopment();
+// Configurações separadas por responsabilidade (SRP)
+builder.Services.AddDatabaseConfiguration(builder.Configuration, builder.Environment);
+builder.Services.AddIdentityConfiguration();
+builder.Services.AddJwtConfiguration(builder.Configuration);
+builder.Services.AddJwksConfiguration();
 
-if (isDevelopment)
-{
-    // SQLite para desenvolvimento
-    builder.Services.AddDbContext<AuthDbContext>(options =>
-        options.UseSqlite(connectionString ?? "Data Source=../../../../../data/auth-dev.db"));
-}
-else
-{
-    // SQL Server para produção
-    builder.Services.AddDbContext<AuthDbContext>(options =>
-        options.UseSqlServer(connectionString ?? "Server=localhost;Database=AuthDB;Trusted_Connection=true;TrustServerCertificate=true;"));
-}
+builder.Services.AddAuthorization();
+builder.Services.AddMemoryCache();
 
-// Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    // Configurações de senha
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
-
-    // Configurações de usuário
-    options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedEmail = false;
-})
-.AddEntityFrameworkStores<AuthDbContext>()
-.AddDefaultTokenProviders();
-
-// JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? "MinhaChaveSecretaSuperSegura123456789";
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"] ?? "Auth.API",
-        ValidAudience = jwtSettings["Audience"] ?? "Auth.API.Users",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
-// Application Services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IEventPublisher, EventPublisher>();
+// Application Services (DIP - dependendo de abstrações)
+builder.Services.AddScoped<AuthService, AuthService>();
 builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
+
+// MediatR e Mediator
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddScoped<Core.Mediator.IMediatorHandler, Core.Mediator.MediatorHandler>();
+builder.Services.AddScoped<MediatR.INotificationHandler<Core.Messages.DomainNotificacaoRaiz>, Core.Messages.DomainNotificacaoHandler>();
+
+// Notification
+builder.Services.RegisterNotification();
 
 // Controllers
 builder.Services.AddControllers();
 
 // Swagger
 builder.Services.AddSwaggerConfiguration();
+
+builder.Services.AddMessageBusConfiguration(builder.Configuration);
 
 // CORS
 builder.Services.AddCors(options =>
@@ -127,7 +83,7 @@ if (app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
-
+app.UseJwksDiscovery();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -141,7 +97,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    
+
     await InitializeDatabaseAsync(context, userManager, roleManager);
 }
 
@@ -165,7 +121,7 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
     // Criar usuário admin padrão se não existir
     const string adminEmail = "admin@auth.api";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
-    
+
     if (adminUser == null)
     {
         adminUser = new ApplicationUser
@@ -177,7 +133,7 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
             EmailConfirmed = true
         };
 
-        var result = await userManager.CreateAsync(adminUser, "Admin@123");
+        var result = await userManager.CreateAsync(adminUser, "Teste@123");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(adminUser, "Administrador");

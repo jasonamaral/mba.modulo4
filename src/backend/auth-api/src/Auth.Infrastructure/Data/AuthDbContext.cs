@@ -2,14 +2,19 @@ using Auth.Application.Interfaces;
 using Auth.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using NetDevPack.Security.Jwt.Core.Model;
+using NetDevPack.Security.Jwt.Store.EntityFrameworkCore;
 
 namespace Auth.Infrastructure.Data;
 
-public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext
+public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext, ISecurityKeyContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
     {
     }
+
+    public DbSet<KeyMaterial> SecurityKeys { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -23,4 +28,4 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext
             entity.Property(e => e.Ativo).IsRequired();
         });
     }
-}
+} 

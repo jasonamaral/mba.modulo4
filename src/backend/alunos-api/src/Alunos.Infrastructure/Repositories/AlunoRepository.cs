@@ -47,6 +47,15 @@ public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
     {
         return await _context.Alunos.AnyAsync(a => a.Email == email);
     }
+
+    public async Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario)
+    {
+        return await _context.Alunos
+            .Include(a => a.MatriculasCursos)
+            .ThenInclude(m => m.Certificado)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.CodigoUsuarioAutenticacao == codigoUsuario);
+    }
     #endregion
 
     #region Matricula Curso

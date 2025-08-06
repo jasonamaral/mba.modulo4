@@ -1,25 +1,24 @@
-﻿namespace Core.Communication
+﻿namespace Core.Communication;
+
+public class ResponseResult<T>
 {
-    public class ResponseResult<T>
+    public ResponseResult()
     {
-        public ResponseResult()
-        {
-            Errors = new ResponseErrorMessages();
-        }
-
-        public string Title { get; set; }
-        public int Status { get; set; }
-        public T? Data { get; set; }
-        public ResponseErrorMessages Errors { get; set; }
+        Errors = new ResponseErrorMessages();
     }
 
-    public class ResponseErrorMessages
-    {
-        public ResponseErrorMessages()
-        {
-            Mensagens = new List<string>();
-        }
+    public string Title { get; set; }
+    public int Status { get; set; }
+    public T? Data { get; set; }
+    public ResponseErrorMessages Errors { get; set; }
+}
 
-        public List<string> Mensagens { get; set; }
+public class ResponseErrorMessages
+{
+    public ResponseErrorMessages()
+    {
+        Mensagens = new List<string>();
     }
+
+    public List<string> Mensagens { get; set; }
 }

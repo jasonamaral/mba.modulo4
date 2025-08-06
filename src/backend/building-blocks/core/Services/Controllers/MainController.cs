@@ -14,6 +14,7 @@ public abstract class MainController(IMediatorHandler mediator
                                    , INotificationHandler<DomainNotificacaoRaiz> notifications) : ControllerBase
 {
     protected readonly DomainNotificacaoHandler _notifications = (DomainNotificacaoHandler)notifications;
+
     protected bool OperacaoValida() => !_notifications.TemNotificacao();
 
     protected ActionResult RespostaPadraoApi<T>(HttpStatusCode statusCode = HttpStatusCode.OK, T? data = default, string? message = null)
@@ -39,6 +40,7 @@ public abstract class MainController(IMediatorHandler mediator
             }
         });
     }
+
     protected ActionResult RespostaPadraoApi<T>(HttpStatusCode statusCode, string message)
     {
         return RespostaPadraoApi(statusCode, message);
@@ -68,5 +70,4 @@ public abstract class MainController(IMediatorHandler mediator
     {
         return RespostaPadraoApi(data: result);
     }
-
 }

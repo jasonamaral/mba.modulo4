@@ -4,6 +4,10 @@ using Conteudo.Application.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+﻿using Core.Identidade;
+using Conteudo.API.Extensions;
+using Conteudo.Application.Commands;
+using Mapster;
 
 namespace Conteudo.API.Configuration
 {
@@ -19,7 +23,7 @@ namespace Conteudo.API.Configuration
                 .AddCorsConfiguration()
                 .AddMediatRConfiguration()
                 .AddServicesConfiguration()
-                .AddAutoMapperConfiguration()
+                .AddMapsterConfiguration()
                 .AddJwtConfiguration()
                 .AddSwaggerConfigurationExtension();
         }
@@ -72,9 +76,9 @@ namespace Conteudo.API.Configuration
             return builder;
         }
 
-        private static WebApplicationBuilder AddAutoMapperConfiguration(this WebApplicationBuilder builder)
+        private static WebApplicationBuilder AddMapsterConfiguration(this WebApplicationBuilder builder)
         {
-            builder.Services.AddAutoMapper(typeof(CursoMap));
+            TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
             return builder;
         }
 
@@ -86,32 +90,7 @@ namespace Conteudo.API.Configuration
 
         private static WebApplicationBuilder AddJwtConfiguration(this WebApplicationBuilder builder)
         {
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-
-            // Configura autenticação JWT
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-
-                    ValidIssuer = jwtSettings["Issuer"],     
-                    ValidAudience = jwtSettings["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]!)
-                    ),
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
-            builder.Services.AddAuthorization();
+            builder.Services.AddJwtConfiguration(builder.Configuration);
             return builder;
         }
     }

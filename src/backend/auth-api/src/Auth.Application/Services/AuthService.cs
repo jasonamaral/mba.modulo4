@@ -2,337 +2,141 @@ using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
 using Auth.Application.Settings;
 using Auth.Domain.Entities;
-using Auth.Domain.Events;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NetDevPack.Security.Jwt.Core.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Auth.Application.Services;
 
-public class AuthService : IAuthService
+public class AuthService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
+    public readonly UserManager<ApplicationUser> UserManager;
+    public readonly SignInManager<ApplicationUser> SignInManager;
     private readonly IAuthDbContext _context;
     private readonly ILogger<AuthService> _logger;
     private readonly JwtSettings _jwtSettings;
-    private readonly IEventPublisher _eventPublisher;
+    private readonly IJwtService _jwtService;
+    private readonly IHttpContextAccessor _accessor;
+    private readonly AppTokenSettings _appTokenSettingsSettings;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
         IAuthDbContext context,
         ILogger<AuthService> logger,
         IOptions<JwtSettings> jwtSettings,
-        IEventPublisher eventPublisher)
+        IJwtService jwksService,
+        IHttpContextAccessor accessor,
+        IOptions<AppTokenSettings> appTokenSettingsSettings)
     {
-        _userManager = userManager;
+        UserManager = userManager;
+        SignInManager = signInManager;
         _context = context;
         _logger = logger;
         _jwtSettings = jwtSettings.Value;
-        _eventPublisher = eventPublisher;
+        _jwtService = jwksService;
+        _accessor = accessor;
+        _appTokenSettingsSettings = appTokenSettingsSettings.Value;
     }
 
-    public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
+    public async Task<UsuarioRespostaLoginDto> GerarJwt(string email)
     {
-        try
-        {
-            // Verificar se o usuário já existe
-            var existingUser = await _userManager.FindByEmailAsync(request.Email);
-            if (existingUser != null)
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Usuário já existe com este email",
-                    Errors = ["Email já está em uso"]
-                };
-            }
+        var user = await UserManager.FindByEmailAsync(email);
+        var claims = await UserManager.GetClaimsAsync(user!);
 
-            var user = new ApplicationUser
-            {
-                UserName = request.Email,
-                Email = request.Email,
-                Nome = request.Nome,
-                DataNascimento = request.DataNascimento,
-                CPF = request.CPF,
-                Telefone = request.Telefone,
-                Genero = request.Genero,
-                Cidade = request.Cidade,
-                Estado = request.Estado,
-                CEP = request.CEP,
-                Foto = request.Foto,
-                DataCadastro = DateTime.UtcNow,
-                Ativo = true,
-                EmailConfirmed = true
-            };
+        var identityClaims = await ObterClaimsUsuario(claims, user!);
+        var encodedToken = await CodificarTokenAsync(identityClaims);
 
-            var result = await _userManager.CreateAsync(user, request.Senha);
+        var refreshToken = await GerarRefreshToken(email);
 
-            if (!result.Succeeded)
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Erro ao criar usuário",
-                    Errors = result.Errors.Select(e => e.Description).ToList()
-                };
-            }
-
-            // Adicionar role
-            var roleName = request.EhAdministrador ? "Administrador" : "Usuario";
-            await _userManager.AddToRoleAsync(user, roleName);
-
-            // Publicar evento para criar perfil do aluno (se não for administrador)
-            if (!request.EhAdministrador)
-            {
-                var userRegisteredEvent = new UserRegisteredEvent
-                {
-                    UserId = user.Id,
-                    Email = user.Email ?? "",
-                    Nome = user.Nome,
-                    DataNascimento = user.DataNascimento,
-                    CPF = user.CPF,
-                    Telefone = user.Telefone,
-                    Genero = user.Genero,
-                    Cidade = user.Cidade,
-                    Estado = user.Estado,
-                    CEP = user.CEP,
-                    Foto = user.Foto,
-                    DataCadastro = user.DataCadastro,
-                    EhAdministrador = request.EhAdministrador
-                };
-                
-                await _eventPublisher.PublishAsync(userRegisteredEvent);
-            }
-
-            // Gerar tokens
-            var accessToken = await GenerateJwtTokenAsync(user);
-            var refreshToken = GenerateRefreshToken();
-
-            // Salvar refresh token
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays);
-            await _userManager.UpdateAsync(user);
-
-            return new AuthResponseDto
-            {
-                Success = true,
-                Message = "Usuário registrado com sucesso",
-                Token = accessToken,
-                RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-                User = new UserDto
-                {
-                    Id = user.Id,
-                    Email = user.Email ?? "",
-                    Nome = user.Nome,
-                    DataNascimento = user.DataNascimento,
-                    CPF = user.CPF,
-                    Telefone = user.Telefone,
-                    Genero = user.Genero,
-                    Cidade = user.Cidade,
-                    Estado = user.Estado,
-                    CEP = user.CEP,
-                    Foto = user.Foto,
-                    DataCadastro = user.DataCadastro,
-                    Ativo = user.Ativo,
-                    Roles = [roleName]
-                }
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro durante o registro do usuário");
-            return new AuthResponseDto
-            {
-                Success = false,
-                Message = "Erro interno do servidor",
-                Errors = ["Erro interno do servidor"]
-            };
-        }
+        return ObterRespostaToken(encodedToken, user!, claims, refreshToken);
     }
 
-    public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
+    public async Task<RefreshToken?> ObterRefreshToken(Guid refreshToken)
     {
-        try
-        {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, request.Senha))
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Credenciais inválidas",
-                    Errors = ["Email ou senha incorretos"]
-                };
-            }
+        var token = await _context.RefreshTokens.AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Token == refreshToken);
 
-            if (!user.Ativo)
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Usuário inativo",
-                    Errors = ["Conta desativada"]
-                };
-            }
-
-            // Gerar tokens
-            var accessToken = await GenerateJwtTokenAsync(user);
-            var refreshToken = GenerateRefreshToken();
-
-            // Salvar refresh token
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays);
-            await _userManager.UpdateAsync(user);
-
-            // Obter roles do usuário
-            var roles = await _userManager.GetRolesAsync(user);
-
-            return new AuthResponseDto
-            {
-                Success = true,
-                Message = "Login realizado com sucesso",
-                Token = accessToken,
-                RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-                User = new UserDto
-                {
-                    Id = user.Id,
-                    Email = user.Email ?? "",
-                    Nome = user.Nome,
-                    DataNascimento = user.DataNascimento,
-                    CPF = user.CPF,
-                    Telefone = user.Telefone,
-                    Genero = user.Genero,
-                    Cidade = user.Cidade,
-                    Estado = user.Estado,
-                    CEP = user.CEP,
-                    Foto = user.Foto,
-                    DataCadastro = user.DataCadastro,
-                    Ativo = user.Ativo,
-                    Roles = roles.ToList()
-                }
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro durante o login");
-            return new AuthResponseDto
-            {
-                Success = false,
-                Message = "Erro interno do servidor",
-                Errors = ["Erro interno do servidor"]
-            };
-        }
+        return token != null && token.ExpirationDate.ToLocalTime() > DateTime.Now ? token : null;
     }
 
-    public async Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request)
+    private async Task<ClaimsIdentity> ObterClaimsUsuario(ICollection<Claim> claims, ApplicationUser user)
     {
-        try
+        var userRoles = await UserManager.GetRolesAsync(user);
+
+        claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email!));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString()));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64));
+
+        foreach (var userRole in userRoles)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == request.RefreshToken);
-
-            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Refresh token inválido ou expirado",
-                    Errors = ["Token inválido"]
-                };
-            }
-
-            // Gerar novos tokens
-            var accessToken = await GenerateJwtTokenAsync(user);
-            var refreshToken = GenerateRefreshToken();
-
-            // Atualizar refresh token
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays);
-            await _userManager.UpdateAsync(user);
-
-            // Obter roles do usuário
-            var roles = await _userManager.GetRolesAsync(user);
-
-            return new AuthResponseDto
-            {
-                Success = true,
-                Message = "Token renovado com sucesso",
-                Token = accessToken,
-                RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-                User = new UserDto
-                {
-                    Id = user.Id,
-                    Email = user.Email ?? "",
-                    Nome = user.Nome,
-                    DataNascimento = user.DataNascimento,
-                    CPF = user.CPF,
-                    Telefone = user.Telefone,
-                    Genero = user.Genero,
-                    Cidade = user.Cidade,
-                    Estado = user.Estado,
-                    CEP = user.CEP,
-                    Foto = user.Foto,
-                    DataCadastro = user.DataCadastro,
-                    Ativo = user.Ativo,
-                    Roles = roles.ToList()
-                }
-            };
+            claims.Add(new Claim("role", userRole));
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro durante refresh token");
-            return new AuthResponseDto
-            {
-                Success = false,
-                Message = "Erro interno do servidor",
-                Errors = ["Erro interno do servidor"]
-            };
-        }
+
+        var identityClaims = new ClaimsIdentity();
+        identityClaims.AddClaims(claims);
+
+        return identityClaims;
     }
 
-    private async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
+    private async Task<string> CodificarTokenAsync(ClaimsIdentity identityClaims)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
-        var roles = await _userManager.GetRolesAsync(user);
-
-        var claims = new List<Claim>
+        var currentIssuer =
+            $"{_accessor.HttpContext!.Request.Scheme}://{_accessor.HttpContext!.Request.Host}";
+        var key = await _jwtService.GetCurrentSigningCredentials();
+        var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
         {
-            new(ClaimTypes.NameIdentifier, user.Id),
-            new(ClaimTypes.Email, user.Email ?? ""),
-            new(ClaimTypes.Name, user.Nome),
-            new("userId", user.Id)
-        };
+            Issuer = currentIssuer,
+            Subject = identityClaims,
+            Expires = DateTime.UtcNow.AddHours(1),
+            SigningCredentials = key
+        });
 
-        // Adicionar roles como claims
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = _jwtSettings.Issuer,
-            Audience = _jwtSettings.Audience
-        };
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
 
-    private static string GenerateRefreshToken()
+    private UsuarioRespostaLoginDto ObterRespostaToken(string encodedToken, IdentityUser user, IEnumerable<Claim> claims, RefreshToken refreshToken)
     {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
+        return new UsuarioRespostaLoginDto
+        {
+            AccessToken = encodedToken,
+            RefreshToken = refreshToken.Token,
+            ExpiresIn = TimeSpan.FromHours(1).TotalSeconds,
+            UsuarioToken = new UsuarioTokenDto
+            {
+                Id = user.Id,
+                Email = user.Email!,
+                Claims = claims.Select(c => new UsuarioClaimDto { Type = c.Type, Value = c.Value })
+            }
+        };
     }
-} 
+
+    private static long ToUnixEpochDate(DateTime date)
+        => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
+            .TotalSeconds);
+
+    private async Task<RefreshToken> GerarRefreshToken(string email)
+    {
+        var refreshToken = new RefreshToken
+        {
+            Username = email,
+            ExpirationDate = DateTime.UtcNow.AddHours(_appTokenSettingsSettings.RefreshTokenExpiration)
+        };
+
+        _context.RefreshTokens.RemoveRange(_context.RefreshTokens.Where(u => u.Username == email));
+        await _context.RefreshTokens.AddAsync(refreshToken);
+
+        await _context.SaveChangesAsync();
+
+        return refreshToken;
+    }
+}

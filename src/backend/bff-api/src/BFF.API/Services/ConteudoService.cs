@@ -2,92 +2,170 @@
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
+using BFF.Infrastructure.Services;
 using Core.Communication;
 using Core.Communication.Filters;
 using Microsoft.Extensions.Options;
-using System.Net.Http.Headers;
 
-namespace BFF.API.Services
-{   
-    public interface IConteudoService
+namespace BFF.API.Services;
+
+public class ConteudoService : BaseApiService, IConteudoService
+{
+    private readonly ApiSettings _apiSettings;
+
+    public ConteudoService(
+        IOptions<ApiSettings> apiSettings, 
+        IApiClientService apiClient, 
+        ILogger<ConteudoService> logger) : base(apiClient, logger)
     {
-        Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, string token, bool includeAulas = false);
-        Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursos(string token, CursoFilter filter);
-        Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(string token, Guid categoriaId, bool includeAulas = false);    
-        Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso, string token);
-        Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso, string token);
-        Task<ResponseResult<bool>> ExcluirCurso(Guid cursoId);
-        Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaDto aula);
-        Task<ResponseResult<AulaDto>> AtualizarAula(Guid cursoId, AulaDto aula);
-        Task<ResponseResult<bool>> ExcluirAula(Guid cursoId, Guid aulaId);
+        _apiSettings = apiSettings.Value;
     }
-    public class ConteudoService : IConteudoService
+
+    public async Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, string token, bool includeAulas = false)
     {
-        private readonly IHttpClientService _httpClientService;
-        public ConteudoService(IOptions<ApiSettings> apiSettings, IHttpClientService httpClientService)
-        {
-            _httpClientService = httpClientService;
-            _httpClientService.SetBaseAddress(apiSettings.Value.ConteudoApiUrl);
-        }
+        if (!ValidateToken(token, nameof(ObterCursoPorId)))
+            return new ResponseResult<CursoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Token inválido" } } };
 
-        public async Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, string token, bool includeAulas = false)
+        var result = await ExecuteWithErrorHandling(async () =>
         {
-            AdicionarToken(token);
-            var response = await _httpClientService.GetAsync<ResponseResult<CursoDto>>($"api/cursos/{cursoId}?includeAulas={includeAulas}");
-            return response;
-        }
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            ConfigureAuthToken(token);
+            
+            var url = includeAulas ? $"api/cursos/{cursoId}?includeAulas=true" : $"api/cursos/{cursoId}";
+            return await _apiClient.GetAsync<ResponseResult<CursoDto>>(url);
+        }, nameof(ObterCursoPorId), cursoId);
 
-        public async Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursos(string token, CursoFilter filter)
-        {
-            AdicionarToken(token);
-            var response = await _httpClientService.GetAsync<ResponseResult<PagedResult<CursoDto>>>($"api/cursos?pageIndex={filter.PageIndex}&pageSize={filter.PageSize}&query={filter.Query}&includeAulas={filter.IncludeAulas}");
-            return response;
-        }
-        public async Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(string token, Guid categoriaId, bool includeAulas = false)
-        {
-            AdicionarToken(token);
-            var response = await _httpClientService.GetAsync<ResponseResult<IEnumerable<CursoDto>>>($"api/cursos/categoria/{categoriaId}?includeAulas={includeAulas}");
-            return response;
-        }
-        public async Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso, string token)
-        {
-            AdicionarToken(token);
-            var response = await _httpClientService.PostAsync<CursoCriarRequest, ResponseResult<Guid>>($"api/cursos", curso);
-            return response;
-        }
+        return result ?? new ResponseResult<CursoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+    }
 
-        public async Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso, string token)
-        {   
-            AdicionarToken(token);
-            var response = await _httpClientService.PutAsync<AtualizarCursoRequest, ResponseResult<CursoDto>>($"api/cursos/{id}", curso);
-            return response;
-        }
+    public async Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursos(string token, CursoFilter filter)
+    {
+        if (!ValidateToken(token, nameof(ObterTodosCursos)))
+            return new ResponseResult<PagedResult<CursoDto>> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Token inválido" } } };
 
-        public Task<ResponseResult<bool>> ExcluirCurso(Guid cursoId)
-        {   
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaDto aula)
+        var result = await ExecuteWithErrorHandling(async () =>
         {
-            throw new NotImplementedException();
-        }
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            ConfigureAuthToken(token);
+            
+            return await _apiClient.GetAsync<ResponseResult<PagedResult<CursoDto>>>("api/cursos");
+        }, nameof(ObterTodosCursos));
 
-        public Task<ResponseResult<AulaDto>> AtualizarAula(Guid cursoId, AulaDto aula)
-        {
-            throw new NotImplementedException();
-        }
+        return result ?? new ResponseResult<PagedResult<CursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+    }
 
-        public Task<ResponseResult<bool>> ExcluirAula(Guid cursoId, Guid aulaId)
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso, string token)
+    {
+        if (!ValidateToken(token, nameof(AdicionarCurso)))
+            return new ResponseResult<Guid> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Token inválido" } } };
 
-        private void AdicionarToken(string token)
+        var result = await ExecuteWithErrorHandling(async () =>
         {
-            var _httpClient = _httpClientService.GetHttpClient();
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        }
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            ConfigureAuthToken(token);
+            
+            var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<Guid>>("api/cursos", curso);
+            
+            if (apiResponse.IsSuccess)
+            {
+                return apiResponse.Data;
+            }
+            
+            // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
+            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+            {
+                try
+                {
+                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<Guid>>(apiResponse.ErrorContent);
+                    return errorResponse;
+                }
+                catch
+                {
+                    return new ResponseResult<Guid> 
+                    { 
+                        Status = apiResponse.StatusCode, 
+                        Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } } 
+                    };
+                }
+            }
+            
+            return new ResponseResult<Guid> 
+            { 
+                Status = apiResponse.StatusCode, 
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } } 
+            };
+        }, nameof(AdicionarCurso), curso.Nome);
+
+        return result ?? new ResponseResult<Guid> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+    }
+
+    public async Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso, string token)
+    {
+        if (!ValidateToken(token, nameof(AtualizarCurso)))
+            return new ResponseResult<CursoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Token inválido" } } };
+
+        var result = await ExecuteWithErrorHandling(async () =>
+        {
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            ConfigureAuthToken(token);
+            
+            var apiResponse = await _apiClient.PutAsyncWithDetails<AtualizarCursoRequest, ResponseResult<CursoDto>>($"api/cursos/{id}", curso);
+            
+            if (apiResponse.IsSuccess)
+            {
+                return apiResponse.Data;
+            }
+            
+            // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
+            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+            {
+                try
+                {
+                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<CursoDto>>(apiResponse.ErrorContent);
+                    return errorResponse;
+                }
+                catch
+                {
+                    return new ResponseResult<CursoDto> 
+                    { 
+                        Status = apiResponse.StatusCode, 
+                        Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } } 
+                    };
+                }
+            }
+            
+            return new ResponseResult<CursoDto> 
+            { 
+                Status = apiResponse.StatusCode, 
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } } 
+            };
+        }, nameof(AtualizarCurso), id);
+
+        return result ?? new ResponseResult<CursoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+    }
+
+    public Task<ResponseResult<bool>> ExcluirCurso(Guid cursoId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaDto aula)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseResult<AulaDto>> AtualizarAula(Guid cursoId, AulaDto aula)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseResult<bool>> ExcluirAula(Guid cursoId, Guid aulaId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(string token, Guid categoriaId, bool includeAulas = false)
+    {
+        throw new NotImplementedException();
     }
 }

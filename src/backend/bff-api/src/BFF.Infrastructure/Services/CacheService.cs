@@ -47,7 +47,13 @@ public class CacheService : ICacheService
                 var cachedValue = await _distributedCache.GetStringAsync(fullKey);
                 if (!string.IsNullOrEmpty(cachedValue))
                 {
-                    return JsonSerializer.Deserialize<T>(cachedValue);
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    };
+                    
+                    return JsonSerializer.Deserialize<T>(cachedValue, options);
                 }
             }
             else if (_memoryCache != null)
@@ -57,7 +63,9 @@ public class CacheService : ICacheService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao buscar item do cache: {Key}", fullKey);
+            _logger.LogError(ex, "Erro ao buscar item do cache: {Key}. Erro: {Error}", fullKey, ex.Message);
+            // Remove o item corrompido do cache
+            await RemoveAsync(key);
         }
 
         return null;
@@ -72,13 +80,19 @@ public class CacheService : ICacheService
         {
             if (_useDistributedCache && _distributedCache != null)
             {
-                var serializedValue = JsonSerializer.Serialize(value);
-                var options = new DistributedCacheEntryOptions
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = false
+                };
+                
+                var serializedValue = JsonSerializer.Serialize(value, options);
+                var cacheOptions = new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = exp
                 };
                 
-                await _distributedCache.SetStringAsync(fullKey, serializedValue, options);
+                await _distributedCache.SetStringAsync(fullKey, serializedValue, cacheOptions);
             }
             else if (_memoryCache != null)
             {
@@ -92,7 +106,7 @@ public class CacheService : ICacheService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao salvar item no cache: {Key}", fullKey);
+            _logger.LogError(ex, "Erro ao salvar item no cache: {Key}. Erro: {Error}", fullKey, ex.Message);
         }
     }
 

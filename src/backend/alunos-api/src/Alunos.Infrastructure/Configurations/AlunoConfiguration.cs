@@ -31,21 +31,18 @@ public class AlunoConfiguration : IEntityTypeConfiguration<Aluno>
             .HasColumnName("Nome")
             .HasColumnType(DatabaseTypeConstant.Varchar)
             .HasMaxLength(100)
-            .UseCollation(DatabaseTypeConstant.Collate)
             .IsRequired();
 
         builder.Property(x => x.Email)
             .HasColumnName("Email")
             .HasColumnType(DatabaseTypeConstant.Varchar)
             .HasMaxLength(100)
-            .UseCollation(DatabaseTypeConstant.Collate)
             .IsRequired();
 
         builder.Property(x => x.Cpf)
             .HasColumnName("Cpf")
             .HasColumnType(DatabaseTypeConstant.Varchar)
-            .HasMaxLength(11)
-            .UseCollation(DatabaseTypeConstant.Collate);
+            .HasMaxLength(11);
 
         builder.Property(x => x.DataNascimento)
             .HasColumnName("DataNascimento")
@@ -55,8 +52,7 @@ public class AlunoConfiguration : IEntityTypeConfiguration<Aluno>
         builder.Property(x => x.Contato)
             .HasColumnName("Contato")
             .HasColumnType(DatabaseTypeConstant.Varchar)
-            .HasMaxLength(25)
-            .UseCollation(DatabaseTypeConstant.Collate);
+            .HasMaxLength(25);
 
         builder.Property(x => x.Ativo)
             .HasColumnName("Ativo")

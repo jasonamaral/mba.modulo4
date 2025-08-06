@@ -1,9 +1,12 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace BFF.API.Models.Request;
 
+/// <summary>
+/// Request para renovaÃ§Ã£o de token
+/// </summary>
 public class RefreshTokenRequest
 {
-    [Required(ErrorMessage = "Token de refresh é obrigatório")]
+    /// <summary>
+    /// Token de refresh
+    /// </summary>
     public string RefreshToken { get; set; } = string.Empty;
-}
+} 

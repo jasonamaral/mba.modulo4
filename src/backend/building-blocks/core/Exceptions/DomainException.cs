@@ -1,4 +1,5 @@
 ﻿namespace Plataforma.Educacao.Core.Exceptions;
+
 public class DomainException : Exception
 {
     public IReadOnlyCollection<string> Errors { get; }
@@ -12,9 +13,4 @@ public class DomainException : Exception
     {
         Errors = mensagens.ToList().AsReadOnly();
     }
-
-    //public DomainException(string mensagem, Exception innerException) : base(mensagem, innerException)
-    //{
-    //    Errors = [mensagem];
-    //}
 }

@@ -1,4 +1,5 @@
 ﻿namespace Core.DomainValidations;
+
 public static class ValidacaoData
 {
     public static void DeveSerValido<T>(DateTime data, string mensagem, ResultadoValidacao<T> resultado) where T : class

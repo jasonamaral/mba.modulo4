@@ -1,7 +1,6 @@
-﻿namespace Core.Data
+﻿namespace Core.Data;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        Task<bool> Commit();
-    }
+    Task<bool> Commit();
 }

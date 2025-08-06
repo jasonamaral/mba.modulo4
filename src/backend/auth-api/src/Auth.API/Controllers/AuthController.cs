@@ -1,8 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
 using Auth.API.Models.Requests;
-using Auth.API.Models.Responses;
-using Auth.Application.Interfaces;
-using Auth.Application.DTOs;
+using Auth.Application.Services;
+using Auth.Domain.Entities;
+using Core.Communication;
+using Core.Mediator;
+using Core.Messages;
+using Core.Messages.Integration;
+using Core.Notification;
+using Core.Services.Controllers;
+using MediatR;
+using MessageBus;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Auth.API.Controllers;
 
@@ -12,244 +20,140 @@ namespace Auth.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class AuthController : ControllerBase
+public class AuthController(IMediatorHandler mediator
+                                  , AuthService authService
+                                  , INotificationHandler<DomainNotificacaoRaiz> notifications, IMessageBus bus, INotificador notificador) : MainController(mediator, notifications)
 {
-    private readonly IAuthService _authService;
-    private readonly ILogger<AuthController> _logger;
-
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
-    {
-        _authService = authService;
-        _logger = logger;
-    }
+    private readonly AuthService _authService = authService;
+    private readonly IMessageBus _bus = bus;
+    private readonly INotificador _notificador = notificador;
 
     /// <summary>
     /// Registra um novo usuário no sistema
     /// </summary>
-    /// <param name="request">Dados do usuário para registro</param>
+    /// <param name="registroRequest">Dados do usuário para registro</param>
     /// <returns>Confirmação de registro</returns>
     [HttpPost("registro")]
-    [ProducesResponseType(typeof(AuthResponse), 200)]
+    [ProducesResponseType(typeof(ApiSuccess), 200)]
     [ProducesResponseType(typeof(ApiError), 400)]
-    public async Task<IActionResult> Registro([FromBody] RegistroRequest request)
+    public async Task<IActionResult> Registro([FromBody] RegistroRequest registroRequest)
     {
-        try
+        if (!ModelState.IsValid) return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
+
+        var user = new ApplicationUser
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ApiError
-                {
-                    Message = "Dados inválidos",
-                    Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage),
-                    ErrorCode = "VALIDATION_ERROR"
-                });
-            }
+            Nome = registroRequest.Nome,
+            UserName = registroRequest.Email,
+            Email = registroRequest.Email,
+            EmailConfirmed = true
+        };
 
-            var registerDto = new RegisterRequestDto
-            {
-                Email = request.Email,
-                Senha = request.Senha,
-                Nome = request.Nome,
-                DataNascimento = request.DataNascimento,
-                EhAdministrador = request.EhAdministrador,
-                CPF = request.CPF,
-                Telefone = request.Telefone,
-                Genero = request.Genero,
-                Cidade = request.Cidade,
-                Estado = request.Estado,
-                CEP = request.CEP,
-                Foto = request.Foto
-            };
+        var result = await _authService.UserManager.CreateAsync(user, registroRequest.Senha);
 
-            var result = await _authService.RegisterAsync(registerDto);
-
-            if (!result.Success)
-            {
-                return BadRequest(new ApiError
-                {
-                    Message = result.Message,
-                    Details = result.Errors,
-                    ErrorCode = "REGISTRATION_ERROR"
-                });
-            }
-
-            var response = new AuthResponse
-            {
-                Success = true,
-                Message = result.Message,
-                AccessToken = result.Token,
-                RefreshToken = result.RefreshToken,
-                ExpiresAt = result.ExpiresAt,
-                Endpoint = "registro"
-            };
-
-            if (result.User != null)
-            {
-                response.User = new UserInfo
-                {
-                    Id = result.User.Id,
-                    Email = result.User.Email,
-                    Nome = result.User.Nome,
-                    Roles = result.User.Roles
-                };
-            }
-            return Ok(response);
-        }
-        catch (Exception ex)
+        if (result.Succeeded)
         {
-            _logger.LogError(ex, "Erro ao registrar usuário: {Email}", request.Email);
-            return StatusCode(500, new ApiError
+            var clienteResult = await RegistrarCliente(registroRequest);
+
+            if (!clienteResult.ValidationResult.IsValid)
             {
-                Message = "Erro interno do servidor",
-                ErrorCode = "INTERNAL_ERROR"
-            });
+                await _authService.UserManager.DeleteAsync(user);
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, clienteResult.ValidationResult);
+            }
+            return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(registroRequest.Email));
         }
+
+        foreach (var error in result.Errors)
+        {
+            _notificador.AdicionarErro(error.Description);
+        }
+
+        return RespostaPadraoApi(HttpStatusCode.BadRequest, string.Empty);
     }
 
     /// <summary>
     /// Autentica um usuário no sistema
     /// </summary>
-    /// <param name="request">Credenciais do usuário</param>
+    /// <param name="loginRequest">Credenciais do usuário</param>
     /// <returns>Token de autenticação</returns>
     [HttpPost("login")]
-    [ProducesResponseType(typeof(AuthResponse), 200)]
+    [ProducesResponseType(typeof(ApiSuccess), 200)]
     [ProducesResponseType(typeof(ApiError), 401)]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
-        try
+        if (!ModelState.IsValid) return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
+
+        var result = await _authService.SignInManager.PasswordSignInAsync(loginRequest.Email, loginRequest.Senha, false, true);
+
+        if (result.Succeeded)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ApiError
-                {
-                    Message = "Dados inválidos",
-                    Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage),
-                    ErrorCode = "VALIDATION_ERROR"
-                });
-            }
-
-            var loginDto = new LoginRequestDto
-            {
-                Email = request.Email,
-                Senha = request.Senha
-            };
-
-            var result = await _authService.LoginAsync(loginDto);
-
-            if (!result.Success)
-            {
-                return Unauthorized(new ApiError
-                {
-                    Message = result.Message,
-                    Details = result.Errors,
-                    ErrorCode = "AUTHENTICATION_ERROR"
-                });
-            }
-
-            var response = new AuthResponse
-            {
-                Success = true,
-                Message = result.Message,
-                AccessToken = result.Token,
-                RefreshToken = result.RefreshToken,
-                ExpiresAt = result.ExpiresAt,
-                Endpoint = "login"
-            };
-
-            if (result.User != null)
-            {
-                response.User = new UserInfo
-                {
-                    Id = result.User.Id,
-                    Email = result.User.Email,
-                    Nome = result.User.Nome,
-                    Roles = result.User.Roles
-                };
-            }
-
-            return Ok(response);
+            return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(loginRequest.Email));
         }
-        catch (Exception ex)
+
+        if (result.IsLockedOut)
         {
-            _logger.LogError(ex, "Erro ao fazer login: {Email}", request.Email);
-            return StatusCode(500, new ApiError
-            {
-                Message = "Erro interno do servidor",
-                ErrorCode = "INTERNAL_ERROR"
-            });
+            _notificador.AdicionarErro("Usuário temporariamente bloqueado por tentativas inválidas");
+            return RespostaPadraoApi(HttpStatusCode.Forbidden, "Usuário temporariamente bloqueado por tentativas inválidas");
         }
+
+        _notificador.AdicionarErro("Usuário ou Senha incorretos");
+        return RespostaPadraoApi(HttpStatusCode.BadRequest, "Usuário ou Senha incorretos");
     }
 
     /// <summary>
     /// Renova o token de autenticação
     /// </summary>
-    /// <param name="request">Token de refresh</param>
+    /// <param name="refreshToken">Token de refresh</param>
     /// <returns>Novo token de autenticação</returns>
     [HttpPost("refresh-token")]
-    [ProducesResponseType(typeof(AuthResponse), 200)]
+    [ProducesResponseType(typeof(ApiSuccess), 200)]
     [ProducesResponseType(typeof(ApiError), 401)]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
     {
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            _notificador.AdicionarErro("Refresh Token inválido.");
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, "Refresh Token inválido.");
+        }
+
+        var token = await _authService.ObterRefreshToken(Guid.Parse(refreshToken));
+
+        if (token is null)
+        {
+            _notificador.AdicionarErro("Refresh Token expirado");
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, "Refresh Token expirado");
+        }
+
+        return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(token.Username));
+    }
+
+    private async Task<ResponseMessage> RegistrarCliente(RegistroRequest registroRequest)
+    {
+        var usuario = await _authService.UserManager.FindByEmailAsync(registroRequest.Email);
+
+        var usuarioRegistrado = new UsuarioRegistradoIntegrationEvent(
+             Guid.Parse(usuario!.Id),
+             registroRequest.Nome,
+             registroRequest.Email,
+             registroRequest.CPF,
+             registroRequest.DataNascimento,
+             registroRequest.Telefone,
+             registroRequest.Genero,
+             registroRequest.Cidade,
+             registroRequest.Estado,
+             registroRequest.CEP,
+             registroRequest.Foto,
+             registroRequest.EhAdministrador,
+             DateTime.Now
+         );
+
         try
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ApiError
-                {
-                    Message = "Dados inválidos",
-                    Details = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage),
-                    ErrorCode = "VALIDATION_ERROR"
-                });
-            }
-
-            var refreshDto = new RefreshTokenRequestDto
-            {
-                RefreshToken = request.RefreshToken
-            };
-
-            var result = await _authService.RefreshTokenAsync(refreshDto);
-
-            if (!result.Success)
-            {
-                return Unauthorized(new ApiError
-                {
-                    Message = result.Message,
-                    Details = result.Errors,
-                    ErrorCode = "TOKEN_REFRESH_ERROR"
-                });
-            }
-
-            var response = new AuthResponse
-            {
-                Success = true,
-                Message = result.Message,
-                AccessToken = result.Token,
-                RefreshToken = result.RefreshToken,
-                ExpiresAt = result.ExpiresAt,
-                Endpoint = "refresh-token"
-            };
-
-            if (result.User != null)
-            {
-                response.User = new UserInfo
-                {
-                    Id = result.User.Id,
-                    Email = result.User.Email,
-                    Nome = result.User.Nome,
-                    Roles = result.User.Roles
-                };
-            }
-
-            return Ok(response);
+            return await _bus.RequestAsync<UsuarioRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "Erro ao renovar token");
-            return StatusCode(500, new ApiError
-            {
-                Message = "Erro interno do servidor",
-                ErrorCode = "INTERNAL_ERROR"
-            });
+            await _authService.UserManager.DeleteAsync(usuario);
+            throw;
         }
     }
 }

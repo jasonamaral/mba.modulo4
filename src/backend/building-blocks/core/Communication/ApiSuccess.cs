@@ -1,8 +1,7 @@
-﻿namespace Core.Communication
+﻿namespace Core.Communication;
+
+public class ApiSuccess
 {
-    public class ApiSuccess
-    {
-        public string Message { get; set; } = string.Empty;
-        public object? Data { get; set; }
-    }
+    public string Message { get; set; } = string.Empty;
+    public object? Data { get; set; }
 }
