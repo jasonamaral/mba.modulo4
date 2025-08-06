@@ -1,9 +1,6 @@
-using Alunos.Application.Commands;
 using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
 using Core.Communication;
-using Core.Messages;
-using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 
@@ -54,4 +51,4 @@ public class RegistrarClienteCommandHandler : IRequestHandler<RegistrarClienteCo
             return new CommandResult(request.ValidationResult);
         }
     }
-} 
+}

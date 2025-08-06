@@ -1,6 +1,7 @@
 ﻿using Plataforma.Educacao.Core.Exceptions;
 
 namespace Core.DomainValidations;
+
 public class ResultadoValidacao<T> where T : class
 {
     private readonly IList<string> _erros;

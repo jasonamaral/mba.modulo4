@@ -1,59 +1,91 @@
-using Microsoft.AspNetCore.Mvc;
-using Core.Notification;
+using BFF.API.Models.Response;
 using Core.Mediator;
 using Core.Messages;
+using Core.Notification;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BFF.API.Controllers;
 
 /// <summary>
-/// Controller para verificação de saúde da API
+/// Controller de Health Check da API
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class HealthController : BffController
 {
-    public HealthController(IMediatorHandler mediator,
-                          INotificationHandler<DomainNotificacaoRaiz> notifications,
-                          INotificador notificador) : base(mediator, notifications, notificador)
+    private readonly ILogger<HealthController> _logger;
+
+    public HealthController(
+        ILogger<HealthController> logger,
+        IMediatorHandler mediator,
+        INotificationHandler<DomainNotificacaoRaiz> notifications,
+        INotificador notificador) : base(mediator, notifications, notificador)
     {
-    }
-    /// <summary>
-    /// Verifica se a API está funcionando
-    /// </summary>
-    /// <returns>Status da API</returns>
-    [HttpGet]
-    public IActionResult Get()
-    {
-        var healthData = new
-        {
-            status = "healthy",
-            timestamp = DateTime.UtcNow,
-            version = "1.0.0",
-            service = "BFF API"
-        };
-        
-        return RespostaPadraoApi<object>(System.Net.HttpStatusCode.OK, healthData, "API funcionando normalmente");
+        _logger = logger;
     }
 
     /// <summary>
-    /// Endpoint para verificação de status com informações detalhadas
+    /// Verificar saúde da API
     /// </summary>
-    /// <returns>Informações detalhadas sobre a API</returns>
+    /// <returns>Status de saúde da API</returns>
+    [HttpGet]
+    public IActionResult Get()
+    {
+        try
+        {
+            var healthData = new HealthCheckResponse
+            {
+                Status = "Healthy",
+                Timestamp = DateTime.UtcNow,
+                Version = "1.0.0",
+                Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
+                Services = new List<ServiceHealthResponse>
+                {
+                    new() { Name = "BFF API", Status = "Healthy", ResponseTime = "0ms", LastCheck = DateTime.UtcNow }
+                }
+            };
+
+            return RespostaPadraoApi<HealthCheckResponse>(System.Net.HttpStatusCode.OK, healthData, "API funcionando normalmente");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao verificar saúde da API");
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
+        }
+    }
+
+    /// <summary>
+    /// Obter status detalhado da API
+    /// </summary>
+    /// <returns>Status detalhado da API</returns>
     [HttpGet("status")]
     public IActionResult GetStatus()
     {
-        var statusData = new
+        try
         {
-            api = "BFF API",
-            version = "1.0.0",
-            environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
-            timestamp = DateTime.UtcNow,
-            uptime = DateTime.UtcNow,
-            status = "running",
-            description = "Backend for Frontend API - Orquestração dos Microsserviços da Plataforma Educacional"
-        };
-        
-        return RespostaPadraoApi<object>(System.Net.HttpStatusCode.OK, statusData, "Status da API obtido com sucesso");
+            var statusData = new ApiStatusResponse
+            {
+                Name = "BFF API",
+                Version = "1.0.0",
+                Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
+                StartTime = DateTime.UtcNow.AddHours(-1), // Simulado
+                Uptime = TimeSpan.FromHours(1), // Simulado
+                Status = "Running",
+                Configuration = new Dictionary<string, object>
+                {
+                    { "LogLevel", "Information" },
+                    { "Caching", "Enabled" },
+                    { "Compression", "Enabled" }
+                }
+            };
+
+            return RespostaPadraoApi<ApiStatusResponse>(System.Net.HttpStatusCode.OK, statusData, "Status da API obtido com sucesso");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao obter status da API");
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
+        }
     }
 } 

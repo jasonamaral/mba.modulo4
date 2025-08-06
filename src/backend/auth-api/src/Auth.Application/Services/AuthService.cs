@@ -21,7 +21,6 @@ public class AuthService
     private readonly IAuthDbContext _context;
     private readonly ILogger<AuthService> _logger;
     private readonly JwtSettings _jwtSettings;
-    private readonly IEventPublisher _eventPublisher;
     private readonly IJwtService _jwtService;
     private readonly IHttpContextAccessor _accessor;
     private readonly AppTokenSettings _appTokenSettingsSettings;
@@ -32,7 +31,6 @@ public class AuthService
         IAuthDbContext context,
         ILogger<AuthService> logger,
         IOptions<JwtSettings> jwtSettings,
-        IEventPublisher eventPublisher,
         IJwtService jwksService,
         IHttpContextAccessor accessor,
         IOptions<AppTokenSettings> appTokenSettingsSettings)
@@ -42,7 +40,6 @@ public class AuthService
         _context = context;
         _logger = logger;
         _jwtSettings = jwtSettings.Value;
-        _eventPublisher = eventPublisher;
         _jwtService = jwksService;
         _accessor = accessor;
         _appTokenSettingsSettings = appTokenSettingsSettings.Value;

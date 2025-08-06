@@ -7,10 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Alunos.Application.Services;
 
-/// <summary>
-/// Implementação do serviço de integração de registro de usuário
-/// Segue os princípios SOLID e Clean Code
-/// </summary>
 public class RegistroUsuarioIntegrationService : IRegistroUsuarioIntegrationService
 {
     private readonly IMediatorHandler _mediatorHandler;
@@ -24,16 +20,11 @@ public class RegistroUsuarioIntegrationService : IRegistroUsuarioIntegrationServ
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    /// <summary>
-    /// Processa o evento de usuário registrado criando um comando para registrar o cliente
-    /// </summary>
     public async Task<ResponseMessage> ProcessarUsuarioRegistradoAsync(UsuarioRegistradoIntegrationEvent message)
     {
         try
         {
-            _logger.LogInformation("Processando evento de usuário registrado para ID: {UserId}", message.Id);
 
-            // Criar comando para registrar cliente
             var registrarClienteCommand = new RegistrarClienteCommand(
                 message.Id,
                 message.Nome,
@@ -50,18 +41,15 @@ public class RegistroUsuarioIntegrationService : IRegistroUsuarioIntegrationServ
                 message.DataCadastro
             );
 
-            // Enviar comando através do mediator
             var resultado = await _mediatorHandler.EnviarComando(registrarClienteCommand);
 
             if (resultado.IsValid)
             {
-                _logger.LogInformation("Usuário registrado com sucesso. ID: {UserId}", message.Id);
                 return new ResponseMessage(resultado);
             }
             else
             {
-                _logger.LogWarning("Falha na validação do comando de registro. ID: {UserId}, Erros: {Erros}", 
-                    message.Id, string.Join(", ", resultado.Errors.Select(e => e.ErrorMessage)));
+                _logger.LogWarning("Falha na validação do comando de registro. ID: {UserId}, Erros: {Erros}", message.Id, string.Join(", ", resultado.Errors.Select(e => e.ErrorMessage)));
                 return new ResponseMessage(resultado);
             }
         }
@@ -73,4 +61,4 @@ public class RegistroUsuarioIntegrationService : IRegistroUsuarioIntegrationServ
             return new ResponseMessage(validationResult);
         }
     }
-} 
+}

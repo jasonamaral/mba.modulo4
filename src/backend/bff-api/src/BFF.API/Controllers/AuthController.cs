@@ -1,13 +1,14 @@
 using BFF.API.Models.Request;
+using BFF.API.Models.Response;
 using BFF.API.Settings;
+using BFF.Application.Interfaces.Services;
+using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Text;
-using System.Text.Json;
 
 namespace BFF.API.Controllers;
 
@@ -18,19 +19,19 @@ namespace BFF.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : BffController
 {
-    private readonly HttpClient _httpClient;
+    private readonly IApiClientService _apiClient;
     private readonly ApiSettings _apiSettings;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
-        IHttpClientFactory httpClientFactory,
+        IApiClientService apiClient,
         IOptions<ApiSettings> apiSettings,
         ILogger<AuthController> logger,
         IMediatorHandler mediator,
         INotificationHandler<DomainNotificacaoRaiz> notifications,
         INotificador notificador) : base(mediator, notifications, notificador)
     {
-        _httpClient = httpClientFactory.CreateClient("ApiClient");
+        _apiClient = apiClient;
         _apiSettings = apiSettings.Value;
         _logger = logger;
     }
@@ -45,12 +46,35 @@ public class AuthController : BffController
     {
         try
         {
-            var json = JsonSerializer.Serialize(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            _apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
+            var result = await _apiClient.PostAsyncWithActionResult<RegistroRequest, ResponseResult<AuthRegistroResponse>>(
+                "/api/auth/registro",
+                request,
+                "Usuário registrado com sucesso");
 
-            var response = await _httpClient.PostAsync($"{_apiSettings.AuthApiUrl}/api/auth/registro", content);
+            if (result.Success && result.Data != null)
+            {
+                // Se o resultado é um ResponseResult genérico, extrair o Data interno
+                var dataType = result.Data.GetType();
+                if (dataType.IsGenericType && dataType.GetGenericTypeDefinition() == typeof(ResponseResult<>))
+                {
+                    var dataProperty = dataType.GetProperty("Data");
+                    var innerData = dataProperty?.GetValue(result.Data);
+                    if (innerData != null)
+                    {
+                        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, innerData, result.Message);
+                    }
+                }
 
-            return await ProcessarRespostaApi(response, "Usuário registrado com sucesso");
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, result.Data, result.Message);
+            }
+
+            if (result.ErrorContent != null)
+            {
+                return StatusCode(result.StatusCode, result.ErrorContent);
+            }
+
+            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, result.Message);
         }
         catch (Exception ex)
         {
@@ -69,12 +93,35 @@ public class AuthController : BffController
     {
         try
         {
-            var json = JsonSerializer.Serialize(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            _apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
+            var result = await _apiClient.PostAsyncWithActionResult<LoginRequest, ResponseResult<AuthLoginResponse>>(
+                "/api/auth/login",
+                request,
+                "Login realizado com sucesso");
 
-            var response = await _httpClient.PostAsync($"{_apiSettings.AuthApiUrl}/api/auth/login", content);
+            if (result.Success && result.Data != null)
+            {
+                // Se o resultado é um ResponseResult genérico, extrair o Data interno
+                var dataType = result.Data.GetType();
+                if (dataType.IsGenericType && dataType.GetGenericTypeDefinition() == typeof(ResponseResult<>))
+                {
+                    var dataProperty = dataType.GetProperty("Data");
+                    var innerData = dataProperty?.GetValue(result.Data);
+                    if (innerData != null)
+                    {
+                        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, innerData, result.Message);
+                    }
+                }
 
-            return await ProcessarRespostaApi(response, "Login realizado com sucesso");
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, result.Data, result.Message);
+            }
+
+            if (result.ErrorContent != null)
+            {
+                return StatusCode(result.StatusCode, result.ErrorContent);
+            }
+
+            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, result.Message);
         }
         catch (Exception ex)
         {
@@ -93,12 +140,32 @@ public class AuthController : BffController
     {
         try
         {
-            var json = JsonSerializer.Serialize(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            _apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
+            var result = await _apiClient.PostAsyncWithActionResult<RefreshTokenRequest, ResponseResult<AuthRefreshTokenResponse>>("/api/auth/refresh-token", request, "Token renovado com sucesso");
 
-            var response = await _httpClient.PostAsync($"{_apiSettings.AuthApiUrl}/api/auth/refresh-token", content);
+            if (result.Success && result.Data != null)
+            {
+                // Se o resultado é um ResponseResult genérico, extrair o Data interno
+                var dataType = result.Data.GetType();
+                if (dataType.IsGenericType && dataType.GetGenericTypeDefinition() == typeof(ResponseResult<>))
+                {
+                    var dataProperty = dataType.GetProperty("Data");
+                    var innerData = dataProperty?.GetValue(result.Data);
+                    if (innerData != null)
+                    {
+                        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, innerData, result.Message);
+                    }
+                }
 
-            return await ProcessarRespostaApi(response, "Token renovado com sucesso");
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, result.Data, result.Message);
+            }
+
+            if (result.ErrorContent != null)
+            {
+                return StatusCode(result.StatusCode, result.ErrorContent);
+            }
+
+            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, result.Message);
         }
         catch (Exception ex)
         {

@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 
 namespace Core.DomainValidations;
+
 public static class ValidacaoTexto
 {
     public static void DeveSerDiferenteDe<T>(string valor, string comparacao, string mensagem, ResultadoValidacao<T> resultado) where T : class

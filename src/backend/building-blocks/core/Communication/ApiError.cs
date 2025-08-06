@@ -1,8 +1,7 @@
-﻿namespace Core.Communication
+﻿namespace Core.Communication;
+
+public class ApiError
 {
-    public class ApiError
-    {
-        public string Message { get; set; } = string.Empty;
-        public IEnumerable<string>? Details { get; set; }
-    }
+    public string Message { get; set; } = string.Empty;
+    public IEnumerable<string>? Details { get; set; }
 }

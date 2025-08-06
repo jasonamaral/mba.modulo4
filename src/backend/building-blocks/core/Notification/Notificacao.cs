@@ -1,8 +1,7 @@
-﻿namespace Core.Notification
+﻿namespace Core.Notification;
+
+public class Notificacao
 {
-    public class Notificacao
-    {
-        public TipoNotificacao Tipo { get; set; }
-        public string Mensagem { get; set; } = string.Empty;
-    }
+    public TipoNotificacao Tipo { get; set; }
+    public string Mensagem { get; set; } = string.Empty;
 }

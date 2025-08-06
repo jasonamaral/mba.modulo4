@@ -2,6 +2,8 @@ using BFF.API.Extensions;
 using BFF.API.Models.Request;
 using BFF.API.Models.Response;
 using BFF.API.Settings;
+using BFF.Application.Interfaces.Services;
+using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
@@ -9,8 +11,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Text;
-using System.Text.Json;
 
 namespace BFF.API.Controllers;
 
@@ -22,19 +22,19 @@ namespace BFF.API.Controllers;
 [Authorize]
 public class AlunosController : BffController
 {
-    private readonly HttpClient _httpClient;
+    private readonly IApiClientService _apiClient;
     private readonly ApiSettings _apiSettings;
     private readonly ILogger<AlunosController> _logger;
 
     public AlunosController(
-        IHttpClientFactory httpClientFactory,
+        IApiClientService apiClient,
         IOptions<ApiSettings> apiSettings,
         ILogger<AlunosController> logger,
         IMediatorHandler mediator,
         INotificationHandler<DomainNotificacaoRaiz> notifications,
         INotificador notificador) : base(mediator, notifications, notificador)
     {
-        _httpClient = httpClientFactory.CreateClient("ApiClient");
+        _apiClient = apiClient;
         _apiSettings = apiSettings.Value;
         _logger = logger;
     }
@@ -56,18 +56,20 @@ public class AlunosController : BffController
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
+            _apiClient.ClearDefaultHeaders();
+            _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
+            _apiClient.AddDefaultHeader("Accept", "application/json");
+            _apiClient.AddDefaultHeader("Content-Type", "application/json");
 
-            // Fazer chamada para Alunos API
-            var response = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}");
+            var response = await _apiClient.GetAsync<ResponseResult<AlunoPerfilResponse>>($"/api/alunos/usuario/{userId}");
 
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            if (response?.Data != null)
             {
-                return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Perfil do aluno não encontrado. O perfil pode estar sendo criado.");
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, response.Data, "Perfil do aluno obtido com sucesso");
             }
 
-            return await ProcessarRespostaApi(response, "Perfil do aluno obtido com sucesso");
+            return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Perfil do aluno não encontrado. O perfil pode estar sendo criado.");
         }
         catch (Exception ex)
         {
@@ -93,16 +95,41 @@ public class AlunosController : BffController
                 return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
             }
 
-            var json = JsonSerializer.Serialize(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
+            _apiClient.ClearDefaultHeaders();
+            _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
+            _apiClient.AddDefaultHeader("Accept", "application/json");
+            _apiClient.AddDefaultHeader("Content-Type", "application/json");
 
-            var response = await _httpClient.PutAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}", content);
+            var result = await _apiClient.PutAsyncWithActionResult<AtualizarPerfilAluno, ResponseResult<AlunoPerfilResponse>>(
+                $"/api/alunos/usuario/{userId}", 
+                request, 
+                "Perfil do aluno atualizado com sucesso");
 
-            return await ProcessarRespostaApi(response, "Perfil do aluno atualizado com sucesso");
+            if (result.Success && result.Data != null)
+            {
+                // Se o resultado é um ResponseResult genérico, extrair o Data interno
+                var dataType = result.Data.GetType();
+                if (dataType.IsGenericType && dataType.GetGenericTypeDefinition() == typeof(ResponseResult<>))
+                {
+                    var dataProperty = dataType.GetProperty("Data");
+                    var innerData = dataProperty?.GetValue(result.Data);
+                    if (innerData != null)
+                    {
+                        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, innerData, result.Message);
+                    }
+                }
+                
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, result.Data, result.Message);
+            }
+
+            if (result.ErrorContent != null)
+            {
+                return StatusCode(result.StatusCode, result.ErrorContent);
+            }
+
+            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, result.Message);
         }
         catch (Exception ex)
         {
@@ -128,22 +155,29 @@ public class AlunosController : BffController
             }
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
+            _apiClient.ClearDefaultHeaders();
+            _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
+            _apiClient.AddDefaultHeader("Accept", "application/json");
+            _apiClient.AddDefaultHeader("Content-Type", "application/json");
 
-            var alunoResponse = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}");
+            // Primeiro, buscar o perfil do aluno
+            var aluno = await _apiClient.GetAsync<ResponseResult<AlunoPerfilResponse>>($"/api/alunos/usuario/{userId}");
 
-            if (!alunoResponse.IsSuccessStatusCode)
+            if (aluno?.Data == null)
             {
                 return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Perfil do aluno não encontrado");
             }
 
-            var alunoContent = await alunoResponse.Content.ReadAsStringAsync();
-            var aluno = JsonSerializer.Deserialize<AlunoPerfil>(alunoContent, JsonExtensions.GlobalJsonOptions);
+            // Depois, buscar as matrículas
+            var matriculas = await _apiClient.GetAsync<ResponseResult<AlunoMatriculasResponse>>($"/api/alunos/{userId}/matriculas");
 
-            var matriculasResponse = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/{aluno?.Id}/matriculas");
+            if (matriculas?.Data != null)
+            {
+                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, matriculas.Data, "Matrículas do aluno obtidas com sucesso");
+            }
 
-            return await ProcessarRespostaApi(matriculasResponse, "Matrículas obtidas com sucesso");
+            return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Matrículas não encontradas");
         }
         catch (Exception ex)
         {

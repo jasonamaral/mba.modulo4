@@ -6,32 +6,30 @@ using Core.Mediator;
 using Core.Messages;
 using MediatR;
 
-namespace BFF.API.Configuration
+namespace BFF.API.Configuration;
+
+public static class DependencyInjectionConfig
 {
-    public static class DependencyInjectionConfig
+    public static void RegisterServices(this IServiceCollection services)
     {
-        public static void RegisterServices(this IServiceCollection services)
-        {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            // Serviços de Core
-            services.AddScoped<INotificador, Notificador>();
+        // Serviços de Core
+        services.AddScoped<INotificador, Notificador>();
 
-            // MediatR
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-            services.AddScoped<IMediatorHandler, MediatorHandler>();
-            services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
+        // MediatR
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+        services.AddScoped<IMediatorHandler, MediatorHandler>();
+        services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
 
-            // Serviços de API
-            services.AddScoped<IConteudoService, ConteudoService>();
-            
-            // Serviços de infraestrutura
-            services.AddScoped<ICacheService, Infrastructure.Services.CacheService>();
-            services.AddScoped<IRestApiService, Infrastructure.Services.RestApiService>();
-            services.AddScoped<IHttpClientService, Infrastructure.Services.HttpClientService>();
-            services.AddScoped<IDashboardService, Infrastructure.Services.DashboardService>();
+        // Serviços de API
+        services.AddScoped<IConteudoService, ConteudoService>();
+        
+        // Serviços de infraestrutura
+        services.AddScoped<ICacheService, Infrastructure.Services.CacheService>();
+        services.AddScoped<IApiClientService, Infrastructure.Services.ApiClientService>();
+        services.AddScoped<IDashboardService, Infrastructure.Services.DashboardService>();
 
-            services.RegisterNotification();
-        }
+        services.RegisterNotification();
     }
 }

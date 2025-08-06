@@ -1,23 +1,29 @@
 ﻿namespace Core.DomainValidations;
+
 public static class ValidacaoNumerica
 {
     #region Validação BYTE
+
     public static void DeveSerMaiorQueZero<T>(byte valor, string mensagem, ResultadoValidacao<T> resultado) where T : class
     {
         if (valor <= 0)
             resultado.AdicionarErro(mensagem);
     }
-    #endregion
+
+    #endregion Validação BYTE
 
     #region Validação SHORT
+
     public static void DeveSerMaiorQueZero<T>(short valor, string mensagem, ResultadoValidacao<T> resultado) where T : class
     {
         if (valor <= 0)
             resultado.AdicionarErro(mensagem);
     }
-    #endregion
+
+    #endregion Validação SHORT
 
     #region Validação INT
+
     public static void DeveSerMaiorQueZero<T>(int valor, string mensagem, ResultadoValidacao<T> resultado) where T : class
     {
         if (valor <= 0)
@@ -29,13 +35,16 @@ public static class ValidacaoNumerica
         if (valor < tamanhoMinimo || valor > tamanhoMaximo)
             resultado.AdicionarErro(mensagem);
     }
-    #endregion
+
+    #endregion Validação INT
 
     #region Validação DECIMAL
+
     public static void DeveSerMaiorQueZero<T>(decimal valor, string mensagem, ResultadoValidacao<T> resultado) where T : class
     {
         if (valor <= 0)
             resultado.AdicionarErro(mensagem);
     }
-    #endregion
+
+    #endregion Validação DECIMAL
 }

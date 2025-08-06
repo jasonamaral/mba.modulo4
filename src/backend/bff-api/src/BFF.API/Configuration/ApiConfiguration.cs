@@ -1,13 +1,8 @@
-﻿using Core.Identidade;
-using BFF.API.Extensions;
+﻿using BFF.API.Extensions;
 using BFF.API.Settings;
 using BFF.Domain.Settings;
+using Core.Identidade;
 using Mapster;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using NetDevPack.Security.JwtExtensions;
-using System.Text;
-using Core;
 
 namespace BFF.API.Configuration;
 

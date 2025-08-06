@@ -1,6 +1,7 @@
 ﻿using MediatR;
 
 namespace Core.Messages;
+
 public class DomainNotificacaoRaiz : INotification
 {
     public Guid RaizAgregacao { get; internal set; }
@@ -17,6 +18,7 @@ public class DomainNotificacaoRaiz : INotification
         Chave = key;
         Valor = value;
     }
+
     public DomainNotificacaoRaiz(string key, string value)
     {
         DataHora = DateTime.Now;

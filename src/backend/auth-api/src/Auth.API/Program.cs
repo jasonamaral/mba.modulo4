@@ -4,7 +4,6 @@ using Auth.Application.Services;
 using Auth.Application.Settings;
 using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
-using Auth.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Mapster;
 using Core.Notification;
@@ -35,7 +34,6 @@ builder.Services.AddMemoryCache();
 
 // Application Services (DIP - dependendo de abstrações)
 builder.Services.AddScoped<AuthService, AuthService>();
-builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
 
 // MediatR e Mediator

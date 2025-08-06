@@ -5,29 +5,21 @@ namespace BFF.Infrastructure.Services;
 
 public abstract class BaseApiService
 {
-    protected readonly IRestApiService _restApiService;
+    protected readonly IApiClientService _apiClient;
     protected readonly ILogger _logger;
 
-    protected BaseApiService(IRestApiService restApiService, ILogger logger)
+    protected BaseApiService(IApiClientService apiClient, ILogger logger)
     {
-        _restApiService = restApiService;
+        _apiClient = apiClient;
         _logger = logger;
     }
 
-    protected void AddAuthHeader(string token)
+    protected void ConfigureAuthToken(string token)
     {
-        _restApiService.AddDefaultHeader("Authorization", $"Bearer {token}");
-        _restApiService.AddDefaultHeader("Accept", "application/json");
-    }
-
-    protected static IDictionary<string, string> CreateAuthHeaders(string token)
-    {
-        return new Dictionary<string, string>
-        {
-            { "Authorization", $"Bearer {token}" },
-            { "Accept", "application/json" },
-            { "Content-Type", "application/json" }
-        };
+        _apiClient.ClearDefaultHeaders();
+        _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
+        _apiClient.AddDefaultHeader("Accept", "application/json");
+        _apiClient.AddDefaultHeader("Content-Type", "application/json");
     }
 
     protected async Task<T?> ExecuteWithErrorHandling<T>(Func<Task<T?>> operation, string operationName, params object[] parameters)
@@ -55,17 +47,6 @@ public abstract class BaseApiService
         if (string.IsNullOrWhiteSpace(token))
         {
             _logger.LogWarning("Token inválido para operação {OperationName}", operationName);
-            return false;
-        }
-
-        return true;
-    }
-
-    protected bool ValidateId(Guid id, string operationName)
-    {
-        if (id == Guid.Empty)
-        {
-            _logger.LogWarning("ID inválido para operação {OperationName}", operationName);
             return false;
         }
 

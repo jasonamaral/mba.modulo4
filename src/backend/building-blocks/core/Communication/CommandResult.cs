@@ -18,10 +18,12 @@ public class CommandResult
     {
         ValidationResult.Errors.Add(new ValidationFailure(string.Empty, mensagem));
     }
+
     public List<ValidationFailure> ObterErros()
     {
         return ValidationResult.Errors;
     }
+
     public ValidationResult ObterValidationResult()
     {
         return ValidationResult;

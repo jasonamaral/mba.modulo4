@@ -8,7 +8,6 @@ public class AuthApiMappingConfig : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        // Mapeamento de RegistroRequest para UsuarioRegistradoIntegrationEvent
         config.NewConfig<RegistroRequest, UsuarioRegistradoIntegrationEvent>()
             .ConstructUsing(src => new UsuarioRegistradoIntegrationEvent(
                 Guid.Empty, // Será definido manualmente

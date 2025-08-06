@@ -2,7 +2,7 @@
 
 namespace Core.Messages;
 
-public class ResponseMessage //: Message
+public class ResponseMessage
 {
     public ValidationResult ValidationResult { get; set; }
 
