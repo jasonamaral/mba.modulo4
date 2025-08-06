@@ -1,5 +1,3 @@
-using System;
-
 namespace Pagamentos.Application.DTOs
 {
     public class PagamentoDto

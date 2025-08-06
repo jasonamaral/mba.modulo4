@@ -1,6 +1,10 @@
 ﻿using BFF.API.Services;
 using BFF.Application.Interfaces.Services;
+using Core.Utils;
 using Core.Notification;
+using Core.Mediator;
+using Core.Messages;
+using MediatR;
 
 namespace BFF.API.Configuration
 {
@@ -13,6 +17,11 @@ namespace BFF.API.Configuration
             // Serviços de Core
             services.AddScoped<INotificador, Notificador>();
 
+            // MediatR
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+            services.AddScoped<IMediatorHandler, MediatorHandler>();
+            services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
+
             // Serviços de API
             services.AddScoped<IConteudoService, ConteudoService>();
             
@@ -21,6 +30,8 @@ namespace BFF.API.Configuration
             services.AddScoped<IRestApiService, Infrastructure.Services.RestApiService>();
             services.AddScoped<IHttpClientService, Infrastructure.Services.HttpClientService>();
             services.AddScoped<IDashboardService, Infrastructure.Services.DashboardService>();
+
+            services.RegisterNotification();
         }
     }
 }

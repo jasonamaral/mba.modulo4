@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Alunos.Application.Commands;
 
-public class RegistrarClienteCommand : Command, IRequest<CommandResult>
+public class RegistrarClienteCommand : CommandRaiz, IRequest<CommandResult>
 {
     public Guid Id { get; private set; }
     public string Nome { get; private set; }
@@ -123,4 +123,4 @@ public class RegistrarClienteCommandValidation : AbstractValidator<RegistrarClie
             .NotEmpty()
             .WithMessage("Data de cadastro é obrigatória");
     }
-} 
+}

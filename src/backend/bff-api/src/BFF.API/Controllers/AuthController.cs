@@ -1,12 +1,13 @@
-using BFF.API.Extensions;
 using BFF.API.Models.Request;
-using BFF.API.Models.Response;
 using BFF.API.Settings;
+using Core.Mediator;
+using Core.Messages;
+using Core.Notification;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Text;
 using System.Text.Json;
-using Core.Notification;
 
 namespace BFF.API.Controllers;
 
@@ -25,7 +26,9 @@ public class AuthController : BffController
         IHttpClientFactory httpClientFactory,
         IOptions<ApiSettings> apiSettings,
         ILogger<AuthController> logger,
-        INotificador notificador) : base(notificador)
+        IMediatorHandler mediator,
+        INotificationHandler<DomainNotificacaoRaiz> notifications,
+        INotificador notificador) : base(mediator, notifications, notificador)
     {
         _httpClient = httpClientFactory.CreateClient("ApiClient");
         _apiSettings = apiSettings.Value;

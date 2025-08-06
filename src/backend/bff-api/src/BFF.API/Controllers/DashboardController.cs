@@ -3,6 +3,9 @@ using BFF.API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Core.Notification;
+using Core.Mediator;
+using Core.Messages;
+using MediatR;
 
 namespace BFF.API.Controllers;
 
@@ -17,8 +20,12 @@ public class DashboardController : BffController
     private readonly IDashboardService _dashboardService;
     private readonly ILogger<DashboardController> _logger;
 
-    public DashboardController(IDashboardService dashboardService, ILogger<DashboardController> logger, INotificador notificador)
-        : base(notificador)
+    public DashboardController(IDashboardService dashboardService, 
+                             ILogger<DashboardController> logger, 
+                             IMediatorHandler mediator,
+                             INotificationHandler<DomainNotificacaoRaiz> notifications,
+                             INotificador notificador)
+        : base(mediator, notifications, notificador)
     {
         _dashboardService = dashboardService;
         _logger = logger;
@@ -41,7 +48,7 @@ public class DashboardController : BffController
             }
 
             var dashboard = await _dashboardService.GetDashboardAlunoAsync(userId);
-            return RespostaPadraoApi(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do aluno obtido com sucesso");
+            return RespostaPadraoApi<object>(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do aluno obtido com sucesso");
         }
         catch (Exception ex)
         {
@@ -61,7 +68,7 @@ public class DashboardController : BffController
         try
         {
             var dashboard = await _dashboardService.GetDashboardAdminAsync();
-            return RespostaPadraoApi(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do administrador obtido com sucesso");
+            return RespostaPadraoApi<object>(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do administrador obtido com sucesso");
         }
         catch (Exception ex)
         {

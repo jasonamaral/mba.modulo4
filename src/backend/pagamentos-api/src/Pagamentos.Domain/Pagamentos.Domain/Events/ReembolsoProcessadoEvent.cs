@@ -1,5 +1,3 @@
-using System;
-
 namespace Pagamentos.Domain.Events
 {
     public class ReembolsoProcessadoEvent

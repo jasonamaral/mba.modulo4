@@ -1,13 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using System.Text.Json;
-using System.Text;
-using BFF.API.Settings;
-using Microsoft.Extensions.Options;
 using BFF.API.Extensions;
-using BFF.API.Models.Response;
 using BFF.API.Models.Request;
+using BFF.API.Models.Response;
+using BFF.API.Settings;
+using Core.Mediator;
+using Core.Messages;
 using Core.Notification;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Text;
+using System.Text.Json;
 
 namespace BFF.API.Controllers;
 
@@ -27,7 +30,9 @@ public class AlunosController : BffController
         IHttpClientFactory httpClientFactory,
         IOptions<ApiSettings> apiSettings,
         ILogger<AlunosController> logger,
-        INotificador notificador) : base(notificador)
+        IMediatorHandler mediator,
+        INotificationHandler<DomainNotificacaoRaiz> notifications,
+        INotificador notificador) : base(mediator, notifications, notificador)
     {
         _httpClient = httpClientFactory.CreateClient("ApiClient");
         _apiSettings = apiSettings.Value;
@@ -52,8 +57,7 @@ public class AlunosController : BffController
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = 
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             // Fazer chamada para Alunos API
             var response = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}");
@@ -94,8 +98,7 @@ public class AlunosController : BffController
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = 
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var response = await _httpClient.PutAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}", content);
 
@@ -126,11 +129,10 @@ public class AlunosController : BffController
 
             var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = 
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var alunoResponse = await _httpClient.GetAsync($"{_apiSettings.AlunosApiUrl}/api/alunos/usuario/{userId}");
-            
+
             if (!alunoResponse.IsSuccessStatusCode)
             {
                 return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Perfil do aluno não encontrado");

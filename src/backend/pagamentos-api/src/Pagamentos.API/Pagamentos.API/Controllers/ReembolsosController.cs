@@ -2,9 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pagamentos.Application.Commands;
 using Pagamentos.Application.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Pagamentos.API.Controllers
 {

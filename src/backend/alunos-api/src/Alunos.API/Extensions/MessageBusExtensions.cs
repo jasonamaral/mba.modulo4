@@ -12,6 +12,6 @@ public static class MessageBusExtensions
         services.AddMessageBus(msg!);
 
         services.AddMessageBus(configuration?.GetMessageQueueConnection("MessageBus")!)
-            .AddHostedService<RegistroAlunoIntegrationHandler>();
+            .AddHostedService<RegistroUsuarioIntegrationHandler>();
     }
 }

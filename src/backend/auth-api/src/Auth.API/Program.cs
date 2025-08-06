@@ -38,6 +38,11 @@ builder.Services.AddScoped<AuthService, AuthService>();
 builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
 
+// MediatR e Mediator
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddScoped<Core.Mediator.IMediatorHandler, Core.Mediator.MediatorHandler>();
+builder.Services.AddScoped<MediatR.INotificationHandler<Core.Messages.DomainNotificacaoRaiz>, Core.Messages.DomainNotificacaoHandler>();
+
 // Notification
 builder.Services.RegisterNotification();
 

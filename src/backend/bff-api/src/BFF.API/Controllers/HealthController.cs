@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Core.Notification;
+using Core.Mediator;
+using Core.Messages;
+using MediatR;
 
 namespace BFF.API.Controllers;
 
@@ -10,7 +13,9 @@ namespace BFF.API.Controllers;
 [Route("api/[controller]")]
 public class HealthController : BffController
 {
-    public HealthController(INotificador notificador) : base(notificador)
+    public HealthController(IMediatorHandler mediator,
+                          INotificationHandler<DomainNotificacaoRaiz> notifications,
+                          INotificador notificador) : base(mediator, notifications, notificador)
     {
     }
     /// <summary>
@@ -28,7 +33,7 @@ public class HealthController : BffController
             service = "BFF API"
         };
         
-        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, healthData, "API funcionando normalmente");
+        return RespostaPadraoApi<object>(System.Net.HttpStatusCode.OK, healthData, "API funcionando normalmente");
     }
 
     /// <summary>
@@ -49,6 +54,6 @@ public class HealthController : BffController
             description = "Backend for Frontend API - Orquestração dos Microsserviços da Plataforma Educacional"
         };
         
-        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, statusData, "Status da API obtido com sucesso");
+        return RespostaPadraoApi<object>(System.Net.HttpStatusCode.OK, statusData, "Status da API obtido com sucesso");
     }
 } 

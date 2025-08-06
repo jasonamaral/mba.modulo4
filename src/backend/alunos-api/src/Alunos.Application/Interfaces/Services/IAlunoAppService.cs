@@ -1,79 +1,85 @@
-using Alunos.Application.DTOs;
-
 namespace Alunos.Application.Interfaces.Services;
 
 public interface IAlunoAppService
 {
-    Task<AlunoDto?> GetByIdAsync(Guid id);
+    //Task<AlunoDto> ObterAlunoPorIdAsync(Guid alunoId);
+    //Task<EvolucaoAlunoDto> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid alunoId);
+    //Task<IEnumerable<MatriculaCursoDto>> ObterMatriculasPorAlunoIdAsync(Guid alunoId);
+    //Task<MatriculaCursoDto> ObterInformacaoMatriculaCursoAsync(Guid matriculaCursoId);
+    //Task<CertificadoDto> ObterCertificadoPorMatriculaIdAsync(Guid matriculaCursoId);
+    //Task<IEnumerable<AulaCursoDto>> ObterAulasPorMatriculaIdAsync(Guid matriculaCursoId, CursoDto cursoDto);
 
-    Task<AlunoDto?> ObterAlunoPorIdAsync(Guid id);
 
-    Task<AlunoDto?> GetByCodigoUsuarioAsync(Guid codigoUsuario);
+    //Task<AlunoDto?> GetByIdAsync(Guid id);
 
-    Task<AlunoDto?> ObterAlunoPorCodigoUsuarioAsync(Guid codigoUsuario);
+    //Task<AlunoDto?> ObterAlunoPorIdAsync(Guid id);
 
-    /// <summary>
+    //Task<AlunoDto?> GetByCodigoUsuarioAsync(Guid codigoUsuario);
 
-    Task<AlunoDto?> GetByEmailAsync(string email);
+    //Task<AlunoDto?> ObterAlunoPorCodigoUsuarioAsync(Guid codigoUsuario);
 
-    Task<IEnumerable<AlunoResumoDto>> GetAllAsync(bool includeMatriculas = false);
+    ///// <summary>
 
-    Task<IEnumerable<AlunoResumoDto>> ListarAlunosAsync(
-        int pagina, int tamanhoPagina, string? filtro = null, string? ordenacao = null, string? direcao = null);
+    //Task<AlunoDto?> GetByEmailAsync(string email);
 
-    Task<IEnumerable<AlunoResumoDto>> GetAlunosAtivosAsync(bool includeMatriculas = false);
+    //Task<IEnumerable<AlunoResumoDto>> GetAllAsync(bool includeMatriculas = false);
 
-    Task<IEnumerable<AlunoResumoDto>> BuscarPorNomeAsync(string nome, bool includeMatriculas = false);
+    //Task<IEnumerable<AlunoResumoDto>> ListarAlunosAsync(
+    //    int pagina, int tamanhoPagina, string? filtro = null, string? ordenacao = null, string? direcao = null);
 
-    Task<AlunoPerfilDto?> GetPerfilAsync(Guid id);
+    //Task<IEnumerable<AlunoResumoDto>> GetAlunosAtivosAsync(bool includeMatriculas = false);
 
-    Task<AlunoPerfilDto?> ObterPerfilAlunoAsync(Guid id);
+    //Task<IEnumerable<AlunoResumoDto>> BuscarPorNomeAsync(string nome, bool includeMatriculas = false);
 
-    Task<AlunoDashboardDto?> GetDashboardAsync(Guid id);
+    //Task<AlunoPerfilDto?> GetPerfilAsync(Guid id);
 
-    Task<AlunoDashboardDto?> ObterDashboardAlunoAsync(Guid id);
+    //Task<AlunoPerfilDto?> ObterPerfilAlunoAsync(Guid id);
 
-    Task<AlunoEstatisticasDto?> GetEstatisticasAsync(Guid id);
+    //Task<AlunoDashboardDto?> GetDashboardAsync(Guid id);
 
-    Task<AlunoEstatisticasDto?> ObterEstatisticasAlunoAsync(Guid id);
+    //Task<AlunoDashboardDto?> ObterDashboardAlunoAsync(Guid id);
 
-    Task<AlunoDto> CreateAsync(AlunoCadastroDto dto);
+    //Task<AlunoEstatisticasDto?> GetEstatisticasAsync(Guid id);
 
-    Task<AlunoDto> CadastrarAlunoAsync(AlunoCadastroDto dto);
+    //Task<AlunoEstatisticasDto?> ObterEstatisticasAlunoAsync(Guid id);
 
-    Task<AlunoDto> UpdateAsync(Guid id, AlunoAtualizarDto dto);
+    //Task<AlunoDto> CreateAsync(AlunoCadastroDto dto);
 
-    Task<AlunoDto?> AtualizarAlunoAsync(Guid id, AlunoAtualizarDto dto);
+    //Task<AlunoDto> CadastrarAlunoAsync(AlunoCadastroDto dto);
 
-    Task<AlunoDto> AtivarAsync(Guid id);
+    //Task<AlunoDto> UpdateAsync(Guid id, AlunoAtualizarDto dto);
 
-    Task<bool> AtivarAlunoAsync(Guid id);
+    //Task<AlunoDto?> AtualizarAlunoAsync(Guid id, AlunoAtualizarDto dto);
 
-    Task<AlunoDto> DesativarAsync(Guid id);
+    //Task<AlunoDto> AtivarAsync(Guid id);
 
-    Task<bool> DesativarAlunoAsync(Guid id);
+    //Task<bool> AtivarAlunoAsync(Guid id);
 
-    Task DeleteAsync(Guid id);
+    //Task<AlunoDto> DesativarAsync(Guid id);
 
-    Task<bool> ExcluirAlunoAsync(Guid id);
+    //Task<bool> DesativarAlunoAsync(Guid id);
 
-    Task<MatriculaDto> MatricularAsync(Guid alunoId, MatriculaCadastroDto dto);
+    //Task DeleteAsync(Guid id);
 
-    Task<IEnumerable<MatriculaDto>> GetMatriculasAsync(Guid alunoId);
+    //Task<bool> ExcluirAlunoAsync(Guid id);
 
-    Task<IEnumerable<MatriculaDto>> ListarMatriculasAlunoAsync(Guid id, string? status = null);
+    //Task<MatriculaDto> MatricularAsync(Guid alunoId, MatriculaCadastroDto dto);
 
-    Task<IEnumerable<CertificadoDto>> GetCertificadosAsync(Guid alunoId);
+    //Task<IEnumerable<MatriculaDto>> GetMatriculasAsync(Guid alunoId);
 
-    Task<IEnumerable<CertificadoDto>> ListarCertificadosAlunoAsync(Guid id);
+    //Task<IEnumerable<MatriculaDto>> ListarMatriculasAlunoAsync(Guid id, string? status = null);
 
-    Task<HistoricoAlunoPaginadoDto> GetHistoricoAsync(Guid alunoId, HistoricoAlunoFiltroDto filtro);
+    //Task<IEnumerable<CertificadoDto>> GetCertificadosAsync(Guid alunoId);
 
-    Task<bool> ExisteEmailAsync(string email, Guid? excluirId = null);
+    //Task<IEnumerable<CertificadoDto>> ListarCertificadosAlunoAsync(Guid id);
 
-    Task<bool> VerificarExistenciaAlunoAsync(Guid id);
+    //Task<HistoricoAlunoPaginadoDto> GetHistoricoAsync(Guid alunoId, HistoricoAlunoFiltroDto filtro);
 
-    Task<int> GetCountAsync();
+    //Task<bool> ExisteEmailAsync(string email, Guid? excluirId = null);
 
-    Task<int> GetCountAtivosAsync();
+    //Task<bool> VerificarExistenciaAlunoAsync(Guid id);
+
+    //Task<int> GetCountAsync();
+
+    //Task<int> GetCountAtivosAsync();
 }

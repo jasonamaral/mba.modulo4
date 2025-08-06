@@ -1,6 +1,6 @@
 using Alunos.Application.Commands;
-using Alunos.Application.Interfaces.Repositories;
 using Alunos.Domain.Entities;
+using Alunos.Domain.Interfaces;
 using Core.Communication;
 using Core.Messages;
 using FluentValidation;
@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Alunos.Application.Commands;
 
-public class RegistrarClienteCommandHandler : CommandHandler, IRequestHandler<RegistrarClienteCommand, CommandResult>
+public class RegistrarClienteCommandHandler : IRequestHandler<RegistrarClienteCommand, CommandResult>
 {
     private readonly IAlunoRepository _alunoRepository;
 
@@ -26,7 +26,7 @@ public class RegistrarClienteCommandHandler : CommandHandler, IRequestHandler<Re
         try
         {
             // Verificar se já existe um aluno com este código de usuário
-            var alunoExistente = await _alunoRepository.GetByCodigoUsuarioAsync(request.Id);
+            var alunoExistente = await _alunoRepository.ObterPorCodigoUsuarioAsync(request.Id);
             if (alunoExistente != null)
             {
                 request.ValidationResult.Errors.Add(new ValidationFailure("Id", "Já existe um aluno cadastrado com este código de usuário."));
@@ -39,17 +39,12 @@ public class RegistrarClienteCommandHandler : CommandHandler, IRequestHandler<Re
                 nome: request.Nome,
                 email: request.Email,
                 cpf: request.Cpf,
-                dataNascimento: request.DataNascimento,
-                telefone: request.Telefone,
-                genero: request.Genero,
-                cidade: request.Cidade,
-                estado: request.Estado,
-                cep: request.Cep
+                dataNascimento: request.DataNascimento
             );
 
             // Salvar no repositório
-            await _alunoRepository.AddAsync(novoAluno);
-            await _alunoRepository.SaveChangesAsync();
+            await _alunoRepository.AdicionarAsync(novoAluno);
+            await _alunoRepository.UnitOfWork.Commit();
 
             return new CommandResult(request.ValidationResult);
         }

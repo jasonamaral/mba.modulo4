@@ -2,10 +2,12 @@ using Auth.API.Models.Requests;
 using Auth.Application.Services;
 using Auth.Domain.Entities;
 using Core.Communication;
-using Core.Controller;
+using Core.Mediator;
 using Core.Messages;
 using Core.Messages.Integration;
 using Core.Notification;
+using Core.Services.Controllers;
+using MediatR;
 using MessageBus;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -18,18 +20,13 @@ namespace Auth.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class AuthController : MainController
+public class AuthController(IMediatorHandler mediator
+                                  , AuthService authService
+                                  , INotificationHandler<DomainNotificacaoRaiz> notifications, IMessageBus bus, INotificador notificador) : MainController(mediator, notifications)
 {
-    private readonly AuthService _authService;
-    private readonly ILogger<AuthController> _logger;
-    private readonly IMessageBus _bus;
-
-    public AuthController(AuthService authService, ILogger<AuthController> logger, INotificador notificador, IMessageBus bus) : base(notificador)
-    {
-        _authService = authService;
-        _logger = logger;
-        _bus = bus;
-    }
+    private readonly AuthService _authService = authService;
+    private readonly IMessageBus _bus = bus;
+    private readonly INotificador _notificador = notificador;
 
     /// <summary>
     /// Registra um novo usuário no sistema
@@ -38,10 +35,10 @@ public class AuthController : MainController
     /// <returns>Confirmação de registro</returns>
     [HttpPost("registro")]
     [ProducesResponseType(typeof(ApiSuccess), 200)]
-    [ProducesResponseType(typeof(ResponseResult), 400)]
+    [ProducesResponseType(typeof(ApiError), 400)]
     public async Task<IActionResult> Registro([FromBody] RegistroRequest registroRequest)
     {
-        if (!ModelState.IsValid) return RespostaPadraoApi(ModelState);
+        if (!ModelState.IsValid) return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
 
         var user = new ApplicationUser
         {
@@ -60,17 +57,17 @@ public class AuthController : MainController
             if (!clienteResult.ValidationResult.IsValid)
             {
                 await _authService.UserManager.DeleteAsync(user);
-                return RespostaPadraoApi(clienteResult.ValidationResult);
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, clienteResult.ValidationResult);
             }
             return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(registroRequest.Email));
         }
 
         foreach (var error in result.Errors)
         {
-            Notificador.AdicionarErro(error.Description);
+            _notificador.AdicionarErro(error.Description);
         }
 
-        return RespostaPadraoApi();
+        return RespostaPadraoApi(HttpStatusCode.BadRequest, string.Empty);
     }
 
     /// <summary>
@@ -80,10 +77,10 @@ public class AuthController : MainController
     /// <returns>Token de autenticação</returns>
     [HttpPost("login")]
     [ProducesResponseType(typeof(ApiSuccess), 200)]
-    [ProducesResponseType(typeof(ResponseResult), 401)]
+    [ProducesResponseType(typeof(ApiError), 401)]
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
-        if (!ModelState.IsValid) return RespostaPadraoApi(ModelState);
+        if (!ModelState.IsValid) return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
 
         var result = await _authService.SignInManager.PasswordSignInAsync(loginRequest.Email, loginRequest.Senha, false, true);
 
@@ -94,11 +91,11 @@ public class AuthController : MainController
 
         if (result.IsLockedOut)
         {
-            Notificador.AdicionarErro("Usuário temporariamente bloqueado por tentativas inválidas");
+            _notificador.AdicionarErro("Usuário temporariamente bloqueado por tentativas inválidas");
             return RespostaPadraoApi(HttpStatusCode.Forbidden, "Usuário temporariamente bloqueado por tentativas inválidas");
         }
 
-        Notificador.AdicionarErro("Usuário ou Senha incorretos");
+        _notificador.AdicionarErro("Usuário ou Senha incorretos");
         return RespostaPadraoApi(HttpStatusCode.BadRequest, "Usuário ou Senha incorretos");
     }
 
@@ -109,12 +106,12 @@ public class AuthController : MainController
     /// <returns>Novo token de autenticação</returns>
     [HttpPost("refresh-token")]
     [ProducesResponseType(typeof(ApiSuccess), 200)]
-    [ProducesResponseType(typeof(ResponseResult), 401)]
+    [ProducesResponseType(typeof(ApiError), 401)]
     public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
     {
         if (string.IsNullOrEmpty(refreshToken))
         {
-            Notificador.AdicionarErro("Refresh Token inválido.");
+            _notificador.AdicionarErro("Refresh Token inválido.");
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "Refresh Token inválido.");
         }
 
@@ -122,7 +119,7 @@ public class AuthController : MainController
 
         if (token is null)
         {
-            Notificador.AdicionarErro("Refresh Token expirado");
+            _notificador.AdicionarErro("Refresh Token expirado");
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "Refresh Token expirado");
         }
 

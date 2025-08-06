@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Alunos.Domain\Alunos.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\core\Core.csproj" />
+    <ProjectReference Include="..\Alunos.Infrastructure\Alunos.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -14,7 +15,6 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
 </Project>

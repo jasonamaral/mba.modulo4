@@ -1,4 +1,3 @@
-using System;
 using Pagamentos.Application.DTOs;
 
 namespace Pagamentos.Application.Commands

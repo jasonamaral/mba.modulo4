@@ -1,5 +1,3 @@
-using System;
-
 namespace Pagamentos.Application.Queries
 {
     public class GetPagamentosByAlunoQuery

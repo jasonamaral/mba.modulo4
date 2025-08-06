@@ -1,403 +1,232 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Alunos.Domain.Common;
+using Alunos.Domain.Enumerators;
+using Alunos.Domain.ValueObjects;
+using Core.DomainValidations;
+using Core.Utils;
+using Plataforma.Educacao.Core.Exceptions;
+using System.Text.Json.Serialization;
 
-namespace Alunos.Domain.Entities
+namespace Alunos.Domain.Entities;
+public class MatriculaCurso : Common.Entidade
 {
-    /// <summary>
-    /// Entidade MatriculaCurso - Representa a matrícula de um aluno em um curso
-    /// </summary>
-    public class MatriculaCurso : Entidade
+    #region Atributos
+    public Guid AlunoId { get; }
+    public Guid CursoId { get; }
+    public string NomeCurso { get; }
+    public decimal Valor { get; }
+    public DateTime DataMatricula { get; }
+    public DateTime? DataConclusao { get; private set; }
+    public EstadoMatriculaCursoEnum EstadoMatricula { get; private set; }
+    public byte? NotaFinal { get; private set; }
+    public string Observacao { get; private set; }
+
+    private readonly List<HistoricoAprendizado> _historicoAprendizado = [];
+    public IReadOnlyCollection<HistoricoAprendizado> HistoricoAprendizado => _historicoAprendizado.AsReadOnly();
+    public Certificado Certificado { get; private set; }
+
+    [JsonIgnore]
+    public Aluno Aluno { get; private set; }
+    #endregion
+
+    #region CTOR
+    // EF Compatibility
+    protected MatriculaCurso() { }
+
+    public MatriculaCurso(Guid alunoId,
+        Guid cursoId,
+        string nomeCurso,
+        decimal valor,
+        string observacao)
     {
-        /// <summary>
-        /// ID do aluno matriculado
-        /// </summary>
-        public Guid AlunoId { get; private set; }
+        AlunoId = alunoId;
+        CursoId = cursoId;
+        NomeCurso = nomeCurso?.Trim() ?? string.Empty;
+        Valor = valor;
+        DataMatricula = DateTime.UtcNow;
+        EstadoMatricula = EstadoMatriculaCursoEnum.PendentePagamento;
+        Observacao = observacao;
 
-        /// <summary>
-        /// Referência de navegação para o aluno
-        /// </summary>
-        public Aluno Aluno { get; private set; }
+        ValidarIntegridadeMatriculaCurso();
+    }
+    #endregion
 
-        /// <summary>
-        /// ID do curso
-        /// </summary>
-        public Guid CursoId { get; private set; }
+    #region Métodos
+    internal short QuantidadeTotalCargaHoraria() => (short)_historicoAprendizado.Sum(x => x.CargaHoraria);
+    //public int QuantidadeAulasFinalizadas => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
+    //public int QuantidadeAulasEmAndamento => _historicoAprendizado.Count(h => !h.DataTermino.HasValue);
+    public bool MatriculaCursoConcluido() => DataConclusao.HasValue;
+    internal bool MatriculaCursoDisponivel() => !DataConclusao.HasValue && EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado;
+    internal bool PodeConcluirCurso() => EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado && _historicoAprendizado.Count(h => !h.DataTermino.HasValue) == 0;
 
-        /// <summary>
-        /// Data da matrícula
-        /// </summary>
-        public DateTime DataMatricula { get; private set; }
+    //public bool PagamentoPodeSerRealizado => EstadoMatricula == EstadoMatriculaCursoEnum.PendentePagamento || EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado;
 
-        /// <summary>
-        /// Data de início do curso
-        /// </summary>
-        public DateTime DataInicio { get; private set; }
+    //internal HistoricoAprendizado ObterHistoricoAulaPeloId(Guid aulaId)
+    //{
+    //    var historico = _historicoAprendizado.FirstOrDefault(h => h.CursoId == CursoId && h.AulaId == aulaId);
+    //    if (historico == null) { throw new DomainException("Historico não foi localizado"); }
 
-        /// <summary>
-        /// Data de término do curso
-        /// </summary>
-        public DateTime? DataTermino { get; private set; }
+    //    return historico;
+    //}
 
-        /// <summary>
-        /// Status da matrícula
-        /// </summary>
-        public StatusMatricula Status { get; private set; }
+    #region Manipuladores de MatriculaCurso
+    internal void AtualizarNotaFinalCurso(byte notaFinal)
+    {
+        ValidarIntegridadeMatriculaCurso(novaNotaFinal: notaFinal);
+        VerificarSeCertificadoExiste();
+        Certificado.AtualizarNotaFinal(notaFinal);
+        NotaFinal = notaFinal;
+    }
 
-        /// <summary>
-        /// Valor pago pela matrícula
-        /// </summary>
-        public decimal ValorPago { get; private set; }
+    internal void RegistrarPagamentoMatricula()
+    {
+        ValidarIntegridadeMatriculaCurso(novoEstadoMatriculaCurso: EstadoMatriculaCursoEnum.PagamentoRealizado);
+        EstadoMatricula = EstadoMatriculaCursoEnum.PagamentoRealizado;
+    }
 
-        /// <summary>
-        /// Forma de pagamento
-        /// </summary>
-        public string FormaPagamento { get; private set; }
+    internal void RegistrarAbandonoMatricula()
+    {
+        ValidarIntegridadeMatriculaCurso(novoEstadoMatriculaCurso: EstadoMatriculaCursoEnum.Abandonado);
+        EstadoMatricula = EstadoMatriculaCursoEnum.Abandonado;
+    }
 
-        /// <summary>
-        /// Percentual de conclusão do curso
-        /// </summary>
-        public decimal PercentualConclusao { get; private set; }
+    internal void ConcluirCurso()
+    {
+        if (EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado) { throw new DomainException("Não é possível concluir um curso com estado de pagamento abandonado"); }
+        if (!PodeConcluirCurso()) { throw new DomainException("Não é possível concluir o curso, existem aulas não finalizadas"); }
+        if (MatriculaCursoConcluido()) { throw new DomainException("Curso já foi concluído"); }
 
-        /// <summary>
-        /// Nota final do aluno
-        /// </summary>
-        public decimal? NotaFinal { get; private set; }
+        var dataAtual = DateTime.Now;
+        ValidarIntegridadeMatriculaCurso(novaDataConclusao: dataAtual);
+        DataConclusao = dataAtual;
+        EstadoMatricula = EstadoMatriculaCursoEnum.Concluido;
+    }
 
-        /// <summary>
-        /// Observações sobre a matrícula
-        /// </summary>
-        public string Observacoes { get; private set; }
+    internal void AtualizarObservacoes(string observacao)
+    {
+        ValidarIntegridadeMatriculaCurso(novaObservacao: observacao ?? string.Empty);
+        Observacao = observacao;
+    }
+    #endregion
 
-        /// <summary>
-        /// Indica se a matrícula está ativa
-        /// </summary>
-        public bool IsAtiva { get; private set; }
+    #region Manipuladores de HistoricoAprendizado
+    internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, byte cargaHoraria, DateTime? dataTermino = null)
+    {
+        if (!MatriculaCursoDisponivel()) { throw new DomainException("Matrícula não está disponível para registrar histórico de aprendizado"); }
 
-        /// <summary>
-        /// Lista privada de progresso nas aulas
-        /// </summary>
-        private readonly List<Progresso> _progresso = new();
-
-        /// <summary>
-        /// Coleção somente leitura do progresso
-        /// </summary>
-        public IReadOnlyCollection<Progresso> Progresso => _progresso.AsReadOnly();
-
-        /// <summary>
-        /// Lista privada de certificados
-        /// </summary>
-        private readonly List<Certificado> _certificados = new();
-
-        /// <summary>
-        /// Coleção somente leitura dos certificados
-        /// </summary>
-        public IReadOnlyCollection<Certificado> Certificados => _certificados.AsReadOnly();
-
-        /// <summary>
-        /// Construtor protegido para Entity Framework
-        /// </summary>
-        protected MatriculaCurso() : base()
+        var historicoExistente = _historicoAprendizado.FirstOrDefault(h => h.CursoId == CursoId && h.AulaId == aulaId);
+        DateTime? dataInicio = historicoExistente?.DataInicio ?? DateTime.UtcNow;
+        if (historicoExistente != null)
         {
-            FormaPagamento = string.Empty;
-            Observacoes = string.Empty;
-            Aluno = null!;
+            if (historicoExistente.DataTermino.HasValue) { throw new DomainException("Esta aula já foi concluída"); }
+
+            _historicoAprendizado.Remove(historicoExistente);
         }
 
-        /// <summary>
-        /// Construtor principal para criação de nova matrícula
-        /// </summary>
-        /// <param name="alunoId">ID do aluno</param>
-        /// <param name="cursoId">ID do curso</param>
-        /// <param name="dataInicio">Data de início do curso</param>
-        /// <param name="valorPago">Valor pago pela matrícula</param>
-        /// <param name="formaPagamento">Forma de pagamento</param>
-        /// <param name="observacoes">Observações</param>
-        public MatriculaCurso(
-            Guid alunoId,
-            Guid cursoId,
-            DateTime dataInicio,
-            decimal valorPago,
-            string formaPagamento = "",
-            string observacoes = "") : base()
-        {
-            ValidarDadosObrigatorios(alunoId, cursoId, dataInicio, valorPago);
+        _historicoAprendizado.Add(new HistoricoAprendizado(Id, CursoId, aulaId, nomeAula, cargaHoraria, dataInicio, dataTermino));
+    }
+    #endregion
 
-            AlunoId = alunoId;
-            CursoId = cursoId;
-            DataMatricula = DateTime.UtcNow;
-            DataInicio = dataInicio.Date;
-            ValorPago = valorPago;
-            FormaPagamento = formaPagamento?.Trim() ?? string.Empty;
-            Observacoes = observacoes?.Trim() ?? string.Empty;
-            Status = StatusMatricula.Ativa;
-            PercentualConclusao = 0;
-            IsAtiva = true;
+    #region Manipuladores de Certificado
+    internal void RequisitarCertificadoConclusao(byte notaFinal, string pathCertificado, string nomeInstrutor)
+    {
+        if (Certificado != null) { throw new DomainException("Certificado já foi solicitado para esta matrícula"); }
+        if (!MatriculaCursoConcluido()) { throw new DomainException("Certificado só pode ser solicitado após a conclusão do curso"); }
+
+        Certificado = new Certificado(Id, NomeCurso, DateTime.UtcNow, null, QuantidadeTotalCargaHoraria(), notaFinal, pathCertificado, nomeInstrutor);
+    }
+
+    internal void ComunicarDataEmissaoCertificado(DateTime dataEmissao)
+    {
+        VerificarSeCertificadoExiste();
+        if (Certificado.DataEmissao.HasValue) { throw new DomainException("Data de emissão do certificado já foi informada"); }
+
+        Certificado.AtualizarDataEmissao(dataEmissao);
+    }
+
+    internal void AtualizarCargaHoraria(short cargaHoraria)
+    {
+        VerificarSeCertificadoExiste();
+        Certificado.AtualizarCargaHoraria(cargaHoraria);
+    }
+
+    internal void AtualizarPathCertificado(string path)
+    {
+        VerificarSeCertificadoExiste();
+        Certificado.AtualizarPathCertificado(path ?? string.Empty);
+    }
+
+    internal void AtualizarNomeInstrutor(string nomeInstrutor)
+    {
+        VerificarSeCertificadoExiste();
+        Certificado.AtualizarNomeInstrutor(nomeInstrutor ?? string.Empty);
+    }
+    private void VerificarSeCertificadoExiste()
+    {
+        if (Certificado == null) { throw new DomainException("Certificado não foi solicitado para esta matrícula"); }
+    }
+    #endregion
+
+    private void ValidarIntegridadeMatriculaCurso(int? novaNotaFinal = null,
+        DateTime? novaDataConclusao = null,
+        EstadoMatriculaCursoEnum? novoEstadoMatriculaCurso = null, 
+        string novaObservacao = null)
+    {
+        novaDataConclusao ??= DataConclusao;
+        novaObservacao ??= Observacao;
+
+        var validacao = new ResultadoValidacao<MatriculaCurso>();
+        ValidacaoGuid.DeveSerValido(AlunoId, "Aluno deve ser informado", validacao);
+        ValidacaoGuid.DeveSerValido(CursoId, "Curso deve ser informado", validacao);
+        ValidacaoTexto.DevePossuirConteudo(NomeCurso, "Nome do curso deve ser informado", validacao);
+        ValidacaoTexto.DevePossuirTamanho(NomeCurso, 10, 200, "Nome do curso deve ter entre 10 e 200 caracteres", validacao);
+        ValidacaoNumerica.DeveSerMaiorQueZero(Valor, "Valor da matrícula deve ser maior que zero", validacao);
+        ValidacaoData.DeveSerValido(DataMatricula, "Data da matrícula é inválida", validacao);
+
+        if (novaNotaFinal.HasValue)
+        {
+            ValidacaoNumerica.DeveEstarEntre(novaNotaFinal.Value, 0, 10, "Nota final deve estar entre 0 e 10", validacao);
         }
 
-        /// <summary>
-        /// Atualiza os dados da matrícula
-        /// </summary>
-        /// <param name="dataInicio">Nova data de início</param>
-        /// <param name="valorPago">Novo valor pago</param>
-        /// <param name="formaPagamento">Nova forma de pagamento</param>
-        /// <param name="observacoes">Novas observações</param>
-        public void AtualizarDados(
-            DateTime dataInicio,
-            decimal valorPago,
-            string formaPagamento = "",
-            string observacoes = "")
+        ValidarConclusaoCurso(novaDataConclusao, validacao);
+        ValidarEstadoParaAbandono(novoEstadoMatriculaCurso, novaDataConclusao, validacao);
+
+        if (!string.IsNullOrWhiteSpace(novaObservacao))
         {
-            if (Status == StatusMatricula.Concluida)
-                throw new InvalidOperationException("Não é possível atualizar uma matrícula concluída.");
-
-            if (Status == StatusMatricula.Cancelada)
-                throw new InvalidOperationException("Não é possível atualizar uma matrícula cancelada.");
-
-            ValidarValorPago(valorPago);
-
-            DataInicio = dataInicio.Date;
-            ValorPago = valorPago;
-            FormaPagamento = formaPagamento?.Trim() ?? string.Empty;
-            Observacoes = observacoes?.Trim() ?? string.Empty;
-
-            SetUpdatedAt();
+            ValidacaoTexto.DevePossuirTamanho(novaObservacao, 0, 2000, "Observações devem ter no máximo 2000 caracteres", validacao);
         }
 
-        /// <summary>
-        /// Inicia o curso
-        /// </summary>
-        public void IniciarCurso()
+        validacao.DispararExcecaoDominioSeInvalido();
+    }
+
+    private void ValidarConclusaoCurso(DateTime? dataConclusao, ResultadoValidacao<MatriculaCurso> validacao)
+    {
+        if (dataConclusao.HasValue)
         {
-            if (Status != StatusMatricula.Ativa)
-                throw new InvalidOperationException("Apenas matrículas ativas podem ser iniciadas.");
-
-            Status = StatusMatricula.EmAndamento;
-            SetUpdatedAt();
-        }
-
-        /// <summary>
-        /// Conclui o curso
-        /// </summary>
-        /// <param name="notaFinal">Nota final do aluno</param>
-        public void ConcluirCurso(decimal? notaFinal = null)
-        {
-            if (Status != StatusMatricula.EmAndamento)
-                throw new InvalidOperationException("Apenas matrículas em andamento podem ser concluídas.");
-
-            if (notaFinal.HasValue)
+            switch (EstadoMatricula)
             {
-                ValidarNota(notaFinal.Value);
-                NotaFinal = notaFinal.Value;
+                case EstadoMatriculaCursoEnum.PagamentoRealizado:
+                    ValidacaoData.DeveSerValido(dataConclusao.Value, "Data de conclusão deve ser informada", validacao);
+                    ValidacaoData.DeveTerRangeValido(DataMatricula, dataConclusao.Value, "Data de conclusão não pode ser anterior a data de matrícula", validacao);
+                    break;
+                case EstadoMatriculaCursoEnum.PendentePagamento:
+                case EstadoMatriculaCursoEnum.Abandonado:
+                    validacao.AdicionarErro($"Não é possível concluir um curso com estado de pagamento {EstadoMatricula.GetDescription()}");
+                    break;
             }
-
-            Status = StatusMatricula.Concluida;
-            DataTermino = DateTime.UtcNow;
-            PercentualConclusao = 100;
-            SetUpdatedAt();
-        }
-
-        /// <summary>
-        /// Cancela a matrícula
-        /// </summary>
-        /// <param name="motivo">Motivo do cancelamento</param>
-        public void CancelarMatricula(string motivo = "")
-        {
-            if (Status == StatusMatricula.Concluida)
-                throw new InvalidOperationException("Não é possível cancelar uma matrícula concluída.");
-
-            Status = StatusMatricula.Cancelada;
-            IsAtiva = false;
-            
-            if (!string.IsNullOrWhiteSpace(motivo))
-            {
-                Observacoes = string.IsNullOrWhiteSpace(Observacoes) 
-                    ? $"Cancelamento: {motivo.Trim()}" 
-                    : $"{Observacoes} | Cancelamento: {motivo.Trim()}";
-            }
-
-            SetUpdatedAt();
-        }
-
-        /// <summary>
-        /// Suspende a matrícula
-        /// </summary>
-        /// <param name="motivo">Motivo da suspensão</param>
-        public void SuspenderMatricula(string motivo = "")
-        {
-            if (Status == StatusMatricula.Concluida)
-                throw new InvalidOperationException("Não é possível suspender uma matrícula concluída.");
-
-            if (Status == StatusMatricula.Cancelada)
-                throw new InvalidOperationException("Não é possível suspender uma matrícula cancelada.");
-
-            Status = StatusMatricula.Suspensa;
-            
-            if (!string.IsNullOrWhiteSpace(motivo))
-            {
-                Observacoes = string.IsNullOrWhiteSpace(Observacoes) 
-                    ? $"Suspensão: {motivo.Trim()}" 
-                    : $"{Observacoes} | Suspensão: {motivo.Trim()}";
-            }
-
-            SetUpdatedAt();
-        }
-
-        /// <summary>
-        /// Reativa a matrícula
-        /// </summary>
-        public void ReativarMatricula()
-        {
-            if (Status != StatusMatricula.Suspensa)
-                throw new InvalidOperationException("Apenas matrículas suspensas podem ser reativadas.");
-
-            Status = StatusMatricula.Ativa;
-            IsAtiva = true;
-            SetUpdatedAt();
-        }
-
-        /// <summary>
-        /// Atualiza o percentual de conclusão
-        /// </summary>
-        /// <param name="percentual">Novo percentual (0-100)</param>
-        public void AtualizarPercentualConclusao(decimal percentual)
-        {
-            if (percentual < 0 || percentual > 100)
-                throw new ArgumentException("Percentual deve estar entre 0 e 100.", nameof(percentual));
-
-            PercentualConclusao = percentual;
-            SetUpdatedAt();
-        }
-
-        /// <summary>
-        /// Adiciona progresso de uma aula
-        /// </summary>
-        /// <param name="progresso">Progresso a ser adicionado</param>
-        public void AdicionarProgresso(Progresso progresso)
-        {
-            if (progresso == null)
-                throw new ArgumentNullException(nameof(progresso));
-
-            if (Status != StatusMatricula.EmAndamento)
-                throw new InvalidOperationException("Apenas matrículas em andamento podem ter progresso adicionado.");
-
-            var progressoExistente = _progresso.FirstOrDefault(p => p.AulaId == progresso.AulaId);
-            if (progressoExistente != null)
-            {
-                _progresso.Remove(progressoExistente);
-            }
-
-            _progresso.Add(progresso);
-            SetUpdatedAt();
-        }
-
-        /// <summary>
-        /// Adiciona certificado
-        /// </summary>
-        /// <param name="certificado">Certificado a ser adicionado</param>
-        public void AdicionarCertificado(Certificado certificado)
-        {
-            if (certificado == null)
-                throw new ArgumentNullException(nameof(certificado));
-
-            if (Status != StatusMatricula.Concluida)
-                throw new InvalidOperationException("Apenas matrículas concluídas podem ter certificados.");
-
-            _certificados.Add(certificado);
-            SetUpdatedAt();
-        }
-
-        /// <summary>
-        /// Calcula a duração do curso em dias
-        /// </summary>
-        /// <returns>Duração em dias</returns>
-        public int CalcularDuracaoCurso()
-        {
-            var dataFim = DataTermino ?? DateTime.UtcNow;
-            return (dataFim.Date - DataInicio.Date).Days;
-        }
-
-        /// <summary>
-        /// Verifica se a matrícula está vencida
-        /// </summary>
-        /// <param name="diasVencimento">Dias para considerar vencida</param>
-        /// <returns>True se vencida</returns>
-        public bool EstaVencida(int diasVencimento = 365)
-        {
-            if (Status == StatusMatricula.Concluida || Status == StatusMatricula.Cancelada)
-                return false;
-
-            return DateTime.UtcNow.Date > DataInicio.AddDays(diasVencimento).Date;
-        }
-
-        /// <summary>
-        /// Valida dados obrigatórios
-        /// </summary>
-        private static void ValidarDadosObrigatorios(Guid alunoId, Guid cursoId, DateTime dataInicio, decimal valorPago)
-        {
-            if (alunoId == Guid.Empty)
-                throw new ArgumentException("ID do aluno é obrigatório.", nameof(alunoId));
-
-            if (cursoId == Guid.Empty)
-                throw new ArgumentException("ID do curso é obrigatório.", nameof(cursoId));
-
-            if (dataInicio.Date < DateTime.Today.AddDays(-30))
-                throw new ArgumentException("Data de início não pode ser muito antiga.", nameof(dataInicio));
-
-            ValidarValorPago(valorPago);
-        }
-
-        /// <summary>
-        /// Valida valor pago
-        /// </summary>
-        private static void ValidarValorPago(decimal valorPago)
-        {
-            if (valorPago < 0)
-                throw new ArgumentException("Valor pago não pode ser negativo.", nameof(valorPago));
-
-            if (valorPago > 999999.99m)
-                throw new ArgumentException("Valor pago é muito alto.", nameof(valorPago));
-        }
-
-        /// <summary>
-        /// Valida nota
-        /// </summary>
-        private static void ValidarNota(decimal nota)
-        {
-            if (nota < 0 || nota > 10)
-                throw new ArgumentException("Nota deve estar entre 0 e 10.", nameof(nota));
         }
     }
 
-    /// <summary>
-    /// Enum para status da matrícula
-    /// </summary>
-    public enum StatusMatricula
+    private void ValidarEstadoParaAbandono(EstadoMatriculaCursoEnum? novoEstado, DateTime? dataConclusao, ResultadoValidacao<MatriculaCurso> validacao)
     {
-        /// <summary>
-        /// Matrícula ativa, mas curso não iniciado
-        /// </summary>
-        Ativa = 1,
-
-        /// <summary>
-        /// Curso em andamento
-        /// </summary>
-        EmAndamento = 2,
-
-        /// <summary>
-        /// Curso concluído
-        /// </summary>
-        Concluida = 3,
-
-        /// <summary>
-        /// Matrícula cancelada
-        /// </summary>
-        Cancelada = 4,
-
-        /// <summary>
-        /// Matrícula suspensa
-        /// </summary>
-        Suspensa = 5
+        if (novoEstado.HasValue && novoEstado == EstadoMatriculaCursoEnum.Abandonado && dataConclusao.HasValue)
+        {
+            validacao.AdicionarErro("Não é possível alterar o estado da matrícula para pagamento abandonado com o curso concluído");
+        }
     }
-} 
+    #endregion
+
+    public override string ToString()
+    {
+        string concluido = MatriculaCursoConcluido() ? "Sim" : "Não";
+        return $"Matrícula no curso {CursoId} do aluno {AlunoId} (Concluído? {concluido})";
+    }
+}

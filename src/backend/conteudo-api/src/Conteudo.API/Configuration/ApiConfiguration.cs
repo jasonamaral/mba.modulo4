@@ -1,3 +1,9 @@
+﻿using Conteudo.API.Extensions;
+using Conteudo.Application.Commands.CadastrarCurso;
+using Conteudo.Application.Mappings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 ﻿using Core.Identidade;
 using Conteudo.API.Extensions;
 using Conteudo.Application.Commands;

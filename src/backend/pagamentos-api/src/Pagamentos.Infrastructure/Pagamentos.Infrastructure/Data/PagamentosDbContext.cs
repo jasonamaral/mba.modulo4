@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Pagamentos.Domain.Entities;
-using System;
-using System.Threading.Tasks;
 
 namespace Pagamentos.Infrastructure.Data
 {
