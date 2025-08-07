@@ -44,7 +44,6 @@ namespace BFF.API.Controllers
         /// <returns>Dados do curso</returns>
         [HttpGet("{cursoId}")]
         [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         public async Task<IActionResult> ObterCurso([FromRoute] Guid cursoId, [FromQuery] bool includeAulas = false)
         {
@@ -67,10 +66,6 @@ namespace BFF.API.Controllers
             {
                 await _cacheService.SetAsync(cacheKey, resultado, TimeSpan.FromMinutes(30));
                 return Ok(resultado);
-            }
-            if (resultado?.Status == (int)HttpStatusCode.NotFound)
-            {
-                return NotFound(resultado);
             }
 
             return BadRequest(resultado);
@@ -111,7 +106,6 @@ namespace BFF.API.Controllers
         /// <returns>Lista de cursos da categoria</returns>
         [HttpGet("categoria/{categoriaId}")]
         [ProducesResponseType(typeof(ResponseResult<IEnumerable<CursoDto>>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
         {
@@ -123,10 +117,6 @@ namespace BFF.API.Controllers
                 if (resultado?.Status == (int)HttpStatusCode.OK)
                 {
                     return Ok(resultado);
-                }
-                if (resultado?.Status == (int)HttpStatusCode.NotFound)
-                {
-                    return NotFound(resultado);
                 }
 
                 return BadRequest(resultado);

@@ -18,10 +18,15 @@ namespace Conteudo.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Categoria?> ObterPorIdAsync(Guid id)
+        public async Task<Categoria?> ObterPorIdAsync(Guid id, bool noTracking = true)
         {   
-            return await _categoria
-                .AsNoTracking()
+            var query = _categoria.AsQueryable();
+            if (noTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+            return await query
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
@@ -32,9 +37,13 @@ namespace Conteudo.Infrastructure.Repositories
                 .AnyAsync(c => EF.Functions.Like(c.Nome, nome));
         }
 
-        public async Task Adicionar(Categoria categoria)
+        public void Adicionar(Categoria categoria)
         {
-            await _categoria.AddAsync(categoria);
+            _categoria.Add(categoria);
+        }
+        public void Atualizar(Categoria categoria)
+        {
+            _categoria.Update(categoria);
         }
 
         public void Dispose()
