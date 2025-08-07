@@ -19,8 +19,8 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
         // Revisar e aguardar a opinião do Eduardo
 
         _raizAgregacao = request.RaizAgregacao;
-        if (!ValidarRequisicao(request)) { return request.CommandResult; }
-        if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.CommandResult; }
+        if (!ValidarRequisicao(request)) { return request.Resultado; }
+        if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
 
         var matricula = aluno.ObterMatriculaPorCursoId(request.CursoId);
         aluno.AtualizarPagamentoMatricula(matricula.Id);
@@ -28,7 +28,7 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
         await _alunoRepository.AtualizarAsync(aluno);
         await _alunoRepository.UnitOfWork.Commit();
 
-        return request.CommandResult;
+        return request.Resultado;
     }
 
     private bool ValidarRequisicao(AtualizarPagamentoMatriculaCommand request)

@@ -4,9 +4,9 @@ namespace Core.Communication;
 
 public class CommandResult
 {
-    private ValidationResult ValidationResult { get; }
+    public bool IsValid => ValidationResult.IsValid;
     public object? Data { get; set; }
-    public bool Success => ValidationResult.IsValid;
+    private ValidationResult ValidationResult { get; }
 
     public CommandResult(ValidationResult validationResult, object? data = null)
     {
@@ -14,18 +14,13 @@ public class CommandResult
         Data = data;
     }
 
-    public void AdicionarErro(string propName, string mensagem)
+    public void AdicionarErro(string mensagem)
     {
         ValidationResult.Errors.Add(new ValidationFailure(string.Empty, mensagem));
     }
 
-    public List<ValidationFailure> ObterErros()
-    {
-        return ValidationResult.Errors;
-    }
+    public IEnumerable<string> ObterErros() =>
+        ValidationResult.Errors.Select(e => e.ErrorMessage);
 
-    public ValidationResult ObterValidationResult()
-    {
-        return ValidationResult;
-    }
+    public ValidationResult ObterValidationResult() => ValidationResult;
 }

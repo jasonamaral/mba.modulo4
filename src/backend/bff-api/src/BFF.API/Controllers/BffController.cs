@@ -15,7 +15,7 @@ public abstract class BffController : MainController
 {
     protected readonly INotificador _notificador;
 
-    protected BffController(IMediatorHandler mediator, INotificationHandler<DomainNotificacaoRaiz> notifications, INotificador notificador) : base(mediator, notifications)
+    protected BffController(IMediatorHandler mediator, INotificationHandler<DomainNotificacaoRaiz> notifications, INotificador notificador) : base(mediator, notifications, notificador)
     {
         _notificador = notificador;
     }

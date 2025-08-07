@@ -17,17 +17,17 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
     public async Task<CommandResult> Handle(ConcluirCursoCommand request, CancellationToken cancellationToken)
     {
         _raizAgregacao = request.RaizAgregacao;
-        if (!ValidarRequisicao(request)) { return request.CommandResult; }
-        if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.CommandResult; }
+        if (!ValidarRequisicao(request)) { return request.Resultado; }
+        if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
         var matriculaCurso = aluno.ObterMatriculaPorCursoId(request.MatriculaCursoId);
 
-        if (!ValidarSeMatriculaCursoPodeSerConcluido(aluno, request.CursoDto)) { return request.CommandResult; }
+        if (!ValidarSeMatriculaCursoPodeSerConcluido(aluno, request.CursoDto)) { return request.Resultado; }
 
         aluno.ConcluirCurso(request.MatriculaCursoId);
 
         await _alunoRepository.AtualizarAsync(aluno);
         await _alunoRepository.UnitOfWork.Commit();
-        return request.CommandResult;
+        return request.Resultado;
     }
 
     private bool ValidarRequisicao(ConcluirCursoCommand request)
