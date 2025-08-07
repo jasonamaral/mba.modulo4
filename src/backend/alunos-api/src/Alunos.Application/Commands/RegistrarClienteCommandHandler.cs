@@ -18,7 +18,7 @@ public class RegistrarClienteCommandHandler : IRequestHandler<RegistrarClienteCo
     public async Task<CommandResult> Handle(RegistrarClienteCommand request, CancellationToken cancellationToken)
     {
         if (!request.EhValido())
-            return new CommandResult(request.ValidationResult);
+            return request.Resultado;
 
         try
         {
@@ -26,8 +26,8 @@ public class RegistrarClienteCommandHandler : IRequestHandler<RegistrarClienteCo
             var alunoExistente = await _alunoRepository.ObterPorCodigoUsuarioAsync(request.Id);
             if (alunoExistente != null)
             {
-                request.ValidationResult.Errors.Add(new ValidationFailure("Id", "Já existe um aluno cadastrado com este código de usuário."));
-                return new CommandResult(request.ValidationResult);
+                request.Validacao.Errors.Add(new ValidationFailure("Id", "Já existe um aluno cadastrado com este código de usuário."));
+                return request.Resultado;
             }
 
             // Criar novo perfil de aluno
@@ -43,12 +43,12 @@ public class RegistrarClienteCommandHandler : IRequestHandler<RegistrarClienteCo
             await _alunoRepository.AdicionarAsync(novoAluno);
             await _alunoRepository.UnitOfWork.Commit();
 
-            return new CommandResult(request.ValidationResult);
+            return request.Resultado;
         }
         catch (Exception ex)
         {
-            request.ValidationResult.Errors.Add(new ValidationFailure("Exception", $"Erro ao registrar aluno: {ex.Message}"));
-            return new CommandResult(request.ValidationResult);
+            request.Validacao.Errors.Add(new ValidationFailure("Exception", $"Erro ao registrar aluno: {ex.Message}"));
+            return request.Resultado;
         }
     }
 }

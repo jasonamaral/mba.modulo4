@@ -1,4 +1,5 @@
-﻿using Conteudo.Application.Commands.AtualizarCurso;
+﻿using Conteudo.Application.Commands.AtualizarCategoria;
+using Conteudo.Application.Commands.AtualizarCurso;
 using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.Interfaces.Services;
@@ -26,6 +27,7 @@ namespace Conteudo.API.Configuration
             services.AddScoped<IRequestHandler<CadastrarCursoCommand, CommandResult>, CadastrarCursoCommandHandler>();
             services.AddScoped<IRequestHandler<CadastrarCategoriaCommand, CommandResult>, CadastrarCategoriaCommandHandler>();
             services.AddScoped<IRequestHandler<AtualizarCursoCommand, CommandResult>, AtualizarCursoCommandHandler>();
+            services.AddScoped<IRequestHandler<AtualizarCategoriaCommand, CommandResult>, AtualizarCategoriaCommandHandler>();
 
             // Services
             services.AddScoped<ICursoAppService, CursoAppService>();

@@ -1,9 +1,11 @@
-﻿using Conteudo.Application.Commands.CadastrarCategoria;
+﻿using Conteudo.Application.Commands.AtualizarCategoria;
+using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
+using Core.Notification;
 using Core.Services.Controllers;
 using Mapster;
 using MediatR;
@@ -18,7 +20,8 @@ namespace Conteudo.API.Controllers
     [Produces("application/json")]
     public class CategoriaController(IMediatorHandler mediator
                                   , ICategoriaAppService categoriaAppService
-                                  , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications)
+                                  , INotificationHandler<DomainNotificacaoRaiz> notifications
+                                  , INotificador notificador) : MainController(mediator, notifications, notificador)
     {
         private readonly IMediatorHandler _mediator = mediator;
         private readonly ICategoriaAppService _categoriaAppService = categoriaAppService;
@@ -29,7 +32,7 @@ namespace Conteudo.API.Controllers
         /// <param name="id">ID do curso</param>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResponseResult<CategoriaDto>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         public async Task<IActionResult> ObterPorId(Guid id)
         {
             try
@@ -37,7 +40,10 @@ namespace Conteudo.API.Controllers
                 var categoria = await _categoriaAppService.ObterPorIdAsync(id);
 
                 if (categoria == null)
-                    return RespostaPadraoApi(HttpStatusCode.NotFound, "Categoria não encontrada.");
+                {
+                    _notificador.AdicionarErro("Categoria não encontrada.");
+                    return RespostaPadraoApi<string>();
+                }
 
                 return RespostaPadraoApi(data: categoria);
             }
@@ -80,6 +86,30 @@ namespace Conteudo.API.Controllers
             {
                 var command = dto.Adapt<CadastrarCategoriaCommand>();
                 return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.ExecutarComando(command));
+            }
+            catch (Exception ex)
+            {
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Atualiza uma categoria existente.
+        /// </summary>
+        /// param name="dto">Dados da categoria</param>
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Administrador")]
+        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        public async Task<IActionResult> AtualizarCategoria(Guid id, [FromBody] AtualizarCategoriaDto dto)
+        {
+            try
+            {
+                if (id != dto.Id)
+                    return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria não confere.");
+
+                var command = dto.Adapt<AtualizarCategoriaCommand>();
+                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
             {

@@ -6,8 +6,9 @@ using Core.Messages;
 using MediatR;
 
 namespace Conteudo.Application.Commands.CadastrarCategoria;
-public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepository, 
-    IMediatorHandler mediatorHandler) : IRequestHandler<CadastrarCategoriaCommand, CommandResult>
+public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepository
+                                            , IMediatorHandler mediatorHandler) 
+    : IRequestHandler<CadastrarCategoriaCommand, CommandResult>
 {
     private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
     private readonly ICategoriaRepository _categoriaRepository = categoriaRepository;
@@ -16,17 +17,20 @@ public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
     public async Task<CommandResult> Handle(CadastrarCategoriaCommand request, CancellationToken cancellationToken)
     {
         _raizAgregacao = request.RaizAgregacao;
-        if (!await ValidarRequisicao(request)) { return request.CommandResult; }
+        if (!await ValidarRequisicao(request)) { return request.Resultado; }
 
         var categoria = new Categoria(request.Nome,
-            request.Descricao,
-            request.Cor,
-            request.IconeUrl,
-            request.Ordem);
+                                    request.Descricao,
+                                    request.Cor,
+                                    request.IconeUrl,
+                                    request.Ordem);
 
-        await categoriaRepository.Adicionar(categoria);
-        await categoriaRepository.UnitOfWork.Commit();
-        return request.CommandResult;
+        _categoriaRepository.Adicionar(categoria);
+
+        if (await _categoriaRepository.UnitOfWork.Commit())
+            request.Resultado.Data = categoria.Id;
+
+        return request.Resultado;
     }
 
     private async Task<bool> ValidarRequisicao(CadastrarCategoriaCommand request)
@@ -36,14 +40,14 @@ public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
         {
             foreach (var erro in request.Erros)
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), erro)).GetAwaiter().GetResult();
+               await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), erro));
             }
             return false;
         }
 
         if (await _categoriaRepository.ExistePorNome(request.Nome))
         {
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), "Já existe uma categoria com este nome.")).GetAwaiter().GetResult();
+            await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), "Já existe uma categoria com este nome."));
             return false;
         }
 

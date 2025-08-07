@@ -1,7 +1,6 @@
 using Core.Communication;
 using Core.Messages;
 using FluentValidation;
-using FluentValidation.Results;
 using MediatR;
 
 namespace Alunos.Application.Commands;
@@ -21,8 +20,6 @@ public class RegistrarClienteCommand : CommandRaiz, IRequest<CommandResult>
     public string? Foto { get; private set; }
     public bool EhAdministrador { get; private set; }
     public DateTime DataCadastro { get; private set; }
-
-    public ValidationResult ValidationResult { get; set; } = new ValidationResult();
 
     public RegistrarClienteCommand(
         Guid id,
@@ -54,10 +51,11 @@ public class RegistrarClienteCommand : CommandRaiz, IRequest<CommandResult>
         DataCadastro = dataCadastro;
     }
 
-    public override bool EhValido()
+    public bool EhValido()
     {
-        ValidationResult = new RegistrarClienteCommandValidation().Validate(this);
-        return ValidationResult.IsValid;
+        var result = new RegistrarClienteCommandValidation().Validate(this);
+        DefinirValidacao(result);
+        return result.IsValid;
     }
 }
 

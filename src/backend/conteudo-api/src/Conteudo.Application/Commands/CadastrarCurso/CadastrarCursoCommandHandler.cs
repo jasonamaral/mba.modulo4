@@ -18,7 +18,7 @@ public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
     public async Task<CommandResult> Handle(CadastrarCursoCommand request, CancellationToken cancellationToken)
     {
         _raizAgregacao = request.RaizAgregacao;
-        if (!await ValidarRequisicao(request)) { return request.CommandResult; }
+        if (!await ValidarRequisicao(request)) { return request.Resultado; }
 
         var curso = new Curso(request.Nome,
                               request.Valor,
@@ -41,8 +41,8 @@ public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
 
         await _cursoRepository.Adicionar(curso);
         await categoriaRepository.UnitOfWork.Commit();
-        request.CommandResult.Data = curso.Id;
-        return request.CommandResult;
+        request.Resultado.Data = curso.Id;
+        return request.Resultado;
     }
 
     private async Task<bool> ValidarRequisicao(CadastrarCursoCommand request)

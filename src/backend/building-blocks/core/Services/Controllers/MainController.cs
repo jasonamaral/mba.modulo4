@@ -1,6 +1,7 @@
 ﻿using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
+using Core.Notification;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +12,13 @@ namespace Core.Services.Controllers;
 
 [ApiController]
 public abstract class MainController(IMediatorHandler mediator
-                                   , INotificationHandler<DomainNotificacaoRaiz> notifications) : ControllerBase
+                                   , INotificationHandler<DomainNotificacaoRaiz> notifications
+                                   , INotificador notificador) : ControllerBase
 {
     protected readonly DomainNotificacaoHandler _notifications = (DomainNotificacaoHandler)notifications;
+    protected readonly INotificador _notificador = notificador;
 
-    protected bool OperacaoValida() => !_notifications.TemNotificacao();
+    protected bool OperacaoValida() => !_notifications.TemNotificacao() && !_notificador.TemErros();
 
     protected ActionResult RespostaPadraoApi<T>(HttpStatusCode statusCode = HttpStatusCode.OK, T? data = default, string? message = null)
     {
@@ -36,7 +39,7 @@ public abstract class MainController(IMediatorHandler mediator
             Title = message ?? "Ocorreu um ou mais erros durante a operação",
             Errors = new ResponseErrorMessages
             {
-                Mensagens = _notifications.ObterMensagens()
+                Mensagens = ObterMensagensDeErro()
             }
         });
     }
@@ -68,6 +71,20 @@ public abstract class MainController(IMediatorHandler mediator
 
     protected ActionResult RespostaPadraoApi<T>(CommandResult result)
     {
-        return RespostaPadraoApi(data: result);
+        return RespostaPadraoApi(data: result.Data);
+    }
+
+    protected List<string> ObterMensagensDeErro()
+    {
+        var mensagens = new List<string>();
+        if (_notifications.TemNotificacao())
+        {
+            mensagens.AddRange(_notifications.ObterMensagens());
+        }
+        if (_notificador.TemErros())
+        {
+            mensagens.AddRange(_notificador.ObterErros());
+        }
+        return mensagens;
     }
 }
