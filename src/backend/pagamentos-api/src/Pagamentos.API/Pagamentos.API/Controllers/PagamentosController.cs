@@ -33,6 +33,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(500)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ProcessarPagamento([FromBody] ProcessarPagamentoCommand command)
         {
             try
@@ -71,6 +72,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(typeof(PagamentoDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> GetPagamento(Guid id)
         {
             try
@@ -99,6 +101,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> CancelarPagamento(Guid id, [FromBody] CancelarPagamentoCommand command)
         {
             try
@@ -129,6 +132,7 @@ namespace Pagamentos.API.Controllers
         [HttpGet("aluno/{alunoId:guid}")]
         [ProducesResponseType(typeof(IEnumerable<PagamentoDto>), 200)]
         [ProducesResponseType(401)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> GetPagamentosByAluno(
             Guid alunoId,
             [FromQuery] int pagina = 1,
@@ -166,6 +170,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(typeof(object), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> GetStatusPagamento(Guid id)
         {
             try

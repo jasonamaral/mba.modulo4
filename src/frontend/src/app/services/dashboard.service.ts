@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
-import { CategoryTransactionGraphModel } from '../pages/dashboard/transaction-category-graph/models/transaction-category-graph';
-import { CardSumaryModel } from '../pages/dashboard/balance-card/models/card-sumary.model';
-import { TransactionYearEvolutionGraphModel } from '../pages/dashboard/transaction-category-graph/models/transaction-year-evolution-graph';
+type CardSumaryModel = any;
+type CategoryTransactionGraphModel = any[];
+type TransactionYearEvolutionGraphModel = any[];
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService extends BaseService {

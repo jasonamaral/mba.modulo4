@@ -36,6 +36,7 @@ public class CursosController(ICursoAppService cursoAppService
     [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCurso([FromRoute] Guid id, [FromQuery] bool includeAulas = false)
     {
         try
@@ -60,6 +61,7 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpGet]
     [ProducesResponseType(typeof(ResponseResult<PagedResult<CursoDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursos([FromQuery] CursoFilter filter)
     {
         try
@@ -83,10 +85,11 @@ public class CursosController(ICursoAppService cursoAppService
     [ProducesResponseType(typeof(ResponseResult<IEnumerable<CursoDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
     {
         try
-        {   
+        {
             if (categoriaId == Guid.Empty)
                 return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria inválido");
 
@@ -104,9 +107,9 @@ public class CursosController(ICursoAppService cursoAppService
     /// </summary>
     /// <param name="dto">Dados do curso</param>
     [HttpPost]
-    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> CadastrarCurso([FromBody] CadastroCursoDto dto)
     {
         try
@@ -117,7 +120,7 @@ public class CursosController(ICursoAppService cursoAppService
         catch (Exception ex)
         {
             return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        } 
+        }
     }
 
     /// <summary>
@@ -126,10 +129,10 @@ public class CursosController(ICursoAppService cursoAppService
     /// <param name="id">ID do curso</param>
     /// <param name="dto">Dados atualizados do curso</param>
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AtualizarCurso([FromRoute] Guid id, [FromBody] AtualizarCursoDto dto)
     {
         try
@@ -141,7 +144,7 @@ public class CursosController(ICursoAppService cursoAppService
                 return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do curso não confere");
 
             var command = dto.Adapt<AtualizarCursoCommand>();
-            
+
             return RespostaPadraoApi<CursoDto>(await _mediator.ExecutarComando(command));
         }
         catch (ArgumentException ex)
@@ -160,9 +163,9 @@ public class CursosController(ICursoAppService cursoAppService
     /// <param name="id">ID do curso</param>
     /// <returns>Confirmação da exclusão</returns>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ExcluirCurso([FromRoute] Guid id)
     {
         try
@@ -188,6 +191,7 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpGet("{id}/aulas")]
     [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> GetAulasDoCurso([FromRoute] Guid id)
     {
         try
@@ -212,6 +216,7 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpGet("{id}/conteudo-programatico")]
     [ProducesResponseType(typeof(ResponseResult<ConteudoProgramaticoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> GetConteudoProgramatico([FromRoute] Guid id)
     {
         try
@@ -249,6 +254,7 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpPost("{id}/acesso")]
     [ProducesResponseType(typeof(ResponseResult<string>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> RegistrarAcesso([FromRoute] Guid id)
     {
         try
@@ -289,4 +295,4 @@ public class ConteudoProgramaticoDto
     public string Bibliografia { get; set; } = string.Empty;
 }
 
-#endregion 
+#endregion

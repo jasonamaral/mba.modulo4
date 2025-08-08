@@ -14,17 +14,22 @@ export const navItems: NavItem[] = [
     divider: true
   },
   {
-    displayName: 'Manutenção',
-    iconName: 'material-symbols-light:engineering-outline',
-    route: 'pages/conteudo/lista',
+    displayName: 'Cursos',
+    iconName: 'material-symbols-light:library-books-outline',
+    route: 'pages/cursos',
   },
   {
     navCap: 'Area do Aluno',
     divider: true
   },
   {
-    displayName: 'Meus cursos',
-    iconName: 'fluent:money-hand-16-regular',
-    route: 'pages/aluno/cursos',
+    displayName: 'Minhas matrículas',
+    iconName: 'material-symbols-light:school-outline',
+    route: 'pages/matriculas',
+  },
+  {
+    displayName: 'Certificados',
+    iconName: 'material-symbols-light:verified-outline',
+    route: 'pages/certificados',
   }
 ];

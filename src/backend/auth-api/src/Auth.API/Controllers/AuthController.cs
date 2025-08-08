@@ -1,6 +1,7 @@
 using Auth.API.Models.Requests;
 using Auth.Application.Services;
 using Auth.Domain.Entities;
+using Azure.Core;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -9,6 +10,7 @@ using Core.Notification;
 using Core.Services.Controllers;
 using MediatR;
 using MessageBus;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -52,6 +54,10 @@ public class AuthController(IMediatorHandler mediator
 
         if (result.Succeeded)
         {
+            // Adicionar role
+            var roleName = registroRequest.EhAdministrador ? "Administrador" : "Usuario";
+            await _authService.UserManager.AddToRoleAsync(user, roleName);
+
             var clienteResult = await RegistrarCliente(registroRequest);
 
             if (!clienteResult.ValidationResult.IsValid)

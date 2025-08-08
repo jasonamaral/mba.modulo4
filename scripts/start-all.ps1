@@ -136,15 +136,33 @@ foreach ($service in $infraServices) {
     }
 }
 
+function Wait-ContainerHealthy {
+    param([string]$containerName, [int]$timeoutSec = 90)
+    $elapsed = 0
+    Write-Host "Aguardando '$containerName' ficar HEALTHY (timeout ${timeoutSec}s)..." -ForegroundColor Yellow
+    while ($elapsed -lt $timeoutSec) {
+        $status = docker inspect --format='{{.State.Health.Status}}' $containerName 2>$null
+        if ($status -eq 'healthy') {
+            Write-Host "Container '$containerName' HEALTHY" -ForegroundColor Green
+            return $true
+        }
+        Start-Sleep -Seconds 3
+        $elapsed += 3
+    }
+    Write-Host "Timeout aguardando '$containerName' HEALTHY. Prosseguindo assim mesmo." -ForegroundColor Yellow
+    return $false
+}
+
 if ($missingInfra.Count -gt 0) {
     Write-Host "Iniciando infraestrutura faltante: $($missingInfra -join ', ')" -ForegroundColor Blue
     docker-compose -f $composeFile up -d $missingInfra
-    
-    Write-Host "Aguardando infraestrutura inicializar (15 segundos)..." -ForegroundColor Yellow
-    Start-Sleep -Seconds 15
 } else {
     Write-Host "Toda infraestrutura ja esta rodando!" -ForegroundColor Green
 }
+
+# Aguarda RabbitMQ ficar 'healthy' para evitar timeout nas APIs ao registrar filas
+$rabbitContainer = "plataforma-rabbitmq"
+try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
 
 Write-Host "Verificando microservicos..." -ForegroundColor Blue
 $apiServices = @("auth-api", "conteudo-api", "alunos-api", "pagamentos-api")
@@ -232,15 +250,34 @@ if ($missingFrontend.Count -gt 0) {
     Write-Host "BFF e Frontend ja estao rodando!" -ForegroundColor Green
 }
 
-# Só recriar containers se foi solicitado ou se há containers faltando
+# Recriação orquestrada (evita subir APIs antes do RabbitMQ)
 $totalMissing = $missingInfra.Count + $missingApis.Count + $missingFrontend.Count
-if ($ForceBuild -or $CleanBuild -or $totalMissing -gt 0) {
-    Write-Host ""
-    Write-Host "Recriando containers para garantir ambiente limpo..." -ForegroundColor Yellow
-    docker-compose -f $composeFile up -d --force-recreate
+if ($ForceBuild -or $CleanBuild) {
+    Write-Host ""; Write-Host "Recriando infraestrutura..." -ForegroundColor Yellow
+    docker-compose -f $composeFile up -d --force-recreate rabbitmq redis
+    try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
+
+    Write-Host "Recriando APIs..." -ForegroundColor Yellow
+    docker-compose -f $composeFile up -d --force-recreate auth-api conteudo-api alunos-api pagamentos-api
+    Start-Sleep -Seconds 10
+
+    Write-Host "Recriando BFF e Frontend..." -ForegroundColor Yellow
+    docker-compose -f $composeFile up -d --force-recreate bff-api frontend
+} elseif ($totalMissing -gt 0) {
+    Write-Host ""; Write-Host "Recriando apenas servicos faltantes, em ordem..." -ForegroundColor Yellow
+    if ($missingInfra.Count -gt 0) {
+        docker-compose -f $composeFile up -d --force-recreate $missingInfra
+        try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
+    }
+    if ($missingApis.Count -gt 0) {
+        docker-compose -f $composeFile up -d --force-recreate $missingApis
+        Start-Sleep -Seconds 10
+    }
+    if ($missingFrontend.Count -gt 0) {
+        docker-compose -f $composeFile up -d --force-recreate $missingFrontend
+    }
 } else {
-    Write-Host ""
-    Write-Host "Todos os containers ja estao rodando!" -ForegroundColor Green
+    Write-Host ""; Write-Host "Todos os containers ja estao rodando!" -ForegroundColor Green
 }
 
 Write-Host ""

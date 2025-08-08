@@ -1,5 +1,6 @@
 using BFF.API.Configuration;
 using BFF.API.Extensions;
+using BFF.API.Handlers;
 using BFF.Domain.Settings;
 using Polly;
 using Polly.Extensions.Http;
@@ -10,7 +11,9 @@ builder.AddApiConfiguration();
 
 // HttpClient para comunicação com outras APIs com Polly
 var resilienceSettings = builder.Configuration.GetSection("ResilienceSettings").Get<ResilienceSettings>();
+builder.Services.AddTransient<AuthorizationDelegatingHandler>();
 builder.Services.AddHttpClient("ApiClient")
+    .AddHttpMessageHandler<AuthorizationDelegatingHandler>()
     .AddPolicyHandler(GetRetryPolicy(resilienceSettings))
     .AddPolicyHandler(GetCircuitBreakerPolicy(resilienceSettings));
 

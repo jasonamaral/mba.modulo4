@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Subject, takeUntil } from 'rxjs';
 import { MaterialModule } from 'src/app/material.module';
-import { CategoryModel } from './models/category.model';
+import { CategoryModel } from './models/conteudo.model';
 import { CommonModule } from '@angular/common';
-import { CategoryTypeDescriptions, CategoryTypeEnum } from './enums/category-type.enum';
+import { ConteudoTypeDescriptions, ConteudoTypeEnum } from './enums/conteudo-type.enum';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent, ConfirmDialogModel } from 'src/app/components/confirm-dialog/confirm-dialog.component';
 import { ConteudoService } from 'src/app/services/conteudo.service';
@@ -48,8 +48,8 @@ export class ConteudoListComponent implements OnInit, OnDestroy {
       });
   }
 
-  getDescription(type: CategoryTypeEnum): string {
-    return CategoryTypeDescriptions[type] || 'Unknown';
+  getDescription(type: ConteudoTypeEnum): string {
+    return ConteudoTypeDescriptions[type] || 'Unknown';
   }
 
   addDialog() {

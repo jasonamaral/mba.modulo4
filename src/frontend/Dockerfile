@@ -12,14 +12,14 @@ RUN npm install --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Build Angular app
+# Build Angular app (gera dist/MBA.Modulo4)
 RUN npm run build
 
 # Production stage
 FROM nginx:alpine
 
-# Copy built app from build stage
-COPY --from=build /app/dist/plataforma-educacional-frontend /usr/share/nginx/html
+# Copy built app from build stage (ajustado para nome real do output)
+COPY --from=build /app/dist/MBA.Modulo4 /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
