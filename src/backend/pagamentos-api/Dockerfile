@@ -6,19 +6,19 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copiar arquivos de projeto
-COPY ["src/Pagamentos.API/Pagamentos.API/Pagamentos.API.csproj", "src/Pagamentos.API/Pagamentos.API/"]
-COPY ["src/Pagamentos.Application/Pagamentos.Application/Pagamentos.Application.csproj", "src/Pagamentos.Application/Pagamentos.Application/"]
-COPY ["src/Pagamentos.Domain/Pagamentos.Domain/Pagamentos.Domain.csproj", "src/Pagamentos.Domain/Pagamentos.Domain/"]
-COPY ["src/Pagamentos.Infrastructure/Pagamentos.Infrastructure/Pagamentos.Infrastructure.csproj", "src/Pagamentos.Infrastructure/Pagamentos.Infrastructure/"]
+COPY ["pagamentos-api/src/Pagamentos.API/Pagamentos.API/Pagamentos.API.csproj", "pagamentos-api/src/Pagamentos.API/Pagamentos.API/"]
+COPY ["pagamentos-api/src/Pagamentos.Application/Pagamentos.Application/Pagamentos.Application.csproj", "pagamentos-api/src/Pagamentos.Application/Pagamentos.Application/"]
+COPY ["pagamentos-api/src/Pagamentos.Domain/Pagamentos.Domain/Pagamentos.Domain.csproj", "pagamentos-api/src/Pagamentos.Domain/Pagamentos.Domain/"]
+COPY ["pagamentos-api/src/Pagamentos.Infrastructure/Pagamentos.Infrastructure/Pagamentos.Infrastructure.csproj", "pagamentos-api/src/Pagamentos.Infrastructure/Pagamentos.Infrastructure/"]
 
 # Restaurar dependências
-RUN dotnet restore "src/Pagamentos.API/Pagamentos.API/Pagamentos.API.csproj"
+RUN dotnet restore "pagamentos-api/src/Pagamentos.API/Pagamentos.API/Pagamentos.API.csproj"
 
 # Copiar código fonte
 COPY . .
 
 # Build da aplicação
-WORKDIR "/src/src/Pagamentos.API/Pagamentos.API"
+WORKDIR "/src/pagamentos-api/src/Pagamentos.API/Pagamentos.API"
 RUN dotnet build "Pagamentos.API.csproj" -c Release -o /app/build
 
 FROM build AS publish

@@ -22,11 +22,11 @@ namespace Auth.API.Controllers;
 [Produces("application/json")]
 public class AuthController(IMediatorHandler mediator
                                   , AuthService authService
-                                  , INotificationHandler<DomainNotificacaoRaiz> notifications, IMessageBus bus, INotificador notificador) : MainController(mediator, notifications)
+                                  , INotificationHandler<DomainNotificacaoRaiz> notifications, IMessageBus bus, INotificador notificador) : MainController(mediator, notifications, notificador)
 {
     private readonly AuthService _authService = authService;
     private readonly IMessageBus _bus = bus;
-    private readonly INotificador _notificador = notificador;
+    private readonly new INotificador _notificador = notificador;
 
     /// <summary>
     /// Registra um novo usuário no sistema

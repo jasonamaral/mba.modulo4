@@ -6,19 +6,19 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copiar arquivos de projeto
-COPY ["src/Auth.API/Auth.API.csproj", "src/Auth.API/"]
-COPY ["src/Auth.Application/Auth.Application.csproj", "src/Auth.Application/"]
-COPY ["src/Auth.Domain/Auth.Domain.csproj", "src/Auth.Domain/"]
-COPY ["src/Auth.Infrastructure/Auth.Infrastructure.csproj", "src/Auth.Infrastructure/"]
+COPY ["auth-api/src/Auth.API/Auth.API.csproj", "auth-api/src/Auth.API/"]
+COPY ["auth-api/src/Auth.Application/Auth.Application.csproj", "auth-api/src/Auth.Application/"]
+COPY ["auth-api/src/Auth.Domain/Auth.Domain.csproj", "auth-api/src/Auth.Domain/"]
+COPY ["auth-api/src/Auth.Infrastructure/Auth.Infrastructure.csproj", "auth-api/src/Auth.Infrastructure/"]
 
 # Restaurar dependências
-RUN dotnet restore "src/Auth.API/Auth.API.csproj"
+RUN dotnet restore "auth-api/src/Auth.API/Auth.API.csproj"
 
 # Copiar código fonte
 COPY . .
 
 # Build da aplicação
-WORKDIR "/src/src/Auth.API"
+WORKDIR "/src/auth-api/src/Auth.API"
 RUN dotnet build "Auth.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
