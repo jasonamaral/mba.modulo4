@@ -107,3 +107,5 @@ app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", DateTime = Date
     .WithOpenApi();
 
 app.Run();
+
+
