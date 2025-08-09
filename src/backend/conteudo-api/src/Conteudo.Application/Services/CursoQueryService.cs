@@ -7,7 +7,7 @@ using Mapster;
 
 namespace Conteudo.Application.Services;
 
-public class CursoAppService(ICursoRepository cursoRepository) : ICursoAppService
+public class CursoQueryService(ICursoRepository cursoRepository) : ICursoQuery
 {
     public async Task<PagedResult<CursoDto>> ObterTodosAsync(CursoFilter filter)
     {

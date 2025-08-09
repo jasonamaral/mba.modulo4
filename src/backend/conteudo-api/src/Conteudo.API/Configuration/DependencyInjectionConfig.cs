@@ -2,6 +2,7 @@
 using Conteudo.Application.Commands.AtualizarCurso;
 using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.Commands.CadastrarCurso;
+using Conteudo.Application.Commands.ExcluirCurso;
 using Conteudo.Application.Interfaces.Services;
 using Conteudo.Application.Services;
 using Conteudo.Domain.Interfaces.Repositories;
@@ -15,6 +16,9 @@ using MediatR;
 
 namespace Conteudo.API.Configuration
 {
+    /// <summary>
+    /// Configura injeção de dependências para a API de Conteúdo
+    /// </summary>
     public static class DependencyInjectionConfig
     {
         public static void RegisterServices(this IServiceCollection services)
@@ -28,9 +32,10 @@ namespace Conteudo.API.Configuration
             services.AddScoped<IRequestHandler<CadastrarCategoriaCommand, CommandResult>, CadastrarCategoriaCommandHandler>();
             services.AddScoped<IRequestHandler<AtualizarCursoCommand, CommandResult>, AtualizarCursoCommandHandler>();
             services.AddScoped<IRequestHandler<AtualizarCategoriaCommand, CommandResult>, AtualizarCategoriaCommandHandler>();
+            services.AddScoped<IRequestHandler<ExcluirCursoCommand, CommandResult>, ExcluirCursoCommandHandler>();
 
             // Services
-            services.AddScoped<ICursoAppService, CursoAppService>();
+            services.AddScoped<ICursoQuery, CursoQueryService>();
             services.AddScoped<ICategoriaAppService, CategoriaAppService>();
 
             // Data

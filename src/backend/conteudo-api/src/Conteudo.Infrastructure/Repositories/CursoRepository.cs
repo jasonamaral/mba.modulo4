@@ -72,21 +72,29 @@ namespace Conteudo.Infrastructure.Repositories
 
         public async Task<IEnumerable<Curso>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
         {
-            return await _curso
+            var query = _curso
                 .Where(c => c.CategoriaId == categoriaId)
-                .AsNoTracking()
-                .Include(c => includeAulas ? c.Aulas : null)
-                .ToListAsync();
+                .AsNoTracking();
+
+            if (includeAulas)
+                query = query.Include(c => c.Aulas);
+
+            return await query.ToListAsync();
         }
+
 
         public async Task<IEnumerable<Curso>> ObterAtivosAsync(bool includeAulas = false)
         {
-            return await _curso
+            var query = _curso
                 .Where(c => c.Ativo)
-                .AsNoTracking()
-                .Include(c => includeAulas ? c.Aulas : null)
-                .ToListAsync();
+                .AsNoTracking();
+
+            if (includeAulas)
+                query = query.Include(c => c.Aulas);
+
+            return await query.ToListAsync();
         }
+
 
         public Task<IEnumerable<Curso>> ObterPorPesquisaAsync(string searchTerm, bool includeAulas = false)
         {
