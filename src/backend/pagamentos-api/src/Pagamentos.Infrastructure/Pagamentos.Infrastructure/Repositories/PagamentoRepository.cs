@@ -1,102 +1,46 @@
-using Microsoft.EntityFrameworkCore;
-using Pagamentos.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Pagamentos.Core.Data;
 using Pagamentos.Domain.Entities;
-using Pagamentos.Infrastructure.Data;
+using Pagamentos.Domain.Interfaces;
+using Pagamentos.Infrastructure.Context;
 
 namespace Pagamentos.Infrastructure.Repositories
 {
     public class PagamentoRepository : IPagamentoRepository
     {
-        private readonly PagamentosDbContext _context;
+        private readonly PagamentoContext _context;
 
-        public PagamentoRepository(PagamentosDbContext context)
+        public PagamentoRepository(PagamentoContext context)
         {
             _context = context;
         }
 
-        public async Task<Pagamento> GetByIdAsync(Guid id)
+        public IUnitOfWork UnitOfWork => _context;
+
+
+        public void Adicionar(Pagamento pagamento)
         {
-            return await _context.Pagamentos.FirstOrDefaultAsync(p => p.Id == id);
+            _context.Pagamentos.Add(pagamento);
         }
 
-        public async Task<Pagamento> GetByMatriculaIdAsync(Guid matriculaId)
+        public void AdicionarTransacao(Transacao transacao)
         {
-            return await _context.Pagamentos.FirstOrDefaultAsync(p => p.MatriculaId == matriculaId);
+            _context.Transacoes.Add(transacao);
         }
 
-        public async Task<Pagamento> GetByTransacaoIdAsync(string transacaoId)
+        public void Dispose()
         {
-            return await _context.Pagamentos.FirstOrDefaultAsync(p => p.TransacaoId == transacaoId);
+            _context.Dispose();
         }
 
-        public async Task<IEnumerable<Pagamento>> GetByAlunoIdAsync(Guid alunoId)
+        public async Task<Pagamento> ObterPorId(Guid id)
         {
-            return await _context.Pagamentos
-                .Where(p => p.AlunoId == alunoId)
-                .OrderByDescending(p => p.CriadoEm)
-                .ToListAsync();
+            return await _context.Pagamentos.Include(u => u.Transacao).AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<Pagamento>> GetByStatusAsync(string status)
+        public async Task<IEnumerable<Pagamento>> ObterTodos()
         {
-            return await _context.Pagamentos
-                .Where(p => p.Status == status)
-                .OrderByDescending(p => p.CriadoEm)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Pagamento>> GetPagamentosPendentesAsync()
-        {
-            return await _context.Pagamentos
-                .Where(p => p.Status == "Pendente" || p.Status == "Processando")
-                .OrderBy(p => p.CriadoEm)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Pagamento>> GetPagamentosPorPeriodoAsync(DateTime dataInicio, DateTime dataFim)
-        {
-            return await _context.Pagamentos
-                .Where(p => p.CriadoEm >= dataInicio && p.CriadoEm <= dataFim)
-                .OrderByDescending(p => p.CriadoEm)
-                .ToListAsync();
-        }
-
-        public async Task<Pagamento> AddAsync(Pagamento pagamento)
-        {
-            await _context.Pagamentos.AddAsync(pagamento);
-            await _context.SaveChangesAsync();
-            return pagamento;
-        }
-
-        public async Task UpdateAsync(Pagamento pagamento)
-        {
-            _context.Pagamentos.Update(pagamento);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            var pagamento = await GetByIdAsync(id);
-            if (pagamento != null)
-            {
-                _context.Pagamentos.Remove(pagamento);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<int> CountByAlunoAsync(Guid alunoId)
-        {
-            return await _context.Pagamentos.CountAsync(p => p.AlunoId == alunoId);
-        }
-
-        public async Task<bool> ExistsAsync(Guid id)
-        {
-            return await _context.Pagamentos.AnyAsync(p => p.Id == id);
-        }
-
-        public async Task<bool> ExistsByMatriculaIdAsync(Guid matriculaId)
-        {
-            return await _context.Pagamentos.AnyAsync(p => p.MatriculaId == matriculaId);
+            return await _context.Pagamentos.Include(u => u.Transacao).AsNoTracking().ToListAsync();
         }
     }
-} 
+}

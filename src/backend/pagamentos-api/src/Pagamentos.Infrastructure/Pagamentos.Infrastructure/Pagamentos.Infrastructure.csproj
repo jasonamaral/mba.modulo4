@@ -1,16 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Pagamentos.Domain\Pagamentos.Domain\Pagamentos.Domain.csproj" />
-    <ProjectReference Include="..\..\Pagamentos.Application\Pagamentos.Application\Pagamentos.Application.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Pagamentos.Core\Pagamentos.Core.csproj" />
+    <ProjectReference Include="..\..\Pagamentos.Domain\Pagamentos.Domain\Pagamentos.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

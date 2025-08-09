@@ -3,7 +3,7 @@
     public class PagamentoCursoEvent : IntegrationEvent
     {
         public Guid PedidoId { get; private set; }
-        public Guid UsuarioId { get; private set; }
+        public Guid AlunoId { get; private set; }
         public decimal Total { get; private set; }
         public string NomeCartao { get; private set; }
         public string NumeroCartao { get; private set; }
@@ -20,7 +20,7 @@
         {
             AggregateID = pedidoId;
             PedidoId = pedidoId;
-            UsuarioId = clienteId;
+            AlunoId = clienteId;
             Total = total;
             NomeCartao = nomeCartao;
             NumeroCartao = numeroCartao;
