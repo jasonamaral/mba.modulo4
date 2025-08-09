@@ -21,15 +21,11 @@ public class ConteudoService : BaseApiService, IConteudoService
         _apiSettings = apiSettings.Value;
     }
 
-    public async Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, string token, bool includeAulas = false)
+    public async Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, bool includeAulas = false)
     {
-        if (!ValidateToken(token, nameof(ObterCursoPorId)))
-            return new ResponseResult<CursoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Token inválido" } } };
-
         var result = await ExecuteWithErrorHandling(async () =>
         {
             _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            ConfigureAuthToken(token);
             
             var url = includeAulas ? $"api/cursos/{cursoId}?includeAulas=true" : $"api/cursos/{cursoId}";
             return await _apiClient.GetAsync<ResponseResult<CursoDto>>(url);
@@ -38,15 +34,11 @@ public class ConteudoService : BaseApiService, IConteudoService
         return result ?? new ResponseResult<CursoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
     }
 
-    public async Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursos(string token, CursoFilter filter)
+    public async Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursos(CursoFilter filter)
     {
-        if (!ValidateToken(token, nameof(ObterTodosCursos)))
-            return new ResponseResult<PagedResult<CursoDto>> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Token inválido" } } };
-
         var result = await ExecuteWithErrorHandling(async () =>
         {
             _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            ConfigureAuthToken(token);
             
             return await _apiClient.GetAsync<ResponseResult<PagedResult<CursoDto>>>("api/cursos");
         }, nameof(ObterTodosCursos));
@@ -54,15 +46,11 @@ public class ConteudoService : BaseApiService, IConteudoService
         return result ?? new ResponseResult<PagedResult<CursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
     }
 
-    public async Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso, string token)
+    public async Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso)
     {
-        if (!ValidateToken(token, nameof(AdicionarCurso)))
-            return new ResponseResult<Guid> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Token inválido" } } };
-
         var result = await ExecuteWithErrorHandling(async () =>
         {
             _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            ConfigureAuthToken(token);
             
             var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<Guid>>("api/cursos", curso);
             
@@ -99,15 +87,11 @@ public class ConteudoService : BaseApiService, IConteudoService
         return result ?? new ResponseResult<Guid> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
     }
 
-    public async Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso, string token)
+    public async Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso)
     {
-        if (!ValidateToken(token, nameof(AtualizarCurso)))
-            return new ResponseResult<CursoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Token inválido" } } };
-
         var result = await ExecuteWithErrorHandling(async () =>
         {
             _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            ConfigureAuthToken(token);
             
             var apiResponse = await _apiClient.PutAsyncWithDetails<AtualizarCursoRequest, ResponseResult<CursoDto>>($"api/cursos/{id}", curso);
             
@@ -164,7 +148,7 @@ public class ConteudoService : BaseApiService, IConteudoService
         throw new NotImplementedException();
     }
 
-    public Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(string token, Guid categoriaId, bool includeAulas = false)
+    public Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
     {
         throw new NotImplementedException();
     }

@@ -1,0 +1,32 @@
+<ng-container *ngIf="curso; else carregando">
+  <section class="page-header">
+    <h2>{{curso.nome}}</h2>
+    <p class="subtitle">{{curso.descricao}}</p>
+    <hr />
+  </section>
+
+  <section>
+    <h3>Aulas</h3>
+    <mat-list *ngIf="curso?.aulas?.length; else vazio">
+      <mat-list-item *ngFor="let a of curso?.aulas">
+        <div class="row w-100">
+          <div class="col-8">
+            {{a.ordem}}. {{a.nome}}
+          </div>
+          <div class="col-4 text-end">
+            <button mat-stroked-button (click)="marcarProgresso(a.id)">Marcar 10%</button>
+          </div>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </section>
+
+  <div class="mt-3">
+    <button mat-flat-button color="primary" (click)="matricular()">Matricular-se</button>
+  </div>
+</ng-container>
+
+<ng-template #carregando><p>Carregando curso...</p></ng-template>
+<ng-template #vazio><p>Sem aulas.</p></ng-template>
+
+

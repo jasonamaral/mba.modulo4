@@ -8,10 +8,25 @@ public static class MessageBusExtensions
 {
     public static void AddMessageBusConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        var msg = configuration?.GetSection("MessageQueueConnection")?["MessageBus"];
-        services.AddMessageBus(msg!);
+        // Em Docker, preferir variáveis de ambiente RabbitMQ:* (host rabbitmq).
+        string? rabbitHost = configuration["RabbitMQ:Host"];
+        string connection = string.Empty;
 
-        services.AddMessageBus(configuration?.GetMessageQueueConnection("MessageBus")!)
+        if (!string.IsNullOrWhiteSpace(rabbitHost))
+        {
+            string rabbitPort = configuration["RabbitMQ:Port"] ?? "5672";
+            string rabbitUser = configuration["RabbitMQ:Username"] ?? "guest";
+            string rabbitPass = configuration["RabbitMQ:Password"] ?? "guest";
+            connection = $"host={rabbitHost}:{rabbitPort};username={rabbitUser};password={rabbitPass};publisherConfirms=true;timeout=30";
+        }
+        else
+        {
+            connection = configuration?.GetSection("MessageQueueConnection")?["MessageBus"]
+                         ?? configuration.GetMessageQueueConnection("MessageBus");
+        }
+
+        services
+            .AddMessageBus(connection)
             .AddHostedService<RegistroUsuarioIntegrationHandler>();
     }
 }

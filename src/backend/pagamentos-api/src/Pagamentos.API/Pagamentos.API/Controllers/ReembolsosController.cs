@@ -33,6 +33,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(500)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> SolicitarReembolso([FromBody] SolicitarReembolsoCommand command)
         {
             try
@@ -59,6 +60,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(typeof(ReembolsoDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> GetReembolso(Guid id)
         {
             try
@@ -88,6 +90,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
         [ProducesResponseType(403)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> AprovarReembolso(Guid id)
         {
             try
@@ -118,6 +121,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
         [ProducesResponseType(403)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> RejeitarReembolso(Guid id, [FromBody] string motivo)
         {
             try
@@ -143,6 +147,7 @@ namespace Pagamentos.API.Controllers
         [HttpGet("pagamento/{pagamentoId:guid}")]
         [ProducesResponseType(typeof(IEnumerable<ReembolsoDto>), 200)]
         [ProducesResponseType(401)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> GetReembolsosByPagamento(Guid pagamentoId)
         {
             try
@@ -169,6 +174,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<ReembolsoDto>), 200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(403)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> GetReembolsosPendentes()
         {
             try

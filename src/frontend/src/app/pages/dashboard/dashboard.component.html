@@ -1,12 +1,23 @@
-<div class="row">
-  <div class="col-lg-8">
-    Alguma coisa
+<section class="page-header">
+  <h2>Dashboard do Aluno</h2>
+  <p class="subtitle">Resumo das suas atividades recentes.</p>
+  <hr />
+</section>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h4>Progresso Geral</h4>
+      <div class="display-6">{{progressoGeral?.percentualConcluidoGeral || 0}}%</div>
+      <small>Cursos matriculados: {{progressoGeral?.cursosMatriculados || 0}}</small>
+    </div>
   </div>
-  <div class="col-lg-4">
-    <div class="row">
-      <div class="col-12">
-        Alguma coisa 2
-      </div>
+  <div class="col-md-8">
+    <div class="card p-3">
+      <h4>Atalhos</h4>
+      <a class="btn btn-outline-primary me-2" routerLink="/cursos">Ver cursos</a>
+      <a class="btn btn-outline-accent me-2" routerLink="/matriculas">Minhas matrículas</a>
+      <a class="btn btn-outline-success" routerLink="/certificados">Certificados</a>
     </div>
   </div>
 </div>

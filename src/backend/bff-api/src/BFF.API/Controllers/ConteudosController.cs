@@ -45,6 +45,7 @@ namespace BFF.API.Controllers
         [HttpGet("{cursoId}")]
         [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ObterCurso([FromRoute] Guid cursoId, [FromQuery] bool includeAulas = false)
         {
             if (cursoId == Guid.Empty)
@@ -59,8 +60,7 @@ namespace BFF.API.Controllers
                 return RespostaPadraoApi(System.Net.HttpStatusCode.OK, cachedCurso, "Curso obtido do cache com sucesso");
             }
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            var resultado = await _conteudoService.ObterCursoPorId(cursoId, token);
+            var resultado = await _conteudoService.ObterCursoPorId(cursoId);
 
             if (resultado?.Status == (int)HttpStatusCode.OK)
             {
@@ -78,6 +78,7 @@ namespace BFF.API.Controllers
         [HttpGet("cursos")]
         [ProducesResponseType(typeof(ResponseResult<PagedResult<CursoDto>>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ObterTodosCursos([FromQuery] CursoFilter filter)
         {
             var cacheKey = $"TodosCursos_Filtro:{JsonSerializer.Serialize(filter)}";
@@ -86,9 +87,7 @@ namespace BFF.API.Controllers
             if (cachedCursos != null)
                 return Ok(cachedCursos);
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
-            var resultado = await _conteudoService.ObterTodosCursos(token, filter);
+            var resultado = await _conteudoService.ObterTodosCursos(filter);
 
             if (resultado?.Status == (int)HttpStatusCode.OK)
             {
@@ -107,12 +106,12 @@ namespace BFF.API.Controllers
         [HttpGet("categoria/{categoriaId}")]
         [ProducesResponseType(typeof(ResponseResult<IEnumerable<CursoDto>>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
         {
             try
             {   
-                var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-                var resultado = await _conteudoService.ObterPorCategoriaIdAsync(token, categoriaId, includeAulas);
+                var resultado = await _conteudoService.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
 
                 if (resultado?.Status == (int)HttpStatusCode.OK)
                 {
@@ -130,15 +129,13 @@ namespace BFF.API.Controllers
         /// <summary>
         /// Cadastrar um novo curso
         /// </summary>
-        [Authorize(Roles = "Administrador")]
         [HttpPost("cursos")]
         [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> AdicionarCurso([FromBody] CursoCriarRequest curso)
         {
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
-            var response = await _conteudoService.AdicionarCurso(curso, token);
+            var response = await _conteudoService.AdicionarCurso(curso);
 
             if (response?.Status == (int)HttpStatusCode.BadRequest)
                 return BadRequest(response);
@@ -149,11 +146,11 @@ namespace BFF.API.Controllers
         /// <summary>
         /// Atualizar um curso existente
         /// </summary>
-        [Authorize(Roles = "Administrador")]
         [HttpPut("cursos/{cursoId}")]
         [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> AtualizarCurso(Guid cursoId, [FromBody] AtualizarCursoRequest curso)
         {
             if (cursoId == Guid.Empty)
@@ -166,9 +163,7 @@ namespace BFF.API.Controllers
                     }
                 });
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
-            var response = await _conteudoService.AtualizarCurso(cursoId, curso, token);
+            var response = await _conteudoService.AtualizarCurso(cursoId, curso);
 
             if (response?.Status == (int)HttpStatusCode.NotFound)
                 return NotFound(response);

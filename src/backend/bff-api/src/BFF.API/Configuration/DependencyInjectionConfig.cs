@@ -29,6 +29,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<ICacheService, Infrastructure.Services.CacheService>();
         services.AddScoped<IApiClientService, Infrastructure.Services.ApiClientService>();
         services.AddScoped<IDashboardService, Infrastructure.Services.DashboardService>();
+        services.AddScoped<IAlunoStoreService, Infrastructure.Services.AlunoStoreService>();
 
         services.RegisterNotification();
     }

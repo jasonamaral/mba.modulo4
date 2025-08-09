@@ -1,0 +1,29 @@
+<section class="page-header">
+  <h2>Cursos Disponíveis</h2>
+  <p class="subtitle">Explore os cursos e matricule-se para iniciar seus estudos.</p>
+  <hr />
+</section>
+
+<div class="course-grid" *ngIf="cursos?.length; else vazio">
+  <mat-card *ngFor="let c of cursos" class="course-card">
+    <mat-card-header>
+      <mat-card-title>{{c.nome}}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{c.descricao}}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <a mat-stroked-button color="primary" [routerLink]="['/cursos', c.id]">Ver detalhes</a>
+      <button mat-flat-button color="accent" (click)="matricular(c)">Matricular-se</button>
+    </mat-card-actions>
+  </mat-card>
+  
+</div>
+
+<ng-template #vazio>
+  <div class="empty-state">
+    <p>Nenhum curso encontrado.</p>
+  </div>
+</ng-template>
+
+
