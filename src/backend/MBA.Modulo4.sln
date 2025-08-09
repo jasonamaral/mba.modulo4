@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageBus", "building-bloc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pagamentos.Core", "Pagamentos.Core\Pagamentos.Core.csproj", "{2AEBB63E-FBCC-4B6B-96B4-0B7091320DCE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pagamento.AntiCorruption", "Pagamento.AntiCorruption\Pagamento.AntiCorruption.csproj", "{AFAA27FC-9EF0-4183-BE46-268199DC9020}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +169,10 @@ Global
 		{2AEBB63E-FBCC-4B6B-96B4-0B7091320DCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AEBB63E-FBCC-4B6B-96B4-0B7091320DCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AEBB63E-FBCC-4B6B-96B4-0B7091320DCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFAA27FC-9EF0-4183-BE46-268199DC9020}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFAA27FC-9EF0-4183-BE46-268199DC9020}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFAA27FC-9EF0-4183-BE46-268199DC9020}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFAA27FC-9EF0-4183-BE46-268199DC9020}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -197,6 +203,7 @@ Global
 		{012A4258-38F6-AD22-A159-4A4373F319AE} = {904054D2-FFF3-489B-A945-2DF46FB0FB32}
 		{471AA123-332F-47EC-B3F5-7B34022DD702} = {8C3CAE77-A3D6-4E68-A6BE-36137B5D8935}
 		{2AEBB63E-FBCC-4B6B-96B4-0B7091320DCE} = {11EB907F-A04A-4EC3-A82C-1D98ACD3CD41}
+		{AFAA27FC-9EF0-4183-BE46-268199DC9020} = {11EB907F-A04A-4EC3-A82C-1D98ACD3CD41}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBEC1BAF-9C8B-4F5F-9FEC-20641AD3871D}
