@@ -51,13 +51,13 @@ public class MatriculaCurso : Common.Entidade
 
     #region Métodos
     internal short QuantidadeTotalCargaHoraria() => (short)_historicoAprendizado.Sum(x => x.CargaHoraria);
-    //public int QuantidadeAulasFinalizadas => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
-    //public int QuantidadeAulasEmAndamento => _historicoAprendizado.Count(h => !h.DataTermino.HasValue);
+    public int QuantidadeAulasFinalizadas() => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
+    public int QuantidadeAulasEmAndamento() => _historicoAprendizado.Count(h => !h.DataTermino.HasValue);
     public bool MatriculaCursoConcluido() => DataConclusao.HasValue;
     internal bool MatriculaCursoDisponivel() => !DataConclusao.HasValue && EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado;
     internal bool PodeConcluirCurso() => EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado && _historicoAprendizado.Count(h => !h.DataTermino.HasValue) == 0;
 
-    //public bool PagamentoPodeSerRealizado => EstadoMatricula == EstadoMatriculaCursoEnum.PendentePagamento || EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado;
+    public bool PagamentoPodeSerRealizado() => EstadoMatricula == EstadoMatriculaCursoEnum.PendentePagamento || EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado;
 
     //internal HistoricoAprendizado ObterHistoricoAulaPeloId(Guid aulaId)
     //{

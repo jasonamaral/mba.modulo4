@@ -1,6 +1,4 @@
-﻿//using Plataforma.Educacao.Core.SharedDto.Aluno;
-
-namespace Alunos.Application.DTOs;
+﻿namespace Alunos.Application.DTOs;
 public class EvolucaoMatriculaCursoDto
 {
     public Guid Id { get; set; }
@@ -10,7 +8,7 @@ public class EvolucaoMatriculaCursoDto
     public DateTime DataMatricula { get; set; }
     public DateTime? DataConclusao { get; set; }
     public string EstadoMatricula { get; set; }
-    //public CertificadoDto Certificado { get; set; }
+    public CertificadoDto Certificado { get; set; }
     public int QuantidadeAulasNoCurso { get; set; }
     public int QuantidadeAulasRealizadas { get; set; }
     public int QuantidadeAulasEmAndamento { get; set; }

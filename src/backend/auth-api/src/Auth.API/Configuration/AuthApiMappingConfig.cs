@@ -8,8 +8,8 @@ public class AuthApiMappingConfig : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<RegistroRequest, UsuarioRegistradoIntegrationEvent>()
-            .ConstructUsing(src => new UsuarioRegistradoIntegrationEvent(
+        config.NewConfig<RegistroRequest, AlunoRegistradoIntegrationEvent>()
+            .ConstructUsing(src => new AlunoRegistradoIntegrationEvent(
                 Guid.Empty, // Será definido manualmente
                 src.Nome,
                 src.Email,
@@ -20,9 +20,9 @@ public class AuthApiMappingConfig : IRegister
                 src.Cidade,
                 src.Estado,
                 src.CEP,
-                src.Foto,
-                src.EhAdministrador,
-                DateTime.UtcNow
+                src.Foto
+                //src.EhAdministrador,
+                //DateTime.UtcNow
             ));
     }
 } 

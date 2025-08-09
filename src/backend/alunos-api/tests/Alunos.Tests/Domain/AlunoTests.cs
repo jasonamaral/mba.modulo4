@@ -9,10 +9,15 @@ public class AlunoTests
     private static readonly Guid _codigoUsuario = Guid.NewGuid();
     private const string _nomeValido = "Jairo Azevedo";
     private const string _emailValido = "jsouza.lp@gmail.com";
-    private const string _cpfValido = "12345678909"; // CPF válido fictício
+    private const string _cpfValido = "12345678909"; 
     private static readonly DateTime _dataNascimentoValida = new(1973, 06, 25);
+    private const string _generoValido = "Masculino"; 
+    private const string _cidadeValido = "Rio de Janeiro";
+    private const string _estadoValido = "RJ";
+    private const string _cepValido = "21210000"; 
+    private const string _fotoValido = "var/mnt/fotos/jairo.jpeg";
 
-    private Aluno CriarAlunoValido() => new(_codigoUsuario, _nomeValido, _emailValido, _cpfValido, _dataNascimentoValida);
+    private Aluno CriarAlunoValido() => new(_codigoUsuario, _nomeValido, _emailValido, _cpfValido, _dataNascimentoValida, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
     #endregion
 
     #region Construtores
@@ -27,6 +32,12 @@ public class AlunoTests
         aluno.Email.Should().Be(_emailValido);
         aluno.Cpf.Should().Be(_cpfValido);
         aluno.DataNascimento.Should().Be(_dataNascimentoValida);
+        aluno.Genero.Should().Be(_generoValido);
+        aluno.Cidade.Should().Be(_cidadeValido);
+        aluno.Estado.Should().Be(_estadoValido);
+        aluno.Cep.Should().Be(_cepValido);
+        aluno.Foto.Should().Be(_fotoValido);
+
     }
 
     [Theory]
@@ -34,7 +45,7 @@ public class AlunoTests
     [InlineData("Jo", "*Nome deve ter entre 3 e 50 caracteres*")]
     public void Nao_deve_criar_aluno_com_nome_invalido(string nome, string msgErro)
     {
-        Action act = () => new Aluno(_codigoUsuario, nome, _emailValido, _cpfValido, _dataNascimentoValida);
+        Action act = () => new Aluno(_codigoUsuario, nome, _emailValido, _cpfValido, _dataNascimentoValida, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
         act.Should().Throw<DomainException>().WithMessage(msgErro);
     }
 
@@ -44,7 +55,7 @@ public class AlunoTests
     [InlineData("emailinvalido", "*Email informado é inválido*")]
     public void Nao_deve_criar_aluno_com_email_invalido(string email, string msgErro)
     {
-        Action act = () => new Aluno(_codigoUsuario, _nomeValido, email, _cpfValido, _dataNascimentoValida);
+        Action act = () => new Aluno(_codigoUsuario, _nomeValido, email, _cpfValido, _dataNascimentoValida, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
         act.Should().Throw<DomainException>().WithMessage(msgErro);
     }
 
@@ -52,7 +63,7 @@ public class AlunoTests
     public void Nao_deve_criar_aluno_com_data_nascimento_futura()
     {
         var dataFutura = DateTime.UtcNow.AddDays(1);
-        Action act = () => new Aluno(_codigoUsuario, _nomeValido, _emailValido, _cpfValido, dataFutura);
+        Action act = () => new Aluno(_codigoUsuario, _nomeValido, _emailValido, _cpfValido, dataFutura, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
         act.Should().Throw<DomainException>().WithMessage("*Data de nascimento não pode ser superior à data atual*");
     }
     #endregion
@@ -79,7 +90,7 @@ public class AlunoTests
 
         aluno.Nome.Should().Be("Novo Nome");
         aluno.Email.Should().Be("novo@email.com");
-        aluno.Contato.Should().Be("12345");
+        aluno.Telefone.Should().Be("12345");
     }
 
     [Fact]

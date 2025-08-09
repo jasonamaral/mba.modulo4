@@ -1,4 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Alunos.Application.Interfaces;
+using Core.Mediator;
+using Core.Messages;
+using Core.Notification;
+using Core.Services.Controllers;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alunos.API.Controllers;
@@ -6,17 +12,12 @@ namespace Alunos.API.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public partial class AlunoController()
-    //ICursoAppService cursoAppService,
-    //IAlunoQueryService alunoQueryService,
-    //IMapper mapper,
-    //IAppIdentityUser appIdentityUser,
-    //INotificationHandler<DomainNotificacaoRaiz> notifications,
-    //IMediatorHandler mediatorHandler) : MainController(appIdentityUser, notifications, mediatorHandler)
+public partial class AlunoController(IMediatorHandler mediator, 
+    IAlunoQueryService alunoQueryService,
+    INotificationHandler<DomainNotificacaoRaiz> notifications,
+    INotificador notificador) : MainController(mediator, notifications, notificador)
 {
-    //private readonly ICursoAppService _cursoAppService = cursoAppService;
-    //private readonly IAlunoQueryService _alunoQueryService = alunoQueryService;
-    //private readonly IMapper _mapper = mapper;
+    private readonly IAlunoQueryService _alunoQueryService = alunoQueryService;
 
     //[Authorize(Policy = "ApenasAluno")]
     //[HttpPost("{alunoId}/matricular-aluno")]
