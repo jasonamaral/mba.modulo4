@@ -15,15 +15,15 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
     public async Task<CommandResult> Handle(SolicitarCertificadoCommand request, CancellationToken cancellationToken)
     {
         _raizAgregacao = request.RaizAgregacao;
-        if (!ValidarRequisicao(request)) { return request.CommandResult; }
-        if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.CommandResult; }
+        if (!ValidarRequisicao(request)) { return request.Resultado; }
+        if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
 
         aluno.RequisitarCertificadoConclusao(request.MatriculaCursoId, request.NotaFinal, request.PathCertificado, request.NomeInstrutor);
         var certificado = aluno.ObterMatriculaCursoPeloId(request.MatriculaCursoId).Certificado;
 
         await _alunoRepository.AdicionarCertificadoMatriculaCursoAsync(certificado);
         await _alunoRepository.UnitOfWork.Commit();
-        return request.CommandResult;
+        return request.Resultado;
     }
 
     private bool ValidarRequisicao(SolicitarCertificadoCommand request)

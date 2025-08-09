@@ -8,9 +8,10 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.AtualizarCurso
 {
-    public class AtualizarCursoCommandHandler(IMediatorHandler mediatorHandler,
-        ICursoRepository cursoRepository,
-        ICategoriaRepository categoriaRepository) : IRequestHandler<AtualizarCursoCommand, CommandResult>
+    public class AtualizarCursoCommandHandler(IMediatorHandler mediatorHandler
+                                            , ICursoRepository cursoRepository
+                                            , ICategoriaRepository categoriaRepository)
+        : IRequestHandler<AtualizarCursoCommand, CommandResult>
     {
         private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
         private readonly ICursoRepository _cursoRepository = cursoRepository;
@@ -22,7 +23,7 @@ namespace Conteudo.Application.Commands.AtualizarCurso
             _raizAgregacao = request.RaizAgregacao;
             var curso = await _cursoRepository.ObterPorIdAsync(request.Id, noTracking: false);
 
-            if (!await ValidarRequisicao(request, curso)) { return request.CommandResult; }
+            if (!await ValidarRequisicao(request, curso)) { return request.Resultado; }
 
             curso.AtualizarInformacoes(request.Nome,
                             request.Valor,
@@ -46,7 +47,7 @@ namespace Conteudo.Application.Commands.AtualizarCurso
 
             await _cursoRepository.Atualizar(curso);
             await _cursoRepository.UnitOfWork.Commit();
-            return request.CommandResult;
+            return request.Resultado;
         }
 
         private async Task<bool> ValidarRequisicao(AtualizarCursoCommand request, Curso curso)
@@ -57,20 +58,20 @@ namespace Conteudo.Application.Commands.AtualizarCurso
             {
                 foreach (var erro in request.Erros)
                 {
-                    _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), erro)).GetAwaiter().GetResult();
+                   await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), erro));
                 }
                 return false;
             }
 
             if (curso == null)
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Curso não encontrado.")).GetAwaiter().GetResult();
+                await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Curso não encontrado."));
                 return false;
             }
 
             if (await _cursoRepository.ExistePorNomeAsync(curso.Nome, curso.Id))
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Já existe um curso com este nome.")).GetAwaiter().GetResult();
+                await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Já existe um curso com este nome."));
                 return false;
             }
 
@@ -79,7 +80,7 @@ namespace Conteudo.Application.Commands.AtualizarCurso
                 var categoria = await _categoriaRepository.ObterPorIdAsync((Guid)curso.CategoriaId);
                 if (categoria == null)
                 {
-                    _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Categoria não encontrada")).GetAwaiter().GetResult();
+                    await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Categoria não encontrada"));
                     return false;
                 }
             }

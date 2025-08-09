@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Mapster;
+using Core.Notification;
 
 namespace Conteudo.API.Controllers;
 
@@ -21,7 +22,8 @@ namespace Conteudo.API.Controllers;
 [Produces("application/json")]
 public class CursosController(ICursoAppService cursoAppService
                            , IMediatorHandler mediator
-                           , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications)
+                           , INotificador notificador
+                           , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
 {
     private readonly ICursoAppService _cursoAppService = cursoAppService;
     private readonly IMediatorHandler _mediator = mediator;
@@ -34,7 +36,6 @@ public class CursosController(ICursoAppService cursoAppService
     /// <returns>Dados do curso</returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     public async Task<IActionResult> ObterCurso([FromRoute] Guid id, [FromQuery] bool includeAulas = false)
     {
@@ -42,7 +43,10 @@ public class CursosController(ICursoAppService cursoAppService
         {
             var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas);
             if (curso == null)
-                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
+            {
+                _notificador.AdicionarErro("Curso não encontrado.");
+                return RespostaPadraoApi<string>();
+            }
 
             return RespostaPadraoApi(data: curso);
         }
@@ -188,7 +192,7 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpGet("{id}/aulas")]
     [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-    public async Task<IActionResult> GetAulasDoCurso([FromRoute] Guid id)
+    public async Task<IActionResult> ObterAulasDoCurso([FromRoute] Guid id)
     {
         try
         {
@@ -196,7 +200,7 @@ public class CursosController(ICursoAppService cursoAppService
             if (curso == null)
                 return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
 
-            return Ok(curso.Aulas);
+            return RespostaPadraoApi(data: curso.Aulas);
         }
         catch (Exception ex)
         {
@@ -212,7 +216,7 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpGet("{id}/conteudo-programatico")]
     [ProducesResponseType(typeof(ResponseResult<ConteudoProgramaticoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-    public async Task<IActionResult> GetConteudoProgramatico([FromRoute] Guid id)
+    public async Task<IActionResult> ObterConteudoProgramatico([FromRoute] Guid id)
     {
         try
         {
@@ -233,34 +237,7 @@ public class CursosController(ICursoAppService cursoAppService
                 Bibliografia = curso.Bibliografia
             };
 
-            return Ok(conteudoProgramatico);
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
-    }
-
-    /// <summary>
-    /// Registra acesso ao curso para auditoria
-    /// </summary>
-    /// <param name="id">ID do curso</param>
-    /// <returns>Confirmação do registro</returns>
-    [HttpPost("{id}/acesso")]
-    [ProducesResponseType(typeof(ResponseResult<string>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-    public async Task<IActionResult> RegistrarAcesso([FromRoute] Guid id)
-    {
-        try
-        {
-            var curso = await _cursoAppService.ObterPorIdAsync(id);
-            if (curso == null)
-                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
-
-            // TODO: Implementar auditoria de acesso
-            // await _auditService.RegistrarAcessoCurso(id, User.Identity.Name);
-
-            return Ok(new ApiSuccess { Message = "Acesso registrado com sucesso" });
+            return RespostaPadraoApi(data: conteudoProgramatico);
         }
         catch (Exception ex)
         {
@@ -268,25 +245,3 @@ public class CursosController(ICursoAppService cursoAppService
         }
     }
 }
-
-#region Response DTOs
-
-public class CursoCreatedResponse
-{
-    public Guid Id { get; set; }
-}
-
-public class ConteudoProgramaticoDto
-{
-    public string Resumo { get; set; } = string.Empty;
-    public string Descricao { get; set; } = string.Empty;
-    public string Objetivos { get; set; } = string.Empty;
-    public string PreRequisitos { get; set; } = string.Empty;
-    public string PublicoAlvo { get; set; } = string.Empty;
-    public string Metodologia { get; set; } = string.Empty;
-    public string Recursos { get; set; } = string.Empty;
-    public string Avaliacao { get; set; } = string.Empty;
-    public string Bibliografia { get; set; } = string.Empty;
-}
-
-#endregion 
