@@ -106,38 +106,4 @@ public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
         _context?.Dispose();
         GC.SuppressFinalize(this);
     }
-
-    //public async Task<IEnumerable<Aluno>> GetAllAsync(bool includeMatriculas = false)
-    //{
-    //    var query = _context.Alunos.AsQueryable();
-    //    return await query.ToListAsync();
-    //}
-
-    //public async Task<IEnumerable<Aluno>> GetAlunosAtivosAsync(bool includeMatriculas = false)
-    //{
-    //    var query = _context.Alunos.Where(a => a.IsAtivo);
-    //    return await query.ToListAsync();
-    //}
-
-    //public async Task<IEnumerable<Aluno>> BuscarPorNomeAsync(string nome, bool includeMatriculas = false)
-    //{
-    //    var query = _context.Alunos.Where(a => a.Nome.Contains(nome));
-    //    return await query.ToListAsync();
-    //}
-
-    //public async Task<IEnumerable<Aluno>> GetAlunosMatriculadosNoCursoAsync(Guid cursoId)
-    //{
-    //    // Por enquanto retorna lista vazia, pois a relação com matrículas precisa ser configurada adequadamente
-    //    return await Task.FromResult(new List<Aluno>());
-    //}
-
-    //public async Task<int> GetCountAsync()
-    //{
-    //    return await _context.Alunos.CountAsync();
-    //}
-
-    //public async Task<int> GetCountAtivosAsync()
-    //{
-    //    return await _context.Alunos.CountAsync(a => a.IsAtivo);
-    //}
 }

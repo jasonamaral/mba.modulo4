@@ -58,13 +58,17 @@ public class AuthController(IMediatorHandler mediator
             var roleName = registroRequest.EhAdministrador ? "Administrador" : "Usuario";
             await _authService.UserManager.AddToRoleAsync(user, roleName);
 
-            var clienteResult = await RegistrarCliente(registroRequest);
-
-            if (!clienteResult.ValidationResult.IsValid)
+            if (!registroRequest.EhAdministrador)
             {
-                await _authService.UserManager.DeleteAsync(user);
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, clienteResult.ValidationResult);
+                var clienteResult = await RegistrarAluno(registroRequest);
+
+                if (!clienteResult.ValidationResult.IsValid)
+                {
+                    await _authService.UserManager.DeleteAsync(user);
+                    return RespostaPadraoApi(HttpStatusCode.BadRequest, clienteResult.ValidationResult);
+                }
             }
+
             return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(registroRequest.Email));
         }
 
@@ -132,34 +136,34 @@ public class AuthController(IMediatorHandler mediator
         return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(token.Username));
     }
 
-    private async Task<ResponseMessage> RegistrarCliente(RegistroRequest registroRequest)
+    private async Task<ResponseMessage> RegistrarAluno(RegistroRequest registroRequest)
     {
         var usuario = await _authService.UserManager.FindByEmailAsync(registroRequest.Email);
 
-        var usuarioRegistrado = new UsuarioRegistradoIntegrationEvent(
-             Guid.Parse(usuario!.Id),
-             registroRequest.Nome,
-             registroRequest.Email,
-             registroRequest.CPF,
-             registroRequest.DataNascimento,
-             registroRequest.Telefone,
-             registroRequest.Genero,
-             registroRequest.Cidade,
-             registroRequest.Estado,
-             registroRequest.CEP,
-             registroRequest.Foto,
-             registroRequest.EhAdministrador,
-             DateTime.Now
-         );
+            var usuarioRegistrado = new AlunoRegistradoIntegrationEvent(
+                 Guid.Parse(usuario!.Id),
+                 registroRequest.Nome,
+                 registroRequest.Email,
+                 registroRequest.CPF,
+                 registroRequest.DataNascimento,
+                 registroRequest.Telefone,
+                 registroRequest.Genero,
+                 registroRequest.Cidade,
+                 registroRequest.Estado,
+                 registroRequest.CEP,
+                 registroRequest.Foto
+                 //registroRequest.EhAdministrador,
+                 //DateTime.Now
+             );
 
-        try
-        {
-            return await _bus.RequestAsync<UsuarioRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
-        }
-        catch
-        {
-            await _authService.UserManager.DeleteAsync(usuario);
-            throw;
-        }
+            try
+            {
+                return await _bus.RequestAsync<AlunoRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
+            }
+            catch
+            {
+                await _authService.UserManager.DeleteAsync(usuario);
+                throw;
+            }
     }
 }

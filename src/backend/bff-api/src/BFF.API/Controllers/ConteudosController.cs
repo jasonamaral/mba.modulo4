@@ -1,5 +1,4 @@
 ﻿using BFF.API.Models.Request;
-using BFF.API.Services;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
 using Core.Communication;
@@ -12,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json;
 using MediatR;
+using BFF.API.Services.Conteudos;
 
 namespace BFF.API.Controllers
 {

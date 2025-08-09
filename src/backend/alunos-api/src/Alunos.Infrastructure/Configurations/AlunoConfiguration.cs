@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
-using Alunos.Domain.Entities;
+﻿using Alunos.Domain.Entities;
 using Core.Data.Constants;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.ConstrainedExecution;
 
 namespace Alunos.Infrastructure.Configurations;
 
@@ -49,8 +50,8 @@ public class AlunoConfiguration : IEntityTypeConfiguration<Aluno>
             .HasColumnType(DatabaseTypeConstant.SmallDateTime)
             .IsRequired();
 
-        builder.Property(x => x.Contato)
-            .HasColumnName("Contato")
+        builder.Property(x => x.Telefone)
+            .HasColumnName("Telefone")
             .HasColumnType(DatabaseTypeConstant.Varchar)
             .HasMaxLength(25);
 
@@ -58,6 +59,34 @@ public class AlunoConfiguration : IEntityTypeConfiguration<Aluno>
             .HasColumnName("Ativo")
             .HasColumnType(DatabaseTypeConstant.Boolean)
             .IsRequired();
+
+        builder.Property(x => x.Genero)
+            .HasColumnName("Genero")
+            .HasColumnType(DatabaseTypeConstant.Varchar)
+            .HasMaxLength(20)
+            .IsRequired();
+
+        builder.Property(x => x.Cidade)
+            .HasColumnName("Cidade")
+            .HasColumnType(DatabaseTypeConstant.Varchar)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(x => x.Estado)
+            .HasColumnName("Estado")
+            .HasColumnType(DatabaseTypeConstant.Varchar)
+            .HasMaxLength(2);
+
+        builder.Property(x => x.Cep)
+            .HasColumnName("Cep")
+            .HasColumnType(DatabaseTypeConstant.Varchar)
+            .HasMaxLength(8)
+            .IsRequired();
+
+        builder.Property(x => x.Foto)
+            .HasColumnName("Foto")
+            .HasColumnType(DatabaseTypeConstant.Varchar)
+            .HasMaxLength(1024);
 
         builder.Property(x => x.DataCriacao)
             .HasColumnName("DataCriacao")

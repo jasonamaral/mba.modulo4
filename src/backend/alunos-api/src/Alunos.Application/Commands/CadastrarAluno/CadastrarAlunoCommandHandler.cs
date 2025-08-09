@@ -5,6 +5,7 @@ using Alunos.Domain.Interfaces;
 using Core.Mediator;
 using Alunos.Domain.Entities;
 using Core.Messages;
+using FluentValidation.Results;
 
 namespace Alunos.Application.Commands.CadastrarAluno;
 public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMediatorHandler mediatorHandler) : IRequestHandler<CadastrarAlunoCommand, CommandResult>
@@ -15,18 +16,33 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
 
     public async Task<CommandResult> Handle(CadastrarAlunoCommand request, CancellationToken cancellationToken)
     {
-        _raizAgregacao = request.RaizAgregacao;
-        if (! await ValidarRequisicao(request)) { return request.Resultado; }
+        try
+        {
+            _raizAgregacao = request.RaizAgregacao;
+            if (!await ValidarRequisicao(request)) { return request.Resultado; }
 
+            var aluno = new Aluno(request.Id,
+                request.Nome,
+                request.Email,
+                request.Cpf,
+                request.DataNascimento,
+                request.Genero,
+                request.Cidade,
+                request.Estado,
+                request.Cep,
+                request.Foto);
 
+            await _alunoRepository.AdicionarAsync(aluno);
+            if (await _alunoRepository.UnitOfWork.Commit())
+                request.Resultado.Data = aluno.Id;
 
-        var aluno = new Aluno(request.Id, request.Nome, request.Email, request.Cpf, request.DataNascimento);
-
-        await _alunoRepository.AdicionarAsync(aluno);
-        if (await _alunoRepository.UnitOfWork.Commit())
-            request.Resultado.Data = aluno.Id;
-
-        return request.Resultado;
+            return request.Resultado;
+        }
+        catch (Exception ex)
+        {
+            request.Validacao.Errors.Add(new ValidationFailure("Exception", $"Erro ao registrar aluno: {ex.Message}"));
+            return request.Resultado;
+        }
     }
 
     private async Task<bool> ValidarRequisicao(CadastrarAlunoCommand request)
@@ -45,6 +61,13 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
         if (alunoExistente != null)
         {
             await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aluno), "Já existe um aluno cadastrado com este código."));
+            return false;
+        }
+
+        alunoExistente = await _alunoRepository.ObterPorEmailAsync(request.Email);
+        if (alunoExistente != null)
+        {
+            await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aluno), "Já existe um aluno cadastrado com este email."));
             return false;
         }
 

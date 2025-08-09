@@ -27,7 +27,7 @@ public class MessageBus : IMessageBus
     {
         TryConnect();
 
-        if (message is UsuarioRegistradoIntegrationEvent)
+        if (message is AlunoRegistradoIntegrationEvent)
         {
             _bus?.Publish(message);
         }
