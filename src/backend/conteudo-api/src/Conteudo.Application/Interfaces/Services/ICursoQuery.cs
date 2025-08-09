@@ -1,11 +1,10 @@
-using Core.SharedDtos.Conteudo;
-using Conteudo.Application.DTOs;
 using Core.Communication;
 using Core.Communication.Filters;
+using Core.SharedDtos.Conteudo;
 
 namespace Conteudo.Application.Interfaces.Services;
 
-public interface ICursoAppService
+public interface ICursoQuery
 {
     Task<PagedResult<CursoDto>> ObterTodosAsync(CursoFilter filter);
     Task<IEnumerable<CursoDto>> ObterTodosAsync(bool includeAulas = false);

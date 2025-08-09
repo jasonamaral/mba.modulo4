@@ -45,6 +45,16 @@ public class ConteudoService : BaseApiService, IConteudoService
 
         return result ?? new ResponseResult<PagedResult<CursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
     }
+    public async Task<ResponseResult<ConteudoProgramaticoDto>> ObterConteudoProgramaticoPorCursoId(Guid cursoId, bool includeAulas = false)
+    {
+        var result = await ExecuteWithErrorHandling(async () =>
+        {
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            
+            return await _apiClient.GetAsync<ResponseResult<ConteudoProgramaticoDto>>($"api/cursos/{cursoId}/conteudo-programatico");
+        }, nameof(ObterConteudoProgramaticoPorCursoId), cursoId);
+        return result ?? new ResponseResult<ConteudoProgramaticoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+    }
 
     public async Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso)
     {
@@ -128,9 +138,23 @@ public class ConteudoService : BaseApiService, IConteudoService
         return result ?? new ResponseResult<CursoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
     }
 
-    public Task<ResponseResult<bool>> ExcluirCurso(Guid cursoId)
+    public async Task<ResponseResult<bool>> ExcluirCurso(Guid cursoId)
     {
-        throw new NotImplementedException();
+        var result = await ExecuteWithErrorHandling(async () =>
+        {
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            var apiResponse = await _apiClient.DeleteAsync($"api/cursos/{cursoId}");
+            if (apiResponse)
+            {
+                return new ResponseResult<bool> { Status = 200, Data = true };
+            }
+            return new ResponseResult<bool> 
+            { 
+                Status = 400, 
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro ao excluir o curso" } } 
+            };
+        }, nameof(ExcluirCurso), cursoId);
+        return result ?? new ResponseResult<bool> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
     }
 
     public Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaDto aula)
@@ -148,8 +172,14 @@ public class ConteudoService : BaseApiService, IConteudoService
         throw new NotImplementedException();
     }
 
-    public Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
+    public async Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaId(Guid categoriaId, bool includeAulas = false)
     {
-        throw new NotImplementedException();
+        var result = await ExecuteWithErrorHandling(async () =>
+        {
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            var url = includeAulas ? $"api/cursos/categoria/{categoriaId}?includeAulas=true" : $"api/cursos/categoria/{categoriaId}";
+            return await _apiClient.GetAsync<ResponseResult<IEnumerable<CursoDto>>>(url);
+        }, nameof(ObterPorCategoriaId), categoriaId);
+        return result ?? new ResponseResult<IEnumerable<CursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
     }
 }

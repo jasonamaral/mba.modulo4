@@ -15,6 +15,9 @@ using System.Net;
 
 namespace Conteudo.API.Controllers
 {
+    /// <summary>
+    /// Controller de Categorias
+    /// </summary>
     [Route("api/[controller]")]
     [Authorize]
     [Produces("application/json")]
