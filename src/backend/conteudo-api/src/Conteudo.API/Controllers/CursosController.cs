@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Mapster;
+using Core.Notification;
 
 namespace Conteudo.API.Controllers;
 
@@ -21,7 +22,8 @@ namespace Conteudo.API.Controllers;
 [Produces("application/json")]
 public class CursosController(ICursoAppService cursoAppService
                            , IMediatorHandler mediator
-                           , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications)
+                           , INotificador notificador
+                           , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
 {
     private readonly ICursoAppService _cursoAppService = cursoAppService;
     private readonly IMediatorHandler _mediator = mediator;
@@ -34,7 +36,6 @@ public class CursosController(ICursoAppService cursoAppService
     /// <returns>Dados do curso</returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCurso([FromRoute] Guid id, [FromQuery] bool includeAulas = false)
@@ -43,7 +44,10 @@ public class CursosController(ICursoAppService cursoAppService
         {
             var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas);
             if (curso == null)
-                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
+            {
+                _notificador.AdicionarErro("Curso não encontrado.");
+                return RespostaPadraoApi<string>();
+            }
 
             return RespostaPadraoApi(data: curso);
         }
@@ -200,7 +204,7 @@ public class CursosController(ICursoAppService cursoAppService
             if (curso == null)
                 return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
 
-            return Ok(curso.Aulas);
+            return RespostaPadraoApi(data: curso.Aulas);
         }
         catch (Exception ex)
         {
@@ -238,7 +242,7 @@ public class CursosController(ICursoAppService cursoAppService
                 Bibliografia = curso.Bibliografia
             };
 
-            return Ok(conteudoProgramatico);
+            return RespostaPadraoApi(data: conteudoProgramatico);
         }
         catch (Exception ex)
         {

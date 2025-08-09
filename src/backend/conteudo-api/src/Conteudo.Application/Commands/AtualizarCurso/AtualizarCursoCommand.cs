@@ -27,10 +27,4 @@ public class AtualizarCursoCommand : CommandRaiz
     {
         DefinirRaizAgregacao(Id);
     }
-
-    //public override bool EhValido()
-    //{
-    //    CommandResult = new CommandResult(new AtualizarCursoCommandValidator().Validate(this));
-    //    return CommandResult.Success;
-    //}
 }

@@ -75,6 +75,20 @@ public abstract class MainController(IMediatorHandler mediator
 
     protected ActionResult RespostaPadraoApi<T>(CommandResult result)
     {
-        return RespostaPadraoApi(data: result);
+        return RespostaPadraoApi(data: result.Data);
+    }
+
+    protected List<string> ObterMensagensDeErro()
+    {
+        var mensagens = new List<string>();
+        if (_notifications.TemNotificacao())
+        {
+            mensagens.AddRange(_notifications.ObterMensagens());
+        }
+        if (_notificador.TemErros())
+        {
+            mensagens.AddRange(_notificador.ObterErros());
+        }
+        return mensagens;
     }
 }

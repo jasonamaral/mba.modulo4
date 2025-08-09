@@ -21,9 +21,9 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
         try
         {
             _raizAgregacao = request.RaizAgregacao;
-            if (!ValidarRequisicao(request)) { return request.CommandResult; }
-            if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.CommandResult; }
-            if (!ObterAulaCurso(request.CursoDto, request.AulaId, aluno, out AulaDto aulaDto)) { return request.CommandResult; }
+            if (!ValidarRequisicao(request)) { return request.Resultado; }
+            if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
+            if (!ObterAulaCurso(request.CursoDto, request.AulaId, aluno, out AulaDto aulaDto)) { return request.Resultado; }
 
             // Capturo o histórico anterior (se existir)
             // Isto é um "bug" do EF que não consegue identificar corretamente o estado de mudança do objeto
@@ -38,7 +38,7 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
 
             await _alunoRepository.AtualizarEstadoHistoricoAprendizadoAsync(historicoAntigo, historicoAtual);
             await _alunoRepository.UnitOfWork.Commit();
-            return request.CommandResult;
+            return request.Resultado;
         }
         catch (Exception ex)
         {

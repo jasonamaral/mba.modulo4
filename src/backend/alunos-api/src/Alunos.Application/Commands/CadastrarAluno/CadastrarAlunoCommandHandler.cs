@@ -16,16 +16,17 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
     public async Task<CommandResult> Handle(CadastrarAlunoCommand request, CancellationToken cancellationToken)
     {
         _raizAgregacao = request.RaizAgregacao;
-        if (! await ValidarRequisicao(request)) { return request.CommandResult; }
+        if (! await ValidarRequisicao(request)) { return request.Resultado; }
 
 
 
         var aluno = new Aluno(request.Id, request.Nome, request.Email, request.Cpf, request.DataNascimento);
 
         await _alunoRepository.AdicionarAsync(aluno);
-        await _alunoRepository.UnitOfWork.Commit();
-        request.CommandResult.Data = aluno.Id;
-        return request.CommandResult;
+        if (await _alunoRepository.UnitOfWork.Commit())
+            request.Resultado.Data = aluno.Id;
+
+        return request.Resultado;
     }
 
     private async Task<bool> ValidarRequisicao(CadastrarAlunoCommand request)
