@@ -8,6 +8,7 @@ namespace Alunos.API.Controllers;
 
 public partial class AlunoController
 {
+    [Authorize(Roles = "Usuario")]
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ResponseResult<AlunoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
@@ -30,6 +31,7 @@ public partial class AlunoController
         }
     }
 
+    [Authorize(Roles = "Usuario")]
     [HttpGet("{id}/evolucao")]
     [ProducesResponseType(typeof(ResponseResult<EvolucaoAlunoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
@@ -52,6 +54,7 @@ public partial class AlunoController
         }
     }
 
+    [Authorize(Roles = "Usuario")]
     [HttpGet("{id}/todas-matriculas")]
     [ProducesResponseType(typeof(ResponseResult<ICollection<MatriculaCursoDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
@@ -74,6 +77,7 @@ public partial class AlunoController
         }
     }
 
+    [Authorize(Roles = "Usuario")]
     [HttpGet("matricula/{matriculaId}/certificado")]
     [ProducesResponseType(typeof(ResponseResult<CertificadoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
@@ -96,6 +100,7 @@ public partial class AlunoController
         }
     }
 
+    [Authorize(Roles = "Usuario")]
     [HttpGet("aulas/{matriculaId}")]
     [ProducesResponseType(typeof(ResponseResult<ICollection<AulaCursoDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
