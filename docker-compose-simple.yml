@@ -29,8 +29,8 @@ services:
   # Microserviços
   auth-api:
     build:
-      context: ./src/backend/auth-api
-      dockerfile: Dockerfile
+      context: ./src/backend
+      dockerfile: auth-api/Dockerfile
     container_name: plataforma-auth-api
     ports:
       - "5001:5001"
@@ -81,8 +81,8 @@ services:
 
   alunos-api:
     build:
-      context: ./src/backend/alunos-api
-      dockerfile: Dockerfile
+      context: ./src/backend
+      dockerfile: alunos-api/Dockerfile
     container_name: plataforma-alunos-api
     ports:
       - "5003:5003"
@@ -104,8 +104,8 @@ services:
 
   pagamentos-api:
     build:
-      context: ./src/backend/pagamentos-api
-      dockerfile: Dockerfile
+      context: ./src/backend
+      dockerfile: pagamentos-api/Dockerfile
     container_name: plataforma-pagamentos-api
     ports:
       - "5004:5004"

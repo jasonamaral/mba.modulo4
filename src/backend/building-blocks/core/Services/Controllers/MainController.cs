@@ -13,10 +13,10 @@ namespace Core.Services.Controllers;
 [ApiController]
 public abstract class MainController(IMediatorHandler mediator
                                    , INotificationHandler<DomainNotificacaoRaiz> notifications
-                                   , INotificador notificador) : ControllerBase
+                                   , INotificador notificador = null) : ControllerBase
 {
     protected readonly DomainNotificacaoHandler _notifications = (DomainNotificacaoHandler)notifications;
-    protected readonly INotificador _notificador = notificador;
+    protected readonly INotificador _notificador = notificador ?? new Notificador();
 
     protected bool OperacaoValida() => !_notifications.TemNotificacao() && !_notificador.TemErros();
 
@@ -24,7 +24,7 @@ public abstract class MainController(IMediatorHandler mediator
     {
         if (OperacaoValida())
         {
-            return new ObjectResult(new ResponseResult<T>
+            return StatusCode((int)statusCode, new ResponseResult<T>
             {
                 Status = (int)statusCode,
                 Title = message ?? string.Empty,
@@ -33,20 +33,24 @@ public abstract class MainController(IMediatorHandler mediator
             });
         }
 
+        var mensagens = new List<string>();
+        mensagens.AddRange(_notifications.ObterMensagens());
+        mensagens.AddRange(_notificador.ObterErros());
+
         return BadRequest(new ResponseResult<T>
         {
             Status = (int)HttpStatusCode.BadRequest,
             Title = message ?? "Ocorreu um ou mais erros durante a operação",
             Errors = new ResponseErrorMessages
             {
-                Mensagens = ObterMensagensDeErro()
+                Mensagens = mensagens
             }
         });
     }
 
     protected ActionResult RespostaPadraoApi<T>(HttpStatusCode statusCode, string message)
     {
-        return RespostaPadraoApi(statusCode, message);
+        return RespostaPadraoApi<T>(statusCode, default, message);
     }
 
     protected ActionResult RespostaPadraoApi<T>(ModelStateDictionary modelState)

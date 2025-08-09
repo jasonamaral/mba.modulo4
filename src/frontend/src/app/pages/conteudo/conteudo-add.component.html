@@ -1,0 +1,39 @@
+<h3 mat-dialog-title>Cadastro de categoria</h3>
+<mat-dialog-content>
+  <form class="m-t-30" [formGroup]="form" (ngSubmit)="submit()">
+    <div fxLayout="row wrap">
+      <div class="p-10">
+        <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Tipo</mat-label>
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-select formControlName="type" name="type">
+            <mat-option [value]="1">Receita </mat-option>
+            <mat-option [value]="2">Despesa </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <small class="text-error" *ngIf="displayMessage['type']">
+          <p [innerHTML]="displayMessage['type']"></p>
+        </small>
+      </div>
+      <div class="p-10" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+        <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Categoria</mat-label>
+        <mat-form-field appearance="outline" class="w-100">
+          <input matInput name="description" formControlName="description" type="text" autocomplete="off"
+            maxlength="100" minlength="4" />
+        </mat-form-field>
+        <small class="text-error" *ngIf="displayMessage['description']">
+          <p [innerHTML]="displayMessage['description']"></p>
+        </small>
+      </div>
+    </div>
+    <mat-dialog-actions align="end">
+      <button type="button" mat-raised-button (click)="cancel()" color="secondary" cdkFocusInitial [disabled]="submitted">
+        Cancelar
+      </button>
+  
+      <button type="submit" mat-raised-button color="primary" [disabled]="!form.valid || submitted">
+        <mat-icon class="rotating" *ngIf="submitted">loop</mat-icon>
+        Salvar
+      </button>
+    </mat-dialog-actions>
+  </form>
+</mat-dialog-content>
