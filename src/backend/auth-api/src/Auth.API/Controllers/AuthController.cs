@@ -26,7 +26,7 @@ public class AuthController(IMediatorHandler mediator
 {
     private readonly AuthService _authService = authService;
     private readonly IMessageBus _bus = bus;
-    private readonly INotificador _notificador = notificador;
+    private readonly new INotificador _notificador = notificador;
 
     /// <summary>
     /// Registra um novo usuário no sistema

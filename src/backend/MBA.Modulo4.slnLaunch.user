@@ -7,11 +7,11 @@
         "Action": "Start"
       },
       {
-        "Path": "alunos-api\\src\\Alunos.API\\Alunos.API.csproj",
+        "Path": "bff-api\\src\\BFF.API\\BFF.API.csproj",
         "Action": "Start"
       },
       {
-        "Path": "bff-api\\src\\BFF.API\\BFF.API.csproj",
+        "Path": "alunos-api\\src\\Alunos.API\\Alunos.API.csproj",
         "Action": "Start"
       }
     ]

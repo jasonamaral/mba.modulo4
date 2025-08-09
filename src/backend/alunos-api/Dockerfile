@@ -6,19 +6,21 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copiar arquivos de projeto
-COPY ["src/Alunos.API/Alunos.API.csproj", "src/Alunos.API/"]
-COPY ["src/Alunos.Application/Alunos.Application.csproj", "src/Alunos.Application/"]
-COPY ["src/Alunos.Domain/Alunos.Domain.csproj", "src/Alunos.Domain/"]
-COPY ["src/Alunos.Infrastructure/Alunos.Infrastructure.csproj", "src/Alunos.Infrastructure/"]
+COPY ["alunos-api/src/Alunos.API/Alunos.API.csproj", "alunos-api/src/Alunos.API/"]
+COPY ["alunos-api/src/Alunos.Application/Alunos.Application.csproj", "alunos-api/src/Alunos.Application/"]
+COPY ["alunos-api/src/Alunos.Domain/Alunos.Domain.csproj", "alunos-api/src/Alunos.Domain/"]
+COPY ["alunos-api/src/Alunos.Infrastructure/Alunos.Infrastructure.csproj", "alunos-api/src/Alunos.Infrastructure/"]
+COPY ["building-blocks/core/Core.csproj", "building-blocks/core/"]
+COPY ["building-blocks/MessageBus/MessageBus.csproj", "building-blocks/MessageBus/"]
 
 # Restaurar dependências
-RUN dotnet restore "src/Alunos.API/Alunos.API.csproj"
+RUN dotnet restore "alunos-api/src/Alunos.API/Alunos.API.csproj"
 
 # Copiar código fonte
 COPY . .
 
 # Build da aplicação
-WORKDIR "/src/src/Alunos.API"
+WORKDIR "/src/alunos-api/src/Alunos.API"
 RUN dotnet build "Alunos.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
