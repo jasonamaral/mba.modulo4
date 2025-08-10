@@ -1,4 +1,5 @@
-﻿namespace Alunos.Application.DTOs;
+namespace BFF.Domain.DTOs.Alunos.Response;
+
 public class CertificadoDto
 {
     public Guid Id { get; set; }

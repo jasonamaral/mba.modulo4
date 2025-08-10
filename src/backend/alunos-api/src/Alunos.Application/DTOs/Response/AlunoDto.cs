@@ -1,8 +1,6 @@
 ﻿//using Plataforma.Educacao.Core.SharedDto.Aluno;
 
-using Alunos.Domain.Entities;
-
-namespace Alunos.Application.DTOs;
+namespace Alunos.Application.DTOs.Response;
 public class AlunoDto
 {
     public Guid Id { get; set; }
@@ -16,7 +14,7 @@ public class AlunoDto
     public string Cidade { get; set; }
     public string Estado { get; set; }
     public string Cep { get; set; }
-    public string? Foto { get; set; }
+    public string Foto { get; set; }
 
     public ICollection<MatriculaCursoDto> MatriculasCursos { get; set; }
 }

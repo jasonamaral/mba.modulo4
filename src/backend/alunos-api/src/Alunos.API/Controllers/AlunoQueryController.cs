@@ -1,4 +1,4 @@
-﻿using Alunos.Application.DTOs;
+﻿using Alunos.Application.DTOs.Response;
 using Core.Communication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

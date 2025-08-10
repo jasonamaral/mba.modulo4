@@ -1,4 +1,3 @@
-using Alunos.Application.Commands;
 using Alunos.Application.Commands.CadastrarAluno;
 using Alunos.Domain.Interfaces;
 using Core.Mediator;

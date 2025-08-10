@@ -12,7 +12,7 @@ public class Certificado : Common.Entidade
     public DateTime DataSolicitacao { get; }
     public DateTime? DataEmissao { get; private set; }
     public short CargaHoraria { get; private set; }
-    public byte? NotaFinal { get; private set; }
+    public decimal NotaFinal { get; private set; }
     public string PathCertificado { get; private set; }
     public string NomeInstrutor { get; private set; }
 
@@ -28,7 +28,7 @@ public class Certificado : Common.Entidade
         DateTime? dataSolicitacao,
         DateTime? dataEmissao,
         short cargaHoraria,
-        byte? notaFinal,
+        decimal notaFinal,
         string pathCertificado,
         string nomeInstrutor)
     {
@@ -87,7 +87,7 @@ public class Certificado : Common.Entidade
 
     private void ValidarIntegridadeCertificado(DateTime? novaDataEmissao = null,
         int? novaCargaHoraria = null,
-        int? novaNotaFinal = null,
+        decimal? novaNotaFinal = null,
         string novoPathCertificado = null,
         string novoNomeInstrutor = null)
     {
@@ -115,7 +115,7 @@ public class Certificado : Common.Entidade
         ValidacaoNumerica.DeveSerMaiorQueZero(novaCargaHoraria.Value, "Carga horária deve ser maior que zero", validacao);
         ValidacaoNumerica.DeveEstarEntre(novaCargaHoraria.Value, 1, 10000, "Carga horária deve estar entre 1 e 10.000 horas", validacao);
 
-        if (novaNotaFinal.HasValue) { ValidacaoNumerica.DeveEstarEntre(novaNotaFinal.Value, 0, 10, "Nota final deve estar entre 0 e 10", validacao); }
+        if (novaNotaFinal.HasValue) { ValidacaoNumerica.DeveEstarEntre(novaNotaFinal.Value, 0m, 10m, "Nota final deve estar entre 0 e 10", validacao); }
 
         ValidacaoTexto.DevePossuirConteudo(novoNomeInstrutor, "Nome do instrutor não pode ser nulo ou vazio", validacao);
         ValidacaoTexto.DevePossuirTamanho(novoNomeInstrutor, 1, 100, "Nome do instrutor deve ter no máximo 100 caracteres", validacao);

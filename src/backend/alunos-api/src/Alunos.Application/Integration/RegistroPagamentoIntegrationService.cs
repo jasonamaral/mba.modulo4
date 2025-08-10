@@ -1,6 +1,4 @@
-using Alunos.Application.Commands;
 using Alunos.Application.Commands.AtualizarPagamento;
-using Alunos.Application.Commands.CadastrarAluno;
 using Alunos.Domain.Interfaces;
 using Core.Mediator;
 using Core.Messages;

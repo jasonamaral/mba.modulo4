@@ -1,11 +1,6 @@
-using BFF.API.Extensions;
-using BFF.API.Models.Request;
-using BFF.API.Models.Response;
 using BFF.API.Services.Aulas;
-using BFF.API.Settings;
-using BFF.Application.Interfaces.Services;
-using BFF.Domain.DTOs;
-using BFF.Domain.DTOs.Alunos;
+using BFF.Domain.DTOs.Alunos.Request;
+using BFF.Domain.DTOs.Alunos.Response;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -13,7 +8,6 @@ using Core.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using System.Net;
 
 namespace BFF.API.Controllers;
@@ -33,6 +27,7 @@ public class AlunosController(IAulaService aulaService,
     private readonly IAulaService _aulaService = aulaService;
     private readonly ILogger<AlunosController> _logger = logger;
 
+    #region Gets
     [Authorize(Roles = "Usuario")]
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ResponseResult<AlunoDto>), 200)]
@@ -137,4 +132,79 @@ public class AlunosController(IAulaService aulaService,
 
         return BadRequest(resultado);
     }
+    #endregion
+
+    #region Posts and Puts
+    [Authorize(Roles = "Usuario")]
+    [HttpPost("{alunoId}/matricular-aluno")]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    public async Task<IActionResult> MatricularAlunoAsync(Guid alunoId, MatriculaCursoRequest dto)
+    {
+        if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
+
+        var resultado = await _aulaService.MatricularAlunoAsync(dto, "");
+
+        if (resultado?.Status == (int)HttpStatusCode.OK)
+        {
+            return Ok(resultado);
+        }
+
+        return BadRequest(resultado);
+    }
+
+    [Authorize(Roles = "Usuario")]
+    [HttpPost("{alunoId}/registrar-historico-aprendizado")]
+    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    public async Task<IActionResult> RegistrarHistoricoAprendizadoAsync(Guid alunoId, RegistroHistoricoAprendizadoRequest dto)
+    {
+        if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
+
+        var resultado = await _aulaService.RegistrarHistoricoAprendizadoAsync(dto, "");
+
+        if (resultado?.Status == (int)HttpStatusCode.OK)
+        {
+            return Ok(resultado);
+        }
+
+        return BadRequest(resultado);
+    }
+
+    [Authorize(Roles = "Usuario")]
+    [HttpPut("{alunoId}/concluir-curso")]
+    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    public async Task<IActionResult> ConcluirCursoAsync(Guid alunoId, ConcluirCursoRequest dto)
+    {
+        if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
+
+        var resultado = await _aulaService.ConcluirCursoAsync(dto, "");
+
+        if (resultado?.Status == (int)HttpStatusCode.OK)
+        {
+            return Ok(resultado);
+        }
+
+        return BadRequest(resultado);
+    }
+
+    [Authorize(Roles = "Usuario")]
+    [HttpPost("{alunoId}/solicitar-certificado")]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    public async Task<IActionResult> SolicitarCertificadoAsync(Guid alunoId, SolicitaCertificadoRequest dto)
+    {
+        if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
+
+        var resultado = await _aulaService.SolicitarCertificadoAsync(dto, "");
+
+        if (resultado?.Status == (int)HttpStatusCode.OK)
+        {
+            return Ok(resultado);
+        }
+
+        return BadRequest(resultado);
+    }
+    #endregion
 }

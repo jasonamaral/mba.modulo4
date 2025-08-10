@@ -58,9 +58,9 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
             .HasColumnType(DatabaseTypeConstant.Byte)
             .IsRequired();
 
-        builder.Property(x => x.NotaFinal)
-            .HasColumnName("NotaFinal")
-            .HasColumnType(DatabaseTypeConstant.Byte);
+        //builder.Property(x => x.NotaFinal)
+        //    .HasColumnName("NotaFinal")
+        //    .HasColumnType(DatabaseTypeConstant.Byte);
 
         builder.Property(x => x.Observacao)
             .HasColumnName("Observacao")

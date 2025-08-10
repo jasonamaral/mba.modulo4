@@ -6,7 +6,6 @@ using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Mapster;
-using Core.Notification;
 using Core.Utils;
 
 var builder = WebApplication.CreateBuilder(args);

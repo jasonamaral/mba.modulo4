@@ -13,7 +13,6 @@ using Alunos.Infrastructure.Repositories;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
-using Core.Messages.Integration;
 using Core.Utils;
 using MediatR;
 

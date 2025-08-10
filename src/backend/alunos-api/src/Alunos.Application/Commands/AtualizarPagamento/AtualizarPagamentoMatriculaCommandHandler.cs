@@ -22,7 +22,7 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
         aluno.AtualizarPagamentoMatricula(matricula.Id);
 
         await _alunoRepository.AtualizarAsync(aluno);
-        await _alunoRepository.UnitOfWork.Commit();
+        if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
 
         return request.Resultado;
     }

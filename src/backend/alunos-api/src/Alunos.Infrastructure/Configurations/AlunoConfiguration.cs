@@ -3,7 +3,6 @@ using Core.Data.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.ConstrainedExecution;
 
 namespace Alunos.Infrastructure.Configurations;
 

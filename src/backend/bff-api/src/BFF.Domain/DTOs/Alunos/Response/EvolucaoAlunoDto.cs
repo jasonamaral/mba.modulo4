@@ -1,4 +1,4 @@
-﻿namespace BFF.Domain.DTOs.Alunos;
+﻿namespace BFF.Domain.DTOs.Alunos.Response;
 public class EvolucaoAlunoDto
 {
     public Guid Id { get; set; }

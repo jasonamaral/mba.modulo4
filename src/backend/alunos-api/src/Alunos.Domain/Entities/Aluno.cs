@@ -86,6 +86,16 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     #endregion
 
     #region Manipuladores de MatriculaCurso
+    public int ObterQuantidadeAulasMatriculaCurso(Guid cursoId)
+    {
+        return _matriculasCursos.Count(m => m.CursoId == cursoId);
+    }
+
+    public int ObterQuantidadeAulasPendenteMatriculaCurso(Guid cursoId)
+    {
+        return _matriculasCursos.Count(m => m.CursoId == cursoId && m.PodeConcluirCurso() == false);
+    }
+
     public MatriculaCurso ObterMatriculaPorCursoId(Guid cursoId)
     {
         var matriculaCurso = _matriculasCursos.FirstOrDefault(m => m.CursoId == cursoId);
@@ -159,7 +169,7 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     #endregion
 
     #region Manipuladores de Certificado
-    public void RequisitarCertificadoConclusao(Guid matriculaCursoId, byte notaFinal, string pathCertificado, string nomeInstrutor)
+    public void RequisitarCertificadoConclusao(Guid matriculaCursoId, decimal notaFinal, string pathCertificado, string nomeInstrutor)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.RequisitarCertificadoConclusao(notaFinal, pathCertificado, nomeInstrutor);

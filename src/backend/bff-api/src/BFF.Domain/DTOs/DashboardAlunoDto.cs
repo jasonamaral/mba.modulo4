@@ -1,4 +1,4 @@
-using BFF.Domain.DTOs.Alunos;
+using BFF.Domain.DTOs.Alunos.Response;
 
 namespace BFF.Domain.DTOs;
 
