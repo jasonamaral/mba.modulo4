@@ -17,6 +17,7 @@ public abstract class MainController(IMediatorHandler mediator
 {
     protected readonly DomainNotificacaoHandler _notifications = (DomainNotificacaoHandler)notifications;
     protected readonly INotificador _notificador = notificador ?? new Notificador();
+    protected readonly IMediatorHandler _mediatorHandler = mediator;
 
     protected bool OperacaoValida() => !_notifications.TemNotificacao() && !_notificador.TemErros();
 
@@ -57,7 +58,7 @@ public abstract class MainController(IMediatorHandler mediator
     {
         foreach (var erro in modelState.Values.SelectMany(e => e.Errors))
         {
-            mediator.PublicarNotificacaoDominio(new DomainNotificacaoRaiz("ModelState", erro.ErrorMessage));
+            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz("ModelState", erro.ErrorMessage));
         }
 
         return RespostaPadraoApi<T>(message: "Dados inválidos");
@@ -67,7 +68,7 @@ public abstract class MainController(IMediatorHandler mediator
     {
         foreach (var erro in validationResult.Errors)
         {
-            mediator.PublicarNotificacaoDominio(new DomainNotificacaoRaiz("ValidationResult", erro.ErrorMessage));
+            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz("ValidationResult", erro.ErrorMessage));
         }
 
         return RespostaPadraoApi<T>();

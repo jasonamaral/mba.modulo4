@@ -1,8 +1,4 @@
-﻿using Alunos.Domain.Entities;
-using Alunos.Domain.Enumerators;
-using Alunos.Domain.ValueObjects;
-
-namespace Alunos.Application.DTOs;
+﻿namespace Alunos.Application.DTOs.Response;
 public class MatriculaCursoDto
 {
     public Guid Id { get; set; }
@@ -13,7 +9,7 @@ public class MatriculaCursoDto
     public decimal Valor { get; set; }
     public DateTime DataMatricula { get; set; }
     public DateTime? DataConclusao { get; set; }
-    public byte? NotaFinal { get;  set; }
+    public decimal? NotaFinal { get;  set; }
     public string Observacao { get; set; }
     public string EstadoMatricula { get; set; }
     public CertificadoDto Certificado { get; set; }

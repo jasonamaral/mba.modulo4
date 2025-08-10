@@ -1,5 +1,4 @@
-﻿using Alunos.Application.DTOs;
-using Core.SharedDtos.Conteudo;
+﻿using Alunos.Application.DTOs.Response;
 
 namespace Alunos.Application.Interfaces;
 public interface IAlunoQueryService 

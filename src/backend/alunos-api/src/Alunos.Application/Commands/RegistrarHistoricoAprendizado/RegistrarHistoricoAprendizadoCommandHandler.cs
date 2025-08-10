@@ -2,7 +2,6 @@
 using Alunos.Domain.Interfaces;
 using Core.Mediator;
 using Core.Communication;
-using Core.SharedDtos.Conteudo;
 using Alunos.Domain.Entities;
 using Alunos.Domain.ValueObjects;
 using Core.Messages;
@@ -22,8 +21,7 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
         {
             _raizAgregacao = request.RaizAgregacao;
             if (!ValidarRequisicao(request)) { return request.Resultado; }
-            if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
-            if (!ObterAulaCurso(request.CursoDto, request.AulaId, aluno, out AulaDto aulaDto)) { return request.Resultado; }
+            if (!ObterAluno(request.AlunoId, out Aluno aluno)) { return request.Resultado; }
 
             // Capturo o histórico anterior (se existir)
             // Isto é um "bug" do EF que não consegue identificar corretamente o estado de mudança do objeto
@@ -31,13 +29,14 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
             HistoricoAprendizado historicoAntigo = aluno.ObterHistoricoAprendizado(request.MatriculaCursoId, request.AulaId);
 
             // Registro o histórico
-            aluno.RegistrarHistoricoAprendizado(request.MatriculaCursoId, request.AulaId, aulaDto.Descricao, (byte)(aulaDto.DuracaoMinutos), request.DataTermino);
+            aluno.RegistrarHistoricoAprendizado(request.MatriculaCursoId, request.AulaId, request.NomeAula, request.DuracaoMinutos, request.DataTermino);
 
             // Capturo o novo histórico
             HistoricoAprendizado historicoAtual = aluno.ObterHistoricoAprendizado(request.MatriculaCursoId, request.AulaId);
 
             await _alunoRepository.AtualizarEstadoHistoricoAprendizadoAsync(historicoAntigo, historicoAtual);
-            await _alunoRepository.UnitOfWork.Commit();
+            if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
+
             return request.Resultado;
         }
         catch (Exception ex)
@@ -77,40 +76,6 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
             _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
             return false;
         }
-
-        return true;
-    }
-
-    private bool ObterAulaCurso(CursoDto cursoDto, Guid aulaId, Domain.Entities.Aluno aluno, out AulaDto aulaDto)
-    {
-        //aulaDto = new();
-        //MatriculaCurso matriculaCurso = aluno.ObterMatriculaCursoPeloId(matriculaCursoId);
-        //CursoDto cursoDto = _cursoService.ObterPorIdAsync(matriculaCurso.CursoId).Result;
-        aulaDto = cursoDto?.Aulas?.FirstOrDefault(x => x.Id == aulaId) ?? new();
-
-        ////if (cursoDto == null)
-        ////{
-        ////    _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Matrícula do curso deste aluno não encontrado")).GetAwaiter().GetResult();
-        ////    return false;
-        ////}
-
-        ////if (cursoDto?.Aulas == null)
-        ////{
-        ////    _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Curso informado não possui nenhuma aula cadastrada")).GetAwaiter().GetResult();
-        ////    return false;
-        ////}
-
-        ////if (aulaDto == null) 
-        ////{ 
-        ////    _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aula deste curso não encontrado")).GetAwaiter().GetResult();
-        ////    return false;
-        ////}
-
-        //if (!aulaDto.Ativo)
-        //{
-        //    _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aula informada está inativa")).GetAwaiter().GetResult();
-        //    return false;
-        //}
 
         return true;
     }

@@ -1,4 +1,8 @@
-﻿using Alunos.Application.Commands.MatricularAluno;
+﻿using Alunos.Application.Commands.ConcluirCurso;
+using Alunos.Application.Commands.MatricularAluno;
+using Alunos.Application.Commands.RegistrarHistoricoAprendizado;
+using Alunos.Application.Commands.SolicitarCertificado;
+using Alunos.Application.DTOs.Request;
 using Alunos.Application.Interfaces;
 using Core.Communication;
 using Core.Mediator;
@@ -26,38 +30,15 @@ public partial class AlunoController(IMediatorHandler mediator,
     [HttpPost("{alunoId}/matricular-aluno")]
     [ProducesResponseType(typeof(ResponseResult<Guid>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-    public async Task<IActionResult> MatricularAluno(Guid alunoId, MatricularCursoViewModel dto)
+    public async Task<IActionResult> MatricularAluno(Guid alunoId, MatriculaCursoRequest dto)
     {
         try
         {
             if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
-            if (alunoId != dto.Id) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
+            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-            CursoDto cursoDto = await _cursoAppService.ObterPorIdAsync(matriculaCursoViewModel.CursoId);
-            var comando = new MatricularAlunoCommand(matriculaCursoViewModel.AlunoId, matriculaCursoViewModel.CursoId, cursoDto.CursoDisponivel, cursoDto.Nome, cursoDto.Valor);
-            var sucesso = await _mediatorHandler.EnviarComando(comando);
-            if (sucesso)
-            {
-                return GenerateResponse(new { matriculaCursoViewModel.AlunoId, matriculaCursoViewModel.CursoId },
-                    responseType: ResponseTypeEnum.Success,
-                    statusCode: HttpStatusCode.Created);
-            }
-
-            return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-
-
-
-
-
-
-
-            var command = dto.Adapt<AtualizarCursoCommand>();
-
-            return RespostaPadraoApi<CursoDto>(await _mediator.ExecutarComando(command));
-        }
-        catch (ArgumentException ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.NotFound, ex.Message);
+            var comando = new MatricularAlunoCommand(dto.AlunoId, dto.CursoId, dto.CursoDisponivel, dto.Nome, dto.Valor, dto.Observacao);
+            return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
         }
         catch (Exception ex)
         {
@@ -67,125 +48,75 @@ public partial class AlunoController(IMediatorHandler mediator,
 
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/registrar-historico-aprendizado")]
-    [ProducesResponseType(typeof(ResponseResult<CategoriaDto>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-    public async Task<IActionResult> RegistrarHistoricoAprendizado(RegistrarHistoricoAprendizadoViewModel viewModel)
+    public async Task<IActionResult> RegistrarHistoricoAprendizado(Guid alunoId, RegistroHistoricoAprendizadoRequest dto)
     {
-        throw new NotImplementedException("This method is not implemented yet.");
-        //if (!ModelState.IsValid) { return GenerateModelStateResponse(ResponseTypeEnum.ValidationError, HttpStatusCode.BadRequest, ModelState); }
+        try
+        {
+            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-        //try
-        //{
-        //    if (UserId != viewModel.AlunoId) { return GenerateResponse(null, ResponseTypeEnum.ValidationError, HttpStatusCode.Forbidden, ["Você não tem permissão para realizar essa operação"]); }
+            var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
+            if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
 
-        //    var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(viewModel.MatriculaCursoId);
-        //    if (matriculaCurso == null) { return GenerateResponse(null, ResponseTypeEnum.NotFound, HttpStatusCode.NotFound, ["Matrícula não encontrada"]); }
+            var comando = new RegistrarHistoricoAprendizadoCommand(dto.AlunoId,
+                dto.MatriculaCursoId,
+                dto.AulaId,
+                dto.NomeAula,
+                dto.DuracaoMinutos,
+                dto.DataTermino
+            );
 
-        //    CursoDto cursoDto = await _cursoAppService.ObterPorIdAsync(matriculaCurso.CursoId);
-        //    if (cursoDto == null) { return GenerateResponse(null, ResponseTypeEnum.NotFound, HttpStatusCode.NotFound, ["Curso desta matrícula não encontrada"]); }
-
-        //    var comando = new RegistrarHistoricoAprendizadoCommand(
-        //        viewModel.AlunoId,
-        //        viewModel.MatriculaCursoId,
-        //        viewModel.AulaId,
-        //        cursoDto,
-        //        viewModel.DataTermino
-        //    );
-
-        //    var sucesso = await _mediatorHandler.EnviarComando(comando);
-
-        //    if (sucesso)
-        //    {
-        //        return GenerateResponse(new { viewModel.AlunoId, viewModel.MatriculaCursoId, viewModel.AulaId },
-        //            responseType: ResponseTypeEnum.Success,
-        //            statusCode: HttpStatusCode.Created);
-        //    }
-
-        //    return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-        //}
-        //catch (DomainException exDomain)
-        //{
-        //    return GenerateDomainExceptionResponse(null, ResponseTypeEnum.DomainError, HttpStatusCode.BadRequest, exDomain);
-        //}
-        //catch (Exception ex)
-        //{
-        //    return GenerateResponse(null, ResponseTypeEnum.GenericError, HttpStatusCode.BadRequest, [ex.Message]);
-        //}
+            return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
     }
 
     [Authorize(Roles = "Usuario")]
     [HttpPut("{alunoId}/concluir-curso")]
-    [ProducesResponseType(typeof(ResponseResult<CategoriaDto>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-    public async Task<IActionResult> ConcluirCurso(ConcluirCursoViewModel viewModel)
+    public async Task<IActionResult> ConcluirCurso(Guid alunoId, ConcluirCursoRequest dto)
     {
-        throw new NotImplementedException("This method is not implemented yet.");
-        //if (!ModelState.IsValid) { return GenerateModelStateResponse(ResponseTypeEnum.ValidationError, HttpStatusCode.BadRequest, ModelState); }
+        try
+        {
+            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
+            if (dto.CursoDto == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Curso desta matrícula não encontrada"); }
 
-        //try
-        //{
-        //    if (UserId != viewModel.AlunoId) { return GenerateResponse(null, ResponseTypeEnum.ValidationError, HttpStatusCode.Forbidden, ["Você não tem permissão para realizar essa operação"]); }
+            var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
+            if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
 
-        //    var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(viewModel.MatriculaCursoId);
-        //    if (matriculaCurso == null) { return GenerateResponse(null, ResponseTypeEnum.NotFound, HttpStatusCode.NotFound, ["Matrícula não encontrada"]); }
-
-        //    CursoDto cursoDto = await _cursoAppService.ObterPorIdAsync(matriculaCurso.CursoId);
-        //    if (cursoDto == null) { return GenerateResponse(null, ResponseTypeEnum.NotFound, HttpStatusCode.NotFound, ["Curso desta matrícula não encontrada"]); }
-
-        //    var comando = new ConcluirCursoCommand(viewModel.AlunoId, viewModel.MatriculaCursoId, cursoDto);
-        //    var sucesso = await _mediatorHandler.EnviarComando(comando);
-
-        //    if (sucesso)
-        //    {
-        //        return GenerateResponse(new { viewModel.AlunoId, viewModel.MatriculaCursoId },
-        //            responseType: ResponseTypeEnum.Success,
-        //            statusCode: HttpStatusCode.NoContent);
-        //    }
-
-        //    return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-        //}
-        //catch (DomainException exDomain)
-        //{
-        //    return GenerateDomainExceptionResponse(null, ResponseTypeEnum.DomainError, HttpStatusCode.BadRequest, exDomain);
-        //}
-        //catch (Exception ex)
-        //{
-        //    return GenerateResponse(null, ResponseTypeEnum.GenericError, HttpStatusCode.BadRequest, [ex.Message]);
-        //}
+            var comando = new ConcluirCursoCommand(dto.AlunoId, dto.MatriculaCursoId, dto.CursoDto);
+            return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
     }
 
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/solicitar-certificado")]
-    [ProducesResponseType(typeof(ResponseResult<CategoriaDto>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-    public async Task<IActionResult> SolicitarCertificado(SolicitarCertificadoViewModel viewModel)
+    public async Task<IActionResult> SolicitarCertificado(Guid alunoId, SolicitaCertificadoRequest dto)
     {
-        throw new NotImplementedException("This method is not implemented yet.");
-        //if (!ModelState.IsValid) { return GenerateModelStateResponse(ResponseTypeEnum.ValidationError, HttpStatusCode.BadRequest, ModelState); }
+        try
+        {
+            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-        //try
-        //{
-        //    if (UserId != viewModel.AlunoId) { return GenerateResponse(null, ResponseTypeEnum.ValidationError, HttpStatusCode.Forbidden, ["Você não tem permissão para realizar essa operação"]); }
-
-        //    var comando = new SolicitarCertificadoCommand(viewModel.AlunoId, viewModel.MatriculaCursoId, viewModel.PathCertificado);
-        //    var sucesso = await _mediatorHandler.EnviarComando(comando);
-
-        //    if (sucesso)
-        //    {
-        //        return GenerateResponse(new { viewModel.AlunoId, viewModel.MatriculaCursoId, viewModel.PathCertificado },
-        //            responseType: ResponseTypeEnum.Success,
-        //            statusCode: HttpStatusCode.Created);
-        //    }
-
-        //    return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-        //}
-        //catch (DomainException exDomain)
-        //{
-        //    return GenerateDomainExceptionResponse(null, ResponseTypeEnum.DomainError, HttpStatusCode.BadRequest, exDomain);
-        //}
-        //catch (Exception ex)
-        //{
-        //    return GenerateResponse(null, ResponseTypeEnum.GenericError, HttpStatusCode.BadRequest, [ex.Message]);
-        //}
+            var comando = new SolicitarCertificadoCommand(dto.AlunoId, dto.MatriculaCursoId);
+            return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
     }
 }

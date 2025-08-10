@@ -33,8 +33,7 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
                 request.Foto);
 
             await _alunoRepository.AdicionarAsync(aluno);
-            if (await _alunoRepository.UnitOfWork.Commit())
-                request.Resultado.Data = aluno.Id;
+            if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = aluno.Id; }
 
             return request.Resultado;
         }

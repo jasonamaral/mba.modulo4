@@ -1,13 +1,13 @@
-﻿namespace Alunos.Application.DTOs;
+﻿namespace BFF.Domain.DTOs.Alunos.Response;
 public class AulaCursoDto
 {
     public Guid AulaId { get; set; }
     public Guid CursoId { get; set; }
     public string NomeAula { get; set; }
-    public byte OrdemAula { get; set; }
+    public int OrdemAula { get; set; }
     public bool Ativo { get; set; }
     public DateTime? DataInicio { get; set; }
     public DateTime? DataTermino { get; set; }
-    public bool AulaJaIniciadaRealizada => DataTermino.HasValue;
+    public bool AulaJaIniciadaRealizada { get; set; }
     public string Url { get; set; }
 }

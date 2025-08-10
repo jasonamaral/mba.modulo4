@@ -1,9 +1,6 @@
-﻿using Alunos.Application.DTOs;
+﻿using Alunos.Application.DTOs.Response;
 using Alunos.Application.Interfaces;
-using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
-using Alunos.Domain.ValueObjects;
-using Core.SharedDtos.Conteudo;
 using Core.Utils;
 
 namespace Alunos.Application.Queries;
@@ -40,7 +37,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
                 Valor = m.Valor,
                 DataMatricula = m.DataMatricula,
                 DataConclusao = m.DataConclusao,
-                NotaFinal = m.NotaFinal,
+                NotaFinal = m.ObterNotaFinalCurso(),
                 Observacao = m.Observacao,
                 EstadoMatricula = m.EstadoMatricula.GetDescription(),
                 Certificado = m.Certificado != null ? new CertificadoDto
@@ -107,7 +104,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
             Valor = m.Valor,
             DataMatricula = m.DataMatricula,
             DataConclusao = m.DataConclusao,
-            NotaFinal = m.NotaFinal,
+            NotaFinal = m.ObterNotaFinalCurso(),
             Observacao = m.Observacao,
             EstadoMatricula = m.EstadoMatricula.GetDescription(),
             Certificado = m.Certificado != null ? new CertificadoDto
@@ -140,7 +137,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
             PagamentoPodeSerRealizado = matriculaCurso.PagamentoPodeSerRealizado(),
             DataMatricula = matriculaCurso.DataMatricula,
             DataConclusao = matriculaCurso.DataConclusao,
-            NotaFinal = matriculaCurso.NotaFinal,
+            NotaFinal = matriculaCurso.ObterNotaFinalCurso(),
             Observacao = matriculaCurso.Observacao,
             EstadoMatricula = matriculaCurso.EstadoMatricula.GetDescription(),
             Certificado = matriculaCurso.Certificado != null ? new CertificadoDto

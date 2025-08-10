@@ -1,6 +1,4 @@
 using BFF.API.Extensions;
-using BFF.API.Models.Response;
-using BFF.API.Services;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
 using Core.Mediator;
