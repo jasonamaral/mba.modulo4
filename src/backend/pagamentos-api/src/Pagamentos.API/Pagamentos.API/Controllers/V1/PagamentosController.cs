@@ -1,10 +1,13 @@
-﻿using MediatR;
+﻿using Core.Mediator;
+using Core.Messages;
+using Core.Messages.Integration;
+using Core.Notification;
+using Core.Services.Controllers;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.ViewModels;
-using Pagamentos.Core.Messages.CommonMessages.IntegrationEvents;
-using Pagamentos.Core.Messages.CommonMessages.Notifications;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
@@ -14,21 +17,18 @@ namespace Pagamentos.API.Controllers.V1
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/pagamentos")]
     [Authorize]
-    public class PagamentosController : MainController
-    {
-        private readonly IMediator _mediator;
-        private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService;
-        private readonly IPagamentoComandoAppService _pagamentoComandoAppService;
 
-        public PagamentosController(IMediator mediator,
-                                    IPagamentoConsultaAppService pagamentoConsultaAppService,
-                                    IPagamentoComandoAppService pagamentoComandoAppService,
-                                    NotificationContext _notificationContext) : base(mediator, _notificationContext)
-        {
-            _mediator = mediator;
-            _pagamentoConsultaAppService = pagamentoConsultaAppService;
-            _pagamentoComandoAppService = pagamentoComandoAppService;
-        }
+    public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService
+                                         , IPagamentoComandoAppService pagamentoComandoAppService
+                                         , IMediatorHandler mediator
+                                         , INotificador notificador
+                                         , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
+    {
+        private readonly IMediatorHandler _mediator = mediator;
+        private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService = pagamentoConsultaAppService;
+        private readonly IPagamentoComandoAppService _pagamentoComandoAppService = pagamentoComandoAppService;
+
+
 
         [HttpPost("pagamento")]
         [SwaggerOperation(Summary = "Executa pagamento", Description = "Executa o pagamento do curso.")]
@@ -37,31 +37,25 @@ namespace Pagamentos.API.Controllers.V1
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
             if (!ModelState.IsValid)
-                return CustomResponse(HttpStatusCode.BadRequest);
-
-            //var aluno = await _alunoConsultaAppService.ObterPorId(pagamento.AlunoId);
-            //if (aluno == null)
-            //    return NotFoundResponse("Aluno não encontrado.");
+                 return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
 
 
-            //var matricula = await _alunoConsultaAppService.ObterMatriculaPorId(pagamento.MatriculaId);
-            //if (matricula == null)
-            //    return NotFoundResponse("Matrícula no curso não encontrada.");
-
-
-            var pedidoEvent = new PagamentoCursoEvent(pagamento.MatriculaId,
-                                                      pagamento.AlunoId,
-                                                      pagamento.Total,
-                                                      pagamento.NomeCartao,
-                                                      pagamento.NumeroCartao,
-                                                      pagamento.ExpiracaoCartao,
-                                                      pagamento.CvvCartao);
+            var command = new PagamentoCursoEvent(pagamento.MatriculaId,
+                                                    pagamento.AlunoId,
+                                                    pagamento.Total,
+                                                    pagamento.NomeCartao,
+                                                    pagamento.NumeroCartao,
+                                                    pagamento.ExpiracaoCartao,
+                                                    pagamento.CvvCartao);
 
 
 
-            await _mediator.Publish(pedidoEvent);
 
-            return CustomResponse(HttpStatusCode.OK);
+            //TODO
+            // return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+
+            return null;
+
         }
 
         [Authorize(Roles = "Admin")]
@@ -71,7 +65,7 @@ namespace Pagamentos.API.Controllers.V1
         public async Task<ActionResult> ObterTodos()
         {
             var pagamentos = await _pagamentoConsultaAppService.ObterTodos();
-            return CustomResponse(HttpStatusCode.OK, pagamentos);
+            return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
         }
 
         [Authorize(Roles = "Admin")]
@@ -85,13 +79,14 @@ namespace Pagamentos.API.Controllers.V1
             if (pagamento == null)
                 return NotFoundResponse("Pagamento não encontrado.");
 
-            return CustomResponse(HttpStatusCode.OK, pagamento);
+            return RespostaPadraoApi(HttpStatusCode.OK, pagamento);
         }
 
         private IActionResult NotFoundResponse(string message)
         {
-            NotificarErro(message);
-            return CustomResponse(HttpStatusCode.NotFound);
+            _notificador.AdicionarErro(message);
+            return RespostaPadraoApi(HttpStatusCode.NotFound,message);
         }
     }
+
 }

@@ -29,6 +29,9 @@ namespace Pagamentos.Infrastructure.Migrations
                     b.Property<Guid>("CobrancaCursoId")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CvvCartao")
                         .IsRequired()
                         .HasColumnType("varchar(4)");
@@ -49,6 +52,9 @@ namespace Pagamentos.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("Valor")
                         .HasColumnType("TEXT");
 
@@ -66,6 +72,9 @@ namespace Pagamentos.Infrastructure.Migrations
                     b.Property<Guid>("CobrancaCursoId")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("PagamentoId")
                         .HasColumnType("TEXT");
 
@@ -73,6 +82,9 @@ namespace Pagamentos.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Total")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

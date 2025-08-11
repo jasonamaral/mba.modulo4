@@ -1,4 +1,4 @@
-﻿namespace Pagamentos.Core.Messages.CommonMessages.IntegrationEvents
+﻿namespace Core.Messages.Integration
 {
     public class PagamentoCursoEvent : IntegrationEvent
     {
@@ -11,14 +11,14 @@
         public string CvvCartao { get; private set; }
 
         public PagamentoCursoEvent(Guid pedidoId,
-                                       Guid clienteId,
-                                       decimal total,
-                                       string nomeCartao,
-                                       string numeroCartao,
-                                       string expiracaoCartao,
-                                       string cvvCartao)
+                                     Guid clienteId,
+                                     decimal total,
+                                     string nomeCartao,
+                                     string numeroCartao,
+                                     string expiracaoCartao,
+                                     string cvvCartao)
         {
-            AggregateID = pedidoId;
+            //AggregateID = pedidoId;
             PedidoId = pedidoId;
             AlunoId = clienteId;
             Total = total;

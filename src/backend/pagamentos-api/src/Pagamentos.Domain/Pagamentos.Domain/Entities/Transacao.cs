@@ -1,9 +1,9 @@
-﻿using Pagamentos.Core.DomainObjects;
+﻿using Core.DomainObjects;
 using Pagamentos.Domain.Enum;
 
 namespace Pagamentos.Domain.Entities
 {
-    public class Transacao : Entity
+    public class Transacao : Entidade
     {
         public Guid CobrancaCursoId { get; set; }
         public Guid PagamentoId { get; set; }

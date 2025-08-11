@@ -1,4 +1,4 @@
-﻿using Pagamentos.Core.Data;
+﻿using Core.Data;
 using Pagamentos.Domain.Entities;
 
 namespace Pagamentos.Domain.Interfaces

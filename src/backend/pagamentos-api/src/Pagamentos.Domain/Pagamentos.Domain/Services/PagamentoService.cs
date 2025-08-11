@@ -1,7 +1,7 @@
-﻿using Pagamentos.Core.Bus;
+﻿using Core.Mediator;
+using Core.Messages;
+using Core.Messages.Integration;
 using Pagamentos.Core.DomainObjects.DTO;
-using Pagamentos.Core.Messages.CommonMessages.IntegrationEvents;
-using Pagamentos.Core.Messages.CommonMessages.Notifications;
 using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Enum;
 using Pagamentos.Domain.Interfaces;
@@ -13,11 +13,11 @@ namespace Pagamentos.Domain.Services
     {
         private readonly IPagamentoCartaoCreditoFacade _pagamentoCartaoCreditoFacade;
         private readonly IPagamentoRepository _pagamentoRepository;
-        private readonly IMediatrHandler _mediatorHandler;
+        private readonly IMediatorHandler _mediatorHandler;
 
         public PagamentoService(IPagamentoCartaoCreditoFacade pagamentoCartaoCreditoFacade,
                                 IPagamentoRepository pagamentoRepository,
-                                IMediatrHandler mediatorHandler)
+                                IMediatorHandler mediatorHandler)
         {
             _pagamentoCartaoCreditoFacade = pagamentoCartaoCreditoFacade;
             _pagamentoRepository = pagamentoRepository;
@@ -47,7 +47,8 @@ namespace Pagamentos.Domain.Services
 
             if (transacao.StatusTransacao == StatusTransacao.Pago)
             {
-                pagamento.AdicionarEvento(new PagamentoRealizadoEvent(pedido.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, pedido.Valor));
+                //TODO
+                //pagamentos.AdicionarEvento(new PagamentoRealizadoEvent(pedido.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, pedido.Valor));
 
                 pagamento.Status = transacao.StatusTransacao.ToString();
                 pagamento.Transacao = transacao;
@@ -59,7 +60,7 @@ namespace Pagamentos.Domain.Services
                 return transacao;
             }
 
-            await _mediatorHandler.PublicarNotificacao(new DomainNotification("pagamento", "A operadora recusou o pagamento"));
+            await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz("pagamento", "A operadora recusou o pagamento"));
             await _mediatorHandler.PublicarEvento(new PagamentoRecusadoEvent(pedido.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, pedido.Valor));
 
             return transacao;

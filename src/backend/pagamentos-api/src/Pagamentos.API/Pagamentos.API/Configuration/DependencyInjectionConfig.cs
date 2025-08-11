@@ -1,12 +1,12 @@
-﻿using Core.Notification;
+﻿using Core.Mediator;
+using Core.Messages;
+using Core.Notification;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Pagamento.AntiCorruption.Interfaces;
 using Pagamento.AntiCorruption.Services;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.Services;
-using Pagamentos.Core.Bus;
-using Pagamentos.Core.Messages.CommonMessages.Notifications;
 using Pagamentos.Domain.Interfaces;
 using Pagamentos.Domain.Services;
 using Pagamentos.Infrastructure.Repositories;
@@ -28,14 +28,9 @@ namespace Pagamentos.API.Configuration
         {
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
-            services.AddScoped<IMediatrHandler, MediatorHandler>();
-
-            services.AddScoped<DomainNotificationHandler>();
-            services.AddScoped<NotificationContext>();
-            services.AddScoped<INotificationHandler<DomainNotification>>(provider => provider.GetService<DomainNotificationHandler>());
-
+            services.AddScoped<IMediatorHandler, MediatorHandler>();
+            services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
             services.AddScoped<INotificador, Notificador>();
-
 
             services.AddScoped<IPagamentoConsultaAppService, PagamentoAppService>();
             services.AddScoped<IPagamentoComandoAppService, PagamentoAppService>();

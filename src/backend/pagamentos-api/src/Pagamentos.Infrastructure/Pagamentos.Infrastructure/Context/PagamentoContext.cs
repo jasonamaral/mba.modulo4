@@ -1,18 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Core.Data;
+using Core.Mediator;
+using Core.Messages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Pagamentos.Core.Bus;
-using Pagamentos.Core.Data;
-using Pagamentos.Core.Messages;
 using Pagamentos.Domain.Entities;
-using Pagamentos.Infrastructure.Extension;
 
 namespace Pagamentos.Infrastructure.Context
 {
     public class PagamentoContext : DbContext, IUnitOfWork
     {
-        private readonly IMediatrHandler _mediatorHandler;
+        private readonly IMediatorHandler _mediatorHandler;
 
-        public PagamentoContext(DbContextOptions<PagamentoContext> options, IMediatrHandler rebusHandler)
+        public PagamentoContext(DbContextOptions<PagamentoContext> options, IMediatorHandler rebusHandler)
             : base(options)
         {
             _mediatorHandler = rebusHandler ?? throw new ArgumentNullException(nameof(rebusHandler));
@@ -38,7 +37,9 @@ namespace Pagamentos.Infrastructure.Context
             }
 
             var sucesso = await base.SaveChangesAsync() > 0;
-            if (sucesso) await _mediatorHandler.PublicarEventos(this);
+
+            //TODO
+            // if (sucesso) await _mediatorHandler.PublicarEvento(this);
 
             return sucesso;
         }
@@ -51,7 +52,7 @@ namespace Pagamentos.Infrastructure.Context
                 property.SetColumnType("varchar(100)");
             }
 
-            modelBuilder.Ignore<Event>();
+            modelBuilder.Ignore<EventRaiz>();
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(PagamentoContext).Assembly);
 

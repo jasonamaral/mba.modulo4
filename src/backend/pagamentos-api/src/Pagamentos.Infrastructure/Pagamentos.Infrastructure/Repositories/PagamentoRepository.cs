@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Pagamentos.Core.Data;
+﻿using Core.Data;
+using Microsoft.EntityFrameworkCore;
 using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Interfaces;
 using Pagamentos.Infrastructure.Context;

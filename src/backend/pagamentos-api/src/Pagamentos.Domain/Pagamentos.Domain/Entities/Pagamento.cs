@@ -1,8 +1,9 @@
-﻿using Pagamentos.Core.DomainObjects;
+﻿using Core.DomainObjects;
+using Pagamentos.Core.DomainObjects;
 
 namespace Pagamentos.Domain.Entities
 {
-    public class Pagamento : Entity, IAggregateRoot
+    public class Pagamento : Entidade, IRaizAgregacao
     {
         public Guid CobrancaCursoId { get; set; }
         public Guid AlunoId { get; set; }

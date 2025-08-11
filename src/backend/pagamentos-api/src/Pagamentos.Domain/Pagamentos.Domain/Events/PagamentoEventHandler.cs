@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using Core.Messages.Integration;
+using MediatR;
 using Pagamentos.Core.DomainObjects.DTO;
-using Pagamentos.Core.Messages.CommonMessages.IntegrationEvents;
 using Pagamentos.Domain.Interfaces;
 
 namespace Pagamentos.Domain.Events

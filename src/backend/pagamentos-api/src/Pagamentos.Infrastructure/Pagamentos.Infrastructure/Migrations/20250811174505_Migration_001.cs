@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Pagamentos.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Migration01 : Migration
+    public partial class Migration_001 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,7 +23,9 @@ namespace Pagamentos.Infrastructure.Migrations
                     NomeCartao = table.Column<string>(type: "varchar(250)", nullable: false),
                     NumeroCartao = table.Column<string>(type: "varchar(16)", nullable: false),
                     ExpiracaoCartao = table.Column<string>(type: "varchar(10)", nullable: false),
-                    CvvCartao = table.Column<string>(type: "varchar(4)", nullable: false)
+                    CvvCartao = table.Column<string>(type: "varchar(4)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,7 +40,9 @@ namespace Pagamentos.Infrastructure.Migrations
                     CobrancaCursoId = table.Column<Guid>(type: "TEXT", nullable: false),
                     PagamentoId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Total = table.Column<decimal>(type: "TEXT", nullable: false),
-                    StatusTransacao = table.Column<int>(type: "INTEGER", nullable: false)
+                    StatusTransacao = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
