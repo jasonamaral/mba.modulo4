@@ -1,4 +1,4 @@
-﻿namespace Pagamentos.Core.DomainObjects.DTO
+﻿namespace Pagamentos.Domain.Models
 {
     public class PagamentoCurso
     {

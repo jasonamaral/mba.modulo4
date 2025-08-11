@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Pagamentos.Core\Pagamentos.Core.csproj" />
     <ProjectReference Include="..\..\Pagamentos.Domain\Pagamentos.Domain\Pagamentos.Domain.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,5 @@
-﻿using Pagamentos.Core.DomainObjects.DTO;
-using Pagamentos.Domain.Entities;
+﻿using Pagamentos.Domain.Entities;
+using Pagamentos.Domain.Models;
 
 namespace Pagamentos.Domain.Interfaces
 {

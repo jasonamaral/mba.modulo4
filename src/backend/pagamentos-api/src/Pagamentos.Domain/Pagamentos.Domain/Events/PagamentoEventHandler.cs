@@ -1,7 +1,7 @@
 ﻿using Core.Messages.Integration;
 using MediatR;
-using Pagamentos.Core.DomainObjects.DTO;
 using Pagamentos.Domain.Interfaces;
+using Pagamentos.Domain.Models;
 
 namespace Pagamentos.Domain.Events
 {

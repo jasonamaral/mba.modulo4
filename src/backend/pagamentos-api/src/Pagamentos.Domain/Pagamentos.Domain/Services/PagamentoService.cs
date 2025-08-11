@@ -1,7 +1,6 @@
 ﻿using Core.Mediator;
 using Core.Messages;
 using Core.Messages.Integration;
-using Pagamentos.Core.DomainObjects.DTO;
 using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Enum;
 using Pagamentos.Domain.Interfaces;

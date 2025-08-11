@@ -12,7 +12,7 @@ builder
     .AddJwtConfiguration()
     .AddAutoMapperConfig()
     .AddDependencyInjectionConfig()
-    .AddMediatRConfig();
+    .AddMediatrConfig();
 
 var app = builder.Build();
 
