@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Pagamentos.API.Authentication;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.ViewModels;
 using Pagamentos.Core.Messages.CommonMessages.IntegrationEvents;
@@ -24,8 +23,7 @@ namespace Pagamentos.API.Controllers.V1
         public PagamentosController(IMediator mediator,
                                     IPagamentoConsultaAppService pagamentoConsultaAppService,
                                     IPagamentoComandoAppService pagamentoComandoAppService,
-                                    IAppIdentityUser appIdentityUser,
-                                    NotificationContext _notificationContext) : base(mediator, _notificationContext, appIdentityUser)
+                                    NotificationContext _notificationContext) : base(mediator, _notificationContext)
         {
             _mediator = mediator;
             _pagamentoConsultaAppService = pagamentoConsultaAppService;

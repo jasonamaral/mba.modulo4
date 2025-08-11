@@ -15,19 +15,11 @@ namespace Pagamentos.API.Controllers
         protected string UserName { get; set; }
         protected bool UserAdmin { get; set; }
 
-        protected MainController(IMediator mediator,
-                                 NotificationContext notificationContext,
-                                 Authentication.IAppIdentityUser user)
+        protected MainController(IMediator mediator, NotificationContext notificationContext)
         {
             _notificationContext = notificationContext;
             _mediator = mediator;
 
-            if (user.IsAuthenticated())
-            {
-                UserId = user.GetUserId();
-                UserName = user.GetUsername();
-                UserAdmin = user.IsInRole("Admin");
-            }
         }
 
         protected bool OperacaoValida()

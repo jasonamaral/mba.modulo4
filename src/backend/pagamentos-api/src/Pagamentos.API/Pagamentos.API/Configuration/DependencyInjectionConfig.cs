@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using Pagamento.AntiCorruption.Interfaces;
 using Pagamento.AntiCorruption.Services;
-using Pagamentos.API.Authentication;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.Services;
 using Pagamentos.Core.Bus;
@@ -35,7 +34,6 @@ namespace Pagamentos.API.Configuration
             services.AddScoped<NotificationContext>();
             services.AddScoped<INotificationHandler<DomainNotification>>(provider => provider.GetService<DomainNotificationHandler>());
 
-            services.AddScoped<IAppIdentityUser, AppIdentityUser>();
             services.AddScoped<INotificador, Notificador>();
 
 

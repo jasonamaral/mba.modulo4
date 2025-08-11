@@ -9,7 +9,7 @@ builder
     .AddCorsConfig()
     .AddSwaggerConfig()
     .AddDbContextConfig()
-    .AddIdentityConfig()
+    .AddJwtConfiguration()
     .AddAutoMapperConfig()
     .AddDependencyInjectionConfig()
     .AddMediatRConfig();
