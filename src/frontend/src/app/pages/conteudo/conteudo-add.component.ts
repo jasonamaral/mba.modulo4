@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormBaseComponent } from 'src/app/components/base-components/form-base.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, FormControlName, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CategoryModel } from './models/conteudo.model';
+import { CategoryModel } from 'src/app/models/conteudo.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
 
 @Component({

@@ -1,0 +1,15 @@
+.course-card {
+  width: 100%;
+}
+
+.course-essentials .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.course-essentials .col {
+  flex: 1 1 0;
+}
+
+

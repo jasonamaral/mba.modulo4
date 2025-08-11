@@ -3,7 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
-import { CursosService, CursoDto } from '../../services/cursos.service';
+import { CursosService } from '../../services/cursos.service';
+import { CursoModel } from '../../models/curso.model';
 import { MatriculasService } from '../../services/matriculas.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -14,7 +15,7 @@ import { ToastrService } from 'ngx-toastr';
   imports: [CommonModule, MatListModule, MatButtonModule]
 })
 export class CursoDetalheComponent {
-  curso?: CursoDto;
+  curso?: CursoModel;
   cursoId!: string;
   progresso = 0;
   constructor(private route: ActivatedRoute, private cursos: CursosService, private mats: MatriculasService, private toastr: ToastrService) {}

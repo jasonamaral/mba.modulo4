@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Subject, takeUntil } from 'rxjs';
 import { MaterialModule } from 'src/app/material.module';
-import { CategoryModel } from './models/conteudo.model';
+import { CategoryModel } from 'src/app/models/conteudo.model';
 import { CommonModule } from '@angular/common';
 import { ConteudoTypeDescriptions, ConteudoTypeEnum } from './enums/conteudo-type.enum';
 import { MatDialog } from '@angular/material/dialog';

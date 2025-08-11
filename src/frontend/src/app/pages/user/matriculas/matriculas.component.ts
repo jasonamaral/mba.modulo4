@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatriculasService, MatriculaDto } from '../../../services/matriculas.service';
+import { MatriculasService } from '../../../services/matriculas.service';
+import { MatriculaModel } from '../../../models/matricula.model';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -14,7 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class MatriculasComponent {
   cols = ['curso','status','progresso','acoes'];
-  matriculas: MatriculaDto[] = [];
+  matriculas: MatriculaModel[] = [];
 
   constructor(private service: MatriculasService, private toastr: ToastrService) {}
 
@@ -31,7 +32,7 @@ export class MatriculasComponent {
     });
   }
 
-  finalizar(m: MatriculaDto) {
+  finalizar(m: MatriculaModel) {
     this.service.finalizarCurso(m.cursoId).subscribe({
       next: () => {
         this.toastr.success('Curso finalizado com sucesso.');

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable } from 'rxjs';
 import { BaseService } from './BaseService';
-import { CategoryModel } from '../pages/conteudo/models/conteudo.model';
+import { CategoryModel } from '../models/conteudo.model';
 
 @Injectable({ providedIn: 'root' })
 export class ConteudoService extends BaseService {
