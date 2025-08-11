@@ -15,7 +15,7 @@ namespace Pagamentos.API.Configuration
             {
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "Insira o token JWT desta maneira: Bearer {seu token}",
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
@@ -80,10 +80,10 @@ namespace Pagamentos.API.Configuration
         {
             var info = new OpenApiInfo()
             {
-                Title = "EducaMBAXpert Api",
+                Title = "Pagamentos Api",
                 Version = description.ApiVersion.ToString(),
-                Description = "Esta API faz parte do curso MBA DevExpress Modulo 3",
-                Contact = new OpenApiContact() { Name = "Marco Aurelio Roque", Email = "marco@imperiumsolucoes.com.br" },
+                Description = "API de Gestão de Alunos para a Plataforma Educacional",
+                Contact = new OpenApiContact() { Name = "MBA DevXpert", Email = "contato@mbadevxpert.com" },
                 License = new OpenApiLicense() { Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT") }
             };
 
