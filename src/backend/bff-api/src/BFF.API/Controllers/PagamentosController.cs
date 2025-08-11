@@ -41,6 +41,8 @@ namespace BFF.API.Controllers
             _logger = logger;
         }
 
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("pagamento")]
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
 
@@ -83,8 +85,6 @@ namespace BFF.API.Controllers
                 _logger.LogError(ex, "Erro ao processar pagamento via BFF");
                 return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
             }
-
-            return null;
 
         }
 
