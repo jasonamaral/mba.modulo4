@@ -1,0 +1,56 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Pagamentos.Infrastructure.Context;
+
+namespace Pagamentos.API.Configuration
+{
+    public static class DbContextConfig
+    {
+        public static WebApplicationBuilder AddDbContextConfig(this WebApplicationBuilder builder)
+        {
+            if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Test"))
+            {
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionSqLite") ?? throw new InvalidOperationException("Connection string 'DefaultConnectionSqLite' not found.");
+
+                builder.Services.AddDbContext<CursoContext>(options =>
+                    options.UseSqlite(connectionString));
+
+                builder.Services.AddDbContext<AlunoContext>(options =>
+                    options.UseSqlite(connectionString));
+
+                builder.Services.AddDbContext<PagamentoContext>(options =>
+                    options.UseSqlite(connectionString));
+
+                builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlite(connectionString));
+
+                return builder;
+            }
+            else
+            {
+
+                builder.Services.AddDbContext<CursoContext>(options =>
+                {
+                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                });
+
+                builder.Services.AddDbContext<AlunoContext>(options =>
+                {
+                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                });
+
+                builder.Services.AddDbContext<PagamentoContext>(options =>
+                {
+                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                });
+
+                builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                {
+                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                });
+
+                return builder;
+            }
+
+        }
+    }
+}
