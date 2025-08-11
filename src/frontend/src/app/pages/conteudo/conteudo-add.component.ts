@@ -77,7 +77,8 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
         },
         error: (fail) => {
           this.submitted = false;
-          this.toastr.error(fail.error.errors);
+          const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
+          this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao salvar a categoria.');
         }
       });
   }

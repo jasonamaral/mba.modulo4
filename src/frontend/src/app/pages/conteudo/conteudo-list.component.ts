@@ -43,7 +43,8 @@ export class ConteudoListComponent implements OnInit, OnDestroy {
           this.categoryModel = response;
         },
         error: (fail) => {
-          this.toastr.error(fail.error.errors);
+          const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
+          this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Falha ao carregar categorias.');
         }
       });
   }
@@ -118,7 +119,8 @@ export class ConteudoListComponent implements OnInit, OnDestroy {
               this.getCategories();
             },
             error: (fail) => {
-              this.toastr.error(fail.error.errors);
+              const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
+              this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Falha ao excluir categoria.');
             }
           });
       });

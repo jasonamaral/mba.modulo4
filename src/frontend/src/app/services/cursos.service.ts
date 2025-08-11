@@ -31,7 +31,20 @@ export class CursosService extends BaseService {
   listar(): Observable<CursoDto[]> {
     return this.http
       .get(this.UrlServiceV1 + 'Conteudos/cursos', this.getAuthHeaderJson())
-      .pipe(map(r => this.extractData(r)?.items ?? this.extractData(r) ?? []), catchError(e => this.serviceError(e)));
+      .pipe(
+        map(r => {
+          const data = this.extractData(r);
+          if (!data) return [];
+          // Suporta paginação: { pageSize, pageIndex, totalResults, items: [] }
+          if (Array.isArray((data as any).items)) return (data as any).items as CursoDto[];
+          // Suporta retorno direto como array
+          if (Array.isArray(data)) return data as CursoDto[];
+          // Suporta retorno de item único
+          if (typeof data === 'object' && (data as any).id) return [data as CursoDto];
+          return [];
+        }),
+        catchError(e => this.serviceError(e))
+      );
   }
 
   obter(id: string, includeAulas = true): Observable<CursoDto> {
