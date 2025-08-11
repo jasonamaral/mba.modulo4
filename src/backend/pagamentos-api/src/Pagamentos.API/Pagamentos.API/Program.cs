@@ -36,6 +36,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", DateTime = DateTime.UtcNow }))
+   .WithName("HealthCheck")
+   .WithOpenApi();
 
 app.UseDbMigrationHelper();
 
