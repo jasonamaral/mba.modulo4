@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Pagamentos.Domain\Pagamentos.Domain\Pagamentos.Domain.csproj" />
+    <ProjectReference Include="..\Pagamentos.Domain\Pagamentos.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

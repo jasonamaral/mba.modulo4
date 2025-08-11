@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\pagamentos-api\src\Pagamentos.Domain\Pagamentos.Domain\Pagamentos.Domain.csproj" />
+    <ProjectReference Include="..\Pagamentos.Domain\Pagamentos.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -11,8 +11,6 @@ using Pagamentos.Domain.Interfaces;
 using Pagamentos.Domain.Services;
 using Pagamentos.Infrastructure.Repositories;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using ConfigurationManager = Pagamento.AntiCorruption.Services.ConfigurationManager;
-using IConfigurationManager = Pagamento.AntiCorruption.Interfaces.IConfigurationManager;
 
 namespace Pagamentos.API.Configuration
 {
@@ -38,7 +36,7 @@ namespace Pagamentos.API.Configuration
             services.AddScoped<IPagamentoService, PagamentoService>();
             services.AddScoped<IPagamentoCartaoCreditoFacade, PagamentoCartaoCreditoFacade>();
             services.AddScoped<IPayPalGateway, PayPalGateway>();
-            services.AddScoped<IConfigurationManager, ConfigurationManager>();
+            services.AddScoped<Pagamento.AntiCorruption.Interfaces.IConfigurationManager, Pagamento.AntiCorruption.Services.ConfigurationManager>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
