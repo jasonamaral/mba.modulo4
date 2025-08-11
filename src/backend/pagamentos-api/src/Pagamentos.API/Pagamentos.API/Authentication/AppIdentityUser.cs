@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using IdentityModel;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Pagamentos.API.Authentication
 {

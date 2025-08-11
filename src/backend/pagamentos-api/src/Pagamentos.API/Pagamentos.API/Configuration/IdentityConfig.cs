@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Pagamentos.API.Authentication;
+using Pagamentos.API.Context;
 using System.Text;
 
 namespace Pagamentos.API.Configuration

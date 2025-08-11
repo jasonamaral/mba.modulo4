@@ -1,4 +1,6 @@
-﻿namespace Pagamentos.API.Configuration
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Pagamentos.API.Configuration
 {
     public static class ApiConfig
     {
@@ -8,9 +10,9 @@
 
             builder.Services.AddApiVersioning(options =>
             {
-                options.DefaultApiVersion = new ApiVersion(1, 0); // Versão padrão: 1.0
-                options.AssumeDefaultVersionWhenUnspecified = true; // Usar versão padrão se não for especificada
-                options.ReportApiVersions = true; // Expor informações de versões disponíveis nos cabeçalhos de resposta
+                options.DefaultApiVersion = new ApiVersion(1, 0); 
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true; 
             });
 
             builder.Services.AddVersionedApiExplorer(options =>

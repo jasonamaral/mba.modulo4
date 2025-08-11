@@ -6,6 +6,7 @@ using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.ViewModels;
 using Pagamentos.Core.Messages.CommonMessages.IntegrationEvents;
 using Pagamentos.Core.Messages.CommonMessages.Notifications;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace Pagamentos.API.Controllers.V1
@@ -19,19 +20,16 @@ namespace Pagamentos.API.Controllers.V1
         private readonly IMediator _mediator;
         private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService;
         private readonly IPagamentoComandoAppService _pagamentoComandoAppService;
-        private readonly IAlunoConsultaAppService _alunoConsultaAppService;
 
         public PagamentosController(IMediator mediator,
                                     IPagamentoConsultaAppService pagamentoConsultaAppService,
                                     IPagamentoComandoAppService pagamentoComandoAppService,
-                                    IAlunoConsultaAppService alunoConsultaAppService,
                                     IAppIdentityUser appIdentityUser,
                                     NotificationContext _notificationContext) : base(mediator, _notificationContext, appIdentityUser)
         {
             _mediator = mediator;
             _pagamentoConsultaAppService = pagamentoConsultaAppService;
             _pagamentoComandoAppService = pagamentoComandoAppService;
-            _alunoConsultaAppService = alunoConsultaAppService;
         }
 
         [HttpPost("pagamento")]
@@ -43,14 +41,14 @@ namespace Pagamentos.API.Controllers.V1
             if (!ModelState.IsValid)
                 return CustomResponse(HttpStatusCode.BadRequest);
 
-            var aluno = await _alunoConsultaAppService.ObterPorId(pagamento.AlunoId);
-            if (aluno == null)
-                return NotFoundResponse("Aluno não encontrado.");
+            //var aluno = await _alunoConsultaAppService.ObterPorId(pagamento.AlunoId);
+            //if (aluno == null)
+            //    return NotFoundResponse("Aluno não encontrado.");
 
 
-            var matricula = await _alunoConsultaAppService.ObterMatriculaPorId(pagamento.MatriculaId);
-            if (matricula == null)
-                return NotFoundResponse("Matrícula no curso não encontrada.");
+            //var matricula = await _alunoConsultaAppService.ObterMatriculaPorId(pagamento.MatriculaId);
+            //if (matricula == null)
+            //    return NotFoundResponse("Matrícula no curso não encontrada.");
 
 
             var pedidoEvent = new PagamentoCursoEvent(pagamento.MatriculaId,

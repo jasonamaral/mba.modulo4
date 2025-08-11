@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pagamentos.API.Context;
 using Pagamentos.Infrastructure.Context;
 
 namespace Pagamentos.API.Configuration
@@ -11,12 +12,6 @@ namespace Pagamentos.API.Configuration
             {
                 var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionSqLite") ?? throw new InvalidOperationException("Connection string 'DefaultConnectionSqLite' not found.");
 
-                builder.Services.AddDbContext<CursoContext>(options =>
-                    options.UseSqlite(connectionString));
-
-                builder.Services.AddDbContext<AlunoContext>(options =>
-                    options.UseSqlite(connectionString));
-
                 builder.Services.AddDbContext<PagamentoContext>(options =>
                     options.UseSqlite(connectionString));
 
@@ -27,17 +22,6 @@ namespace Pagamentos.API.Configuration
             }
             else
             {
-
-                builder.Services.AddDbContext<CursoContext>(options =>
-                {
-                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-                });
-
-                builder.Services.AddDbContext<AlunoContext>(options =>
-                {
-                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-                });
-
                 builder.Services.AddDbContext<PagamentoContext>(options =>
                 {
                     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

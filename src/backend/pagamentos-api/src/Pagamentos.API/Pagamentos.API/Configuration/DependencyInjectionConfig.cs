@@ -1,8 +1,8 @@
 ﻿using Core.Notification;
 using MediatR;
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Pagamento.AntiCorruption.Interfaces;
+using Pagamento.AntiCorruption.Services;
 using Pagamentos.API.Authentication;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.Services;
@@ -12,6 +12,8 @@ using Pagamentos.Domain.Interfaces;
 using Pagamentos.Domain.Services;
 using Pagamentos.Infrastructure.Repositories;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using ConfigurationManager = Pagamento.AntiCorruption.Services.ConfigurationManager;
+using IConfigurationManager = Pagamento.AntiCorruption.Interfaces.IConfigurationManager;
 
 namespace Pagamentos.API.Configuration
 {
@@ -36,19 +38,6 @@ namespace Pagamentos.API.Configuration
             services.AddScoped<IAppIdentityUser, AppIdentityUser>();
             services.AddScoped<INotificador, Notificador>();
 
-            services.AddScoped<IAlunoRepository, AlunoRepository>();
-            services.AddScoped<IAlunoService, AlunoService>();
-            services.AddScoped<IAlunoComandoAppService, AlunoAppService>();
-            services.AddScoped<IAlunoConsultaAppService, AlunoAppService>();
-
-            services.AddScoped<ICursoRepository, CursoRepository>();
-            services.AddScoped<ICursoService, CursoService>();
-            services.AddScoped<ICursoConsultaAppService, CursoAppService>();
-            services.AddScoped<ICursoComandoAppService, CursoAppService>();
-
-            services.AddScoped<IMatriculaRepository, MatriculaRepository>();
-            services.AddScoped<IMatriculaConsultaAppService, MatriculaAppService>();
-            services.AddScoped<IMatriculaComandoAppService, MatriculaAppService>();
 
             services.AddScoped<IPagamentoConsultaAppService, PagamentoAppService>();
             services.AddScoped<IPagamentoComandoAppService, PagamentoAppService>();
@@ -56,7 +45,7 @@ namespace Pagamentos.API.Configuration
             services.AddScoped<IPagamentoService, PagamentoService>();
             services.AddScoped<IPagamentoCartaoCreditoFacade, PagamentoCartaoCreditoFacade>();
             services.AddScoped<IPayPalGateway, PayPalGateway>();
-            services.AddScoped<Pagamentos.AntiCorruption.Interfaces.IConfigurationManager, Pagamentos.AntiCorruption.Services.ConfigurationManager>();
+            services.AddScoped<IConfigurationManager, ConfigurationManager>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
