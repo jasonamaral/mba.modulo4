@@ -10,7 +10,7 @@ namespace Pagamentos.API.Configuration
         {
             if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Test"))
             {
-                var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionSqLite") ?? throw new InvalidOperationException("Connection string 'DefaultConnectionSqLite' not found.");
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
                 builder.Services.AddDbContext<PagamentoContext>(options =>
                     options.UseSqlite(connectionString));
