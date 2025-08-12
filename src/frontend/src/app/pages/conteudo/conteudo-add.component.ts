@@ -11,6 +11,7 @@ import { CategoryModel } from 'src/app/models/conteudo.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
 import { CursoCreateModel } from 'src/app/models/curso.model';
 import { CursosService } from 'src/app/services/cursos.service';
+import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
 
 @Component({
   selector: 'app-conteudo-add',
@@ -110,6 +111,33 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
 
   ngAfterViewInit(): void {
     super.configureValidationFormBase(this.formInputElements, this.form);
+  }
+
+  openAddCategory(): void {
+    const ref = this.dialog.open(CategoriaAddDialogComponent, {
+      width: '840px',
+      maxWidth: '95vw',
+      disableClose: true,
+      autoFocus: false
+    });
+
+    ref.afterClosed().subscribe(result => {
+      if (result?.inserted) {
+        // Recarrega categorias
+        this.categoriasService.getAllCategories().pipe(takeUntil(this.destroy$)).subscribe({
+          next: (cats) => {
+            const raw = (cats as any[]) ?? [];
+            this.categorias = raw.map((c: any) => ({
+              categoryId: c?.id ?? c?.categoryId ?? '',
+              userId: '',
+              description: c?.nome ?? c?.description ?? c?.descricao ?? '',
+              type: 0,
+            } as CategoryModel));
+          },
+          error: () => {}
+        });
+      }
+    });
   }
 
   submit() {

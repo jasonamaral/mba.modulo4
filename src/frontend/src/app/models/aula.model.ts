@@ -6,6 +6,8 @@ export interface AulaModel {
   ordem: number;
   duracaoMinutos: number;
   videoUrl: string;
+  // Campos opcionais que podem vir da API e serão exibidos
+  status?: string;
 }
 
 

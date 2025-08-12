@@ -49,14 +49,20 @@
         <mat-error *ngIf="form.get('instrutor')?.hasError('required')">Informe o instrutor.</mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" floatLabel="always" class="col-4">
-        <mat-label>Categoria</mat-label>
-        <mat-select formControlName="categoriaId">
-          <mat-option *ngFor="let cat of categorias" [value]="cat.categoryId">{{ cat.description }}</mat-option>
-          <mat-option *ngIf="categorias?.length === 0" disabled>Nenhuma categoria disponível</mat-option>
-        </mat-select>
-        <mat-error *ngIf="form.get('categoriaId')?.hasError('required')">Selecione uma categoria.</mat-error>
-      </mat-form-field>
+      <div class="col-8" style="display:flex; align-items:center; gap:8px;">
+        <mat-form-field appearance="outline" floatLabel="always" style="flex:1 1 auto; min-width: 320px;">
+          <mat-label>Categoria</mat-label>
+          <mat-select formControlName="categoriaId">
+            <mat-option *ngFor="let cat of categorias" [value]="cat.categoryId">{{ cat.description }}</mat-option>
+            <mat-option *ngIf="categorias?.length === 0" disabled>Nenhuma categoria disponível</mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('categoriaId')?.hasError('required')">Selecione uma categoria.</mat-error>
+        </mat-form-field>
+
+        <button type="button" mat-icon-button color="primary" aria-label="Adicionar categoria" (click)="openAddCategory()" style="width:32px;height:32px">
+          <mat-icon fontIcon="add"></mat-icon>
+        </button>
+      </div>
 
       <mat-form-field appearance="outline" floatLabel="always" class="col-4">
         <mat-label>Imagem URL</mat-label>

@@ -14,6 +14,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConteudoAddComponent } from './conteudo-add.component';
 import { LocalStorageUtils } from 'src/app/utils/localstorage';
 import { ConteudoUpdateComponent } from './conteudo-update.component';
+import { AulasListDialogComponent } from './aulas-list-dialog.component';
 
 @Component({
   standalone: true,
@@ -62,8 +63,8 @@ export class CursosListComponent {
 
   openAddDialog(): void {
     const ref = this.dialog.open(ConteudoAddComponent, {
-      width: '1000px',
-      maxWidth: '100vw',
+      width: '1100px',
+      maxWidth: '95vw',
       panelClass: ['dialog-fullwidth'],
       disableClose: true,
       autoFocus: false
@@ -90,6 +91,14 @@ export class CursosListComponent {
       if (result?.inserted) {
         this.loadCursos();
       }
+    });
+  }
+
+  openAulasDialog(curso: CursoModel): void {
+    this.dialog.open(AulasListDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      data: { curso },
     });
   }
 

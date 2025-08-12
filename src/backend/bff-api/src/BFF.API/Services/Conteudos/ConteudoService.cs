@@ -6,6 +6,7 @@ using BFF.Infrastructure.Services;
 using Core.Communication;
 using Core.Communication.Filters;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace BFF.API.Services.Conteudos;
 
@@ -39,11 +40,29 @@ public class ConteudoService : BaseApiService, IConteudoService
         var result = await ExecuteWithErrorHandling(async () =>
         {
             _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            
-            return await _apiClient.GetAsync<ResponseResult<PagedResult<CursoDto>>>("api/cursos");
+
+            var queryParams = new Dictionary<string, string?>
+            {
+                [nameof(CursoFilter.PageSize)] = filter.PageSize > 0 ? filter.PageSize.ToString() : null,
+                [nameof(CursoFilter.PageIndex)] = filter.PageIndex > 0 ? filter.PageIndex.ToString() : null,
+                [nameof(CursoFilter.Query)] = string.IsNullOrWhiteSpace(filter.Query) ? null : filter.Query,
+                [nameof(CursoFilter.IncludeAulas)] = filter.IncludeAulas.ToString().ToLowerInvariant(),
+                [nameof(CursoFilter.Ativos)] = filter.Ativos.ToString().ToLowerInvariant()
+            }!;
+
+            var filteredParams = queryParams
+                .Where(p => p.Value is not null)
+                .ToDictionary(p => p.Key, p => p.Value);
+
+            var url = QueryHelpers.AddQueryString("api/cursos", filteredParams);
+            return await _apiClient.GetAsync<ResponseResult<PagedResult<CursoDto>>>(url);
         }, nameof(ObterTodosCursos));
 
-        return result ?? new ResponseResult<PagedResult<CursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        return result ?? new ResponseResult<PagedResult<CursoDto>>
+        {
+            Status = 500,
+            Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } }
+        };
     }
     public async Task<ResponseResult<ConteudoProgramaticoDto>> ObterConteudoProgramaticoPorCursoId(Guid cursoId, bool includeAulas = false)
     {

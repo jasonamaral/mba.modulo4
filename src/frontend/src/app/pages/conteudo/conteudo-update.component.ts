@@ -12,6 +12,7 @@ import { ConteudoService } from 'src/app/services/conteudo.service';
 import { CursoCreateModel } from 'src/app/models/curso.model';
 import { CursosService } from 'src/app/services/cursos.service';
 import { ConteudoAddComponent } from './conteudo-add.component';
+import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
 
 @Component({
   selector: 'app-conteudo-update',
@@ -166,7 +167,32 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
         }
       });
   }
+  openAddCategory(): void {
+    const ref = this.dialog.open(CategoriaAddDialogComponent, {
+      width: '840px',
+      maxWidth: '95vw',
+      disableClose: true,
+      autoFocus: false
+    });
 
+    ref.afterClosed().subscribe(result => {
+      if (result?.inserted) {
+        // Recarrega categorias
+        this.categoriasService.getAllCategories().pipe(takeUntil(this.destroy$)).subscribe({
+          next: (cats) => {
+            const raw = (cats as any[]) ?? [];
+            this.categorias = raw.map((c: any) => ({
+              categoryId: c?.id ?? c?.categoryId ?? '',
+              userId: '',
+              description: c?.nome ?? c?.description ?? c?.descricao ?? '',
+              type: 0,
+            } as CategoryModel));
+          },
+          error: () => {}
+        });
+      }
+    });
+  }
   cancel() {
     this.dialogRef.close({ inserted: false });
   }

@@ -10,7 +10,7 @@ export class CursosService extends BaseService {
 
   listar(): Observable<CursoModel[]> {
     return this.http
-      .get(this.UrlServiceV1 + 'Conteudos/cursos', this.getAuthHeaderJson())
+      .get(this.UrlServiceV1 + 'Conteudos/cursos?IncludeAulas=true', this.getAuthHeaderJson())
       .pipe(
         map(r => {
           const data = this.extractData(r);

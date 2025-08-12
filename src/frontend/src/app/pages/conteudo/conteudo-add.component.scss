@@ -23,6 +23,17 @@
 .col-4 { grid-column: span 4; }
 .col-3 { grid-column: span 3; min-width: 260px; }
 
+/* Mantém altura e alinhamento uniformes entre fields lado a lado */
+:host ::ng-deep .mat-mdc-form-field {
+  align-self: stretch;
+}
+
+/* Garante que os dois fields da mesma linha tenham a mesma altura e bordas alinhadas */
+:host ::ng-deep .form-grid > [class^='col-'] { display:flex; align-items:stretch; }
+
+/* Ajusta altura da linha de campos no modal de categoria */
+:host ::ng-deep .mat-mdc-form-field-infix { display:flex; align-items:center; }
+
 @media (max-width: 1280px) {
   .col-3 { grid-column: span 6; }
 }

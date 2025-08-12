@@ -44,6 +44,13 @@ export class ConteudoService extends BaseService {
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 
+  // Criação seguindo contrato da API /api/Categoria { nome, descricao, cor, iconeUrl, ordem }
+  createCategoryApi(payload: { nome: string; descricao?: string; cor?: string; iconeUrl?: string; ordem?: number; }): Observable<any> {
+    return this.http
+      .post(this.UrlServiceV1 + 'Categoria', payload, this.getAuthHeaderJson())
+      .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
+  }
+
   update(category: CategoryModel): Observable<CategoryModel> {
     let response = this.http
       .put(this.UrlServiceV1 + 'conteudo/' + category.categoryId, category, this.getAuthHeaderJson())
