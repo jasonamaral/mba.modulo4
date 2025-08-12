@@ -182,4 +182,15 @@ public class ConteudoService : BaseApiService, IConteudoService
         }, nameof(ObterPorCategoriaId), categoriaId);
         return result ?? new ResponseResult<IEnumerable<CursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
     }
+
+    public async Task<ResponseResult<IEnumerable<CategoriaDto>>> ObterTodasCategorias()
+    {
+        var result = await ExecuteWithErrorHandling(async () =>
+        {
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            var url = $"api/categoria";
+            return await _apiClient.GetAsync<ResponseResult<IEnumerable<CategoriaDto>>>(url);
+        }, nameof(ObterPorCategoriaId));
+        return result ?? new ResponseResult<IEnumerable<CategoriaDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+    }
 }

@@ -1,7 +1,14 @@
-<section class="page-header">
-  <h2>Cursos Disponíveis</h2>
-  <p class="subtitle">Explore os cursos e matricule-se para iniciar seus estudos.</p>
-  <hr />
+<section class="page-header" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+  <div>
+    <h2>Cursos Disponíveis</h2>
+    <p class="subtitle">Explore os cursos e matricule-se para iniciar seus estudos.</p>
+  </div>
+  <div *ngIf="isUserAdmin">
+    <button mat-flat-button color="primary" (click)="openAddDialog()">
+      Adicionar curso
+    </button>
+  </div>
+  <hr style="width:100%" />
 </section>
 
 <div *ngIf="cursos?.length; else vazio">
@@ -13,6 +20,12 @@
     </mat-card-header>
     <mat-card-content>
       <div class="course-essentials">
+        <div class="row" *ngIf="c.nomeCategoria">
+          <div class="col">
+            <strong>Categoria:</strong>
+            <span>{{ c.nomeCategoria }}</span>
+          </div>
+        </div>
         <div class="row">
           <div class="col">
             <strong>Instrutor:</strong>
@@ -37,6 +50,30 @@
           <div class="col">
             <strong>Vagas:</strong>
             <span>{{ c.vagasDisponiveis }} disponíveis</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.resumo">
+          <div class="col">
+            <strong>Resumo:</strong>
+            <span>{{ c.resumo }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.descricao">
+          <div class="col">
+            <strong>Descrição:</strong>
+            <span>{{ c.descricao }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.objetivos">
+          <div class="col">
+            <strong>Objetivos:</strong>
+            <span>{{ c.objetivos }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.preRequisitos">
+          <div class="col">
+            <strong>Pré-requisitos:</strong>
+            <span>{{ c.preRequisitos }}</span>
           </div>
         </div>
       </div>

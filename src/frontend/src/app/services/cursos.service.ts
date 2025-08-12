@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
-import { CursoModel } from '../models/curso.model';
+import { CursoCreateModel, CursoModel } from '../models/curso.model';
 
 @Injectable({ providedIn: 'root' })
 export class CursosService extends BaseService {
@@ -30,6 +30,12 @@ export class CursosService extends BaseService {
   obter(id: string, includeAulas = true): Observable<CursoModel> {
     return this.http
       .get(this.UrlServiceV1 + `Conteudos/${id}?includeAulas=${includeAulas}`, this.getAuthHeaderJson())
+      .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
+  }
+
+  create(curso: CursoCreateModel): Observable<CursoModel> {
+    return this.http
+      .post(this.UrlServiceV1 + 'Conteudos/cursos', curso, this.getAuthHeaderJson())
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 }

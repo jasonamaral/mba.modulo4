@@ -10,6 +10,7 @@ public interface IConteudoService
     Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, bool includeAulas = false);
     Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursos(CursoFilter filter);
     Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaId(Guid categoriaId, bool includeAulas = false);
+    Task<ResponseResult<IEnumerable<CategoriaDto>>> ObterTodasCategorias();
     Task<ResponseResult<ConteudoProgramaticoDto>> ObterConteudoProgramaticoPorCursoId(Guid categoriaId, bool includeAulas = false);
     Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso);
     Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso);
