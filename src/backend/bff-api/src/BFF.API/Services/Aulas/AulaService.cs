@@ -22,10 +22,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
     #region Gets
     public async Task<ResponseResult<AlunoDto>> ObterAlunoPorIdAsync(Guid alunoId, string token)
     {
-        if (!ValidateToken(token, nameof(ObterAlunoPorIdAsync)))
-        {
-            return new ResponseResult<AlunoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(ObterAlunoPorIdAsync)))
+        //{
+        //    return new ResponseResult<AlunoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         var result = await ExecuteWithErrorHandling(async () =>
         {
@@ -41,10 +41,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
 
     public async Task<ResponseResult<EvolucaoAlunoDto>> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid alunoId, string token)
     {
-        if (!ValidateToken(token, nameof(ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync)))
-        {
-            return new ResponseResult<EvolucaoAlunoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync)))
+        //{
+        //    return new ResponseResult<EvolucaoAlunoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         var result = await ExecuteWithErrorHandling(async () =>
         {
@@ -60,10 +60,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
 
     public async Task<ResponseResult<ICollection<MatriculaCursoDto>>> ObterMatriculasPorAlunoIdAsync(Guid alunoId, string token)
     {
-        if (!ValidateToken(token, nameof(ObterMatriculasPorAlunoIdAsync)))
-        {
-            return new ResponseResult<ICollection<MatriculaCursoDto>> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(ObterMatriculasPorAlunoIdAsync)))
+        //{
+        //    return new ResponseResult<ICollection<MatriculaCursoDto>> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         var result = await ExecuteWithErrorHandling(async () =>
         {
@@ -79,10 +79,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
 
     public async Task<ResponseResult<CertificadoDto>> ObterCertificadoPorMatriculaIdAsync(Guid matriculaId, string token)
     {
-        if (!ValidateToken(token, nameof(ObterCertificadoPorMatriculaIdAsync)))
-        {
-            return new ResponseResult<CertificadoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(ObterCertificadoPorMatriculaIdAsync)))
+        //{
+        //    return new ResponseResult<CertificadoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         var result = await ExecuteWithErrorHandling(async () =>
         {
@@ -98,10 +98,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
 
     public async Task<ResponseResult<ICollection<AulaCursoDto>>> ObterAulasPorMatriculaIdAsync(Guid matriculaId, string token)
     {
-        if (!ValidateToken(token, nameof(ObterAulasPorMatriculaIdAsync)))
-        {
-            return new ResponseResult<ICollection<AulaCursoDto>> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(ObterAulasPorMatriculaIdAsync)))
+        //{
+        //    return new ResponseResult<ICollection<AulaCursoDto>> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         // Obtenho a matrícula e aulas do aluno
         var aulaCursoDto = await ExecuteWithErrorHandling(async () =>
@@ -151,10 +151,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
     #region Posts and Puts
     public async Task<ResponseResult<Guid>> MatricularAlunoAsync(MatriculaCursoRequest dto, string token)
     {
-        if (!ValidateToken(token, nameof(MatricularAlunoAsync)))
-        {
-            return new ResponseResult<Guid> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(MatricularAlunoAsync)))
+        //{
+        //    return new ResponseResult<Guid> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         var cursoDto = await _conteudoService.ObterCursoPorId(dto.CursoId, includeAulas: false);
         if (cursoDto == null || cursoDto.Data == null)
@@ -177,7 +177,7 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
             _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
             ConfigureAuthToken(token);
 
-            var apiResponse = await _apiClient.PostAsyncWithDetails<MatriculaCursoApiRequest, ResponseResult<Guid>>($"api/{dto.AlunoId}/matricular-aluno", matriculaCursoApi);
+            var apiResponse = await _apiClient.PostAsyncWithDetails<MatriculaCursoApiRequest, ResponseResult<Guid>>($"api/aluno/{dto.AlunoId}/matricular-aluno", matriculaCursoApi);
             if (apiResponse.IsSuccess) { return apiResponse.Data; }
 
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
@@ -210,10 +210,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
 
     public async Task<ResponseResult<bool>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto, string token)
     {
-        if (!ValidateToken(token, nameof(RegistrarHistoricoAprendizadoAsync)))
-        {
-            return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(RegistrarHistoricoAprendizadoAsync)))
+        //{
+        //    return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         var matriculaCurso = await ObterMatriculasPorAlunoIdAsync(dto.AlunoId, token);
         if (matriculaCurso == null || matriculaCurso.Data == null || !matriculaCurso.Data.Any(x => x.Id == dto.MatriculaCursoId))
@@ -277,10 +277,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
 
     public async Task<ResponseResult<bool>> ConcluirCursoAsync(ConcluirCursoRequest dto, string token)
     {
-        if (!ValidateToken(token, nameof(ConcluirCursoAsync)))
-        {
-            return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(ConcluirCursoAsync)))
+        //{
+        //    return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         var matriculaCurso = await ObterMatriculasPorAlunoIdAsync(dto.AlunoId, token);
         if (matriculaCurso == null || matriculaCurso.Data == null || !matriculaCurso.Data.Any(x => x.Id == dto.MatriculaCursoId))
@@ -340,10 +340,10 @@ public class AulaService(IOptions<ApiSettings> apiSettings,
 
     public async Task<ResponseResult<Guid>> SolicitarCertificadoAsync(SolicitaCertificadoRequest dto, string token)
     {
-        if (!ValidateToken(token, nameof(SolicitarCertificadoAsync)))
-        {
-            return new ResponseResult<Guid> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        }
+        //if (!ValidateToken(token, nameof(SolicitarCertificadoAsync)))
+        //{
+        //    return new ResponseResult<Guid> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
+        //}
 
         var result = await ExecuteWithErrorHandling(async () =>
         {

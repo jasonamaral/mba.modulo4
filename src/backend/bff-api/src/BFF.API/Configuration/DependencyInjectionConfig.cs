@@ -29,7 +29,7 @@ public static class DependencyInjectionConfig
         
         // Serviços de infraestrutura
         services.AddScoped<ICacheService, Infrastructure.Services.CacheService>();
-        services.AddScoped<IApiClientService, Infrastructure.Services.ApiClientService>();
+        services.AddTransient<IApiClientService, Infrastructure.Services.ApiClientService>();
         services.AddScoped<IDashboardService, Infrastructure.Services.DashboardService>();
 
         services.RegisterNotification();

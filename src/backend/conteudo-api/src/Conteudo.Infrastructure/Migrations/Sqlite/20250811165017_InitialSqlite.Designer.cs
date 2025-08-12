@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Conteudo.Infrastructure.Migrations.Sqlite
 {
     [DbContext(typeof(ConteudoDbContext))]
-    [Migration("20250731233022_InitialSqlite")]
+    [Migration("20250811165017_InitialSqlite")]
     partial class InitialSqlite
     {
         /// <inheritdoc />
