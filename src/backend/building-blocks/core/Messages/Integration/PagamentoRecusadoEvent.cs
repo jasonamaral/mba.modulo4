@@ -8,10 +8,10 @@
         public Guid TransacaoId { get; private set; }
         public decimal Total { get; private set; }
 
-        public PagamentoRecusadoEvent(Guid pedidoId, Guid clienteId, Guid pagamentoId, Guid transacaoId, decimal total)
+        public PagamentoRecusadoEvent(Guid cursoId, Guid clienteId, Guid pagamentoId, Guid transacaoId, decimal total)
         {
-            //AggregateID = pedidoId;
-            Id = pedidoId;
+            //AggregateID = cursoId;
+            Id = cursoId;
             ClienteId = clienteId;
             PagamentoId = pagamentoId;
             TransacaoId = transacaoId;

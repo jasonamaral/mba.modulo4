@@ -5,6 +5,6 @@ namespace Pagamentos.Domain.Interfaces
 {
     public interface IPagamentoService
     {
-        Task<Transacao> RealizarPagamentoPedido(PagamentoCurso pagamentoPedido);
+        Task<Transacao> RealizarPagamento(PagamentoCurso pagamentoCurso);
     }
 }

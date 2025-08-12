@@ -16,9 +16,9 @@ namespace Pagamentos.Domain.Events
 
         public async Task Handle(PagamentoCursoEvent message, CancellationToken cancellationToken)
         {
-            var pagamentoPedido = new PagamentoCurso
+            var pagamentoCurso = new PagamentoCurso
             {
-                CursoId = message.PedidoId,
+                CursoId = message.CursoId,
                 ClienteId = message.AlunoId,
                 Total = message.Total,
                 NomeCartao = message.NomeCartao,
@@ -27,7 +27,7 @@ namespace Pagamentos.Domain.Events
                 CvvCartao = message.CvvCartao
             };
 
-            await _pagamentoService.RealizarPagamentoPedido(pagamentoPedido);
+            await _pagamentoService.RealizarPagamento(pagamentoCurso);
         }
     }
 }

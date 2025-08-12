@@ -23,9 +23,9 @@ namespace Pagamentos.Domain.Services
             _mediatorHandler = mediatorHandler;
         }
 
-        public async Task<Transacao> RealizarPagamentoPedido(PagamentoCurso pagamentoAnuidade)
+        public async Task<Transacao> RealizarPagamento(PagamentoCurso pagamentoAnuidade)
         {
-            var pedido = new CobrancaCurso
+            var cobranca = new CobrancaCurso
             {
                 Id = pagamentoAnuidade.CursoId,
                 Valor = pagamentoAnuidade.Total
@@ -42,12 +42,12 @@ namespace Pagamentos.Domain.Services
                 AlunoId = pagamentoAnuidade.ClienteId
             };
 
-            var transacao = _pagamentoCartaoCreditoFacade.RealizarPagamento(pedido, pagamento);
+            var transacao = _pagamentoCartaoCreditoFacade.RealizarPagamento(cobranca, pagamento);
 
             if (transacao.StatusTransacao == StatusTransacao.Pago)
             {
                 //TODO
-                await _mediatorHandler.PublicarEvento(new PagamentoRealizadoEvent(pedido.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, pedido.Valor));
+                await _mediatorHandler.PublicarEvento(new PagamentoRealizadoEvent(cobranca.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, cobranca.Valor));
 
                 pagamento.Status = transacao.StatusTransacao.ToString();
                 pagamento.Transacao = transacao;
@@ -60,7 +60,7 @@ namespace Pagamentos.Domain.Services
             }
 
             await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz("pagamento", "A operadora recusou o pagamento"));
-            await _mediatorHandler.PublicarEvento(new PagamentoRecusadoEvent(pedido.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, pedido.Valor));
+            await _mediatorHandler.PublicarEvento(new PagamentoRecusadoEvent(cobranca.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, cobranca.Valor));
 
             return transacao;
         }

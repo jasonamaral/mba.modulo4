@@ -2,7 +2,7 @@
 {
     public class PagamentoCursoEvent : IntegrationEvent
     {
-        public Guid PedidoId { get; private set; }
+        public Guid CursoId { get; private set; }
         public Guid AlunoId { get; private set; }
         public decimal Total { get; private set; }
         public string NomeCartao { get; private set; }
@@ -10,7 +10,7 @@
         public string ExpiracaoCartao { get; private set; }
         public string CvvCartao { get; private set; }
 
-        public PagamentoCursoEvent(Guid pedidoId,
+        public PagamentoCursoEvent(Guid cursoId,
                                      Guid clienteId,
                                      decimal total,
                                      string nomeCartao,
@@ -18,8 +18,8 @@
                                      string expiracaoCartao,
                                      string cvvCartao)
         {
-            //AggregateID = pedidoId;
-            PedidoId = pedidoId;
+            //AggregateID = cursoId;
+            CursoId = cursoId;
             AlunoId = clienteId;
             Total = total;
             NomeCartao = nomeCartao;
