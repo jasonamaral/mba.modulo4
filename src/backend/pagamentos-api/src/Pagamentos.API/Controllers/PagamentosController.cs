@@ -1,4 +1,3 @@
-using Azure.Core;
 using Core.Mediator;
 using Core.Messages;
 using Core.Messages.Integration;

@@ -1,18 +1,14 @@
 ﻿using BFF.API.Extensions;
 using BFF.API.Models.Request;
-using BFF.API.Models.Response;
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
-using Core.Messages.Integration;
 using Core.Notification;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net;
 
 namespace BFF.API.Controllers
 {

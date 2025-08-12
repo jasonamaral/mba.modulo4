@@ -1,6 +1,5 @@
 using Alunos.API.Configurations;
 using Alunos.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
 
 internal class Program
 {

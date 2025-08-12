@@ -1,14 +1,11 @@
-﻿using BFF.API.Models.Request;
-using BFF.API.Services.Conteudos;
+﻿using BFF.API.Services.Conteudos;
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
-using BFF.Domain.DTOs;
 using BFF.Domain.DTOs.Alunos.Request;
 using BFF.Domain.DTOs.Alunos.Response;
 using BFF.Infrastructure.Services;
 using Core.Communication;
 using Microsoft.Extensions.Options;
-using System.Net;
 
 namespace BFF.API.Services.Aulas;
 public class AlunoService : BaseApiService, IAlunoService

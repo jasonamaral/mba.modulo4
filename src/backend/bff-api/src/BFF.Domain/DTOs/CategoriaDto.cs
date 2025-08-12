@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BFF.Domain.DTOs;
+﻿namespace BFF.Domain.DTOs;
 
 
 public class CategoriaDto
