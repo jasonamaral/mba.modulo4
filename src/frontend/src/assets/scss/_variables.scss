@@ -99,8 +99,9 @@ html {
   }
 
   .mat-mdc-form-field-infix {
-    --mat-form-field-container-height: 45px;
-    --mat-form-field-container-vertical-padding: 13px;
+    --mat-form-field-container-height: 52px;
+    --mat-form-field-container-vertical-padding: 14px;
+    width: 100% !important;
   }
 
   .mat-mdc-tab-header {

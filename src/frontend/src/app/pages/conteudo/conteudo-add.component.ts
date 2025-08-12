@@ -17,6 +17,7 @@ import { CursosService } from 'src/app/services/cursos.service';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, MatButtonModule],
   templateUrl: './conteudo-add.component.html',
+  styleUrl: './conteudo-add.component.scss'
 })
 
 export class ConteudoAddComponent extends FormBaseComponent implements OnInit, OnDestroy {
