@@ -29,6 +29,7 @@ namespace Conteudo.Infrastructure.Repositories
             var totalResults = await query.CountAsync();
 
             var cursos = await query
+                .Include(c => c.Categoria)
                 .OrderBy(c => c.Nome)
                 .Skip(filter.PageSize * (filter.PageIndex - 1))
                 .Take(filter.PageSize)
@@ -79,7 +80,9 @@ namespace Conteudo.Infrastructure.Repositories
             if (includeAulas)
                 query = query.Include(c => c.Aulas);
 
-            return await query.ToListAsync();
+            return await query
+                .Include(c => c.Categoria)
+                .ToListAsync();
         }
 
 
