@@ -208,7 +208,7 @@ services:
       - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
       - JwtSettings__Issuer=PlataformaEducacional
       - JwtSettings__Audience=PlataformaEducacional
-      - Redis__ConnectionString=redis:6379
+      - RedisSettings__ConnectionString=redis:6379
       - ApiSettings__AuthApiUrl=http://auth-api:5001
       - ApiSettings__ConteudoApiUrl=http://conteudo-api:5002
       - ApiSettings__AlunosApiUrl=http://alunos-api:5003
