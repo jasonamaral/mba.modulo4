@@ -10,9 +10,14 @@ import { MatriculaModel } from '../models/matricula.model';
 export class MatriculasService extends BaseService {
   constructor(private http: HttpClient) { super(); }
 
-  criarMatricula(cursoId: string): Observable<{ matriculaId: string }> {
+  criarMatricula(cursoId: string, observacao: string = ''): Observable<{ matriculaId: string }> {
+    const alunoId = this.LocalStorage.getUser()?.usuarioToken?.id;
     return this.http
-      .post(this.UrlServiceV1 + 'alunos/matriculas', { cursoId }, this.getAuthHeaderJson())
+      .post(
+        this.UrlServiceV1 + `Alunos/${alunoId}/matricular-aluno`,
+        { alunoId, cursoId, observacao },
+        this.getAuthHeaderJson()
+      )
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 
