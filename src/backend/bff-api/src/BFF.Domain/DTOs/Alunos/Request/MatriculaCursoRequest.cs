@@ -8,5 +8,5 @@ public class MatriculaCursoRequest
 
     [Required(ErrorMessage = "ID do curso é obrigatório")]
     public Guid CursoId { get; set; }
-    public string Observacao { get; init; }
+    public string Observacao { get; set; }
 }

@@ -23,7 +23,10 @@ public class MatricularAlunoCommandHandler(IAlunoRepository alunoRepository,
         aluno.MatricularAlunoEmCurso(request.CursoId, request.NomeCurso, request.ValorCurso, request.Observacao);
         var matricula = aluno.ObterMatriculaPorCursoId(request.CursoId);
         await AlunoRepository.AdicionarMatriculaCursoAsync(matricula);
-        if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = matricula.Id; }
+        if (await _alunoRepository.UnitOfWork.Commit()) 
+        { 
+            request.Resultado.Data = matricula.Id; 
+        }
 
         return request.Resultado;
     }
