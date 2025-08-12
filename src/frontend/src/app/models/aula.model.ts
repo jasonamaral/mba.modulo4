@@ -10,4 +10,11 @@ export interface AulaModel {
   status?: string;
 }
 
+export interface AulaCreateModel {
+  nome: string;
+  descricao: string;
+  duracaoMinutos: number;
+  videoUrl: string;
+}
+
 

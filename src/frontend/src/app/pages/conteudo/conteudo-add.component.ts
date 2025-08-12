@@ -12,6 +12,7 @@ import { ConteudoService } from 'src/app/services/conteudo.service';
 import { CursoCreateModel } from 'src/app/models/curso.model';
 import { CursosService } from 'src/app/services/cursos.service';
 import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
+import { AulaAddDialogComponent } from './aula-add-dialog.component';
 
 @Component({
   selector: 'app-conteudo-add',
@@ -162,7 +163,24 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
           }
 
           this.toastr.success('Curso criado com sucesso.');
-          this.dialogRef.close({ inserted: true })
+          // Após criar, abrir diálogo para cadastrar aulas
+          const cursoId = (result as any)?.id;
+          const cursoNome = (result as any)?.nome;
+          if (cursoId) {
+            const ref = this.dialog.open(AulaAddDialogComponent, {
+              width: '720px',
+              maxWidth: '95vw',
+              disableClose: true,
+              autoFocus: false,
+              data: { cursoId, cursoNome }
+            });
+
+            ref.afterClosed().subscribe(() => {
+              this.dialogRef.close({ inserted: true });
+            });
+          } else {
+            this.dialogRef.close({ inserted: true });
+          }
         },
         error: (fail) => {
           this.submitted = false;
