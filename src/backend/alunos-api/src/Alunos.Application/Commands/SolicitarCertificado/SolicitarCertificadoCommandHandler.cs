@@ -3,9 +3,10 @@ using Core.Mediator;
 using Alunos.Domain.Interfaces;
 using Core.Communication;
 using Core.Messages;
+using Alunos.Domain.Entities;
 
 namespace Alunos.Application.Commands.SolicitarCertificado;
-public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository, 
+public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<SolicitarCertificadoCommand, CommandResult>
 {
     private readonly IAlunoRepository _alunoRepository = alunoRepository;
@@ -17,12 +18,23 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
         _raizAgregacao = request.RaizAgregacao;
         if (!ValidarRequisicao(request)) { return request.Resultado; }
         if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
+        if (!ObterMatriculaCurso(request.MatriculaCursoId, out MatriculaCurso matriculaCurso)) { return request.Resultado; }
+        
+        decimal notaFinal = matriculaCurso.CalcularMediaFinalCurso();
+        string pathCertificado = $"Certificado_{request.AlunoId}_{request.MatriculaCursoId}.pdf";
+        string nomeInstrutor = "Curso Online";
 
-        aluno.RequisitarCertificadoConclusao(request.MatriculaCursoId, request.NotaFinal, request.PathCertificado, request.NomeInstrutor);
+        aluno.RequisitarCertificadoConclusao(request.MatriculaCursoId, notaFinal, pathCertificado, nomeInstrutor);
         var certificado = aluno.ObterMatriculaCursoPeloId(request.MatriculaCursoId).Certificado;
 
         await _alunoRepository.AdicionarCertificadoMatriculaCursoAsync(certificado);
-        await _alunoRepository.UnitOfWork.Commit();
+        if (await _alunoRepository.UnitOfWork.Commit())
+        {
+            // TODO :: Devo enviar algo para mensageria para realizar a impressão/emissão do certificado?
+
+            request.Resultado.Data = certificado.Id; 
+        }
+
         return request.Resultado;
     }
 
@@ -49,6 +61,18 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
         if (aluno == null)
         {
             _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool ObterMatriculaCurso(Guid matriculaCursoId, out MatriculaCurso matriculaCurso)
+    {
+        matriculaCurso = _alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId).Result;
+        if (matriculaCurso == null)
+        {
+            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Matricula do aluno não encontrado.")).GetAwaiter().GetResult();
             return false;
         }
 

@@ -1,23 +1,97 @@
-<section class="page-header">
-  <h2>Cursos Disponíveis</h2>
-  <p class="subtitle">Explore os cursos e matricule-se para iniciar seus estudos.</p>
-  <hr />
+<section class="page-header" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+  <div>
+    <h2>Cursos Disponíveis</h2>
+    <p class="subtitle">Explore os cursos e matricule-se para iniciar seus estudos.</p>
+  </div>
+  <div *ngIf="isUserAdmin">
+    <button mat-flat-button color="primary" (click)="openAddDialog()">
+      Adicionar curso
+    </button>
+  </div>
+  <hr style="width:100%" />
 </section>
 
-<div class="course-grid" *ngIf="cursos?.length; else vazio">
-  <mat-card *ngFor="let c of cursos" class="course-card">
+<div *ngIf="cursos?.length; else vazio">
+  <mat-grid-list [cols]="gridCols" rowHeight="440px" gutterSize="24">
+    <mat-grid-tile *ngFor="let c of cursos" [colspan]="gridCols === 2 && cursos.length === 1 ? 2 : 1">
+      <mat-card class="course-card">
     <mat-card-header>
-      <mat-card-title>{{c.nome}}</mat-card-title>
+      <mat-card-title>{{ c.nome }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <p>{{c.descricao}}</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <a mat-stroked-button color="primary" [routerLink]="['/cursos', c.id]">Ver detalhes</a>
-      <button mat-flat-button color="accent" (click)="matricular(c)">Matricular-se</button>
-    </mat-card-actions>
-  </mat-card>
-  
+      <div class="course-essentials">
+        <div class="row" *ngIf="c.nomeCategoria">
+          <div class="col">
+            <strong>Categoria:</strong>
+            <span>{{ c.nomeCategoria }}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <strong>Instrutor:</strong>
+            <span>{{ c.instrutor || '—' }}</span>
+          </div>
+          <div class="col" *ngIf="c.nivel">
+            <strong>Nível:</strong>
+            <span>{{ c.nivel }}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <strong>Duração:</strong>
+            <span>{{ c.duracaoHoras || 0 }}h</span>
+          </div>
+          <div class="col">
+            <strong>Valor:</strong>
+            <span>{{ c.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.vagasDisponiveis !== undefined">
+          <div class="col">
+            <strong>Vagas:</strong>
+            <span>{{ c.vagasDisponiveis }} disponíveis</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.resumo">
+          <div class="col">
+            <strong>Resumo:</strong>
+            <span>{{ c.resumo }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.descricao">
+          <div class="col">
+            <strong>Descrição:</strong>
+            <span>{{ c.descricao }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.objetivos">
+          <div class="col">
+            <strong>Objetivos:</strong>
+            <span>{{ c.objetivos }}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="c.preRequisitos">
+          <div class="col">
+            <strong>Pré-requisitos:</strong>
+            <span>{{ c.preRequisitos }}</span>
+          </div>
+        </div>
+        <div>
+          <button mat-button color="primary" (click)="openAulasDialog(c)">ver aulas</button>
+        </div>
+      </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button color="accent" (click)="matricular(c)" [disabled]="c.podeSerMatriculado === false" *ngIf="!isUserAdmin">
+            Matricular-se
+          </button>
+          <button mat-flat-button color="accent" (click)="openEditDialog(c)" *ngIf="isUserAdmin">
+            Editar
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
 </div>
 
 <ng-template #vazio>

@@ -1,5 +1,6 @@
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
+using BFF.Domain.DTOs.Alunos.Response;
 using BFF.Domain.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -48,22 +49,22 @@ public class DashboardService : IDashboardService
                 Nome = "João da Silva",
                 Email = "joao.silva@email.com",
                 Telefone = "(11) 99999-9999",
-                CreatedAt = DateTime.UtcNow.AddDays(-30),
-                UpdatedAt = DateTime.UtcNow
+                //CreatedAt = DateTime.UtcNow.AddDays(-30),
+                //UpdatedAt = DateTime.UtcNow
             },
-            Matriculas = new List<MatriculaDto>
+            Matriculas = new List<MatriculaCursoDto>
             {
-                new MatriculaDto
+                new MatriculaCursoDto
                 {
                     Id = Guid.NewGuid(),
                     AlunoId = userId,
                     CursoId = Guid.NewGuid(),
-                    CursoNome = "ASP.NET Core Básico",
+                    NomeCurso = "ASP.NET Core Básico",
                     DataMatricula = DateTime.UtcNow.AddDays(-10),
-                    Status = "Ativo",
-                    PercentualConclusao = 75.5m,
-                    CreatedAt = DateTime.UtcNow.AddDays(-10),
-                    UpdatedAt = DateTime.UtcNow
+                    EstadoMatricula = "Ativo",
+                    //PercentualConclusao = 75.5m,
+                    //CreatedAt = DateTime.UtcNow.AddDays(-10),
+                    //UpdatedAt = DateTime.UtcNow
                 }
             },
             Certificados = new List<CertificadoDto>
@@ -71,13 +72,13 @@ public class DashboardService : IDashboardService
                 new CertificadoDto
                 {
                     Id = Guid.NewGuid(),
-                    AlunoId = userId,
-                    CursoId = Guid.NewGuid(),
-                    CursoNome = "C# Fundamentals",
+                    //AlunoId = userId,
+                    //CursoId = Guid.NewGuid(),
+                    //CursoNome = "C# Fundamentals",
                     DataEmissao = DateTime.UtcNow.AddDays(-5),
-                    CodigoVerificacao = "ABC123456",
-                    CreatedAt = DateTime.UtcNow.AddDays(-5),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-5)
+                    //CodigoVerificacao = "ABC123456",
+                    //CreatedAt = DateTime.UtcNow.AddDays(-5),
+                    //UpdatedAt = DateTime.UtcNow.AddDays(-5)
                 }
             },
             CursosRecomendados = new List<CursoDto>

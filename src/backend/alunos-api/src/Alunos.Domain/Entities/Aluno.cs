@@ -13,8 +13,13 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     public string Email { get; private set; }
     public string Cpf { get; }
     public DateTime DataNascimento { get; private set; }
-    public string Contato { get; private set; }
+    public string Telefone { get; private set; }
     public bool Ativo { get; private set; }
+    public string Genero { get; private set; }
+    public string Cidade { get; private set; }
+    public string Estado { get; private set; }
+    public string Cep { get; private set; }
+    public string? Foto { get; private set; }
 
     private readonly List<MatriculaCurso> _matriculasCursos = [];
     public IReadOnlyCollection<MatriculaCurso> MatriculasCursos => _matriculasCursos.AsReadOnly();
@@ -28,13 +33,23 @@ public class Aluno : Common.Entidade, IRaizAgregacao
         string nome,
         string email,
         string cpf,
-        DateTime dataNascimento) 
+        DateTime dataNascimento,
+        string genero,
+        string cidade,
+        string estado,
+        string cep,
+        string foto)
     {
         CodigoUsuarioAutenticacao = codigoUsuarioAutenticacao;
         Nome = nome?.Trim() ?? string.Empty;
         Email = email?.Trim().ToLowerInvariant() ?? string.Empty;
         Cpf = cpf?.Trim() ?? string.Empty;
         DataNascimento = dataNascimento.Date;
+        Genero = genero?.Trim() ?? string.Empty;
+        Cidade = cidade?.Trim() ?? string.Empty;
+        Estado = estado?.Trim() ?? string.Empty;
+        Cep = cep?.Trim().Replace("-", string.Empty).Replace(".", string.Empty) ?? string.Empty;
+        Foto = foto?.Trim() ?? string.Empty;
 
         ValidarIntegridadeAluno();
     }
@@ -60,7 +75,7 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     internal void AtualizarContatoAluno(string contato)
     {
         ValidarIntegridadeAluno(novoContato: contato ?? string.Empty);
-        Contato = contato.Trim();
+        Telefone = contato.Trim();
     }
 
     public void AtualizarDataNascimento(DateTime dataNascimento)
@@ -71,6 +86,16 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     #endregion
 
     #region Manipuladores de MatriculaCurso
+    public int ObterQuantidadeAulasMatriculaCurso(Guid cursoId)
+    {
+        return _matriculasCursos.Count(m => m.CursoId == cursoId);
+    }
+
+    public int ObterQuantidadeAulasPendenteMatriculaCurso(Guid cursoId)
+    {
+        return _matriculasCursos.Count(m => m.CursoId == cursoId && m.PodeConcluirCurso() == false);
+    }
+
     public MatriculaCurso ObterMatriculaPorCursoId(Guid cursoId)
     {
         var matriculaCurso = _matriculasCursos.FirstOrDefault(m => m.CursoId == cursoId);
@@ -144,7 +169,7 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     #endregion
 
     #region Manipuladores de Certificado
-    public void RequisitarCertificadoConclusao(Guid matriculaCursoId, byte notaFinal, string pathCertificado, string nomeInstrutor)
+    public void RequisitarCertificadoConclusao(Guid matriculaCursoId, decimal notaFinal, string pathCertificado, string nomeInstrutor)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.RequisitarCertificadoConclusao(notaFinal, pathCertificado, nomeInstrutor);
@@ -175,14 +200,14 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     }
     #endregion
 
-    private void ValidarIntegridadeAluno(string novoNome = null, 
-        string novoEmail = null, 
-        string novoContato = null, 
+    private void ValidarIntegridadeAluno(string novoNome = null,
+        string novoEmail = null,
+        string novoContato = null,
         DateTime? novaDataNascimento = null)
     {
         novoNome ??= Nome;
         novoEmail ??= Email;
-        novoContato ??= Contato;
+        novoContato ??= Telefone;
         novaDataNascimento ??= DataNascimento;
 
         var validacao = new ResultadoValidacao<Aluno>();
@@ -197,6 +222,19 @@ public class Aluno : Common.Entidade, IRaizAgregacao
         ValidacaoTexto.DeveSerCpfValido(Cpf, "CPF informado é inválido", validacao);
         ValidacaoData.DeveSerValido(novaDataNascimento.Value, "Data de nascimento deve ser válida", validacao);
         ValidacaoData.DeveSerMenorQue(novaDataNascimento.Value, DateTime.Now, "Data de nascimento não pode ser superior à data atual", validacao);
+        ValidacaoTexto.DevePossuirConteudo(Genero, "Genero não pode ser nulo ou vazio", validacao);
+        ValidacaoTexto.DevePossuirTamanho(Genero, 1, 20, "Genero deve ter entre 1 e 20 caracteres", validacao);
+        ValidacaoTexto.DevePossuirConteudo(Cidade, "Cidade não pode ser nulo ou vazio", validacao);
+        ValidacaoTexto.DevePossuirTamanho(Cidade, 1, 50, "Cidade deve ter entre 1 e 50 caracteres", validacao);
+        ValidacaoTexto.DevePossuirConteudo(Cidade, "Cidade não pode ser nulo ou vazio", validacao);
+        ValidacaoTexto.DevePossuirTamanho(Cidade, 1, 2, "Estado entre 1 e ter entre 1 e 2 caracteres", validacao);
+        ValidacaoTexto.DevePossuirConteudo(Cep, "Cep não pode ser nulo ou vazio", validacao);
+        ValidacaoTexto.DevePossuirTamanho(Cep, 1, 8, "Cep deve ter até 8 caracteres", validacao);
+
+        if (!string.IsNullOrWhiteSpace(Foto))
+        {
+            ValidacaoTexto.DevePossuirTamanho(Foto, 1, 1024, "Foto deve ter entre 1 e 1024 caracteres", validacao);
+        }
 
         if (!string.IsNullOrWhiteSpace(novoContato))
         {

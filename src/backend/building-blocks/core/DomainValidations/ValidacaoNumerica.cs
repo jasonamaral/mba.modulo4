@@ -39,6 +39,11 @@ public static class ValidacaoNumerica
     #endregion Validação INT
 
     #region Validação DECIMAL
+    public static void DeveEstarEntre<T>(decimal valor, decimal tamanhoMinimo, decimal tamanhoMaximo, string mensagem, ResultadoValidacao<T> resultado) where T : class
+    {
+        if (valor < tamanhoMinimo || valor > tamanhoMaximo)
+            resultado.AdicionarErro(mensagem);
+    }
 
     public static void DeveSerMaiorQueZero<T>(decimal valor, string mensagem, ResultadoValidacao<T> resultado) where T : class
     {

@@ -23,10 +23,7 @@ public class MatricularAlunoCommandHandler(IAlunoRepository alunoRepository,
         aluno.MatricularAlunoEmCurso(request.CursoId, request.NomeCurso, request.ValorCurso, request.Observacao);
         var matricula = aluno.ObterMatriculaPorCursoId(request.CursoId);
         await AlunoRepository.AdicionarMatriculaCursoAsync(matricula);
-        await AlunoRepository.UnitOfWork.Commit();
-
-        // Ver aqui a necessidade de gerar o link de pagamento
-        //await _mediatorHandler.PublicarEvento(new GerarLinkPagamentoEvent(matricula.Id, request.AlunoId, request.CursoId, request.ValorCurso));
+        if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = matricula.Id; }
 
         return request.Resultado;
     }

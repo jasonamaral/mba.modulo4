@@ -1,201 +1,122 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Alunos.Application.Commands.ConcluirCurso;
+using Alunos.Application.Commands.MatricularAluno;
+using Alunos.Application.Commands.RegistrarHistoricoAprendizado;
+using Alunos.Application.Commands.SolicitarCertificado;
+using Alunos.Application.DTOs.Request;
+using Alunos.Application.Interfaces;
+using Core.Communication;
+using Core.Mediator;
+using Core.Messages;
+using Core.Notification;
+using Core.Services.Controllers;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Alunos.API.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public partial class AlunoController()
-    //ICursoAppService cursoAppService,
-    //IAlunoQueryService alunoQueryService,
-    //IMapper mapper,
-    //IAppIdentityUser appIdentityUser,
-    //INotificationHandler<DomainNotificacaoRaiz> notifications,
-    //IMediatorHandler mediatorHandler) : MainController(appIdentityUser, notifications, mediatorHandler)
+public partial class AlunoController(IMediatorHandler mediator, 
+    IAlunoQueryService alunoQueryService,
+    INotificationHandler<DomainNotificacaoRaiz> notifications,
+    INotificador notificador) : MainController(mediator, notifications, notificador)
 {
-    //private readonly ICursoAppService _cursoAppService = cursoAppService;
-    //private readonly IAlunoQueryService _alunoQueryService = alunoQueryService;
-    //private readonly IMapper _mapper = mapper;
+    private readonly IAlunoQueryService _alunoQueryService = alunoQueryService;
 
-    //[Authorize(Policy = "ApenasAluno")]
-    //[HttpPost("{alunoId}/matricular-aluno")]
-    //public async Task<IActionResult> MatricularAluno(Guid alunoId, MatricularCursoViewModel matriculaCursoViewModel)
-    //{
-    //    if (!ModelState.IsValid) { return GenerateModelStateResponse(ResponseTypeEnum.ValidationError, HttpStatusCode.BadRequest, ModelState); }
+    [Authorize(Roles = "Usuario")]
+    [HttpPost("{alunoId}/matricular-aluno")]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    public async Task<IActionResult> MatricularAluno(Guid alunoId, MatriculaCursoRequest dto)
+    {
+        try
+        {
+            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-    //    try
-    //    {
-    //        if (UserId != matriculaCursoViewModel.AlunoId) { return GenerateResponse(null, ResponseTypeEnum.ValidationError, HttpStatusCode.Forbidden, ["Você não tem permissão para realizar essa operação"]); }
+            var comando = new MatricularAlunoCommand(dto.AlunoId, dto.CursoId, dto.CursoDisponivel, dto.Nome, dto.Valor, dto.Observacao);
+            return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
+    }
 
-    //        CursoDto cursoDto = await _cursoAppService.ObterPorIdAsync(matriculaCursoViewModel.CursoId);
-    //        var comando = new MatricularAlunoCommand(matriculaCursoViewModel.AlunoId, matriculaCursoViewModel.CursoId, cursoDto.CursoDisponivel, cursoDto.Nome, cursoDto.Valor);
-    //        var sucesso = await _mediatorHandler.EnviarComando(comando);
-    //        if (sucesso)
-    //        {
-    //            return GenerateResponse(new { matriculaCursoViewModel.AlunoId, matriculaCursoViewModel.CursoId },
-    //                responseType: ResponseTypeEnum.Success,
-    //                statusCode: HttpStatusCode.Created);
-    //        }
+    [Authorize(Roles = "Usuario")]
+    [HttpPost("{alunoId}/registrar-historico-aprendizado")]
+    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    public async Task<IActionResult> RegistrarHistoricoAprendizado(Guid alunoId, RegistroHistoricoAprendizadoRequest dto)
+    {
+        try
+        {
+            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-    //        return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-    //    }
-    //    catch (DomainException exDomain)
-    //    {
-    //        return GenerateDomainExceptionResponse(null, ResponseTypeEnum.DomainError, HttpStatusCode.BadRequest, exDomain);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return GenerateResponse(null, ResponseTypeEnum.GenericError, HttpStatusCode.BadRequest, [ex.Message]);
-    //    }
-    //}
+            var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
+            if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
 
-    //#region Devo ou não manter isto???
-    ////[Authorize(Policy = "ApenasAluno")]
-    ////[HttpPut("{alunoId}/atualizar-pagamento-matricula")]
-    ////public async Task<IActionResult> AtualizarPagamentoMatricula(Guid alunoId, AtualizarPagamentoMatriculaViewModel viewModel)
-    ////{
-    ////    if (!ModelState.IsValid) { return GenerateModelStateResponse(ResponseTypeEnum.ValidationError, HttpStatusCode.BadRequest, ModelState); }
+            var comando = new RegistrarHistoricoAprendizadoCommand(dto.AlunoId,
+                dto.MatriculaCursoId,
+                dto.AulaId,
+                dto.NomeAula,
+                dto.DuracaoMinutos,
+                dto.DataTermino
+            );
 
-    ////    try
-    ////    {
-    ////        if (UserId != viewModel.AlunoId) { return GenerateResponse(null, ResponseTypeEnum.ValidationError, HttpStatusCode.Forbidden, ["Você não tem permissão para realizar essa operação"]); }
+            return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
+    }
 
-    ////        var comando = new AtualizarPagamentoMatriculaCommand(viewModel.AlunoId, viewModel.CursoId);
-    ////        var sucesso = await _mediatorHandler.EnviarComando(comando);
+    [Authorize(Roles = "Usuario")]
+    [HttpPut("{alunoId}/concluir-curso")]
+    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    public async Task<IActionResult> ConcluirCurso(Guid alunoId, ConcluirCursoRequest dto)
+    {
+        try
+        {
+            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
+            if (dto.CursoDto == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Curso desta matrícula não encontrada"); }
 
-    ////        if (sucesso)
-    ////        {
-    ////            return GenerateResponse(new { viewModel.AlunoId, viewModel.CursoId },
-    ////                responseType: ResponseTypeEnum.Success,
-    ////                statusCode: HttpStatusCode.NoContent);
-    ////        }
+            var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
+            if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
 
-    ////        return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-    ////    }
-    ////    catch (DomainException exDomain)
-    ////    {
-    ////        return GenerateDomainExceptionResponse(null, ResponseTypeEnum.DomainError, HttpStatusCode.BadRequest, exDomain);
-    ////    }
-    ////    catch (Exception ex)
-    ////    {
-    ////        return GenerateResponse(null, ResponseTypeEnum.GenericError, HttpStatusCode.BadRequest, [ex.Message]);
-    ////    }
-    ////}
-    //#endregion
+            var comando = new ConcluirCursoCommand(dto.AlunoId, dto.MatriculaCursoId, dto.CursoDto);
+            return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
+    }
 
-    //[Authorize(Policy = "ApenasAluno")]
-    //[HttpPost("{alunoId}/registrar-historico-aprendizado")]
-    //public async Task<IActionResult> RegistrarHistoricoAprendizado(RegistrarHistoricoAprendizadoViewModel viewModel)
-    //{
-    //    if (!ModelState.IsValid) { return GenerateModelStateResponse(ResponseTypeEnum.ValidationError, HttpStatusCode.BadRequest, ModelState); }
+    [Authorize(Roles = "Usuario")]
+    [HttpPost("{alunoId}/solicitar-certificado")]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    public async Task<IActionResult> SolicitarCertificado(Guid alunoId, SolicitaCertificadoRequest dto)
+    {
+        try
+        {
+            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-    //    try
-    //    {
-    //        if (UserId != viewModel.AlunoId) { return GenerateResponse(null, ResponseTypeEnum.ValidationError, HttpStatusCode.Forbidden, ["Você não tem permissão para realizar essa operação"]); }
-
-    //        var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(viewModel.MatriculaCursoId);
-    //        if (matriculaCurso == null) { return GenerateResponse(null, ResponseTypeEnum.NotFound, HttpStatusCode.NotFound, ["Matrícula não encontrada"]); }
-
-    //        CursoDto cursoDto = await _cursoAppService.ObterPorIdAsync(matriculaCurso.CursoId);
-    //        if (cursoDto == null) { return GenerateResponse(null, ResponseTypeEnum.NotFound, HttpStatusCode.NotFound, ["Curso desta matrícula não encontrada"]); }
-
-    //        var comando = new RegistrarHistoricoAprendizadoCommand(
-    //            viewModel.AlunoId,
-    //            viewModel.MatriculaCursoId,
-    //            viewModel.AulaId,
-    //            cursoDto,
-    //            viewModel.DataTermino
-    //        );
-
-    //        var sucesso = await _mediatorHandler.EnviarComando(comando);
-
-    //        if (sucesso)
-    //        {
-    //            return GenerateResponse(new { viewModel.AlunoId, viewModel.MatriculaCursoId, viewModel.AulaId },
-    //                responseType: ResponseTypeEnum.Success,
-    //                statusCode: HttpStatusCode.Created);
-    //        }
-
-    //        return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-    //    }
-    //    catch (DomainException exDomain)
-    //    {
-    //        return GenerateDomainExceptionResponse(null, ResponseTypeEnum.DomainError, HttpStatusCode.BadRequest, exDomain);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return GenerateResponse(null, ResponseTypeEnum.GenericError, HttpStatusCode.BadRequest, [ex.Message]);
-    //    }
-    //}
-
-    //[Authorize(Policy = "ApenasAluno")]
-    //[HttpPut("{alunoId}/concluir-curso")]
-    //public async Task<IActionResult> ConcluirCurso(ConcluirCursoViewModel viewModel)
-    //{
-    //    if (!ModelState.IsValid) { return GenerateModelStateResponse(ResponseTypeEnum.ValidationError, HttpStatusCode.BadRequest, ModelState); }
-
-    //    try
-    //    {
-    //        if (UserId != viewModel.AlunoId) { return GenerateResponse(null, ResponseTypeEnum.ValidationError, HttpStatusCode.Forbidden, ["Você não tem permissão para realizar essa operação"]); }
-
-    //        var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(viewModel.MatriculaCursoId);
-    //        if (matriculaCurso == null) { return GenerateResponse(null, ResponseTypeEnum.NotFound, HttpStatusCode.NotFound, ["Matrícula não encontrada"]); }
-
-    //        CursoDto cursoDto = await _cursoAppService.ObterPorIdAsync(matriculaCurso.CursoId);
-    //        if (cursoDto == null) { return GenerateResponse(null, ResponseTypeEnum.NotFound, HttpStatusCode.NotFound, ["Curso desta matrícula não encontrada"]); }
-
-    //        var comando = new ConcluirCursoCommand(viewModel.AlunoId, viewModel.MatriculaCursoId, cursoDto);
-    //        var sucesso = await _mediatorHandler.EnviarComando(comando);
-
-    //        if (sucesso)
-    //        {
-    //            return GenerateResponse(new { viewModel.AlunoId, viewModel.MatriculaCursoId },
-    //                responseType: ResponseTypeEnum.Success,
-    //                statusCode: HttpStatusCode.NoContent);
-    //        }
-
-    //        return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-    //    }
-    //    catch (DomainException exDomain)
-    //    {
-    //        return GenerateDomainExceptionResponse(null, ResponseTypeEnum.DomainError, HttpStatusCode.BadRequest, exDomain);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return GenerateResponse(null, ResponseTypeEnum.GenericError, HttpStatusCode.BadRequest, [ex.Message]);
-    //    }
-    //}
-
-    //[Authorize(Policy = "ApenasAluno")]
-    //[HttpPost("{alunoId}/solicitar-certificado")]
-    //public async Task<IActionResult> SolicitarCertificado(SolicitarCertificadoViewModel viewModel)
-    //{
-    //    if (!ModelState.IsValid) { return GenerateModelStateResponse(ResponseTypeEnum.ValidationError, HttpStatusCode.BadRequest, ModelState); }
-
-    //    try
-    //    {
-    //        if (UserId != viewModel.AlunoId) { return GenerateResponse(null, ResponseTypeEnum.ValidationError, HttpStatusCode.Forbidden, ["Você não tem permissão para realizar essa operação"]); }
-
-    //        var comando = new SolicitarCertificadoCommand(viewModel.AlunoId, viewModel.MatriculaCursoId, viewModel.PathCertificado);
-    //        var sucesso = await _mediatorHandler.EnviarComando(comando);
-
-    //        if (sucesso)
-    //        {
-    //            return GenerateResponse(new { viewModel.AlunoId, viewModel.MatriculaCursoId, viewModel.PathCertificado },
-    //                responseType: ResponseTypeEnum.Success,
-    //                statusCode: HttpStatusCode.Created);
-    //        }
-
-    //        return GenerateResponse(responseType: ResponseTypeEnum.GenericError, statusCode: HttpStatusCode.BadRequest);
-    //    }
-    //    catch (DomainException exDomain)
-    //    {
-    //        return GenerateDomainExceptionResponse(null, ResponseTypeEnum.DomainError, HttpStatusCode.BadRequest, exDomain);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return GenerateResponse(null, ResponseTypeEnum.GenericError, HttpStatusCode.BadRequest, [ex.Message]);
-    //    }
-    //}
+            var comando = new SolicitarCertificadoCommand(dto.AlunoId, dto.MatriculaCursoId);
+            return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
+    }
 }

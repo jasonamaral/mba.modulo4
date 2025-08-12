@@ -16,7 +16,6 @@ public class MatriculaCurso : Common.Entidade
     public DateTime DataMatricula { get; }
     public DateTime? DataConclusao { get; private set; }
     public EstadoMatriculaCursoEnum EstadoMatricula { get; private set; }
-    public byte? NotaFinal { get; private set; }
     public string Observacao { get; private set; }
 
     private readonly List<HistoricoAprendizado> _historicoAprendizado = [];
@@ -51,13 +50,24 @@ public class MatriculaCurso : Common.Entidade
 
     #region Métodos
     internal short QuantidadeTotalCargaHoraria() => (short)_historicoAprendizado.Sum(x => x.CargaHoraria);
-    //public int QuantidadeAulasFinalizadas => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
-    //public int QuantidadeAulasEmAndamento => _historicoAprendizado.Count(h => !h.DataTermino.HasValue);
+    public int QuantidadeAulasFinalizadas() => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
+    public int QuantidadeAulasEmAndamento() => _historicoAprendizado.Count(h => !h.DataTermino.HasValue);
     public bool MatriculaCursoConcluido() => DataConclusao.HasValue;
     internal bool MatriculaCursoDisponivel() => !DataConclusao.HasValue && EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado;
     internal bool PodeConcluirCurso() => EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado && _historicoAprendizado.Count(h => !h.DataTermino.HasValue) == 0;
+    public bool PagamentoPodeSerRealizado() => EstadoMatricula == EstadoMatriculaCursoEnum.PendentePagamento || EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado;
+    public decimal CalcularMediaFinalCurso()
+    {
+        var totalCargaHoraria = QuantidadeTotalCargaHoraria();
+        if (totalCargaHoraria == 0) { throw new DomainException("Não é possível concluir um curso sem aulas realizadas"); }
 
-    //public bool PagamentoPodeSerRealizado => EstadoMatricula == EstadoMatriculaCursoEnum.PendentePagamento || EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado;
+        return 10.00m; // TODO: Implementar lógica de cálculo da média final baseada nas notas das aulas
+    }
+
+    public decimal? ObterNotaFinalCurso()
+    {
+        return Certificado?.NotaFinal ?? null;
+    }
 
     //internal HistoricoAprendizado ObterHistoricoAulaPeloId(Guid aulaId)
     //{
@@ -73,7 +83,7 @@ public class MatriculaCurso : Common.Entidade
         ValidarIntegridadeMatriculaCurso(novaNotaFinal: notaFinal);
         VerificarSeCertificadoExiste();
         Certificado.AtualizarNotaFinal(notaFinal);
-        NotaFinal = notaFinal;
+        //NotaFinal = notaFinal;
     }
 
     internal void RegistrarPagamentoMatricula()
@@ -126,7 +136,7 @@ public class MatriculaCurso : Common.Entidade
     #endregion
 
     #region Manipuladores de Certificado
-    internal void RequisitarCertificadoConclusao(byte notaFinal, string pathCertificado, string nomeInstrutor)
+    internal void RequisitarCertificadoConclusao(decimal notaFinal, string pathCertificado, string nomeInstrutor)
     {
         if (Certificado != null) { throw new DomainException("Certificado já foi solicitado para esta matrícula"); }
         if (!MatriculaCursoConcluido()) { throw new DomainException("Certificado só pode ser solicitado após a conclusão do curso"); }
