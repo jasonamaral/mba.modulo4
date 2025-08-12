@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+using Azure.Core;
 using Core.Mediator;
 using Core.Messages;
 using Core.Messages.Integration;
@@ -12,9 +12,8 @@ using Pagamentos.Application.ViewModels;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
-namespace Pagamentos.API.Controllers.V1
+namespace Pagamentos.API.Controllers
 {
-    [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/pagamentos")]
     //[Authorize]
@@ -38,7 +37,7 @@ namespace Pagamentos.API.Controllers.V1
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
             if (!ModelState.IsValid)
-                 return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
 
 
             var evento = new PagamentoCursoEvent(pagamento.MatriculaId,
@@ -99,7 +98,7 @@ namespace Pagamentos.API.Controllers.V1
         private IActionResult NotFoundResponse(string message)
         {
             _notificador.AdicionarErro(message);
-            return RespostaPadraoApi(HttpStatusCode.NotFound,message);
+            return RespostaPadraoApi(HttpStatusCode.NotFound, message);
         }
     }
 
