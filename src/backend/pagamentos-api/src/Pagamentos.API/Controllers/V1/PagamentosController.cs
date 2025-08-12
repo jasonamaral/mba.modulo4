@@ -19,11 +19,11 @@ namespace Pagamentos.API.Controllers.V1
     [Route("api/v{version:apiVersion}/pagamentos")]
     //[Authorize]
 
-    public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService
-                                         , IPagamentoComandoAppService pagamentoComandoAppService
-                                         , IMediatorHandler mediator
-                                         , INotificador notificador
-                                         , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
+    public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService,
+                                      IPagamentoComandoAppService pagamentoComandoAppService,
+                                      IMediatorHandler mediator,
+                                      INotificador notificador,
+                                      INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
     {
         private readonly IMediatorHandler _mediator = mediator;
         private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService = pagamentoConsultaAppService;
