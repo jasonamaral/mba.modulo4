@@ -99,16 +99,19 @@ export abstract class BaseService {
 
     protected extractData(response: any): any {
         if (response && typeof response === 'object') {
-            if (response.title && response.status !== undefined && response.data !== undefined) {
-                return response.data || {};
-            }
-            
-            if (response.notifications && response.notifications.length > 0) {
-                // Mantém compatibilidade com estrutura antiga
+            // Novo contrato: sempre que houver "data", retorná-lo independentemente de outros campos
+            if (Object.prototype.hasOwnProperty.call(response, 'data')) {
+                return (response as any).data ?? {};
             }
 
-            if (response.result) {
-                return response.result || {};
+            // Compatibilidade com contratos anteriores que usavam "result"
+            if (Object.prototype.hasOwnProperty.call(response, 'result')) {
+                return (response as any).result ?? {};
+            }
+
+            // Mantém compatibilidade com estrutura antiga baseada em notifications
+            if ((response as any).notifications && (response as any).notifications.length > 0) {
+                // Sem transformação específica aqui, retorna o próprio objeto
             }
         }
 

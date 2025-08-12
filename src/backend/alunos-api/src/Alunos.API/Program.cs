@@ -36,7 +36,7 @@ internal class Program
 
     static void InitializeDatabaseAsync(AlunoDbContext context)
     {
-        // Criar banco se não existir
+        // Criar banco se nï¿½o existir
         context.Database.EnsureCreatedAsync();
     }
 }

@@ -2,29 +2,26 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
+import { MatriculaModel } from '../models/matricula.model';
 
-export interface MatriculaDto {
-  id: string;
-  alunoId: string;
-  cursoId: string;
-  cursoNome: string;
-  dataMatricula: string;
-  status: string;
-  percentualConclusao: number;
-  dataConclusao?: string;
-}
+// tipo movido para src/app/models/dtos
 
 @Injectable({ providedIn: 'root' })
 export class MatriculasService extends BaseService {
   constructor(private http: HttpClient) { super(); }
 
-  criarMatricula(cursoId: string): Observable<{ matriculaId: string }> {
+  criarMatricula(cursoId: string, observacao: string = ''): Observable<{ matriculaId: string }> {
+    const alunoId = this.LocalStorage.getUser()?.usuarioToken?.id;
     return this.http
-      .post(this.UrlServiceV1 + 'alunos/matriculas', { cursoId }, this.getAuthHeaderJson())
+      .post(
+        this.UrlServiceV1 + `Alunos/${alunoId}/matricular-aluno`,
+        { alunoId, cursoId, observacao },
+        this.getAuthHeaderJson()
+      )
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 
-  listarMatriculas(): Observable<MatriculaDto[]> {
+  listarMatriculas(): Observable<MatriculaModel[]> {
     return this.http
       .get(this.UrlServiceV1 + 'alunos/minhas-matriculas', this.getAuthHeaderJson())
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));

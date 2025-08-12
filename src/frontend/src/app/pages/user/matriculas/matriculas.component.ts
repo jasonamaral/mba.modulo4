@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatriculasService, MatriculaDto } from '../../../services/matriculas.service';
+import { MatriculasService } from '../../../services/matriculas.service';
+import { MatriculaModel } from '../../../models/matricula.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   standalone: true,
@@ -13,18 +15,35 @@ import { MatriculasService, MatriculaDto } from '../../../services/matriculas.se
 })
 export class MatriculasComponent {
   cols = ['curso','status','progresso','acoes'];
-  matriculas: MatriculaDto[] = [];
+  matriculas: MatriculaModel[] = [];
 
-  constructor(private service: MatriculasService) {}
+  constructor(private service: MatriculasService, private toastr: ToastrService) {}
 
   ngOnInit() { this.load(); }
 
   load() {
-    this.service.listarMatriculas().subscribe(d => this.matriculas = d);
+    this.service.listarMatriculas().subscribe({
+      next: d => this.matriculas = d,
+      error: (fail) => {
+        const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
+        if (Array.isArray(errors) && errors.length > 0) this.toastr.error(errors.join('\n'));
+        else this.toastr.error('Falha ao carregar suas matrículas.');
+      }
+    });
   }
 
-  finalizar(m: MatriculaDto) {
-    this.service.finalizarCurso(m.cursoId).subscribe(() => this.load());
+  finalizar(m: MatriculaModel) {
+    this.service.finalizarCurso(m.cursoId).subscribe({
+      next: () => {
+        this.toastr.success('Curso finalizado com sucesso.');
+        this.load();
+      },
+      error: (fail) => {
+        const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
+        if (Array.isArray(errors) && errors.length > 0) this.toastr.error(errors.join('\n'));
+        else this.toastr.error('Não foi possível finalizar o curso.');
+      }
+    });
   }
 }
 

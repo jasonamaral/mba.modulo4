@@ -31,6 +31,24 @@ export class LocalStorageUtils {
         return user;
     }
 
+    public isUserAdmin(): boolean {
+        try {
+            const user = this.getUser();
+            const claims = user?.usuarioToken?.claims ?? [];
+            if (!Array.isArray(claims)) return false;
+
+            return claims.some(c => {
+                const type = (c?.type ?? '').toLowerCase();
+                const value = c?.value ?? '';
+                // Considera formato comum: type = 'role', value = 'Administrador'
+                // e o formato solicitado: type = 'Administrador'
+                return (type === 'role' && value === 'Administrador') || c?.type === 'Administrador';
+            });
+        } catch {
+            return false;
+        }
+    }
+
     private setExpiresAt() {
         let today = new Date();
         var minutesToAdd = 4 * 60;

@@ -125,6 +125,31 @@ namespace BFF.API.Controllers
         }
 
         /// <summary>
+        /// Obtém todas as categorias
+        /// </summary>
+        /// <returns>Lista categorias</returns>
+        [HttpGet("categorias")]
+        [ProducesResponseType(typeof(ResponseResult<IEnumerable<CategoriaDto>>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
+        public async Task<IActionResult> ObterTodasCategorias()
+        {
+            try
+            {
+                var resultado = await _conteudoService.ObterTodasCategorias();
+
+                if (resultado?.Status == (int)HttpStatusCode.OK)
+                    return Ok(resultado);
+
+                return BadRequest(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Cadastrar um novo curso
         /// </summary>
         [HttpPost("cursos")]

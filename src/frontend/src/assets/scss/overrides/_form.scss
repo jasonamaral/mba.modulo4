@@ -13,3 +13,16 @@ mat-label {
     display: none;
   }
 }
+
+/* Força campos a ocuparem toda a coluna dos grids locais */
+.mat-mdc-form-field,
+.mat-mdc-text-field-wrapper,
+.mdc-text-field,
+.mat-mdc-form-field-flex,
+.mat-mdc-form-field-infix,
+input[matInput],
+.mat-mdc-select-trigger,
+.mat-mdc-select-value {
+  width: 100% !important;
+  min-width: 100% !important;
+}

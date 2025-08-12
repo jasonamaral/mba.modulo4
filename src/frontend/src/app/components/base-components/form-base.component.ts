@@ -3,6 +3,7 @@ import { FormGroup, UntypedFormGroup } from '@angular/forms';
 
 import { Observable, fromEvent, merge } from 'rxjs';
 import { DisplayMessage, GenericValidator, ValidationMessages } from 'src/app/utils/generic-form-validation';
+import { LocalStorageUtils } from 'src/app/utils/localstorage';
 
 export abstract class FormBaseComponent {
 
@@ -12,6 +13,11 @@ export abstract class FormBaseComponent {
     dateLogged!: Date;
 
     mudancasNaoSalvas!: boolean;
+    isUserAdmin!: boolean;
+
+    constructor() {
+        this.isUserAdmin = new LocalStorageUtils().isUserAdmin();
+    }
 
     protected configureMessagesValidation(validationMessages: ValidationMessages) {
         this.genericValidator = new GenericValidator(validationMessages);

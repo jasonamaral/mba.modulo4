@@ -3,10 +3,6 @@
     "Name": "MultipleStartup",
     "Projects": [
       {
-        "Path": "auth-api\\src\\Auth.API\\Auth.API.csproj",
-        "Action": "Start"
-      },
-      {
         "Path": "bff-api\\src\\BFF.API\\BFF.API.csproj",
         "Action": "Start"
       },

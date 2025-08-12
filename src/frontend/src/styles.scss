@@ -3,6 +3,12 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+// Avoid horizontal scroll inside dialogs and body
+html, body, .cdk-overlay-container, .mat-mdc-dialog-container, .mdc-dialog__surface {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 .align-right {
   text-align: right;
   margin-right: 8px; /* Ajuste para espaçamento */
