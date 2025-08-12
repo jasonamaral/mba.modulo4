@@ -1,4 +1,5 @@
-﻿using Core.Mediator;
+﻿using Azure.Core;
+using Core.Mediator;
 using Core.Messages;
 using Core.Messages.Integration;
 using Core.Notification;
@@ -16,7 +17,7 @@ namespace Pagamentos.API.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/pagamentos")]
-    [Authorize]
+    //[Authorize]
 
     public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService
                                          , IPagamentoComandoAppService pagamentoComandoAppService
@@ -40,13 +41,26 @@ namespace Pagamentos.API.Controllers.V1
                  return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
 
 
-            var command = new PagamentoCursoEvent(pagamento.MatriculaId,
+            var evento = new PagamentoCursoEvent(pagamento.MatriculaId,
                                                     pagamento.AlunoId,
                                                     pagamento.Total,
                                                     pagamento.NomeCartao,
                                                     pagamento.NumeroCartao,
                                                     pagamento.ExpiracaoCartao,
                                                     pagamento.CvvCartao);
+
+
+
+
+            //var xxx = await _mediator.PublicarEvento(command);
+
+
+            await _mediator.PublicarEvento(evento);
+
+            return RespostaPadraoApi(HttpStatusCode.OK, "");
+
+
+            //return RespostaPadraoApi<bool>(HttpStatusCode.OK,await _mediator.PublicarEvento(command));
 
 
 

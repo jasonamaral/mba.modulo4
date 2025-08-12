@@ -21,7 +21,7 @@ namespace BFF.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class PagamentosController : BffController
     {
 
@@ -41,7 +41,7 @@ namespace BFF.API.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
         [HttpPost("pagamento")]
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
