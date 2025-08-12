@@ -25,11 +25,11 @@ public static class DependencyInjectionConfig
 
         // Serviços de API
         services.AddScoped<IConteudoService, ConteudoService>();
-        services.AddScoped<IAulaService, AulaService>();
+        services.AddScoped<IAlunoService, AlunoService>();
         
         // Serviços de infraestrutura
         services.AddScoped<ICacheService, Infrastructure.Services.CacheService>();
-        services.AddScoped<IApiClientService, Infrastructure.Services.ApiClientService>();
+        services.AddTransient<IApiClientService, Infrastructure.Services.ApiClientService>();
         services.AddScoped<IDashboardService, Infrastructure.Services.DashboardService>();
 
         services.RegisterNotification();

@@ -1,4 +1,5 @@
 using Alunos.API.Configurations;
+using Alunos.Infrastructure.Data;
 
 internal class Program
 {
@@ -20,7 +21,21 @@ internal class Program
             .WithName("HealthCheck")
             .WithOpenApi();
 
+        // Inicializar banco de dados
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<AlunoDbContext>();
+
+            InitializeDatabaseAsync(context);
+        }
+
         // Migration Helper
         app.Run();
+    }
+
+    static void InitializeDatabaseAsync(AlunoDbContext context)
+    {
+        // Criar banco se n�o existir
+        context.Database.EnsureCreatedAsync();
     }
 }

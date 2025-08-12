@@ -124,5 +124,5 @@ public class Certificado : Common.Entidade
     }
     #endregion
 
-    public override string ToString() => $"Certificado do curso {NomeCurso} (matrícula {MatriculaCursoId}) com total de {CargaHoraria} e nota final {NotaFinal} solicitado em {DataSolicitacao:dd/MM/yyyy}";
+    public override string ToString() => $"Certificado do curso {NomeCurso} (matrícula {MatriculaCursoId}) com total de {CargaHoraria} horas e nota final {NotaFinal} solicitado em {DataSolicitacao:dd/MM/yyyy}";
 }
