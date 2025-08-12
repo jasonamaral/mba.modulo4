@@ -12,6 +12,8 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { HeaderComponent } from './header/header.component';
+import { LocalStorageUtils } from 'src/app/utils/localstorage';
+import { NavItem } from './sidebar/nav-item/nav-item';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -39,6 +41,7 @@ const MONITOR_VIEW = 'screen and (min-width: 1024px)';
 export class FullComponent implements OnInit {
 
   navItems = navItems;
+  filteredNavItems: NavItem[] = [];
 
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav | any;
@@ -69,7 +72,9 @@ export class FullComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.filteredNavItems = this.buildMenuForCurrentUser();
+  }
 
   ngOnDestroy() {
     this.layoutChangesSubscription.unsubscribe();
@@ -85,5 +90,21 @@ export class FullComponent implements OnInit {
 
   onSidenavOpenedChange(isOpened: boolean) {
     this.isCollapsedWidthFixed = !this.isOver;
+  }
+
+  private buildMenuForCurrentUser(): NavItem[] {
+    const localStorageUtils = new LocalStorageUtils();
+    const isAdmin = localStorageUtils.isUserAdmin();
+
+    if (!isAdmin) {
+      return this.navItems;
+    }
+
+    // Oculta a seção "Área do Aluno" e seus itens quando for admin
+    return this.navItems.filter((item) =>
+      item.navCap !== 'Area do Aluno' &&
+      item.route !== 'pages/matriculas' &&
+      item.route !== 'pages/certificados'
+    );
   }
 }
