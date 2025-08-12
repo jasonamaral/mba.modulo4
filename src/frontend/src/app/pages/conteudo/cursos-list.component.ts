@@ -13,6 +13,7 @@ import { BreakpointObserver, LayoutModule } from '@angular/cdk/layout';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConteudoAddComponent } from './conteudo-add.component';
 import { LocalStorageUtils } from 'src/app/utils/localstorage';
+import { ConteudoUpdateComponent } from './conteudo-update.component';
 
 @Component({
   standalone: true,
@@ -74,6 +75,24 @@ export class CursosListComponent {
       }
     });
   }
+
+  openEditDialog(curso: CursoModel): void {
+    const ref = this.dialog.open(ConteudoUpdateComponent, {
+      width: '1000px',
+      maxWidth: '100vw',
+      panelClass: ['dialog-fullwidth'],
+      disableClose: true,
+      autoFocus: false,
+      data: curso
+    });
+
+    ref.afterClosed().subscribe(result => {
+      if (result?.inserted) {
+        this.loadCursos();
+      }
+    });
+  }
+
   matricular(c: CursoModel) {
     this.matriculas.criarMatricula(c.id).subscribe({
       next: () => this.toastr.success('Matrícula realizada com sucesso.'),

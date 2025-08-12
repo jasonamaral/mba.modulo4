@@ -79,8 +79,11 @@
       </div>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-flat-button color="accent" (click)="matricular(c)" [disabled]="c.podeSerMatriculado === false">
+          <button mat-flat-button color="accent" (click)="matricular(c)" [disabled]="c.podeSerMatriculado === false" *ngIf="!isUserAdmin">
             Matricular-se
+          </button>
+          <button mat-flat-button color="accent" (click)="openEditDialog(c)" *ngIf="isUserAdmin">
+            Editar
           </button>
         </mat-card-actions>
       </mat-card>
