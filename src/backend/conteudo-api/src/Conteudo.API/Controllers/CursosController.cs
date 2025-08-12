@@ -14,18 +14,22 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Mapster;
 using Core.Notification;
+using Conteudo.Application.Commands.ExcluirCurso;
 
 namespace Conteudo.API.Controllers;
 
+/// <summary>
+/// Controller para gerenciar cursos
+/// </summary>
 [Route("api/[controller]")]
 [Authorize]
 [Produces("application/json")]
-public class CursosController(ICursoAppService cursoAppService
+public class CursosController(ICursoQuery cursoAppService
                            , IMediatorHandler mediator
                            , INotificador notificador
                            , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
 {
-    private readonly ICursoAppService _cursoAppService = cursoAppService;
+    private readonly ICursoQuery _cursoAppService = cursoAppService;
     private readonly IMediatorHandler _mediator = mediator;
 
     /// <summary>
@@ -37,6 +41,7 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCurso([FromRoute] Guid id, [FromQuery] bool includeAulas = false)
     {
         try
@@ -64,6 +69,7 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpGet]
     [ProducesResponseType(typeof(ResponseResult<PagedResult<CursoDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursos([FromQuery] CursoFilter filter)
     {
         try
@@ -86,11 +92,11 @@ public class CursosController(ICursoAppService cursoAppService
     [HttpGet("categoria/{categoriaId}")]
     [ProducesResponseType(typeof(ResponseResult<IEnumerable<CursoDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
     {
         try
-        {   
+        {
             if (categoriaId == Guid.Empty)
                 return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria inválido");
 
@@ -108,9 +114,9 @@ public class CursosController(ICursoAppService cursoAppService
     /// </summary>
     /// <param name="dto">Dados do curso</param>
     [HttpPost]
-    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> CadastrarCurso([FromBody] CadastroCursoDto dto)
     {
         try
@@ -121,7 +127,7 @@ public class CursosController(ICursoAppService cursoAppService
         catch (Exception ex)
         {
             return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        } 
+        }
     }
 
     /// <summary>
@@ -130,10 +136,9 @@ public class CursosController(ICursoAppService cursoAppService
     /// <param name="id">ID do curso</param>
     /// <param name="dto">Dados atualizados do curso</param>
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AtualizarCurso([FromRoute] Guid id, [FromBody] AtualizarCursoDto dto)
     {
         try
@@ -145,12 +150,8 @@ public class CursosController(ICursoAppService cursoAppService
                 return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do curso não confere");
 
             var command = dto.Adapt<AtualizarCursoCommand>();
-            
+
             return RespostaPadraoApi<CursoDto>(await _mediator.ExecutarComando(command));
-        }
-        catch (ArgumentException ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.NotFound, ex.Message);
         }
         catch (Exception ex)
         {
@@ -164,43 +165,15 @@ public class CursosController(ICursoAppService cursoAppService
     /// <param name="id">ID do curso</param>
     /// <returns>Confirmação da exclusão</returns>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ExcluirCurso([FromRoute] Guid id)
     {
         try
-        {
-            //await _cursoAppService.ExcluirCursoAsync(id);
-            return Ok(new ApiSuccess { Message = "Curso excluído com sucesso" });
-        }
-        catch (ArgumentException ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.NotFound, ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
-    }
-
-    /// <summary>
-    /// Obtém as aulas de um curso
-    /// </summary>
-    /// <param name="id">ID do curso</param>
-    /// <returns>Lista de aulas do curso</returns>
-    [HttpGet("{id}/aulas")]
-    [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-    public async Task<IActionResult> ObterAulasDoCurso([FromRoute] Guid id)
-    {
-        try
-        {
-            var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas: true);
-            if (curso == null)
-                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
-
-            return RespostaPadraoApi(data: curso.Aulas);
+        {   
+            var command = new ExcluirCursoCommand(id);
+            return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
         }
         catch (Exception ex)
         {
@@ -215,14 +188,18 @@ public class CursosController(ICursoAppService cursoAppService
     /// <returns>Conteúdo programático</returns>
     [HttpGet("{id}/conteudo-programatico")]
     [ProducesResponseType(typeof(ResponseResult<ConteudoProgramaticoDto>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterConteudoProgramatico([FromRoute] Guid id)
     {
         try
         {
             var curso = await _cursoAppService.ObterPorIdAsync(id);
             if (curso == null)
-                return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado");
+            {
+                _notificador.AdicionarErro("Curso não encontrado.");
+                return RespostaPadraoApi<string>();
+            }
 
             var conteudoProgramatico = new ConteudoProgramaticoDto
             {

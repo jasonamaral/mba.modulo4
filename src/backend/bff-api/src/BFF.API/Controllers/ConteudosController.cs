@@ -45,22 +45,22 @@ namespace BFF.API.Controllers
         [HttpGet("{cursoId}")]
         [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ObterCurso([FromRoute] Guid cursoId, [FromQuery] bool includeAulas = false)
         {
             if (cursoId == Guid.Empty)
             {
-                return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do curso inválido.");
+                return ProcessarErro(HttpStatusCode.BadRequest, "Id do curso inválido.");
             }
             var cacheKey = $"Curso_{cursoId}_IncludeAulas_{includeAulas}";
             var cachedCurso = await _cacheService.GetAsync<ResponseResult<CursoDto>>(cacheKey);
 
             if (cachedCurso != null)
             {
-                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, cachedCurso, "Curso obtido do cache com sucesso");
+                return RespostaPadraoApi(HttpStatusCode.OK, cachedCurso, "Curso obtido do cache com sucesso");
             }
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            var resultado = await _conteudoService.ObterCursoPorId(cursoId, token);
+            var resultado = await _conteudoService.ObterCursoPorId(cursoId);
 
             if (resultado?.Status == (int)HttpStatusCode.OK)
             {
@@ -78,6 +78,7 @@ namespace BFF.API.Controllers
         [HttpGet("cursos")]
         [ProducesResponseType(typeof(ResponseResult<PagedResult<CursoDto>>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ObterTodosCursos([FromQuery] CursoFilter filter)
         {
             var cacheKey = $"TodosCursos_Filtro:{JsonSerializer.Serialize(filter)}";
@@ -86,9 +87,7 @@ namespace BFF.API.Controllers
             if (cachedCursos != null)
                 return Ok(cachedCursos);
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
-            var resultado = await _conteudoService.ObterTodosCursos(token, filter);
+            var resultado = await _conteudoService.ObterTodosCursos(filter);
 
             if (resultado?.Status == (int)HttpStatusCode.OK)
             {
@@ -107,17 +106,15 @@ namespace BFF.API.Controllers
         [HttpGet("categoria/{categoriaId}")]
         [ProducesResponseType(typeof(ResponseResult<IEnumerable<CursoDto>>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
         {
             try
-            {   
-                var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-                var resultado = await _conteudoService.ObterPorCategoriaIdAsync(token, categoriaId, includeAulas);
+            {
+                var resultado = await _conteudoService.ObterPorCategoriaId(categoriaId, includeAulas);
 
                 if (resultado?.Status == (int)HttpStatusCode.OK)
-                {
                     return Ok(resultado);
-                }
 
                 return BadRequest(resultado);
             }
@@ -130,15 +127,13 @@ namespace BFF.API.Controllers
         /// <summary>
         /// Cadastrar um novo curso
         /// </summary>
-        [Authorize(Roles = "Administrador")]
         [HttpPost("cursos")]
         [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> AdicionarCurso([FromBody] CursoCriarRequest curso)
         {
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
-            var response = await _conteudoService.AdicionarCurso(curso, token);
+            var response = await _conteudoService.AdicionarCurso(curso);
 
             if (response?.Status == (int)HttpStatusCode.BadRequest)
                 return BadRequest(response);
@@ -149,34 +144,78 @@ namespace BFF.API.Controllers
         /// <summary>
         /// Atualizar um curso existente
         /// </summary>
-        [Authorize(Roles = "Administrador")]
         [HttpPut("cursos/{cursoId}")]
         [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> AtualizarCurso(Guid cursoId, [FromBody] AtualizarCursoRequest curso)
         {
-            if (cursoId == Guid.Empty)
-                return BadRequest(new ResponseResult<string>
-                {
-                    Status = (int)HttpStatusCode.BadRequest,
-                    Errors = new ResponseErrorMessages
-                    {
-                        Mensagens = new List<string> { "Id do curso inválido." }
-                    }
-                });
-
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
-            var response = await _conteudoService.AtualizarCurso(cursoId, curso, token);
-
-            if (response?.Status == (int)HttpStatusCode.NotFound)
-                return NotFound(response);
+            var response = await _conteudoService.AtualizarCurso(cursoId, curso);
 
             if (response?.Status == (int)HttpStatusCode.BadRequest)
                 return BadRequest(response);
 
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Excluir um curso
+        /// </summary>
+        [HttpDelete("cursos/{cursoId}")]
+        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> ExcluirCurso(Guid cursoId)
+        {
+            var response = await _conteudoService.ExcluirCurso(cursoId);
+
+            if (response?.Status == (int)HttpStatusCode.BadRequest)
+                return BadRequest(response);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Obter Aulas por Curso ID
+        /// </summary>
+        [HttpGet("cursos/{cursoId}/aulas")]
+        [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
+        public async Task<IActionResult> ObterAulasPorCursoId([FromRoute] Guid cursoId)
+        {
+            try
+            {
+                var resultado = await _conteudoService.ObterCursoPorId(cursoId, true);
+                if (resultado?.Status == (int)HttpStatusCode.OK)
+                    return Ok(resultado);
+                return BadRequest(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Obter Conteudo Programatico por Curso ID
+        /// </summary>
+        [HttpGet("cursos/{cursoId}/conteudo-programatico")]
+        [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
+        public async Task<IActionResult> ObterConteudoProgramaticoPorCursoId([FromRoute] Guid cursoId)
+        {
+            try
+            {
+                var resultado = await _conteudoService.ObterConteudoProgramaticoPorCursoId(cursoId);
+                if (resultado?.Status == (int)HttpStatusCode.OK)
+                    return Ok(resultado);
+                return BadRequest(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

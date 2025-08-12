@@ -81,24 +81,52 @@ foreach ($service in $services) {
     }
 }
 
+# Verificar se precisa fazer build
+$needsBuild = $false
 if ($ForceBuild -or $CleanBuild) {
+    $needsBuild = $true
     Write-Host "Reconstruindo todas as imagens..." -ForegroundColor Yellow
-    docker-compose -f $composeFile build --no-cache --parallel
 } elseif ($missingImages.Count -gt 0) {
+    $needsBuild = $true
     Write-Host "Construindo imagens faltantes: $($missingImages -join ', ')" -ForegroundColor Yellow
-    $buildServices = $missingImages -join " "
-    docker-compose -f $composeFile build --parallel $buildServices
 } else {
     Write-Host "Todas as imagens ja existem!" -ForegroundColor Green
+}
+
+# Fazer build se necessário
+if ($needsBuild) {
+    if ($ForceBuild -or $CleanBuild) {
+        docker-compose -f $composeFile build --no-cache --parallel
+    } elseif ($missingImages.Count -gt 0) {
+        $buildServices = $missingImages -join " "
+        docker-compose -f $composeFile build --parallel $buildServices
+    }
 }
 
 Write-Host "Verificando infraestrutura (RabbitMQ, Redis)..." -ForegroundColor Blue
 $infraServices = @("rabbitmq", "redis")
 $missingInfra = @()
 
+# Verificar containers usando docker-compose ps
+$runningContainers = docker-compose -f $composeFile ps -q
+
 foreach ($service in $infraServices) {
     $containerName = "plataforma-$service"
-    $containerExists = docker ps -q -f "name=$containerName"
+    $containerExists = $false
+    
+    if ($runningContainers) {
+        foreach ($containerId in $runningContainers) {
+            try {
+                $containerInfo = docker inspect $containerId --format='{{.Name}}' 2>$null
+                if ($containerInfo -and $containerInfo.Contains($containerName)) {
+                    $containerExists = $true
+                    break
+                }
+            } catch {
+                # Ignorar erros de containers que foram removidos
+            }
+        }
+    }
     
     if (-not $containerExists) {
         $missingInfra += $service
@@ -108,26 +136,58 @@ foreach ($service in $infraServices) {
     }
 }
 
+function Wait-ContainerHealthy {
+    param([string]$containerName, [int]$timeoutSec = 90)
+    $elapsed = 0
+    Write-Host "Aguardando '$containerName' ficar HEALTHY (timeout ${timeoutSec}s)..." -ForegroundColor Yellow
+    while ($elapsed -lt $timeoutSec) {
+        $status = docker inspect --format='{{.State.Health.Status}}' $containerName 2>$null
+        if ($status -eq 'healthy') {
+            Write-Host "Container '$containerName' HEALTHY" -ForegroundColor Green
+            return $true
+        }
+        Start-Sleep -Seconds 3
+        $elapsed += 3
+    }
+    Write-Host "Timeout aguardando '$containerName' HEALTHY. Prosseguindo assim mesmo." -ForegroundColor Yellow
+    return $false
+}
+
 if ($missingInfra.Count -gt 0) {
     Write-Host "Iniciando infraestrutura faltante: $($missingInfra -join ', ')" -ForegroundColor Blue
-    $infraServicesToStart = $missingInfra -join " "
-    docker-compose -f $composeFile up -d $infraServicesToStart
-    
-    if ($missingInfra.Count -gt 0) {
-        Write-Host "Aguardando infraestrutura inicializar (15 segundos)..." -ForegroundColor Yellow
-        Start-Sleep -Seconds 15
-    }
+    docker-compose -f $composeFile up -d $missingInfra
 } else {
     Write-Host "Toda infraestrutura ja esta rodando!" -ForegroundColor Green
 }
+
+# Aguarda RabbitMQ ficar 'healthy' para evitar timeout nas APIs ao registrar filas
+$rabbitContainer = "plataforma-rabbitmq"
+try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
 
 Write-Host "Verificando microservicos..." -ForegroundColor Blue
 $apiServices = @("auth-api", "conteudo-api", "alunos-api", "pagamentos-api")
 $missingApis = @()
 
+# Atualizar lista de containers rodando
+$runningContainers = docker-compose -f $composeFile ps -q
+
 foreach ($service in $apiServices) {
     $containerName = "plataforma-$service"
-    $containerExists = docker ps -q -f "name=$containerName"
+    $containerExists = $false
+    
+    if ($runningContainers) {
+        foreach ($containerId in $runningContainers) {
+            try {
+                $containerInfo = docker inspect $containerId --format='{{.Name}}' 2>$null
+                if ($containerInfo -and $containerInfo.Contains($containerName)) {
+                    $containerExists = $true
+                    break
+                }
+            } catch {
+                # Ignorar erros de containers que foram removidos
+            }
+        }
+    }
     
     if (-not $containerExists) {
         $missingApis += $service
@@ -139,8 +199,7 @@ foreach ($service in $apiServices) {
 
 if ($missingApis.Count -gt 0) {
     Write-Host "Iniciando APIs faltantes: $($missingApis -join ', ')" -ForegroundColor Blue
-    $apisToStart = $missingApis -join " "
-    docker-compose -f $composeFile up -d $apisToStart
+    docker-compose -f $composeFile up -d $missingApis
     
     Write-Host "Aguardando APIs inicializarem (20 segundos)..." -ForegroundColor Yellow
     Start-Sleep -Seconds 20
@@ -152,9 +211,26 @@ Write-Host "Verificando BFF e Frontend..." -ForegroundColor Blue
 $frontendServices = @("bff-api", "frontend")
 $missingFrontend = @()
 
+# Atualizar lista de containers rodando
+$runningContainers = docker-compose -f $composeFile ps -q
+
 foreach ($service in $frontendServices) {
     $containerName = "plataforma-$service"
-    $containerExists = docker ps -q -f "name=$containerName"
+    $containerExists = $false
+    
+    if ($runningContainers) {
+        foreach ($containerId in $runningContainers) {
+            try {
+                $containerInfo = docker inspect $containerId --format='{{.Name}}' 2>$null
+                if ($containerInfo -and $containerInfo.Contains($containerName)) {
+                    $containerExists = $true
+                    break
+                }
+            } catch {
+                # Ignorar erros de containers que foram removidos
+            }
+        }
+    }
     
     if (-not $containerExists) {
         $missingFrontend += $service
@@ -166,8 +242,7 @@ foreach ($service in $frontendServices) {
 
 if ($missingFrontend.Count -gt 0) {
     Write-Host "Iniciando BFF e Frontend faltantes: $($missingFrontend -join ', ')" -ForegroundColor Blue
-    $frontendToStart = $missingFrontend -join " "
-    docker-compose -f $composeFile up -d $frontendToStart
+    docker-compose -f $composeFile up -d $missingFrontend
     
     Write-Host "Aguardando inicializacao completa (10 segundos)..." -ForegroundColor Yellow
     Start-Sleep -Seconds 10
@@ -175,9 +250,35 @@ if ($missingFrontend.Count -gt 0) {
     Write-Host "BFF e Frontend ja estao rodando!" -ForegroundColor Green
 }
 
-Write-Host ""
-Write-Host "Recriando todos os containers para garantir ambiente limpo..." -ForegroundColor Yellow
-docker-compose -f $composeFile up -d --force-recreate
+# Recriação orquestrada (evita subir APIs antes do RabbitMQ)
+$totalMissing = $missingInfra.Count + $missingApis.Count + $missingFrontend.Count
+if ($ForceBuild -or $CleanBuild) {
+    Write-Host ""; Write-Host "Recriando infraestrutura..." -ForegroundColor Yellow
+    docker-compose -f $composeFile up -d --force-recreate rabbitmq redis
+    try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
+
+    Write-Host "Recriando APIs..." -ForegroundColor Yellow
+    docker-compose -f $composeFile up -d --force-recreate auth-api conteudo-api alunos-api pagamentos-api
+    Start-Sleep -Seconds 10
+
+    Write-Host "Recriando BFF e Frontend..." -ForegroundColor Yellow
+    docker-compose -f $composeFile up -d --force-recreate bff-api frontend
+} elseif ($totalMissing -gt 0) {
+    Write-Host ""; Write-Host "Recriando apenas servicos faltantes, em ordem..." -ForegroundColor Yellow
+    if ($missingInfra.Count -gt 0) {
+        docker-compose -f $composeFile up -d --force-recreate $missingInfra
+        try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
+    }
+    if ($missingApis.Count -gt 0) {
+        docker-compose -f $composeFile up -d --force-recreate $missingApis
+        Start-Sleep -Seconds 10
+    }
+    if ($missingFrontend.Count -gt 0) {
+        docker-compose -f $composeFile up -d --force-recreate $missingFrontend
+    }
+} else {
+    Write-Host ""; Write-Host "Todos os containers ja estao rodando!" -ForegroundColor Green
+}
 
 Write-Host ""
 Write-Host "Sistema iniciado com sucesso!" -ForegroundColor Green

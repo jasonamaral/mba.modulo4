@@ -13,12 +13,8 @@ namespace BFF.API.Controllers;
 [ApiController]
 public abstract class BffController : MainController
 {
-    protected readonly INotificador _notificador;
-
     protected BffController(IMediatorHandler mediator, INotificationHandler<DomainNotificacaoRaiz> notifications, INotificador notificador) : base(mediator, notifications, notificador)
-    {
-        _notificador = notificador;
-    }
+    { }
 
 
     protected async Task<ActionResult> ProcessarRespostaApi(HttpResponseMessage response, string? successMessage = null)

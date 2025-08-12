@@ -9,7 +9,7 @@ namespace MessageBus;
 public class MessageBus : IMessageBus
 {
     private IBus? _bus;
-    private IAdvancedBus _advancedBus;
+    // Removido campo não utilizado
     private readonly string _connectionString;
     private readonly int _requestTimeoutSeconds;
 
@@ -69,18 +69,20 @@ public class MessageBus : IMessageBus
         if (_bus == null)
             throw new InvalidOperationException("Bus not connected");
 
-        var retryPolicy = Policy.Handle<TimeoutException>().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        var retryPolicy = Policy.Handle<TimeoutException>()
+            .Or<EasyNetQ.EasyNetQException>()
+            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(2, retryAttempt))));
 
         return await retryPolicy.ExecuteAsync(async () =>
         {
-            try
+            // Implementa timeout manual quando a versão do EasyNetQ não expõe configuração de timeout
+            var requestTask = _bus.RequestAsync<TRequest, TResponse>(request);
+            var completed = await Task.WhenAny(requestTask, Task.Delay(TimeSpan.FromSeconds(_requestTimeoutSeconds)));
+            if (completed == requestTask)
             {
-                return await _bus.RequestAsync<TRequest, TResponse>(request);
+                return await requestTask;
             }
-            catch (TimeoutException)
-            {
-                throw new TimeoutException($"Request timed out after {_requestTimeoutSeconds} seconds.");
-            }
+            throw new TimeoutException($"Request timed out after {_requestTimeoutSeconds} seconds.");
         });
     }
 

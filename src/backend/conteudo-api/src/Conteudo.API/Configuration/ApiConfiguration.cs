@@ -1,5 +1,6 @@
 ﻿using Conteudo.API.Extensions;
 using Conteudo.Application.Commands.CadastrarCurso;
+using Conteudo.Application.Mappings;
 using Core.Identidade;
 using Mapster;
 
@@ -72,7 +73,7 @@ namespace Conteudo.API.Configuration
 
         private static WebApplicationBuilder AddMapsterConfiguration(this WebApplicationBuilder builder)
         {
-            TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
+            TypeAdapterConfig.GlobalSettings.Scan(typeof(ConteudoMappingConfig).Assembly);
             return builder;
         }
 

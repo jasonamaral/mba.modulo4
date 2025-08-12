@@ -6,7 +6,8 @@ public class AtualizarCursoCommandValidator : AbstractValidator<AtualizarCursoCo
     public AtualizarCursoCommandValidator()
     {
         RuleFor(c => c.Id)
-            .NotEmpty().WithMessage("ID é obrigatório");
+            .NotEmpty().WithMessage("ID é obrigatório")
+            .NotEqual(Guid.Empty).WithMessage("ID do curso inválido.");
         RuleFor(c => c.Nome)
             .NotEmpty().WithMessage("Nome é obrigatório")
             .MaximumLength(200).WithMessage("Nome deve ter no máximo 200 caracteres");

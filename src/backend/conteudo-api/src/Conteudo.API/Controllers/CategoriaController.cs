@@ -15,6 +15,9 @@ using System.Net;
 
 namespace Conteudo.API.Controllers
 {
+    /// <summary>
+    /// Controller de Categorias
+    /// </summary>
     [Route("api/[controller]")]
     [Authorize]
     [Produces("application/json")]
@@ -32,7 +35,8 @@ namespace Conteudo.API.Controllers
         /// <param name="id">ID do curso</param>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResponseResult<CategoriaDto>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ObterPorId(Guid id)
         {
             try
@@ -59,6 +63,7 @@ namespace Conteudo.API.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<CategoriaDto>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
         public async Task<IActionResult> ObterTodos()
         {
             try
@@ -77,9 +82,9 @@ namespace Conteudo.API.Controllers
         /// </summary>
         /// <param name="dto">Dados da categoria</param>
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
         [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> CadastrarCategoria([FromBody] CadastroCategoriaDto dto)
         {
             try

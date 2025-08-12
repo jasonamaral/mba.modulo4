@@ -19,7 +19,6 @@ public abstract class BaseApiService
         _apiClient.ClearDefaultHeaders();
         _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
         _apiClient.AddDefaultHeader("Accept", "application/json");
-        _apiClient.AddDefaultHeader("Content-Type", "application/json");
     }
 
     protected async Task<T?> ExecuteWithErrorHandling<T>(Func<Task<T?>> operation, string operationName, params object[] parameters)

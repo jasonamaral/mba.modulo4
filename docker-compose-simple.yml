@@ -13,6 +13,11 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - plataforma-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7-alpine
@@ -29,8 +34,8 @@ services:
   # Microserviços
   auth-api:
     build:
-      context: ./src/backend/auth-api
-      dockerfile: Dockerfile
+      context: ./src/backend
+      dockerfile: auth-api/Dockerfile
     container_name: plataforma-auth-api
     ports:
       - "5001:5001"
@@ -67,6 +72,7 @@ services:
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
+      - AppSettings__AutenticacaoJwksUrl=http://auth-api:5001/jwks
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__Username=admin
@@ -81,8 +87,8 @@ services:
 
   alunos-api:
     build:
-      context: ./src/backend/alunos-api
-      dockerfile: Dockerfile
+      context: ./src/backend
+      dockerfile: alunos-api/Dockerfile
     container_name: plataforma-alunos-api
     ports:
       - "5003:5003"
@@ -94,6 +100,11 @@ services:
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
       - ExternalApis__ConteudoApi=http://conteudo-api:5002
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+      - AppSettings__AutenticacaoJwksUrl=http://auth-api:5001/jwks
     depends_on:
       - rabbitmq
       - auth-api
@@ -104,8 +115,8 @@ services:
 
   pagamentos-api:
     build:
-      context: ./src/backend/pagamentos-api
-      dockerfile: Dockerfile
+      context: ./src/backend
+      dockerfile: pagamentos-api/Dockerfile
     container_name: plataforma-pagamentos-api
     ports:
       - "5004:5004"
@@ -120,6 +131,7 @@ services:
       - RabbitMQ__Port=5672
       - RabbitMQ__Username=admin
       - RabbitMQ__Password=admin123
+      - AppSettings__AutenticacaoJwksUrl=http://auth-api:5001/jwks
     depends_on:
       - rabbitmq
       - auth-api
@@ -147,6 +159,7 @@ services:
       - ApiSettings__ConteudoApiUrl=http://conteudo-api:5002
       - ApiSettings__AlunosApiUrl=http://alunos-api:5003
       - ApiSettings__PagamentosApiUrl=http://pagamentos-api:5004
+      - AppSettings__AutenticacaoJwksUrl=http://auth-api:5001/jwks
     depends_on:
       - redis
       - auth-api

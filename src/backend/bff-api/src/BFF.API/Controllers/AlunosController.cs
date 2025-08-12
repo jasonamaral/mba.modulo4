@@ -3,6 +3,7 @@ using BFF.API.Models.Request;
 using BFF.API.Models.Response;
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
+using BFF.Domain.DTOs;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -23,18 +24,21 @@ namespace BFF.API.Controllers;
 public class AlunosController : BffController
 {
     private readonly IApiClientService _apiClient;
+    private readonly IAlunoStoreService _store;
     private readonly ApiSettings _apiSettings;
     private readonly ILogger<AlunosController> _logger;
 
     public AlunosController(
         IApiClientService apiClient,
         IOptions<ApiSettings> apiSettings,
+        IAlunoStoreService store,
         ILogger<AlunosController> logger,
         IMediatorHandler mediator,
         INotificationHandler<DomainNotificacaoRaiz> notifications,
         INotificador notificador) : base(mediator, notifications, notificador)
     {
         _apiClient = apiClient;
+        _store = store;
         _apiSettings = apiSettings.Value;
         _logger = logger;
     }
@@ -55,12 +59,8 @@ public class AlunosController : BffController
                 return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
             }
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
             _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
             _apiClient.ClearDefaultHeaders();
-            _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
-            _apiClient.AddDefaultHeader("Accept", "application/json");
-            _apiClient.AddDefaultHeader("Content-Type", "application/json");
 
             var response = await _apiClient.GetAsync<ResponseResult<AlunoPerfilResponse>>($"/api/alunos/usuario/{userId}");
 
@@ -95,12 +95,8 @@ public class AlunosController : BffController
                 return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
             }
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
             _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
             _apiClient.ClearDefaultHeaders();
-            _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
-            _apiClient.AddDefaultHeader("Accept", "application/json");
-            _apiClient.AddDefaultHeader("Content-Type", "application/json");
 
             var result = await _apiClient.PutAsyncWithActionResult<AtualizarPerfilAluno, ResponseResult<AlunoPerfilResponse>>(
                 $"/api/alunos/usuario/{userId}", 
@@ -154,35 +150,116 @@ public class AlunosController : BffController
                 return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
             }
 
-            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            _apiClient.ClearDefaultHeaders();
-            _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
-            _apiClient.AddDefaultHeader("Accept", "application/json");
-            _apiClient.AddDefaultHeader("Content-Type", "application/json");
-
-            // Primeiro, buscar o perfil do aluno
-            var aluno = await _apiClient.GetAsync<ResponseResult<AlunoPerfilResponse>>($"/api/alunos/usuario/{userId}");
-
-            if (aluno?.Data == null)
-            {
-                return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Perfil do aluno não encontrado");
-            }
-
-            // Depois, buscar as matrículas
-            var matriculas = await _apiClient.GetAsync<ResponseResult<AlunoMatriculasResponse>>($"/api/alunos/{userId}/matriculas");
-
-            if (matriculas?.Data != null)
-            {
-                return RespostaPadraoApi(System.Net.HttpStatusCode.OK, matriculas.Data, "Matrículas do aluno obtidas com sucesso");
-            }
-
-            return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Matrículas não encontradas");
+            var lista = await _store.ListarMatriculasAsync(userId);
+            return RespostaPadraoApi(System.Net.HttpStatusCode.OK, lista, "Matrículas do aluno obtidas com sucesso");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar busca de matrículas via BFF");
             return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
+    }
+
+    /// <summary>
+    /// Cria uma matrícula temporária (store BFF) e prepara checkout
+    /// </summary>
+    [HttpPost("matriculas")]
+    [Authorize(Roles = "Usuario")]
+    public async Task<IActionResult> CriarMatricula([FromBody] dynamic body)
+    {
+        var userId = User.GetUserId();
+        if (userId == Guid.Empty)
+            return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
+
+        try
+        {
+            // Lê cursoId do body
+            Guid cursoId = Guid.Parse((string)body.cursoId);
+
+            // Busca nome do curso na Conteudo API para enriquecer
+            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+            _apiClient.ClearDefaultHeaders();
+            var curso = await _apiClient.GetAsync<ResponseResult<CursoDto>>($"api/cursos/{cursoId}");
+
+            var cursoNome = curso?.Data?.Nome ?? string.Empty;
+            var matricula = await _store.CriarMatriculaAsync(userId, cursoId, cursoNome);
+
+            return RespostaPadraoApi(System.Net.HttpStatusCode.Created, new { matriculaId = matricula.Id }, "Matrícula criada e pendente de pagamento");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao criar matrícula");
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
+        }
+    }
+
+    /// <summary>
+    /// Atualiza progresso do aluno em uma aula
+    /// </summary>
+    [HttpPost("aulas/{aulaId}/progresso")]
+    [Authorize(Roles = "Usuario")]
+    public async Task<IActionResult> PostProgresso(Guid aulaId, [FromBody] dynamic body)
+    {
+        var userId = User.GetUserId();
+        if (userId == Guid.Empty)
+            return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
+
+        try
+        {
+            Guid cursoId = Guid.Parse((string)body.cursoId);
+            decimal percentual = (decimal)body.percentual;
+            await _store.AtualizarProgressoAulaAsync(userId, cursoId, aulaId, percentual);
+            return RespostaPadraoApi<object>(System.Net.HttpStatusCode.OK, null, "Progresso atualizado");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao atualizar progresso");
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
+        }
+    }
+
+    /// <summary>
+    /// Emite certificado caso curso concluído
+    /// </summary>
+    [HttpPost("cursos/{cursoId}/finalizar")]
+    [Authorize(Roles = "Usuario")]
+    public async Task<IActionResult> FinalizarCurso(Guid cursoId)
+    {
+        var userId = User.GetUserId();
+        if (userId == Guid.Empty)
+            return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
+
+        try
+        {
+            var matricula = (await _store.ListarMatriculasAsync(userId)).FirstOrDefault(m => m.CursoId == cursoId);
+            if (matricula == null)
+                return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Matrícula não encontrada");
+
+            if (matricula.PercentualConclusao < 100)
+                return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Curso ainda não concluído");
+
+            var cert = await _store.EmitirCertificadoAsync(userId, cursoId, matricula.CursoNome);
+            return RespostaPadraoApi(System.Net.HttpStatusCode.OK, cert, "Certificado emitido");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao finalizar curso");
+            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
+        }
+    }
+
+    /// <summary>
+    /// Lista certificados do aluno
+    /// </summary>
+    [HttpGet("certificados")]
+    [Authorize(Roles = "Usuario")]
+    public async Task<IActionResult> ListarCertificados()
+    {
+        var userId = User.GetUserId();
+        if (userId == Guid.Empty)
+            return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
+
+        var certs = await _store.ListarCertificadosAsync(userId);
+        return RespostaPadraoApi(System.Net.HttpStatusCode.OK, certs, "Certificados");
     }
 }

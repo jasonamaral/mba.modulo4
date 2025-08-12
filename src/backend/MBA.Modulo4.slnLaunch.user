@@ -7,11 +7,19 @@
         "Action": "Start"
       },
       {
+        "Path": "bff-api\\src\\BFF.API\\BFF.API.csproj",
+        "Action": "Start"
+      },
+      {
         "Path": "alunos-api\\src\\Alunos.API\\Alunos.API.csproj",
         "Action": "Start"
       },
       {
-        "Path": "bff-api\\src\\BFF.API\\BFF.API.csproj",
+        "Path": "conteudo-api\\src\\Conteudo.API\\Conteudo.API.csproj",
+        "Action": "StartWithoutDebugging"
+      },
+      {
+        "Path": "pagamentos-api\\src\\Pagamentos.API\\Pagamentos.API\\Pagamentos.API.csproj",
         "Action": "Start"
       }
     ]

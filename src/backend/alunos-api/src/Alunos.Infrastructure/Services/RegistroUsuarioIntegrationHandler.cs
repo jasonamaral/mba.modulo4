@@ -25,10 +25,25 @@ public class RegistroUsuarioIntegrationHandler : BackgroundService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        SetResponder();
-        return Task.CompletedTask;
+        // Retry simples para aguardar RabbitMQ ficar disponível dentro do container
+        var tentativas = 0;
+        while (tentativas < 10 && !stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                SetResponder();
+                _logger.LogInformation("Responder de RegistroUsuario configurado com sucesso");
+                break;
+            }
+            catch (Exception ex)
+            {
+                tentativas++;
+                _logger.LogWarning(ex, "Falha ao configurar responder (tentativa {Tentativa}). Aguardando RabbitMQ...", tentativas);
+                await Task.Delay(TimeSpan.FromSeconds(3), stoppingToken);
+            }
+        }
     }
 
     private void SetResponder()

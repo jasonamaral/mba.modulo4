@@ -29,6 +29,7 @@ namespace Conteudo.Infrastructure.Repositories
             var totalResults = await query.CountAsync();
 
             var cursos = await query
+                .Include(c => c.Categoria)
                 .OrderBy(c => c.Nome)
                 .Skip(filter.PageSize * (filter.PageIndex - 1))
                 .Take(filter.PageSize)
@@ -72,21 +73,31 @@ namespace Conteudo.Infrastructure.Repositories
 
         public async Task<IEnumerable<Curso>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
         {
-            return await _curso
+            var query = _curso
                 .Where(c => c.CategoriaId == categoriaId)
-                .AsNoTracking()
-                .Include(c => includeAulas ? c.Aulas : null)
+                .AsNoTracking();
+
+            if (includeAulas)
+                query = query.Include(c => c.Aulas);
+
+            return await query
+                .Include(c => c.Categoria)
                 .ToListAsync();
         }
 
+
         public async Task<IEnumerable<Curso>> ObterAtivosAsync(bool includeAulas = false)
         {
-            return await _curso
+            var query = _curso
                 .Where(c => c.Ativo)
-                .AsNoTracking()
-                .Include(c => includeAulas ? c.Aulas : null)
-                .ToListAsync();
+                .AsNoTracking();
+
+            if (includeAulas)
+                query = query.Include(c => c.Aulas);
+
+            return await query.ToListAsync();
         }
+
 
         public Task<IEnumerable<Curso>> ObterPorPesquisaAsync(string searchTerm, bool includeAulas = false)
         {
