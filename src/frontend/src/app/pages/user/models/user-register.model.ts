@@ -5,6 +5,7 @@ export interface UserRegisterModel {
     senha: string;
     confirmaSenha: string;
     dataNascimento: string;
+    genero: string;
     cpf: string;
     fone: string;
     cidade: string;

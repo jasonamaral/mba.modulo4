@@ -8,6 +8,7 @@ internal class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.AddApiConfiguration();
+        builder.Services.AddMessageBusConfiguration(builder.Configuration);
 
         var app = builder.Build();
         app.UseSwaggerConfiguration();

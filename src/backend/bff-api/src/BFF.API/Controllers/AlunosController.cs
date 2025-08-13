@@ -71,7 +71,7 @@ public class AlunosController(IAlunoService aulaService,
     }
 
     [Authorize(Roles = "Usuario")]
-    [HttpGet("{id}/todas-matriculas")]
+    [HttpGet("{alunoId}/todas-matriculas")]
     [ProducesResponseType(typeof(ResponseResult<ICollection<MatriculaCursoDto>>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     public async Task<IActionResult> ObterMatriculasPorAlunoIdAsync(Guid alunoId)
