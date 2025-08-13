@@ -63,17 +63,19 @@ namespace BFF.API.Controllers
 
                 if (apiResponse.IsSuccess)
                 {
-                    return null;
-                    //return apiResponse.Data;
+                    return Ok(apiResponse.Data);
                 }
 
+                if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+                {
+                    return StatusCode(apiResponse.StatusCode, new ResponseResult<string>
+                    {
+                        Status = apiResponse.StatusCode,
+                        Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                    });
+                }
 
-                //if (response?.Data != null)
-                //{
-                //    return RespostaPadraoApi(System.Net.HttpStatusCode.OK, response.Data, "MSG SUCESSO TODO");
-                //}
-
-                return ProcessarErro(System.Net.HttpStatusCode.NotFound, "MSG ERRO TODO");
+                return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Erro desconhecido na API de pagamentos");
 
             }
             catch (Exception ex)

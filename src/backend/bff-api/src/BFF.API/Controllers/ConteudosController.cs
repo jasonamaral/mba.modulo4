@@ -163,6 +163,8 @@ namespace BFF.API.Controllers
             if (response?.Status == (int)HttpStatusCode.BadRequest)
                 return BadRequest(response);
 
+            await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
+
             return StatusCode(response?.Status ?? 500, response);
         }
 
@@ -180,6 +182,7 @@ namespace BFF.API.Controllers
             if (response?.Status == (int)HttpStatusCode.BadRequest)
                 return BadRequest(response);
 
+            await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
             return Ok(response);
         }
 

@@ -12,8 +12,8 @@
 </section>
 
 <div *ngIf="cursos?.length; else vazio">
-  <mat-grid-list [cols]="gridCols" rowHeight="440px" gutterSize="24">
-    <mat-grid-tile *ngFor="let c of cursos" [colspan]="gridCols === 2 && cursos.length === 1 ? 2 : 1">
+  <div class="courses-grid">
+    <div class="grid-item" *ngFor="let c of cursos">
       <mat-card class="course-card">
     <mat-card-header>
       <mat-card-title>{{ c.nome }}</mat-card-title>
@@ -76,22 +76,24 @@
             <span>{{ c.preRequisitos }}</span>
           </div>
         </div>
-        <div>
-          <button mat-button color="primary" (click)="openAulasDialog(c)">ver aulas</button>
-        </div>
       </div>
         </mat-card-content>
-        <mat-card-actions>
-          <button mat-flat-button color="accent" (click)="matricular(c)" [disabled]="c.podeSerMatriculado === false" *ngIf="!isUserAdmin">
-            Matricular-se
-          </button>
-          <button mat-flat-button color="accent" (click)="openEditDialog(c)" *ngIf="isUserAdmin">
-            Editar
-          </button>
+        <mat-card-actions class="course-actions">
+          <div class="actions-left">
+            <button mat-button color="primary" (click)="openAulasDialog(c)">ver aulas</button>
+          </div>
+          <div class="actions-right">
+            <button mat-flat-button color="accent" (click)="matricular(c)" [disabled]="c.podeSerMatriculado === false" *ngIf="!isUserAdmin">
+              Matricular-se
+            </button>
+            <button mat-flat-button color="accent" (click)="openEditDialog(c)" *ngIf="isUserAdmin">
+              Editar
+            </button>
+          </div>
         </mat-card-actions>
       </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
+    </div>
+  </div>
 </div>
 
 <ng-template #vazio>

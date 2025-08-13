@@ -40,9 +40,9 @@ export class CursosService extends BaseService {
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 
-  update(curso: CursoCreateModel): Observable<CursoModel> {
+  update(id: string, curso: CursoCreateModel): Observable<CursoModel> {
     return this.http
-      .put(this.UrlServiceV1 + 'Conteudos/cursos', curso, this.getAuthHeaderJson())
+      .put(this.UrlServiceV1 + `Conteudos/cursos/${id}`, curso, this.getAuthHeaderJson())
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 

@@ -278,19 +278,11 @@ public class AlunoService : BaseApiService, IAlunoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
+                return new ResponseResult<Guid>
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<Guid>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<Guid>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
+                    Status = apiResponse.StatusCode,
+                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                };
             }
 
             return new ResponseResult<Guid>
@@ -377,19 +369,11 @@ public class AlunoService : BaseApiService, IAlunoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
+                return new ResponseResult<bool>
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<bool>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<bool>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
+                    Status = apiResponse.StatusCode,
+                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                };
             }
 
             return new ResponseResult<bool>
@@ -440,19 +424,11 @@ public class AlunoService : BaseApiService, IAlunoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
+                return new ResponseResult<bool>
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<bool>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<bool>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
+                    Status = apiResponse.StatusCode,
+                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                };
             }
 
             return new ResponseResult<bool>
@@ -483,19 +459,11 @@ public class AlunoService : BaseApiService, IAlunoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
+                return new ResponseResult<Guid>
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<Guid>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<Guid>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
+                    Status = apiResponse.StatusCode,
+                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                };
             }
 
             return new ResponseResult<Guid>
