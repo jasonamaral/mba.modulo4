@@ -11,8 +11,9 @@ builder
     .AddDbContextConfig()
     .AddJwtConfiguration()
     .AddAutoMapperConfig()
-    .AddDependencyInjectionConfig()
-    .AddMediatrConfig();
+    .AddMediatrConfig()
+    .AddDependencyInjectionConfig();
+    
 
 var app = builder.Build();
 

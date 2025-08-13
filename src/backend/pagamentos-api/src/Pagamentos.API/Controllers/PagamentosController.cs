@@ -1,3 +1,4 @@
+using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using Core.Messages.Integration;
@@ -36,7 +37,9 @@ namespace Pagamentos.API.Controllers
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
             if (!ModelState.IsValid)
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
+            {
+                return RespostaPadraoApi<CommandResult>(ModelState);
+            }
 
 
             var evento = new PagamentoCursoEvent(pagamento.MatriculaId,
@@ -47,10 +50,6 @@ namespace Pagamentos.API.Controllers
                                                     pagamento.ExpiracaoCartao,
                                                     pagamento.CvvCartao);
 
-
-
-
-            //var xxx = await _mediator.PublicarEvento(command);
 
 
             await _mediator.PublicarEvento(evento);
