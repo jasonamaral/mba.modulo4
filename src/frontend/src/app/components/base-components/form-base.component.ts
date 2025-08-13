@@ -54,6 +54,18 @@ export abstract class FormBaseComponent {
                 return errors;
             }
 
+            // Novo contrato: erros em fail.error.data.errors como objetos { errorMessage }
+            const dataErrors = fail?.error?.data?.errors;
+            if (Array.isArray(dataErrors)) {
+                dataErrors.forEach((e: any) => {
+                    if (e && typeof e === 'object' && (e.errorMessage || e.message)) {
+                        errors.push(String(e.errorMessage ?? e.message));
+                    } else if (typeof e === 'string') {
+                        errors.push(e);
+                    }
+                });
+            }
+
             if (fail.error && fail.error.errors) {
                 const validationErrorDictionary = fail.error.errors;
                 
@@ -117,6 +129,18 @@ export abstract class FormBaseComponent {
         }
         
         // Trata erros de validação da API
+        // 1) Novo contrato: error.data.errors (array de objetos)
+        const dataErrors = fail?.error?.data?.errors;
+        if (Array.isArray(dataErrors)) {
+            dataErrors.forEach((e: any) => {
+                const message = typeof e === 'string' ? e : (e?.errorMessage ?? e?.message);
+                if (message && toastr) {
+                    toastr.error(String(message), 'Erro de Validação');
+                }
+            });
+            return;
+        }
+
         if (fail && fail.error && fail.error.errors) {
             const errors = fail.error.errors;
             
