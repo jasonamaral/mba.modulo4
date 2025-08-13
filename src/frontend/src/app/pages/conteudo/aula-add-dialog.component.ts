@@ -5,18 +5,12 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogTitle, Ma
 import { MaterialModule } from 'src/app/material.module';
 import { ToastrService } from 'ngx-toastr';
 import { CursosService } from 'src/app/services/cursos.service';
-
-export interface AulaCreateModel {
-  cursoId: string;
-  nome: string;
-  descricao: string;
-  duracaoMinutos: number;
-  videoUrl: string;
-}
+import { AulaCreateModel } from 'src/app/models/aula.model';
 
 interface DialogData {
   cursoId: string;
   cursoNome?: string;
+  aula?: import('src/app/models/aula.model').AulaModel;
 }
 
 @Component({
@@ -42,12 +36,27 @@ export class AulaAddDialogComponent {
     private dialogRef: MatDialogRef<AulaAddDialogComponent>,
     private cursosService: CursosService,
     private toastr: ToastrService
-  ) {}
+  ) {
+    // Pré-preenche o formulário quando "aula" for fornecida (edição)
+    const aula = (this.data as any)?.aula;
+    if (aula) {
+      this.form.patchValue({
+        nome: aula.nome ?? '',
+        descricao: aula.descricao ?? '',
+        duracaoMinutos: aula.duracaoMinutos ?? 0,
+        videoUrl: aula.videoUrl ?? ''
+      });
+    }
+  }
+
+  ngOnInit(): void {
+    // Se dados de aula forem fornecidos (em evolução), pré-preenche. Para agora, só curso/cursoNome
+    // Mantemos a possibilidade de preencher quando editar de fato.
+  }
 
   private buildPayload(): AulaCreateModel {
     const v = this.form.value;
     return {
-      cursoId: this.data.cursoId,
       nome: v.nome,
       descricao: v.descricao,
       duracaoMinutos: Number(v.duracaoMinutos ?? 0),
@@ -76,6 +85,7 @@ export class AulaAddDialogComponent {
       error: (e) => {
         const errors = (e?.error?.errors ?? e?.errors ?? []) as string[];
         this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao salvar a aula.');
+        this.saving = false;
       },
       complete: () => (this.saving = false)
     });

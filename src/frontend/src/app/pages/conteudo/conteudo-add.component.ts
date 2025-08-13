@@ -164,8 +164,10 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
 
           this.toastr.success('Curso criado com sucesso.');
           // Após criar, abrir diálogo para cadastrar aulas
-          const cursoId = (result as any)?.id;
-          const cursoNome = (result as any)?.nome;
+          const payload: any = result as any;
+          const cursoId: string | undefined = typeof payload === 'string' ? payload : (payload?.id ?? payload?.cursoId);
+          const cursoNome: string | undefined = typeof payload === 'object' ? (payload?.nome ?? payload?.titulo ?? undefined) : undefined;
+
           if (cursoId) {
             const ref = this.dialog.open(AulaAddDialogComponent, {
               width: '720px',
@@ -179,6 +181,7 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
               this.dialogRef.close({ inserted: true });
             });
           } else {
+            // Caso o endpoint retorne apenas o GUID e não esteja mapeado
             this.dialogRef.close({ inserted: true });
           }
         },

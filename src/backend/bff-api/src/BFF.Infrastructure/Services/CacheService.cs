@@ -146,7 +146,7 @@ public class CacheService : ICacheService
                 {
                     var endpoints = multiplexer.GetEndPoints();
                     var db = multiplexer.GetDatabase(_redisSettings.Database);
-                    var serverPattern = $"{_redisSettings.KeyPrefix}{pattern}*";
+                    var serverPattern = $"{_redisSettings.KeyPrefix}{GetFullKey(pattern)}*";
 
                     foreach (var endpoint in endpoints)
                     {
