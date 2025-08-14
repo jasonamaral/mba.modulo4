@@ -1,21 +1,25 @@
 using Conteudo.Domain.Entities;
+using Core.Data;
 
 namespace Conteudo.Domain.Interfaces.Repositories;
 
-public interface IMaterialRepository
+public interface IMaterialRepository : IRepository<Material>
 {
-    Task<IEnumerable<Material>> GetAllAsync();
-    Task<Material?> GetByIdAsync(Guid id);
-    Task<IEnumerable<Material>> GetByAulaIdAsync(Guid aulaId);
-    Task<IEnumerable<Material>> GetAtivosAsync();
-    Task<IEnumerable<Material>> GetAtivosByAulaIdAsync(Guid aulaId);
-    Task<IEnumerable<Material>> GetObrigatoriosByAulaIdAsync(Guid aulaId);
-    Task<bool> ExistsAsync(Guid id);
-    Task<bool> ExistsByNomeAsync(Guid aulaId, string nome, Guid? excludeId = null);
-    Task<Material> AddAsync(Material material);
-    Task<Material> UpdateAsync(Material material);
-    Task DeleteAsync(Guid id);
-    Task<int> CountAsync();
-    Task<int> CountByAulaAsync(Guid aulaId);
-    Task<int> CountAtivosByAulaAsync(Guid aulaId);
+    Task<IEnumerable<Material>> ObterTodosAsync();
+    Task<Material?> ObterPorIdAsync(Guid id);
+    Task<IEnumerable<Material>> ObterPorAulaIdAsync(Guid aulaId);
+    Task<IEnumerable<Material>> ObterAtivosAsync();
+    Task<IEnumerable<Material>> ObterAtivosPorAulaIdAsync(Guid aulaId);
+    Task<IEnumerable<Material>> ObterObrigatoriosPorAulaIdAsync(Guid aulaId);
+    Task<bool> ExisteAsync(Guid id);
+    Task<bool> ExistePorNomeAsync(Guid aulaId, string nome, Guid? excludeId = null);
+    Task<Material> CadastrarMaterialAsync(Material material);
+    Task<Material> AtualizarMaterialAsync(Material material);
+    Task AtivarMaterialAsync(Guid id);
+    Task DesativarMaterialAsync(Guid id);
+    Task ExcluirMaterialAsync(Guid id);
+    Task<int> ContarMateriaisAsync();
+    Task<int> ContarMateriaisPorAulaAsync(Guid aulaId);
+    Task<int> ContarMateriaisAtivosPorAulaAsync(Guid aulaId);
+
 } 

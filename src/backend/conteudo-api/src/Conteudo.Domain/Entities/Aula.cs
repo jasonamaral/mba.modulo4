@@ -2,7 +2,7 @@ using Core.DomainObjects;
 
 namespace Conteudo.Domain.Entities;
 
-public class Aula : Entidade
+public class Aula : Entidade, IRaizAgregacao
 {
     public Guid CursoId { get; private set; }
     public Curso Curso { get; private set; }
