@@ -1,4 +1,4 @@
-using BFF.API.Services.Aulas;
+using BFF.API.Services.Aluno;
 using BFF.Domain.DTOs.Alunos.Request;
 using BFF.Domain.DTOs.Alunos.Response;
 using Core.Communication;

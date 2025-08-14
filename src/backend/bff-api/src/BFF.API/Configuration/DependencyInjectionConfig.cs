@@ -5,7 +5,7 @@ using Core.Mediator;
 using Core.Messages;
 using MediatR;
 using BFF.API.Services.Conteudos;
-using BFF.API.Services.Aulas;
+using BFF.API.Services.Aluno;
 
 namespace BFF.API.Configuration;
 

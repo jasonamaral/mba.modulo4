@@ -7,7 +7,7 @@ using BFF.Infrastructure.Services;
 using Core.Communication;
 using Microsoft.Extensions.Options;
 
-namespace BFF.API.Services.Aulas;
+namespace BFF.API.Services.Aluno;
 public class AlunoService : BaseApiService, IAlunoService
 {
     private readonly ApiSettings _apiSettings;
