@@ -16,7 +16,7 @@
 
       <mat-form-field appearance="outline" floatLabel="always" class="col-3">
         <mat-label>Valor</mat-label>
-        <span matPrefix>R$&nbsp;</span>
+        <span matPrefix style="margin-left: 5px;">R$&nbsp;</span>
         <input matInput type="number" formControlName="valor" min="0" step="0.01" />
         <mat-error *ngIf="form.get('valor')?.hasError('required')">Informe o valor.</mat-error>
       </mat-form-field>
@@ -49,8 +49,8 @@
         <mat-error *ngIf="form.get('instrutor')?.hasError('required')">Informe o instrutor.</mat-error>
       </mat-form-field>
 
-      <div class="col-8" style="display:flex; align-items:center; gap:8px;">
-        <mat-form-field appearance="outline" floatLabel="always" style="flex:1 1 auto; min-width: 320px;">
+      <div class="col-8 categoria-wrapper">
+        <mat-form-field appearance="outline" floatLabel="always" class="col-4">
           <mat-label>Categoria</mat-label>
           <mat-select formControlName="categoriaId">
             <mat-option *ngFor="let cat of categorias" [value]="cat.categoryId">{{ cat.description }}</mat-option>
@@ -59,7 +59,8 @@
           <mat-error *ngIf="form.get('categoriaId')?.hasError('required')">Selecione uma categoria.</mat-error>
         </mat-form-field>
 
-        <button type="button" mat-icon-button color="primary" aria-label="Adicionar categoria" (click)="openAddCategory()" style="width:32px;height:32px">
+        <button type="button" mat-icon-button color="primary" aria-label="Adicionar categoria"
+          (click)="openAddCategory()">
           <mat-icon fontIcon="add"></mat-icon>
         </button>
       </div>

@@ -11,7 +11,6 @@ import { CursoModel } from 'src/app/models/curso.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
 import { CursoCreateModel } from 'src/app/models/curso.model';
 import { CursosService } from 'src/app/services/cursos.service';
-import { ConteudoAddComponent } from './conteudo-add.component';
 import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
 
 @Component({
