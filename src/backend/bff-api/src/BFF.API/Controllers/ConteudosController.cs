@@ -1,5 +1,4 @@
 ﻿using BFF.API.Models.Request;
-using BFF.API.Services;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
 using Core.Communication;
@@ -12,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json;
 using MediatR;
+using BFF.API.Services.Conteudos;
 
 namespace BFF.API.Controllers
 {
@@ -125,6 +125,31 @@ namespace BFF.API.Controllers
         }
 
         /// <summary>
+        /// Obtém todas as categorias
+        /// </summary>
+        /// <returns>Lista categorias</returns>
+        [HttpGet("categorias")]
+        [ProducesResponseType(typeof(ResponseResult<IEnumerable<CategoriaDto>>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Usuario, Administrador")]
+        public async Task<IActionResult> ObterTodasCategorias()
+        {
+            try
+            {
+                var resultado = await _conteudoService.ObterTodasCategorias();
+
+                if (resultado?.Status == (int)HttpStatusCode.OK)
+                    return Ok(resultado);
+
+                return BadRequest(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Cadastrar um novo curso
         /// </summary>
         [HttpPost("cursos")]
@@ -137,6 +162,8 @@ namespace BFF.API.Controllers
 
             if (response?.Status == (int)HttpStatusCode.BadRequest)
                 return BadRequest(response);
+
+            await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
 
             return StatusCode(response?.Status ?? 500, response);
         }
@@ -155,6 +182,7 @@ namespace BFF.API.Controllers
             if (response?.Status == (int)HttpStatusCode.BadRequest)
                 return BadRequest(response);
 
+            await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
             return Ok(response);
         }
 

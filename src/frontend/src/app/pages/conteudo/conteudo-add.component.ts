@@ -7,40 +7,65 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormBaseComponent } from 'src/app/components/base-components/form-base.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, FormControlName, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CategoryModel } from './models/conteudo.model';
+import { CategoryModel } from 'src/app/models/conteudo.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
+import { CursoCreateModel } from 'src/app/models/curso.model';
+import { CursosService } from 'src/app/services/cursos.service';
+import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
+import { AulaAddDialogComponent } from './aula-add-dialog.component';
 
 @Component({
   selector: 'app-conteudo-add',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, MatButtonModule],
   templateUrl: './conteudo-add.component.html',
+  styleUrl: './conteudo-add.component.scss'
 })
 
 export class ConteudoAddComponent extends FormBaseComponent implements OnInit, OnDestroy {
   @ViewChildren(FormControlName, { read: ElementRef }) formInputElements!: ElementRef[];
 
   form: FormGroup = new FormGroup({});
-  categoryModel!: CategoryModel;
+  cursoModel!: CursoCreateModel;
   submitted = false;
   destroy$: Subject<boolean> = new Subject<boolean>();
+  categorias: CategoryModel[] = [];
 
   constructor(public dialog: MatDialog,
-    private categorySevice: ConteudoService,
+    private categoriasService: ConteudoService,
+    private cursosService: CursosService,
     private toastr: ToastrService,
     private dialogRef: MatDialogRef<ConteudoAddComponent>) {
 
     super();
 
     this.validationMessages = {
-      description: {
-        required: 'Informe a descrição da categoria.',
-        minlength: 'A descrição precisa ter entre 4 e 100 caracteres.',
-        maxlength: 'A descrição precisa ter entre 4 e 100 caracteres.',
+      nome: {
+        required: 'Informe o nome do curso.',
+        minlength: 'O nome precisa ter entre 3 e 150 caracteres.',
+        maxlength: 'O nome precisa ter entre 3 e 150 caracteres.',
       },
-      type: {
-        required: 'Informe o tipo da categoria.',
+      valor: {
+        required: 'Informe o valor do curso.',
+        min: 'O valor deve ser maior ou igual a 0.'
       },
+      duracaoHoras: {
+        required: 'Informe a duração em horas.',
+        min: 'A duração deve ser maior que 0.'
+      },
+      nivel: {
+        required: 'Informe o nível do curso.'
+      },
+      instrutor: {
+        required: 'Informe o instrutor.'
+      },
+      vagasMaximas: {
+        required: 'Informe as vagas máximas.',
+        min: 'As vagas devem ser maior que 0.'
+      },
+      categoriaId: {
+        required: 'Selecione a categoria.'
+      }
     };
 
     super.configureMessagesValidation(this.validationMessages);
@@ -48,36 +73,122 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      description: new FormControl('', [Validators.required, Validators.minLength(4), Validators.maxLength(100)]),
-      type: new FormControl('', [Validators.required]),
+      nome: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]),
+      valor: new FormControl(0, [Validators.required, Validators.min(0)]),
+      duracaoHoras: new FormControl(0, [Validators.required, Validators.min(1)]),
+      nivel: new FormControl('', [Validators.required]),
+      instrutor: new FormControl('', [Validators.required]),
+      vagasMaximas: new FormControl(0, [Validators.required, Validators.min(1)]),
+      imagemUrl: new FormControl(''),
+      validoAte: new FormControl<string | null>(null),
+      categoriaId: new FormControl('', [Validators.required]),
+      resumo: new FormControl(''),
+      descricao: new FormControl(''),
+      objetivos: new FormControl(''),
+      preRequisitos: new FormControl(''),
+      publicoAlvo: new FormControl(''),
+      metodologia: new FormControl(''),
+      recursos: new FormControl(''),
+      avaliacao: new FormControl(''),
+      bibliografia: new FormControl(''),
     });
+
+    // Ajuste para novo endpoint de categorias
+    this.categoriasService.getAllCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (cats) => {
+          const raw = (cats as any[]) ?? [];
+          this.categorias = raw.map((c: any) => ({
+            categoryId: c?.id ?? c?.categoryId ?? '',
+            userId: '',
+            description: c?.nome ?? c?.description ?? c?.descricao ?? '',
+            type: 0,
+          } as CategoryModel));
+        },
+        error: () => this.categorias = []
+      });
   }
 
   ngAfterViewInit(): void {
     super.configureValidationFormBase(this.formInputElements, this.form);
   }
 
+  openAddCategory(): void {
+    const ref = this.dialog.open(CategoriaAddDialogComponent, {
+      width: '840px',
+      maxWidth: '95vw',
+      disableClose: true,
+      autoFocus: false
+    });
+
+    ref.afterClosed().subscribe(result => {
+      if (result?.inserted) {
+        // Recarrega categorias
+        this.categoriasService.getAllCategories().pipe(takeUntil(this.destroy$)).subscribe({
+          next: (cats) => {
+            const raw = (cats as any[]) ?? [];
+            this.categorias = raw.map((c: any) => ({
+              categoryId: c?.id ?? c?.categoryId ?? '',
+              userId: '',
+              description: c?.nome ?? c?.description ?? c?.descricao ?? '',
+              type: 0,
+            } as CategoryModel));
+          },
+          error: () => {}
+        });
+      }
+    });
+  }
+
   submit() {
-    if (!this.form.valid) return;
-    
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.submitted = true;
-    this.categoryModel = this.form.value;
-    this.categorySevice.create(this.categoryModel)
+    const formValue = this.form.value;
+    // Converte data para ISO, se presente
+    const validoAte = formValue.validoAte ? new Date(formValue.validoAte).toISOString() : undefined;
+    this.cursoModel = { ...formValue, validoAte } as CursoCreateModel;
+    this.cursosService.create(this.cursoModel)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
 
           if (!result) {
-            this.toastr.error('Erro ao salvar a categoria.');
+            this.toastr.error('Erro ao salvar o curso.');
             return;
           }
 
-          this.toastr.success('Categoria criada com sucesso.');
-          this.dialogRef.close({ inserted: true })
+          this.toastr.success('Curso criado com sucesso.');
+          // Após criar, abrir diálogo para cadastrar aulas
+          const payload: any = result as any;
+          const cursoId: string | undefined = typeof payload === 'string' ? payload : (payload?.id ?? payload?.cursoId);
+          const cursoNome: string | undefined = typeof payload === 'object' ? (payload?.nome ?? payload?.titulo ?? undefined) : undefined;
+
+          if (cursoId) {
+            const ref = this.dialog.open(AulaAddDialogComponent, {
+              width: '720px',
+              maxWidth: '95vw',
+              disableClose: true,
+              autoFocus: false,
+              data: { cursoId, cursoNome }
+            });
+
+            ref.afterClosed().subscribe(() => {
+              this.dialogRef.close({ inserted: true });
+            });
+          } else {
+            // Caso o endpoint retorne apenas o GUID e não esteja mapeado
+            this.dialogRef.close({ inserted: true });
+          }
         },
         error: (fail) => {
           this.submitted = false;
-          this.toastr.error(fail.error.errors);
+          const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
+          this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao salvar o curso.');
         }
       });
   }

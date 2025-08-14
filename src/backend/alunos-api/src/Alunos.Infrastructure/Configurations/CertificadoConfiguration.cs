@@ -49,7 +49,8 @@ public class CertificadoConfiguration : IEntityTypeConfiguration<Certificado>
 
         builder.Property(x => x.NotaFinal)
             .HasColumnName("NotaFinal")
-            .HasColumnType(DatabaseTypeConstant.Byte);
+            .HasColumnType(DatabaseTypeConstant.Byte)
+            .IsRequired();
 
         builder.Property(x => x.PathCertificado)
             .HasColumnName("PathCertificado")

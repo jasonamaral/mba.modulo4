@@ -1,0 +1,67 @@
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.grid-item {
+  height: 100%;
+}
+
+.course-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.courses-grid .course-card {
+  box-sizing: border-box;
+}
+
+@media (max-width: 992px) {
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.course-essentials .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.course-essentials .col {
+  flex: 1 1 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.course-essentials strong {
+  flex: 0 0 120px;
+  font-weight: 600;
+}
+
+.course-essentials .col span {
+  flex: 1 1 auto;
+}
+
+mat-card-content {
+  flex: 1 1 auto;
+}
+
+mat-card-actions.course-actions {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.actions-left,
+.actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+

@@ -1,5 +1,6 @@
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
+using BFF.Domain.DTOs.Alunos.Response;
 using BFF.Domain.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,112 +21,6 @@ public class DashboardService : IDashboardService
         _cacheService = cacheService;
         _cacheSettings = cacheOptions.Value;
         _logger = logger;
-    }
-
-    public async Task<DashboardAlunoDto> GetDashboardAlunoAsync(Guid userId)
-    {
-        var cacheKey = $"dashboard:aluno:{userId}";
-        
-        // Tenta buscar do cache primeiro
-        var cachedData = await _cacheService.GetAsync<DashboardAlunoDto>(cacheKey);
-        if (cachedData != null)
-        {
-            _logger.LogInformation("Dashboard do aluno {UserId} recuperado do cache", userId);
-            return cachedData;
-        }
-
-        _logger.LogInformation("Carregando dashboard do aluno {UserId} dos microsserviços", userId);
-
-        // TODO: Substituir por chamadas reais aos microsserviços
-        // Por enquanto, dados mock para demonstração
-        await Task.Delay(100); // Simula chamada assíncrona
-
-        var dashboardData = new DashboardAlunoDto
-        {
-            Aluno = new AlunoDto
-            {
-                Id = userId,
-                Nome = "João da Silva",
-                Email = "joao.silva@email.com",
-                Telefone = "(11) 99999-9999",
-                CreatedAt = DateTime.UtcNow.AddDays(-30),
-                UpdatedAt = DateTime.UtcNow
-            },
-            Matriculas = new List<MatriculaDto>
-            {
-                new MatriculaDto
-                {
-                    Id = Guid.NewGuid(),
-                    AlunoId = userId,
-                    CursoId = Guid.NewGuid(),
-                    CursoNome = "ASP.NET Core Básico",
-                    DataMatricula = DateTime.UtcNow.AddDays(-10),
-                    Status = "Ativo",
-                    PercentualConclusao = 75.5m,
-                    CreatedAt = DateTime.UtcNow.AddDays(-10),
-                    UpdatedAt = DateTime.UtcNow
-                }
-            },
-            Certificados = new List<CertificadoDto>
-            {
-                new CertificadoDto
-                {
-                    Id = Guid.NewGuid(),
-                    AlunoId = userId,
-                    CursoId = Guid.NewGuid(),
-                    CursoNome = "C# Fundamentals",
-                    DataEmissao = DateTime.UtcNow.AddDays(-5),
-                    CodigoVerificacao = "ABC123456",
-                    CreatedAt = DateTime.UtcNow.AddDays(-5),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-5)
-                }
-            },
-            CursosRecomendados = new List<CursoDto>
-            {
-                new CursoDto
-                {
-                    Id = Guid.NewGuid(),
-                    Nome = "C# Avançado",
-                    Descricao = "Conceitos avançados de C#",
-                    CategoriaId = "Programação",
-                    Valor = 149.99m,
-                    CreatedAt = DateTime.UtcNow.AddDays(-15),
-                    UpdatedAt = DateTime.UtcNow
-                }
-            },
-            PagamentosRecentes = new List<PagamentoDto>
-            {
-                new PagamentoDto
-                {
-                    Id = Guid.NewGuid(),
-                    AlunoId = userId,
-                    CursoId = Guid.NewGuid(),
-                    CursoNome = "ASP.NET Core Básico",
-                    Valor = 99.99m,
-                    Status = "Aprovado",
-                    FormaPagamento = "Cartão de Crédito",
-                    DataPagamento = DateTime.UtcNow.AddDays(-5),
-                    CreatedAt = DateTime.UtcNow.AddDays(-5),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-5)
-                }
-            },
-            ProgressoGeral = new ProgressoGeralDto
-            {
-                CursosMatriculados = 2,
-                CursosConcluidos = 1,
-                CertificadosEmitidos = 1,
-                PercentualConcluidoGeral = 75.5m,
-                HorasEstudadas = 45
-            }
-        };
-
-        // Salva no cache usando a configuração específica para dashboard
-        await _cacheService.SetAsync(cacheKey, dashboardData, _cacheSettings.DashboardExpiration);
-        
-        _logger.LogInformation("Dashboard do aluno {UserId} salvo no cache por {Minutes} minutos", 
-            userId, _cacheSettings.DashboardExpiration.TotalMinutes);
-
-        return dashboardData;
     }
 
     public async Task<DashboardAdminDto> GetDashboardAdminAsync()

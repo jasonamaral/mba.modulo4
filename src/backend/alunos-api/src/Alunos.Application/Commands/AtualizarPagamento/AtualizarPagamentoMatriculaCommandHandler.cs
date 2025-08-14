@@ -14,10 +14,6 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
 
     public async Task<CommandResult> Handle(AtualizarPagamentoMatriculaCommand request, CancellationToken cancellationToken)
     {
-        // TODO :: Devo manter este Command? 
-        // Quem faz a orquestração de dizer que MatriculaCurso foi pago é o BC de Faturamento!
-        // Revisar e aguardar a opinião do Eduardo
-
         _raizAgregacao = request.RaizAgregacao;
         if (!ValidarRequisicao(request)) { return request.Resultado; }
         if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
@@ -26,7 +22,7 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
         aluno.AtualizarPagamentoMatricula(matricula.Id);
 
         await _alunoRepository.AtualizarAsync(aluno);
-        await _alunoRepository.UnitOfWork.Commit();
+        if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
 
         return request.Resultado;
     }

@@ -9,6 +9,7 @@ import {
   HttpClient,
   provideHttpClient,
   withInterceptorsFromDi,
+  HTTP_INTERCEPTORS,
 } from '@angular/common/http';
 import { routes } from './app.routes';
 import {
@@ -33,6 +34,7 @@ import { provideToastr } from 'ngx-toastr';
 import { AuthGuard } from './auth.guard';
 import { LocalStorageUtils } from './utils/localstorage';
 import { registerLocaleData } from '@angular/common';
+import { GlobalErrorInterceptor } from './interceptors/global-error.interceptor';
 import localePt from '@angular/common/locales/pt';
 
 registerLocaleData(localePt, 'pt-BR');
@@ -69,6 +71,7 @@ export const appConfig: ApplicationConfig = {
     LocalStorageUtils,
     AuthGuard,
     { provide: LOCALE_ID, useValue: 'pt-BR' }, // Set the locale globally
-    { provide: DEFAULT_CURRENCY_CODE, useValue: 'BRL' } // Set the default currency to BRL
+    { provide: DEFAULT_CURRENCY_CODE, useValue: 'BRL' }, // Set the default currency to BRL
+    { provide: HTTP_INTERCEPTORS, useClass: GlobalErrorInterceptor, multi: true }
   ],
 };

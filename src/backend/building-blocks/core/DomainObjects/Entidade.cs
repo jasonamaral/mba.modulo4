@@ -24,6 +24,11 @@ public abstract class Entidade
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void DefinirId(Guid id)
+    {
+        Id = id;
+    }
+
     public void AtualizarDataModificacao()
     {
         UpdatedAt = DateTime.UtcNow;

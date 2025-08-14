@@ -1,8 +1,10 @@
-﻿using Core.Messages;
+﻿using Core.Communication;
+using Core.Messages;
+using MediatR;
 
 namespace Alunos.Application.Commands.CadastrarAluno;
 
-public class CadastrarAlunoCommand : CommandRaiz
+public class CadastrarAlunoCommand : CommandRaiz, IRequest<CommandResult>
 {
     public Guid Id { get; private set; }
     public string Nome { get; private set; }
@@ -15,10 +17,23 @@ public class CadastrarAlunoCommand : CommandRaiz
     public string Estado { get; private set; }
     public string Cep { get; private set; }
     public string? Foto { get; private set; }
-    public bool EhAdministrador { get; private set; }
-    public DateTime DataCadastro { get; private set; }
+    //public bool EhAdministrador { get; private set; }
+    //public DateTime DataCadastro { get; private set; }
 
-    public CadastrarAlunoCommand(Guid id, string nome, string email, string cpf, DateTime dataNascimento, string telefone, string genero, string cidade, string estado, string cep, string foto, bool ehAdministrador, DateTime dataCadastro)
+
+    public CadastrarAlunoCommand(Guid id, 
+        string nome, 
+        string email, 
+        string cpf, 
+        DateTime dataNascimento, 
+        string telefone, 
+        string genero, 
+        string cidade, 
+        string estado, 
+        string cep, 
+        string foto)
+        //bool ehAdministrador, 
+        //DateTime dataCadastro)
     {
         DefinirRaizAgregacao(Id);
         Id = id;
@@ -32,7 +47,7 @@ public class CadastrarAlunoCommand : CommandRaiz
         Estado = estado;
         Cep = cep;
         Foto = foto;
-        EhAdministrador = ehAdministrador;
-        DataCadastro = dataCadastro;
+        //EhAdministrador = ehAdministrador;
+        //DataCadastro = dataCadastro;
     }
 }

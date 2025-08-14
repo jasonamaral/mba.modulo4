@@ -2,9 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
-type CardSumaryModel = any;
-type CategoryTransactionGraphModel = any[];
-type TransactionYearEvolutionGraphModel = any[];
+import { DashboardAlunoModel } from '../models/dashboard-aluno.model';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService extends BaseService {
@@ -13,48 +11,14 @@ export class DashboardService extends BaseService {
     super();
   }
 
-  getCardSumary(filterDate: Date | null): Observable<CardSumaryModel> {
-    let url: string = `${this.UrlServiceV1}v1/dashboard/cards/`;
-    if (filterDate) {
-      url += this.formatDate(filterDate);
-    }
-
-    let response = this.http
+  getDashboardAluno(): Observable<DashboardAlunoModel> {
+    const url: string = `${this.UrlServiceV1}Dashboard/aluno`;
+    const response = this.http
       .get(url, this.getAuthHeaderJson())
       .pipe(
-        map(response => this.extractData(response)),
-        catchError(error => this.serviceError(error)));
-
-    return response;
-  }
-
-  getTransactionCategorySumary(filterDate: Date | null): Observable<CategoryTransactionGraphModel[]> {
-    let url: string = `${this.UrlServiceV1}v1/dashboard/transactions/`;
-    if (filterDate) {
-      url += this.formatDate(filterDate);
-    }
-
-    let response = this.http
-      .get(url, this.getAuthHeaderJson())
-      .pipe(
-        map(response => this.extractData(response)),
-        catchError(error => this.serviceError(error)));
-
-    return response;
-  }
-
-  getTransactionInYearEvolution(filterDate: Date | null): Observable<TransactionYearEvolutionGraphModel[]> {
-    let url: string = `${this.UrlServiceV1}v1/dashboard/evolution/`;
-    if (filterDate){
-      url += this.formatDate(filterDate);
-    }
-
-    let response = this.http
-      .get(url, this.getAuthHeaderJson())
-      .pipe(
-        map(this.extractData),
-        catchError(this.serviceError));
-
+        map(r => this.extractData(r) as DashboardAlunoModel),
+        catchError(e => this.serviceError(e))
+      );
     return response;
   }
 }
