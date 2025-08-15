@@ -12,6 +12,9 @@ public interface IApiClientService
 
     Task<T?> GetAsync<T>(string endpoint) where T : class;
 
+    Task<ApiResponse<TResponse>> GetAsyncWithDetails<TResponse>(string endpoint)
+        where TResponse : class;
+
     Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest request)
         where TRequest : class
         where TResponse : class;

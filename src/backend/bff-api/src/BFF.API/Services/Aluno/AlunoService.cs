@@ -3,15 +3,22 @@ using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs.Alunos.Request;
 using BFF.Domain.DTOs.Alunos.Response;
+using BFF.Domain.DTOs;
 using BFF.Infrastructure.Services;
 using Core.Communication;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace BFF.API.Services.Aluno;
 public class AlunoService : BaseApiService, IAlunoService
 {
     private readonly ApiSettings _apiSettings;
     private readonly IConteudoService _conteudoService;
+    private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+    };
 
     public AlunoService(IOptions<ApiSettings> apiSettings,
         IConteudoService conteudoService,
@@ -38,7 +45,31 @@ public class AlunoService : BaseApiService, IAlunoService
             //ConfigureAuthToken(token);
 
             var url = $"api/aluno/{alunoId}";
-            return await _apiClient.GetAsync<ResponseResult<AlunoDto>>(url);
+            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<AlunoDto>>(url);
+            if (apiResponse.IsSuccess) { return apiResponse.Data; }
+
+            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+            {
+                try
+                {
+                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<AlunoDto>>(apiResponse.ErrorContent);
+                    return errorResponse;
+                }
+                catch
+                {
+                    return new ResponseResult<AlunoDto>
+                    {
+                        Status = apiResponse.StatusCode,
+                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
+                    };
+                }
+            }
+
+            return new ResponseResult<AlunoDto>
+            {
+                Status = apiResponse.StatusCode,
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
+            };
         }, nameof(ObterAlunoPorIdAsync), alunoId);
 
         return result ?? new ResponseResult<AlunoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
@@ -57,7 +88,31 @@ public class AlunoService : BaseApiService, IAlunoService
             //ConfigureAuthToken(token);
 
             var url = $"api/aluno/{alunoId}/evolucao";
-            return await _apiClient.GetAsync<ResponseResult<EvolucaoAlunoDto>>(url);
+            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<EvolucaoAlunoDto>>(url);
+            if (apiResponse.IsSuccess) { return apiResponse.Data; }
+
+            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+            {
+                try
+                {
+                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<EvolucaoAlunoDto>>(apiResponse.ErrorContent);
+                    return errorResponse;
+                }
+                catch
+                {
+                    return new ResponseResult<EvolucaoAlunoDto>
+                    {
+                        Status = apiResponse.StatusCode,
+                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
+                    };
+                }
+            }
+
+            return new ResponseResult<EvolucaoAlunoDto>
+            {
+                Status = apiResponse.StatusCode,
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
+            };
         }, nameof(ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync), alunoId);
 
         return result ?? new ResponseResult<EvolucaoAlunoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
@@ -65,18 +120,12 @@ public class AlunoService : BaseApiService, IAlunoService
 
     public async Task<ResponseResult<ICollection<MatriculaCursoDto>>> ObterMatriculasPorAlunoIdAsync(Guid alunoId)
     {
-        //if (!ValidateToken(token, nameof(ObterMatriculasPorAlunoIdAsync)))
-        //{
-        //    return new ResponseResult<ICollection<MatriculaCursoDto>> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
 
         var result = await ExecuteWithErrorHandling(async () =>
         {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
-
             var url = $"api/aluno/{alunoId}/todas-matriculas";
-            return await _apiClient.GetAsync<ResponseResult<ICollection<MatriculaCursoDto>>>(url);
+            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<ICollection<MatriculaCursoDto>>>(url);
+            return MapApiResponse(apiResponse);
         }, nameof(ObterMatriculasPorAlunoIdAsync), alunoId);
 
         return result ?? new ResponseResult<ICollection<MatriculaCursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
@@ -95,7 +144,31 @@ public class AlunoService : BaseApiService, IAlunoService
             //ConfigureAuthToken(token);
 
             var url = $"api/aluno/matricula/{matriculaId}/certificado";
-            return await _apiClient.GetAsync<ResponseResult<CertificadoDto>>(url);
+            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<CertificadoDto>>(url);
+            if (apiResponse.IsSuccess) { return apiResponse.Data; }
+
+            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+            {
+                try
+                {
+                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<CertificadoDto>>(apiResponse.ErrorContent);
+                    return errorResponse;
+                }
+                catch
+                {
+                    return new ResponseResult<CertificadoDto>
+                    {
+                        Status = apiResponse.StatusCode,
+                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
+                    };
+                }
+            }
+
+            return new ResponseResult<CertificadoDto>
+            {
+                Status = apiResponse.StatusCode,
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
+            };
         }, nameof(ObterCertificadoPorMatriculaIdAsync), matriculaId);
 
         return result ?? new ResponseResult<CertificadoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
@@ -115,7 +188,31 @@ public class AlunoService : BaseApiService, IAlunoService
             //ConfigureAuthToken(token);
 
             var url = $"api/aluno/aulas/{matriculaId}";
-            return await _apiClient.GetAsync<ResponseResult<ICollection<AulaCursoDto>>>(url);
+            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<ICollection<AulaCursoDto>>>(url);
+            if (apiResponse.IsSuccess) { return apiResponse.Data; }
+
+            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+            {
+                try
+                {
+                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<ICollection<AulaCursoDto>>>(apiResponse.ErrorContent);
+                    return errorResponse;
+                }
+                catch
+                {
+                    return new ResponseResult<ICollection<AulaCursoDto>>
+                    {
+                        Status = apiResponse.StatusCode,
+                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
+                    };
+                }
+            }
+
+            return new ResponseResult<ICollection<AulaCursoDto>>
+            {
+                Status = apiResponse.StatusCode,
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
+            };
         }, nameof(ObterAulasPorMatriculaIdAsync), matriculaId);
 
         // Obtenho o curso e suas aulas para "adicionar" as aulas que não estão na matrícula (por não ter histórico ou novas aulas)
@@ -181,19 +278,11 @@ public class AlunoService : BaseApiService, IAlunoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
+                return new ResponseResult<Guid>
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<Guid>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<Guid>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
+                    Status = apiResponse.StatusCode,
+                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                };
             }
 
             return new ResponseResult<Guid>
@@ -204,6 +293,38 @@ public class AlunoService : BaseApiService, IAlunoService
         }, nameof(MatricularAlunoAsync), dto.AlunoId);
 
         return result ?? new ResponseResult<Guid> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+    }
+
+    private static ResponseResult<T> MapApiResponse<T>(ApiResponse<ResponseResult<T>> apiResponse)
+    {
+        if (apiResponse.IsSuccess && apiResponse.Data != null)
+        {
+            return apiResponse.Data;
+        }
+
+        if (!string.IsNullOrWhiteSpace(apiResponse.ErrorContent))
+        {
+            try
+            {
+                var errorResponse = JsonSerializer.Deserialize<ResponseResult<T>>(apiResponse.ErrorContent, JsonOptions);
+                if (errorResponse != null) return errorResponse;
+            }
+            catch
+            {
+            }
+        }
+
+        return new ResponseResult<T>
+        {
+            Status = apiResponse.StatusCode,
+            Errors = new ResponseErrorMessages
+            {
+                Mensagens = new List<string>
+                {
+                    string.IsNullOrWhiteSpace(apiResponse.ErrorContent) ? "Erro desconhecido na API" : apiResponse.ErrorContent
+                }
+            }
+        };
     }
 
     public async Task<ResponseResult<bool>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto)
@@ -248,19 +369,11 @@ public class AlunoService : BaseApiService, IAlunoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
+                return new ResponseResult<bool>
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<bool>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<bool>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
+                    Status = apiResponse.StatusCode,
+                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                };
             }
 
             return new ResponseResult<bool>
@@ -311,19 +424,11 @@ public class AlunoService : BaseApiService, IAlunoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
+                return new ResponseResult<bool>
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<bool>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<bool>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
+                    Status = apiResponse.StatusCode,
+                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                };
             }
 
             return new ResponseResult<bool>
@@ -354,19 +459,11 @@ public class AlunoService : BaseApiService, IAlunoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
+                return new ResponseResult<Guid>
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<Guid>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<Guid>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
+                    Status = apiResponse.StatusCode,
+                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                };
             }
 
             return new ResponseResult<Guid>

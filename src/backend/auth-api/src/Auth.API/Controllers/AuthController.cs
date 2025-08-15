@@ -11,6 +11,7 @@ using MediatR;
 using MessageBus;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using FluentValidation.Results;
 
 namespace Auth.API.Controllers;
 
@@ -158,10 +159,12 @@ public class AuthController(IMediatorHandler mediator
             {
                 return await _bus.RequestAsync<AlunoRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
             }
-            catch
+            catch (Exception ex)
             {
-                await _authService.UserManager.DeleteAsync(usuario);
-                throw;
+                // Converte falhas de infraestrutura em ValidationResult inválido para ser retornado ao cliente
+                var validationResult = new ValidationResult();
+                validationResult.Errors.Add(new ValidationFailure("RegistroAluno", $"Falha ao registrar aluno no serviço de Alunos: {ex.Message}"));
+                return new ResponseMessage(validationResult);
             }
     }
 }

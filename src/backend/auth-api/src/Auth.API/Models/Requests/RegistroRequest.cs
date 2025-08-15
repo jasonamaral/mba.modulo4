@@ -32,7 +32,8 @@ public class RegistroRequest : IValidatableObject
     [StringLength(100, ErrorMessage = "Cidade deve ter no máximo 100 caracteres")]
     public string Cidade { get; set; } = string.Empty;
 
-    [StringLength(50, ErrorMessage = "Estado deve ter no máximo 50 caracteres")]
+    [StringLength(2, ErrorMessage = "Estado deve ter no máximo 2 caracteres")]
+    [Required(ErrorMessage = "Estado deve ter no máximo 2 caracteres")]
     public string Estado { get; set; } = string.Empty;
 
     [StringLength(10, ErrorMessage = "CEP deve ter no máximo 10 caracteres")]

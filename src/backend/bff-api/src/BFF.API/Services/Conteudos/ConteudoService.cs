@@ -91,11 +91,18 @@ public class ConteudoService : BaseApiService, IConteudoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
-                {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<Guid>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
+				try
+				{
+					var genericError = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<object>>(apiResponse.ErrorContent,
+						new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+					var mapped = new ResponseResult<Guid>
+					{
+						Title = genericError?.Title,
+						Status = genericError?.Status ?? apiResponse.StatusCode,
+						Errors = genericError?.Errors ?? new ResponseErrorMessages { Mensagens = new List<string> { "Erro ao interpretar resposta da API" } }
+					};
+					return mapped;
+				}
                 catch
                 {
                     return new ResponseResult<Guid> 
@@ -132,11 +139,18 @@ public class ConteudoService : BaseApiService, IConteudoService
             // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
-                try
-                {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<CursoDto>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
+				try
+				{
+					var genericError = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<object>>(apiResponse.ErrorContent,
+						new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+					var mapped = new ResponseResult<CursoDto>
+					{
+						Title = genericError?.Title,
+						Status = genericError?.Status ?? apiResponse.StatusCode,
+						Errors = genericError?.Errors ?? new ResponseErrorMessages { Mensagens = new List<string> { "Erro ao interpretar resposta da API" } }
+					};
+					return mapped;
+				}
                 catch
                 {
                     return new ResponseResult<CursoDto> 

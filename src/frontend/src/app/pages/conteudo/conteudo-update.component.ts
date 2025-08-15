@@ -146,8 +146,9 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
     const formValue = this.form.value;
     // Converte data para ISO, se presente
     const validoAte = formValue.validoAte ? new Date(formValue.validoAte).toISOString() : undefined;
-    this.cursoModel = { ...formValue, validoAte } as CursoCreateModel;
-    this.cursosService.create(this.cursoModel)
+    this.cursoModel = { ...formValue, validoAte, id: this.data?.id } as CursoCreateModel;
+    
+    this.cursosService.update(this.data?.id ?? '', this.cursoModel)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {

@@ -227,7 +227,7 @@ public class Aluno : Common.Entidade, IRaizAgregacao
         ValidacaoTexto.DevePossuirConteudo(Cidade, "Cidade não pode ser nulo ou vazio", validacao);
         ValidacaoTexto.DevePossuirTamanho(Cidade, 1, 50, "Cidade deve ter entre 1 e 50 caracteres", validacao);
         ValidacaoTexto.DevePossuirConteudo(Cidade, "Cidade não pode ser nulo ou vazio", validacao);
-        ValidacaoTexto.DevePossuirTamanho(Cidade, 1, 2, "Estado entre 1 e ter entre 1 e 2 caracteres", validacao);
+        ValidacaoTexto.DevePossuirTamanho(Estado, 2, 2, "Estado deve ter 2 caracteres", validacao);
         ValidacaoTexto.DevePossuirConteudo(Cep, "Cep não pode ser nulo ou vazio", validacao);
         ValidacaoTexto.DevePossuirTamanho(Cep, 1, 8, "Cep deve ter até 8 caracteres", validacao);
 

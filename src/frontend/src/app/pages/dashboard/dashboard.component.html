@@ -8,16 +8,35 @@
   <div class="col-md-4">
     <div class="card p-3">
       <h4>Progresso Geral</h4>
-      <div class="display-6">{{progressoGeral?.percentualConcluidoGeral || 0}}%</div>
-      <small>Cursos matriculados: {{progressoGeral?.cursosMatriculados || 0}}</small>
+      <ng-container *ngIf="!carregando; else loadingBlock">
+        <div class="display-6">{{progressoGeral?.percentualConcluidoGeral || 0}}%</div>
+        <small>Cursos matriculados: {{progressoGeral?.cursosMatriculados || 0}}</small>
+        <div class="mt-2">
+          <small>Concluídos: {{progressoGeral?.cursosConcluidos || 0}}</small>
+        </div>
+        <div>
+          <small>Certificados emitidos: {{progressoGeral?.certificadosEmitidos || 0}}</small>
+        </div>
+        <div>
+          <small>Horas estudadas: {{progressoGeral?.horasEstudadas || 0}}</small>
+        </div>
+      </ng-container>
+      <ng-template #loadingBlock>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </ng-template>
     </div>
   </div>
   <div class="col-md-8">
     <div class="card p-3">
-      <h4>Atalhos</h4>
-      <a class="btn btn-outline-primary me-2" routerLink="/cursos">Ver cursos</a>
-      <a class="btn btn-outline-accent me-2" routerLink="/matriculas">Minhas matrículas</a>
-      <a class="btn btn-outline-success" routerLink="/certificados">Certificados</a>
+      <h4>Percentual Concluído</h4>
+      <apx-chart
+        [series]="chartSeries"
+        [chart]="chartOptions.chart"
+        [plotOptions]="chartOptions.plotOptions"
+        [fill]="chartOptions.fill"
+        [stroke]="chartOptions.stroke"
+        [labels]="chartOptions.labels">
+      </apx-chart>
     </div>
   </div>
 </div>
