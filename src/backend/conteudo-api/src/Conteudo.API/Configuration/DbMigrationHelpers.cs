@@ -31,99 +31,278 @@ namespace Conteudo.API.Configuration
         }
 
         private static async Task EnsureSeedData(ConteudoDbContext context)
-        {   
+        {
             await context.Database.EnsureDeletedAsync();
             await context.Database.MigrateAsync();
 
-            // Categoria
+            #region Seed Categorias
+
             if (!context.Categorias.Any())
             {
-                var categoria = new Categoria(nome: "Programação",
-                        descricao: "Cursos voltados para programação e desenvolvimento de software",
-                        cor: "#4CAF50",
-                        iconeUrl: "https://exemplo.com/icones/programacao.png",
-                        ordem: 1);
-                categoria.DefinirId(Guid.Parse("b2cfb629-db43-41f2-8318-f3c52a648b39"));
+                var categoriaProgramacao = new Categoria(
+                    nome: "Programação",
+                    descricao: "Cursos voltados para programação e desenvolvimento de software",
+                    cor: "#4CAF50",
+                    iconeUrl: "https://exemplo.com/icones/programacao.png",
+                    ordem: 1);
+                categoriaProgramacao.DefinirId(Guid.Parse("b2cfb629-db43-41f2-8318-f3c52a648b39"));
 
-                context.Categorias.Add(categoria);
+                var categoriaDevOps = new Categoria(
+                    nome: "DevOps",
+                    descricao: "Cursos voltados para práticas DevOps, containerização e CI/CD",
+                    cor: "#2196F3",
+                    iconeUrl: "https://exemplo.com/icones/devops.png",
+                    ordem: 2);
+                categoriaDevOps.DefinirId(Guid.Parse("e3f6a7b8-c9d0-4a1b-2c3d-5e6f7a8b9c0d"));
+
+                context.Categorias.AddRange(categoriaProgramacao, categoriaDevOps);
                 await context.SaveChangesAsync();
             }
+            #endregion
 
-            // Curso
+            #region Seed Cursos
+
             if (!context.Cursos.Any())
             {
-                var categoriaId = context.Categorias.First().Id;
+                var catProgramacaoId = context.Categorias.First(c => c.Nome == "Programação").Id;
+                var catDevOpsId = context.Categorias.First(c => c.Nome == "DevOps").Id;
 
-                var conteudo = new ConteudoProgramatico(
-                    resumo: "Curso introdutório de C# e .NET",
-                    descricao: "Aprenda os fundamentos de C# e .NET para aplicações modernas",
-                    objetivos: "Fornecer base sólida para desenvolvimento em .NET",
-                    preRequisitos: "Lógica de programação",
-                    publicoAlvo: "Iniciantes em programação",
-                    metodologia: "Aulas gravadas e exercícios práticos",
-                    recursos: "Vídeos, PDFs e fóruns",
-                    avaliacao: "Provas e projetos",
-                    bibliografia: "Documentação oficial Microsoft"
-                );
-
-                var curso = new Curso(nome: "C# para Iniciantes",
+                var cursos = new List<Curso>
+                {
+                    new Curso(
+                        nome: "C# Avançado",
+                        valor: 499.90m,
+                        conteudoProgramatico: new ConteudoProgramatico(
+                            resumo: "Aprenda recursos avançados do C#",
+                            descricao: "Delegates, eventos, LINQ, Async/Await",
+                            objetivos: "Dominar recursos avançados do C#",
+                            preRequisitos: "C# básico",
+                            publicoAlvo: "Desenvolvedores iniciantes/intermediários",
+                            metodologia: "Aulas gravadas e exercícios práticos",
+                            recursos: "Vídeos, PDFs e exemplos de código",
+                            avaliacao: "Projetos práticos",
+                            bibliografia: "Documentação Microsoft"
+                        ),
+                        duracaoHoras: 50,
+                        nivel: "Intermediário",
+                        instrutor: "Maria Souza",
+                        vagasMaximas: 20,
+                        imagemUrl: "https://exemplo.com/imagens/curso-csharp-avancado.jpg",
+                        validoAte: DateTime.UtcNow.AddYears(1),
+                        categoriaId: catProgramacaoId
+                    ),
+                    new Curso(
+                        nome: "SQL Server do Zero ao Avançado",
+                        valor: 399.90m,
+                        conteudoProgramatico: new ConteudoProgramatico(
+                            resumo: "Aprenda SQL Server na prática",
+                            descricao: "Criação de bancos, queries, stored procedures, índices",
+                            objetivos: "Dominar SQL Server para aplicações profissionais",
+                            preRequisitos: "Noções de banco de dados",
+                            publicoAlvo: "Estudantes e desenvolvedores",
+                            metodologia: "Aulas gravadas e exercícios",
+                            recursos: "Vídeos e scripts SQL",
+                            avaliacao: "Exercícios e projetos",
+                            bibliografia: "Documentação Microsoft"
+                        ),
+                        duracaoHoras: 45,
+                        nivel: "Básico/Intermediário",
+                        instrutor: "Carlos Lima",
+                        vagasMaximas: 25,
+                        imagemUrl: "https://exemplo.com/imagens/curso-sql.jpg",
+                        validoAte: DateTime.UtcNow.AddYears(1),
+                        categoriaId: catProgramacaoId
+                    ),
+                    new Curso(
+                        nome: "Docker para Desenvolvedores",
+                        valor: 349.90m,
+                        conteudoProgramatico: new ConteudoProgramatico(
+                            resumo: "Containerize aplicações com Docker",
+                            descricao: "Conceitos de containers, imagens, Docker Compose",
+                            objetivos: "Habilitar deploy de aplicações em containers",
+                            preRequisitos: "Conhecimento básico de programação",
+                            publicoAlvo: "Desenvolvedores e DevOps iniciantes",
+                            metodologia: "Exemplos práticos e exercícios",
+                            recursos: "Vídeos e arquivos de configuração",
+                            avaliacao: "Projetos práticos",
+                            bibliografia: "Documentação oficial Docker"
+                        ),
+                        duracaoHoras: 30,
+                        nivel: "Básico",
+                        instrutor: "Ana Pereira",
+                        vagasMaximas: 20,
+                        imagemUrl: "https://exemplo.com/imagens/curso-docker.jpg",
+                        validoAte: DateTime.UtcNow.AddYears(1),
+                        categoriaId: catDevOpsId
+                    ),
+                    new Curso(
+                        nome: "Angular Essencial",
+                        valor: 449.90m,
+                        conteudoProgramatico: new ConteudoProgramatico(
+                            resumo: "Aprenda a construir aplicações SPA com Angular",
+                            descricao: "Componentes, serviços, rotas, forms e Material",
+                            objetivos: "Desenvolver aplicações Angular do zero",
+                            preRequisitos: "HTML, CSS e JS básico",
+                            publicoAlvo: "Iniciantes em Angular",
+                            metodologia: "Aulas gravadas e exercícios práticos",
+                            recursos: "Vídeos, exemplos de código",
+                            avaliacao: "Exercícios e projetos",
+                            bibliografia: "Documentação Angular"
+                        ),
+                        duracaoHoras: 60,
+                        nivel: "Básico/Intermediário",
+                        instrutor: "Ricardo Martins",
+                        vagasMaximas: 25,
+                        imagemUrl: "https://exemplo.com/imagens/curso-angular.jpg",
+                        validoAte: DateTime.UtcNow.AddYears(1),
+                        categoriaId: catProgramacaoId
+                    ),
+                    new Curso(
+                        nome: "Python para Iniciantes",
                         valor: 299.90m,
-                        conteudoProgramatico: conteudo,
+                        conteudoProgramatico: new ConteudoProgramatico(
+                            resumo: "Aprenda Python do zero",
+                            descricao: "Sintaxe, tipos, estruturas de controle, funções e módulos",
+                            objetivos: "Introduzir o aluno à programação com Python",
+                            preRequisitos: "Nenhum",
+                            publicoAlvo: "Iniciantes em programação",
+                            metodologia: "Aulas gravadas e exercícios práticos",
+                            recursos: "Vídeos, PDFs e exemplos de código",
+                            avaliacao: "Exercícios e projeto final",
+                            bibliografia: "Documentação Python"
+                        ),
                         duracaoHoras: 40,
                         nivel: "Básico",
-                        instrutor: "João Silva",
-                        vagasMaximas: 20,
-                        imagemUrl: "https://exemplo.com/imagens/curso-csharp.jpg",
+                        instrutor: "João Oliveira",
+                        vagasMaximas: 30,
+                        imagemUrl: "https://exemplo.com/imagens/curso-python.jpg",
                         validoAte: DateTime.UtcNow.AddYears(1),
-                        categoriaId: categoriaId
-                    );
-                curso.DefinirId(Guid.Parse("a1e5f8c3-3d2b-4f1e-9c6e-8f9b7c6d5e4f"));
+                        categoriaId: catProgramacaoId
+                    ),
+                    new Curso(
+                    nome: "Kubernetes para DevOps",
+                    valor: 499.90m,
+                    conteudoProgramatico: new ConteudoProgramatico(
+                        resumo: "Orquestração de containers com Kubernetes",
+                        descricao: "Pods, serviços, deployments, escalabilidade e monitoramento",
+                        objetivos: "Preparar o aluno para administrar clusters Kubernetes",
+                        preRequisitos: "Docker básico",
+                        publicoAlvo: "DevOps e desenvolvedores",
+                        metodologia: "Aulas práticas e estudos de caso",
+                        recursos: "Vídeos, arquivos de configuração",
+                        avaliacao: "Projetos práticos",
+                        bibliografia: "Documentação Kubernetes"
+                    ),
+                    duracaoHoras: 55,
+                    nivel: "Avançado",
+                    instrutor: "Lucas Almeida",
+                    vagasMaximas: 20,
+                    imagemUrl: "https://exemplo.com/imagens/curso-kubernetes.jpg",
+                    validoAte: DateTime.UtcNow.AddYears(1),
+                    categoriaId: catDevOpsId
+                    ),
+                    new Curso(
+                    nome: "JavaScript Moderno",
+                    valor: 399.90m,
+                    conteudoProgramatico: new ConteudoProgramatico(
+                        resumo: "Domine o JavaScript moderno",
+                        descricao: "ES6+, Promises, Async/Await, Fetch API",
+                        objetivos: "Capacitar o aluno a desenvolver aplicações JS modernas",
+                        preRequisitos: "HTML e CSS básicos",
+                        publicoAlvo: "Desenvolvedores web iniciantes",
+                        metodologia: "Aulas gravadas e exercícios práticos",
+                        recursos: "Vídeos, exemplos de código",
+                        avaliacao: "Exercícios e projeto final",
+                        bibliografia: "Documentação MDN"
+                    ),
+                    duracaoHoras: 50,
+                    nivel: "Intermediário",
+                    instrutor: "Fernanda Costa",
+                    vagasMaximas: 25,
+                    imagemUrl: "https://exemplo.com/imagens/curso-javascript.jpg",
+                    validoAte: DateTime.UtcNow.AddYears(1),
+                    categoriaId: catProgramacaoId
+                    ),
+                    new Curso(
+                        nome: "Introdução ao Git e GitHub",
+                    valor: 199.90m,
+                    conteudoProgramatico: new ConteudoProgramatico(
+                        resumo: "Controle de versão com Git e GitHub",
+                        descricao: "Comandos Git, branches, pull requests e workflows",
+                        objetivos: "Ensinar o uso do Git para controle de versão",
+                        preRequisitos: "Nenhum",
+                        publicoAlvo: "Desenvolvedores iniciantes",
+                        metodologia: "Aulas gravadas e exercícios práticos",
+                        recursos: "Vídeos e exemplos de repositórios",
+                        avaliacao: "Exercícios práticos",
+                        bibliografia: "Documentação oficial Git"
+                    ),
+                    duracaoHoras: 20,
+                    nivel: "Básico",
+                    instrutor: "Patrícia Fernandes",
+                    vagasMaximas: 30,
+                    imagemUrl: "https://exemplo.com/imagens/curso-git.jpg",
+                    validoAte: DateTime.UtcNow.AddYears(1),
+                    categoriaId: catDevOpsId
+                    )
+                };
 
-                context.Cursos.Add(curso);
+                cursos[0].DefinirId(Guid.Parse("f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c"));
+                cursos[1].DefinirId(Guid.Parse("a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d"));
+                cursos[2].DefinirId(Guid.Parse("b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e"));
+                cursos[3].DefinirId(Guid.Parse("c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f"));
+                cursos[4].DefinirId(Guid.Parse("d1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a"));
+                cursos[5].DefinirId(Guid.Parse("e1f2a3b4-c5d6-7e8f-9a0b-1c2d3e4f5a6b"));
+                cursos[6].DefinirId(Guid.Parse("f2a3b4c5-d6e7-8f9a-0b1c-2d3e4f5a6b7c"));
+                cursos[7].DefinirId(Guid.Parse("a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d"));
+
+                context.Cursos.AddRange(cursos);
                 await context.SaveChangesAsync();
             }
+            #endregion
 
-            // Aula
+            #region Seed Aulas e Materiais
+
             if (!context.Aulas.Any())
             {
-                var cursoId = context.Cursos.First().Id;
+                var cursos = context.Cursos.ToList();
+                foreach (var curso in cursos)
+                {
+                    for (int i = 1; i <= 3; i++)
+                    {
+                        var aula = new Aula(
+                            cursoId: curso.Id,
+                            nome: $"Aula {i} - {curso.Nome}",
+                            descricao: $"Conteúdo da aula {i} do curso {curso.Nome}",
+                            numero: i,
+                            duracaoMinutos: 40 + i * 5,
+                            videoUrl: $"https://exemplo.com/videos/{curso.Nome.ToLower().Replace(" ", "-")}-aula{i}.mp4",
+                            tipoAula: "Teórica",
+                            isObrigatoria: true,
+                            observacoes: "Assistir antes de prosseguir"
+                        );
+                        aula.DefinirId(Guid.NewGuid());
+                        context.Aulas.Add(aula);
 
-                var aula = new Aula(cursoId: cursoId,
-                        nome: "Introdução ao C#",
-                        descricao: "Primeiros passos com a linguagem C#",
-                        numero: 1,
-                        duracaoMinutos: 45,
-                        videoUrl: "https://exemplo.com/videos/aula1.mp4",
-                        tipoAula: "Teórica",
-                        isObrigatoria: true,
-                        observacoes: "Assistir antes de prosseguir"
-                    );
-                aula.DefinirId(Guid.Parse("c3d9f1e2-5b6a-4f7e-8d9c-0a1b2c3d4e5f"));
-
-                context.Aulas.Add(aula);
+                        // Material para cada aula
+                        var material = new Material(
+                            aulaId: aula.Id,
+                            nome: $"Material da Aula {i}",
+                            descricao: $"Arquivo complementar da aula {i} do curso {curso.Nome}",
+                            tipoMaterial: "PDF",
+                            url: $"https://exemplo.com/materiais/{curso.Nome.ToLower().Replace(" ", "-")}-aula{i}.pdf",
+                            isObrigatorio: true,
+                            tamanhoBytes: 1024 * 300,
+                            extensao: ".pdf",
+                            ordem: i
+                        );
+                        material.DefinirId(Guid.NewGuid());
+                        context.Materiais.Add(material);
+                    }
+                }
                 await context.SaveChangesAsync();
             }
-
-            // Material
-            if (!context.Materiais.Any())
-            {
-                var aulaId = context.Aulas.First().Id;
-
-                var material = new Material(aulaId: aulaId,
-                        nome: "Slide da Aula 1",
-                        descricao: "Apresentação utilizada na aula introdutória",
-                        tipoMaterial: "PDF",
-                        url: "https://exemplo.com/materiais/slide-aula1.pdf",
-                        isObrigatorio: false,
-                        tamanhoBytes: 1024 * 200, // ~200 KB
-                        extensao: ".pdf",
-                        ordem: 1
-                    );
-                material.DefinirId(Guid.Parse("d4e5f6a7-b8c9-0a1b-2c3d-4e5f6a7b8c9d"));
-
-                context.Materiais.Add(material);
-                await context.SaveChangesAsync();
-            }
+            #endregion
         }
     }
 }

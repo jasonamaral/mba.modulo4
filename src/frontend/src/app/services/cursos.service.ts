@@ -1,3 +1,4 @@
+import { FilterCurso, PagedResult } from './../models/paged-result.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
@@ -9,20 +10,47 @@ import { AulaCreateModel } from '../models/aula.model';
 export class CursosService extends BaseService {
   constructor(private http: HttpClient) { super(); }
 
-  listar(): Observable<CursoModel[]> {
+  listar(filter: FilterCurso): Observable<PagedResult<CursoModel>> {
+    const params = this.getParams(filter);
     return this.http
-      .get(this.UrlServiceV1 + 'Conteudos/cursos?IncludeAulas=true', this.getAuthHeaderJson())
+      .get(this.UrlServiceV1 + `Conteudos/cursos?${params}`, this.getAuthHeaderJson())
       .pipe(
         map(r => {
           const data = this.extractData(r);
-          if (!data) return [];
           // Suporta paginação: { pageSize, pageIndex, totalResults, items: [] }
-          if (Array.isArray((data as any).items)) return (data as any).items as CursoModel[];
+          if (data && typeof data === 'object' && Array.isArray((data as any).items)) {
+            return {
+              items: (data as any).items as CursoModel[],
+              pageSize: (data as any).pageSize ?? 0,
+              pageIndex: (data as any).pageIndex ?? 0,
+              totalResults: (data as any).totalResults ?? ((data as any).items.length ?? 0)
+            };
+          }
           // Suporta retorno direto como array
-          if (Array.isArray(data)) return data as CursoModel[];
+          if (Array.isArray(data)) {
+            return {
+              items: data as CursoModel[],
+              pageSize: (data as CursoModel[]).length,
+              pageIndex: 0,
+              totalResults: (data as CursoModel[]).length
+            };
+          }
           // Suporta retorno de item único
-          if (typeof data === 'object' && (data as any).id) return [data as CursoModel];
-          return [];
+          if (typeof data === 'object' && (data as any).id) {
+            return {
+              items: [data as CursoModel],
+              pageSize: 1,
+              pageIndex: 0,
+              totalResults: 1
+            };
+          }
+          // Caso não haja dados
+          return {
+            items: [],
+            pageSize: 0,
+            pageIndex: 0,
+            totalResults: 0
+          };
         }),
         catchError(e => this.serviceError(e))
       );
@@ -50,6 +78,10 @@ export class CursosService extends BaseService {
     return this.http
       .post(this.UrlServiceV1 + `Conteudos/curso/${cursoId}/aula`, aula, this.getAuthHeaderJson())
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
+  }
+
+  getParams(filter: FilterCurso): string {
+    return Object.entries(filter).map(([key, value]) => `${key}=${value}`).join('&');
   }
 }
 

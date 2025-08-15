@@ -22,6 +22,9 @@ export class GlobalErrorInterceptor implements HttpInterceptor {
           if (error.status === 401) {
             return throwError(() => error);
           }
+          if (error.status === 403) {
+            return throwError(() => error);
+          }
 
           const extracted = this.extractErrors(error);
           if (extracted && extracted.length > 0) {

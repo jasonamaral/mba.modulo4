@@ -46,7 +46,7 @@ namespace Conteudo.Application.Commands.AtualizarCurso
 
 
             await _cursoRepository.Atualizar(curso);
-            await _cursoRepository.UnitOfWork.Commit();
+            request.Resultado.Data = await _cursoRepository.UnitOfWork.Commit();
             return request.Resultado;
         }
 

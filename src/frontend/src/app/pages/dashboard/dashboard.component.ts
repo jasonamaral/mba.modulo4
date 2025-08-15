@@ -5,6 +5,7 @@ import { DashboardService } from '../../services/dashboard.service';
 import { DashboardAlunoModel, ProgressoGeralModel } from '../../models/dashboard-aluno.model';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ApexNonAxisChartSeries, ApexChart, ApexPlotOptions, ApexStroke, ApexFill } from 'ng-apexcharts';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-dashboard',
@@ -31,7 +32,7 @@ export class DashboardComponent {
         hollow: { size: '60%' },
         track: { background: '#efefef' },
         dataLabels: {
-          name: { show: true, color: '#666', offsetY: 12 },
+          name: { show: true, color: '#666', offsetY: -10 },
           value: { show: true, fontSize: '28px', formatter: (val: number) => `${Math.round(val)}%` }
         }
       }
@@ -41,7 +42,7 @@ export class DashboardComponent {
     labels: ['Concluído']
   };
 
-  constructor(private dashboard: DashboardService) { }
+  constructor(private dashboard: DashboardService, private toastr: ToastrService) { }
 
   ngOnInit() {
     this.carregando = true;
@@ -58,17 +59,23 @@ export class DashboardComponent {
         const percentual = Number(this.progressoGeral.percentualConcluidoGeral ?? 0);
         this.chartSeries = [isNaN(percentual) ? 0 : Math.max(0, Math.min(100, percentual))];
       },
-      error: () => {
-        this.progressoGeral = {
-          cursosMatriculados: 0,
-          cursosConcluidos: 0,
-          certificadosEmitidos: 0,
-          percentualConcluidoGeral: 0,
-          horasEstudadas: 0
-        };
-        this.chartSeries = [0];
+      error: (error) => {
+        this.processFail(error, this.toastr);
       },
       complete: () => this.carregando = false
     });
+  }
+
+  protected processFail(fail: any, toastr: ToastrService): void {
+    const error = (Array.isArray(fail?.error?.errors) ? fail.error.errors.join('\n') : fail.error.errors) || (fail?.error?.message || fail?.message || 'Erro desconhecido');
+    toastr.error(error);
+    this.progressoGeral = {
+        cursosMatriculados: 0,
+        cursosConcluidos: 0,
+        certificadosEmitidos: 0,
+        percentualConcluidoGeral: 0,
+        horasEstudadas: 0
+    };
+    this.chartSeries = [0];
   }
 }
