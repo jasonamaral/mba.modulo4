@@ -3,11 +3,9 @@ using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs.Alunos.Request;
 using BFF.Domain.DTOs.Alunos.Response;
-using BFF.Domain.DTOs;
 using BFF.Infrastructure.Services;
 using Core.Communication;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 
 namespace BFF.API.Services.Aluno;
 public partial class AlunoService : BaseApiService, IAlunoService
@@ -72,7 +70,7 @@ public partial class AlunoService : BaseApiService, IAlunoService
         if (aulaCursoDto.Data != null)
         {
             // Obtenho o curso e suas aulas para "adicionar" as aulas que não estão na matrícula (por não ter histórico ou novas aulas)
-            var cursoDto = await _conteudoService.ObterCursoPorId(matriculaId, includeAulas: true);
+            var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaId, includeAulas: true);
 
             foreach (var aula in cursoDto.Data.Aulas)
             {
@@ -103,7 +101,7 @@ public partial class AlunoService : BaseApiService, IAlunoService
     #region Posts and Puts
     public async Task<ResponseResult<Guid>> MatricularAlunoAsync(MatriculaCursoRequest dto)
     {
-        var cursoDto = await _conteudoService.ObterCursoPorId(dto.CursoId, includeAulas: false);
+        var cursoDto = await _conteudoService.ObterCursoPorIdAsync(dto.CursoId, includeAulas: false);
         if (cursoDto == null || cursoDto.Data == null)
         {
             return new ResponseResult<Guid> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };
@@ -136,7 +134,7 @@ public partial class AlunoService : BaseApiService, IAlunoService
         }
 
         // TODO :: Isso está feio demais. Refatorar urgente! Deve ter um endpoint na AlunoApi para obter a matrícula por ID
-        var cursoDto = await _conteudoService.ObterCursoPorId(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: false);
+        var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: false);
         if (cursoDto == null || cursoDto.Data == null)
         {
             return new ResponseResult<bool> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };
@@ -168,7 +166,7 @@ public partial class AlunoService : BaseApiService, IAlunoService
             return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Matrícula não encontrada"] } };
         }
 
-        var cursoDto = await _conteudoService.ObterCursoPorId(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: false);
+        var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: false);
         if (cursoDto == null || cursoDto.Data == null)
         {
             return new ResponseResult<bool> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };

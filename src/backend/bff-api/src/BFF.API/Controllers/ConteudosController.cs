@@ -59,8 +59,8 @@ public class ConteudosController : BffController
         {
             return RespostaPadraoApi(HttpStatusCode.OK, cachedCurso, "Curso obtido do cache com sucesso");
         }
-
-        var resultado = await _conteudoService.ObterCursoPorId(cursoId);
+        
+        var resultado = await _conteudoService.ObterCursoPorIdAsync(cursoId);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -87,7 +87,7 @@ public class ConteudosController : BffController
         if (cachedCursos != null)
             return Ok(cachedCursos);
 
-        var resultado = await _conteudoService.ObterTodosCursos(filter);
+        var resultado = await _conteudoService.ObterTodosCursosAsync(filter);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -109,7 +109,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
     {
-        var resultado = await _conteudoService.ObterPorCategoriaId(categoriaId, includeAulas);
+        var resultado = await _conteudoService.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
@@ -127,7 +127,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterTodasCategorias()
     {
-        var resultado = await _conteudoService.ObterTodasCategorias();
+        var resultado = await _conteudoService.ObterTodasCategoriasAsync();
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
@@ -144,7 +144,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AdicionarCurso([FromBody] CursoCriarRequest curso)
     {
-        var response = await _conteudoService.AdicionarCurso(curso);
+        var response = await _conteudoService.AdicionarCursoAsync(curso);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
@@ -163,7 +163,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AtualizarCurso(Guid cursoId, [FromBody] AtualizarCursoRequest curso)
     {
-        var response = await _conteudoService.AtualizarCurso(cursoId, curso);
+        var response = await _conteudoService.AtualizarCursoAsync(cursoId, curso);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
@@ -181,7 +181,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ExcluirCurso(Guid cursoId)
     {
-        var response = await _conteudoService.ExcluirCurso(cursoId);
+        var response = await _conteudoService.ExcluirCursoAsync(cursoId);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
@@ -197,7 +197,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterAulasPorCursoId([FromRoute] Guid cursoId)
     {
-        var resultado = await _conteudoService.ObterCursoPorId(cursoId, true);
+        var resultado = await _conteudoService.ObterCursoPorIdAsync(cursoId, true);
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
         return BadRequest(resultado);
@@ -212,7 +212,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterConteudoProgramaticoPorCursoId([FromRoute] Guid cursoId)
     {
-        var resultado = await _conteudoService.ObterConteudoProgramaticoPorCursoId(cursoId);
+        var resultado = await _conteudoService.ObterConteudoProgramaticoPorCursoIdAsync(cursoId);
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
         return BadRequest(resultado);

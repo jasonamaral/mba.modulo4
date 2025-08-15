@@ -7,15 +7,15 @@ namespace BFF.API.Services.Conteudos;
 
 public interface IConteudoService
 {
-    Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, bool includeAulas = false);
-    Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursos(CursoFilter filter);
-    Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaId(Guid categoriaId, bool includeAulas = false);
-    Task<ResponseResult<IEnumerable<CategoriaDto>>> ObterTodasCategorias();
-    Task<ResponseResult<ConteudoProgramaticoDto>> ObterConteudoProgramaticoPorCursoId(Guid categoriaId, bool includeAulas = false);
-    Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso);
-    Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso);
-    Task<ResponseResult<bool>> ExcluirCurso(Guid cursoId);
-    Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaDto aula);
-    Task<ResponseResult<AulaDto>> AtualizarAula(Guid cursoId, AulaDto aula);
-    Task<ResponseResult<bool>> ExcluirAula(Guid cursoId, Guid aulaId);
+    Task<ResponseResult<CursoDto>> ObterCursoPorIdAsync(Guid cursoId, bool includeAulas = false);
+    Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursosAsync(CursoFilter filter);
+    Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false);
+    Task<ResponseResult<IEnumerable<CategoriaDto>>> ObterTodasCategoriasAsync();
+    Task<ResponseResult<ConteudoProgramaticoDto>> ObterConteudoProgramaticoPorCursoIdAsync(Guid categoriaId, bool includeAulas = false);
+    Task<ResponseResult<Guid>> AdicionarCursoAsync(CursoCriarRequest curso);
+    Task<ResponseResult<CursoDto>> AtualizarCursoAsync(Guid id, AtualizarCursoRequest curso);
+    Task<ResponseResult<bool>> ExcluirCursoAsync(Guid cursoId);
+    Task<ResponseResult<Guid>> AdicionarAulaAsync(Guid cursoId, AulaDto aula);
+    Task<ResponseResult<AulaDto>> AtualizarAulaAsync(Guid cursoId, AulaDto aula);
+    Task<ResponseResult<bool>> ExcluirAulaAsync(Guid cursoId, Guid aulaId);
 }

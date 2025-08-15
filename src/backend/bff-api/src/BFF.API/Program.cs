@@ -1,9 +1,5 @@
 using BFF.API.Configuration;
 using BFF.API.Extensions;
-using BFF.API.Handlers;
-using BFF.Domain.Settings;
-using Polly;
-using System.Net;
 
 internal class Program
 {

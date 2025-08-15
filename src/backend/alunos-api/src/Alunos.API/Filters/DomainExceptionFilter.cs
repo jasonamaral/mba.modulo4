@@ -1,5 +1,4 @@
 ﻿using Core.Communication;
-using Core.Notification;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;

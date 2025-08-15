@@ -1,4 +1,3 @@
-using Core.Communication;
 using Mapster;
 
 namespace Alunos.Application.Mappings;

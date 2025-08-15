@@ -51,7 +51,7 @@ public class ApiClientService : IApiClientService, IDisposable
     {
         try
         {
-            var apiResponse = await GetAsyncWithDetails<T>(endpoint);
+            var apiResponse = await GetWithDetailsAsync<T>(endpoint);
             return apiResponse.IsSuccess ? apiResponse.Data : null;
         }
         catch (Exception ex)
@@ -61,7 +61,7 @@ public class ApiClientService : IApiClientService, IDisposable
         }
     }
 
-    public async Task<ApiResponse<TResponse>> GetAsyncWithDetails<TResponse>(string endpoint)
+    public async Task<ApiResponse<TResponse>> GetWithDetailsAsync<TResponse>(string endpoint)
         where TResponse : class
     {
         try

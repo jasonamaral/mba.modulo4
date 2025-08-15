@@ -1,6 +1,5 @@
 using Alunos.API.Configurations;
 using Alunos.API.Helpers;
-using Alunos.Infrastructure.Data;
 
 internal class Program
 {

@@ -1,7 +1,6 @@
 using BFF.Application.Interfaces.Services;
 using Core.Communication;
 using Microsoft.Extensions.Logging;
-using System.Net;
 using System.Text.Json;
 
 namespace BFF.Infrastructure.Services;

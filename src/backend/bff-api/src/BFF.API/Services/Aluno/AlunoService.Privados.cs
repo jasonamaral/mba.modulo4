@@ -1,5 +1,4 @@
-﻿using BFF.Domain.DTOs;
-using BFF.Domain.DTOs.Alunos.Request;
+﻿using BFF.Domain.DTOs.Alunos.Request;
 using BFF.Domain.DTOs.Alunos.Response;
 using Core.Communication;
 
@@ -9,7 +8,7 @@ public partial class AlunoService
     private async Task<ResponseResult<AlunoDto>> ObterAlunoPorId(Guid alunoId)
     {
         var url = $"api/aluno/{alunoId}";
-        var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<AlunoDto>>(url);
+        var apiResponse = await _apiClient.GetWithDetailsAsync<ResponseResult<AlunoDto>>(url);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
         else { return CaptureRequestError<AlunoDto>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
@@ -17,7 +16,7 @@ public partial class AlunoService
     public async Task<ResponseResult<EvolucaoAlunoDto>> ObterEvolucaoMatriculasCursoDoAlunoPorId(Guid alunoId)
     {
         var url = $"api/aluno/{alunoId}/evolucao";
-        var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<EvolucaoAlunoDto>>(url);
+        var apiResponse = await _apiClient.GetWithDetailsAsync<ResponseResult<EvolucaoAlunoDto>>(url);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
         else { return CaptureRequestError<EvolucaoAlunoDto>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
@@ -25,7 +24,7 @@ public partial class AlunoService
     public async Task<ResponseResult<ICollection<MatriculaCursoDto>>> ObterMatriculasPorAlunoId(Guid alunoId)
     {
         var url = $"api/aluno/{alunoId}/todas-matriculas";
-        var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<ICollection<MatriculaCursoDto>>>(url);
+        var apiResponse = await _apiClient.GetWithDetailsAsync<ResponseResult<ICollection<MatriculaCursoDto>>>(url);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
         else { return CaptureRequestError<ICollection<MatriculaCursoDto>>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
@@ -33,7 +32,7 @@ public partial class AlunoService
     public async Task<ResponseResult<CertificadoDto>> ObterCertificadoPorMatriculaId(Guid matriculaId)
     {
         var url = $"api/aluno/matricula/{matriculaId}/certificado";
-        var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<CertificadoDto>>(url);
+        var apiResponse = await _apiClient.GetWithDetailsAsync<ResponseResult<CertificadoDto>>(url);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
         else { return CaptureRequestError<CertificadoDto>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
@@ -41,7 +40,7 @@ public partial class AlunoService
     public async Task<ResponseResult<ICollection<AulaCursoDto>>> ObterAulasPorMatriculaId(Guid matriculaId)
     {
         var url = $"api/aluno/aulas/{matriculaId}";
-        var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<ICollection<AulaCursoDto>>>(url);
+        var apiResponse = await _apiClient.GetWithDetailsAsync<ResponseResult<ICollection<AulaCursoDto>>>(url);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
         else { return CaptureRequestError<ICollection<AulaCursoDto>>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
