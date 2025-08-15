@@ -7,6 +7,7 @@ using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -17,7 +18,7 @@ namespace BFF.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class PagamentosController : BffController
     {
 
