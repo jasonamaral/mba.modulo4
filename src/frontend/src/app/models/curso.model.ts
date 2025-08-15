@@ -44,5 +44,3 @@ export interface CursoCreateModel {
   avaliacao?: string;
   bibliografia?: string;
 }
-
-

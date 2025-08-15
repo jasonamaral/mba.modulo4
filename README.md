@@ -28,92 +28,90 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 A plataforma é composta por **5 microserviços independentes** + **1 BFF** + **1 Frontend**, cada um com seu próprio banco de dados e responsabilidades específicas:
 
 ```mermaid
+---
+config:
+  layout: fixed
+---
 flowchart TD
-    %% NÍVEL 1: FRONT
-    subgraph Front["🖥️ Front"]
-        Frontend[🌐 Angular 18 SPA<br/>📍 Porta: 4200]
-    end
-    
-    %% NÍVEL 2: BFF
-    subgraph BFF_Layer["🔗 BFF"]
-        BFF[🔗 BFF API<br/>📍 Porta: 5000<br/>🏗️ Gateway]
-    end
-    
-    %% NÍVEL 3: MICROSERVIÇOS EM COLUNAS ALINHADAS
-    subgraph Microservicos["🚀 Microserviços"]
-        Auth[🔐 Auth API<br/>📍 5001/7001<br/>🔑 Autenticação]
-        Conteudo[📚 Conteudo API<br/>📍 5002/7002<br/>📖 Cursos & Aulas]
-        Alunos[🎓 Alunos API<br/>📍 5003/7003<br/>👨‍🎓 Matrículas]
-        Pagamentos[💳 Pagamentos API<br/>📍 5004/7004<br/>💰 Transações]
-    end
-    
-    %% NÍVEL 4: INFRAESTRUTURA ALINHADA VERTICALMENTE
-    subgraph Infra["🏗️ Infra"]
-        AuthDB[🗄️ Auth DB<br/>📍 SQL Server]
-        ConteudoDB[🗄️ Conteudo DB<br/>📍 SQL Server]
-        AlunosDB[🗄️ Alunos DB<br/>📍 SQL Server]
-        PagamentosDB[🗄️ Pagamentos DB<br/>📍 SQL Server]
-        
-        AuthMQ[🐰 Auth MQ<br/>📍 RabbitMQ]
-        AlunosMQ[🐰 Alunos MQ<br/>📍 RabbitMQ]
-        PagamentosMQ[🐰 Pagamentos MQ<br/>📍 RabbitMQ]
-        
-        Cache[🔴 Redis<br/>📍 6379<br/>⚡ Cache]
-    end
-    
-    %% CONEXÕES PRINCIPAIS (RETAS)
-    Frontend --> BFF
-    
-    BFF --> Auth
-    BFF --> Conteudo
-    BFF --> Alunos
-    BFF --> Pagamentos
-    
-    %% CONEXÕES DIRETAS E RETAS (SEM SOBREPOSIÇÃO)
-    Auth --> AuthDB
-    Auth --> AuthMQ
-    
-    Conteudo --> ConteudoDB
-    
-    Alunos --> AlunosDB
-    Alunos --> AlunosMQ
-    
-    Pagamentos --> PagamentosDB
-    Pagamentos --> PagamentosMQ
-    
-    BFF --> Cache
-    
-    %% ESTILOS DOS SUBGRAFOS
+ subgraph Front["🖥️ Front"]
+    direction LR
+        Frontend["🌐 Angular 18 SPA<br>📍 Porta: 4200"]
+  end
+ subgraph BFF_Layer["🔗 BFF"]
+    direction LR
+        BFF["🔗 BFF API<br>📍 Porta: 5000<br>🏗️ Gateway"]
+  end
+ subgraph Microservicos["🚀 Microserviços"]
+    direction LR
+        Auth["🔐 Auth API<br>📍 5001/7001<br>🔑 Autenticação"]
+        Conteudo["📚 Conteudo API<br>📍 5002/7002<br>📖 Cursos &amp; Aulas"]
+        Alunos["🎓 Alunos API<br>📍 5003/7003<br>👨‍🎓 Matrículas"]
+        Pagamentos["💳 Pagamentos API<br>📍 5004/7004<br>💰 Transações"]
+  end
+ subgraph Infra["🏗️ Infra — Dados & Cache"]
+    direction LR
+        AuthDB["🗄️ Auth DB<br>📍 SQL Server"]
+        ConteudoDB["🗄️ Conteudo DB<br>📍 SQL Server"]
+        AlunosDB["🗄️ Alunos DB<br>📍 SQL Server"]
+        PagamentosDB["🗄️ Pagamentos DB<br>📍 SQL Server"]
+        Cache["🔴 Redis<br>📍 6379<br>⚡ Cache"]
+  end
+ subgraph Mensageria["📬 Mensageria"]
+    direction TB
+        Rabbit["🐰 RabbitMQ"]
+  end
+    Frontend -- 1 --> BFF
+    BFF -- 2 --> Auth
+    BFF -- 3 --> Conteudo
+    BFF -- 4 --> Alunos
+    BFF -- 5 --> Pagamentos
+    Auth -- 6 --> AuthDB
+    Conteudo -- 7 --> ConteudoDB
+    Alunos -- 8 --> AlunosDB
+    Pagamentos -- 9 --> PagamentosDB
+    BFF -- 10 --> Cache
+    Auth -- 11 --> Rabbit
+    Alunos -- 12 --> Rabbit
+    Pagamentos -- 13 --> Rabbit
+    MensageriaStart[[" "]]
+     Frontend:::frontend
+     BFF:::bff
+     Auth:::microservice
+     Conteudo:::microservice
+     Alunos:::microservice
+     Pagamentos:::microservice
+     AuthDB:::infrastructure
+     ConteudoDB:::infrastructure
+     AlunosDB:::infrastructure
+     PagamentosDB:::infrastructure
+     Cache:::infrastructure
+     Rabbit:::messaging
+     MensageriaStart:::invisible
     classDef frontGroup fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
     classDef bffGroup fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
     classDef microGroup fill:#e8f5e8,stroke:#388e3c,stroke-width:3px
     classDef infraGroup fill:#fff3e0,stroke:#f57c00,stroke-width:3px
-    
-    %% ESTILOS DOS NÓDULOS
+    classDef msgGroup fill:#f1f8e9,stroke:#689f38,stroke-width:3px
+    classDef invisible fill:none,stroke:none
     classDef frontend fill:#bbdefb,stroke:#1976d2,stroke-width:2px,color:#000
     classDef bff fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
     classDef microservice fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
     classDef infrastructure fill:#ffe0b2,stroke:#f57c00,stroke-width:2px,color:#000
-    
-    %% ESTILOS DAS CONEXÕES (CORES DISTINTAS)
-    linkStyle 0 stroke:#1976d2,stroke-width:3px
-    linkStyle 1 stroke:#e91e63,stroke-width:2px
-    linkStyle 2 stroke:#4caf50,stroke-width:2px
-    linkStyle 3 stroke:#2196f3,stroke-width:2px
-    linkStyle 4 stroke:#ff9800,stroke-width:2px
-    linkStyle 5 stroke:#e91e63,stroke-width:2px
-    linkStyle 6 stroke:#ff6b6b,stroke-width:2px
-    linkStyle 7 stroke:#4caf50,stroke-width:2px
-    linkStyle 8 stroke:#2196f3,stroke-width:2px
-    linkStyle 9 stroke:#42a5f5,stroke-width:2px
-    linkStyle 10 stroke:#ff9800,stroke-width:2px
-    linkStyle 11 stroke:#ffa726,stroke-width:2px
-    linkStyle 12 stroke:#9c27b0,stroke-width:2px
-    
-    class Frontend frontend
-    class BFF bff
-    class Auth,Conteudo,Alunos,Pagamentos microservice
-    class AuthDB,ConteudoDB,AlunosDB,PagamentosDB,AuthMQ,AlunosMQ,PagamentosMQ,Cache infrastructure
+    classDef messaging fill:#dcedc8,stroke:#689f38,stroke-width:2px,color:#000
+    linkStyle 0 stroke:#1e88e5,stroke-width:3px,fill:none
+    linkStyle 1 stroke:#8e24aa,stroke-width:3px,fill:none
+    linkStyle 2 stroke:#43a047,stroke-width:3px,fill:none
+    linkStyle 3 stroke:#fdd835,stroke-width:3px,fill:none
+    linkStyle 4 stroke:#fb8c00,stroke-width:3px,fill:none
+    linkStyle 5 stroke:#d81b60,stroke-width:3px,fill:none
+    linkStyle 6 stroke:#5e35b1,stroke-width:3px,fill:none
+    linkStyle 7 stroke:#00acc1,stroke-width:3px,fill:none
+    linkStyle 8 stroke:#c0ca33,stroke-width:3px,fill:none
+    linkStyle 9 stroke:#f4511e,stroke-width:3px,fill:none
+    linkStyle 10 stroke:#3949ab,stroke-width:3px,fill:none
+    linkStyle 11 stroke:#6d4c41,stroke-width:3px,fill:none
+    linkStyle 12 stroke:#00796b,stroke-width:3px,fill:none
+
 ```
 
 ### Princípios Arquiteturais

@@ -24,14 +24,23 @@ interface DialogData {
           <div class="aula-header">
             <span class="ordem">#{{ a.ordem }}</span>
             <span class="nome">{{ a.nome }}</span>
-            <span class="duracao" *ngIf="a.duracaoMinutos !== undefined">{{ a.duracaoMinutos }} min</span>
+            <span class="duracao" *ngIf="a.duracaoMinutos !== undefined">
+              <span class="iconify" data-icon="mdi:clock-outline" data-width="18" data-height="18"></span>
+              {{ a.duracaoMinutos }} min
+            </span>
           </div>
           <div class="descricao" *ngIf="a.descricao">{{ a.descricao }}</div>
           <div class="meta">
             <span *ngIf="a.videoUrl">
-              Vídeo: <a [href]="a.videoUrl" target="_blank" rel="noopener">abrir</a>
+              <span class="iconify" data-icon="mdi:play-circle-outline" data-width="18" data-height="18"></span>
+              <a [href]="a.videoUrl" target="_blank" rel="noopener">Assistir vídeo</a>
             </span>
-            <span *ngIf="a.status">Status: {{ a.status }}</span>
+            <span *ngIf="a.status" [ngClass]="{
+              'status-pendente': a.status === 'Pendente',
+              'status-concluida': a.status === 'Concluída'
+            }">
+              Status: {{ a.status }}
+            </span>
           </div>
           <div class="actions bottom" *ngIf="isUserAdmin">
             <button mat-stroked-button color="primary" (click)="editarAula(a)">editar</button>
@@ -48,15 +57,18 @@ interface DialogData {
   `,
   styles: [
     `.content{max-height:70vh;min-width:300px;display:block}`,
-    `.aula{padding:12px 0;border-bottom:1px solid rgba(0,0,0,.08)}`,
+    `.aula{padding:8px 0;border-bottom:1px solid rgba(0,0,0,.08)}`,
     `.aula:last-child{border-bottom:none}`,
     `.aula-header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}`,
-    `.ordem{font-weight:600;color:#666}`,
-    `.nome{font-weight:600;flex:1 1 auto}`,
-    `.duracao{color:#666}`,
-    `.descricao{margin:6px 0}`,
-    `.meta{display:flex;gap:16px;color:#555}`,
-    `.aula{display:flex;flex-direction:column}`,
+    `.ordem{font-weight:600;color:#1976d2}`,
+    `.nome{font-weight:600;flex:1 1 auto;font-size:1.05rem}`,
+    `.duracao{color:#555;display:flex;align-items:center;gap:4px}`,
+    `.descricao{margin:6px 0;font-size:.98rem;color:#444}`,
+    `.meta{display:flex;gap:16px;color:#555;margin-top:4px;align-items:center}`,
+    `.meta span{display:flex;align-items:center;gap:6px}`,
+    `.meta a{display:inline-flex;align-items:center;text-decoration:none;color:#007ACC}`,
+    `.status-pendente{color:#f57c00;font-weight:500}`,
+    `.status-concluida{color:#388e3c;font-weight:500}`,
     `.actions{margin-top:12px}`,
     `.actions.bottom{align-self:flex-start}`
   ]
