@@ -27,10 +27,10 @@ public partial class AlunoController(IMediatorHandler mediator,
     private readonly IAlunoQueryService _alunoQueryService = alunoQueryService;
 
     /// <summary>
-    /// 
+    /// Realiza a matrícula do aluno em um curso
     /// </summary>
-    /// <param name="alunoId"></param>
-    /// <param name="dto"></param>
+    /// <param name="alunoId">ID do aluno</param>
+    /// <param name="dto">Objeto com informação do curso</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/matricular-aluno")]
@@ -48,10 +48,10 @@ public partial class AlunoController(IMediatorHandler mediator,
     }
 
     /// <summary>
-    /// 
+    /// Registra o histórico de uma aula em andamento
     /// </summary>
-    /// <param name="alunoId"></param>
-    /// <param name="dto"></param>
+    /// <param name="alunoId">ID do aluno</param>
+    /// <param name="dto">Objeto com informação da aula</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/registrar-historico-aprendizado")]
@@ -79,10 +79,10 @@ public partial class AlunoController(IMediatorHandler mediator,
     }
 
     /// <summary>
-    /// 
+    /// Registra a conclusão do curso
     /// </summary>
-    /// <param name="alunoId"></param>
-    /// <param name="dto"></param>
+    /// <param name="alunoId">ID do aluno</param>
+    /// <param name="dto">Objeto com informação do curso</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPut("{alunoId}/concluir-curso")]
@@ -104,10 +104,10 @@ public partial class AlunoController(IMediatorHandler mediator,
     }
 
     /// <summary>
-    /// 
+    /// Registra a solicitação de conclusão do curso
     /// </summary>
-    /// <param name="alunoId"></param>
-    /// <param name="dto"></param>
+    /// <param name="alunoId">ID do aluno</param>
+    /// <param name="dto">Objeto com informação do curso</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/solicitar-certificado")]

@@ -43,8 +43,9 @@ public class ConteudosController : BffController
     /// <param name="includeAulas">Se deve incluir aulas na resposta</param>
     /// <returns>Dados do curso</returns>
     [HttpGet("{cursoId}")]
-    [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<CursoDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCurso([FromRoute] Guid cursoId, [FromQuery] bool includeAulas = false)
     {
@@ -76,8 +77,9 @@ public class ConteudosController : BffController
     /// </summary>
     /// <param name="filter">Filtro para paginação e busca</param>
     [HttpGet("cursos")]
-    [ProducesResponseType(typeof(ResponseResult<PagedResult<CursoDto>>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<PagedResult<CursoDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterTodosCursos([FromQuery] CursoFilter filter)
     {
@@ -104,8 +106,9 @@ public class ConteudosController : BffController
     /// <param name="includeAulas">Se deve incluir aulas na resposta</param>
     /// <returns>Lista de cursos da categoria</returns>
     [HttpGet("categoria/{categoriaId}")]
-    [ProducesResponseType(typeof(ResponseResult<IEnumerable<CursoDto>>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<IEnumerable<CursoDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
     {
@@ -122,8 +125,9 @@ public class ConteudosController : BffController
     /// </summary>
     /// <returns>Lista categorias</returns>
     [HttpGet("categorias")]
-    [ProducesResponseType(typeof(ResponseResult<IEnumerable<CategoriaDto>>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<IEnumerable<CategoriaDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterTodasCategorias()
     {
@@ -139,8 +143,9 @@ public class ConteudosController : BffController
     /// Cadastrar um novo curso
     /// </summary>
     [HttpPost("cursos")]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AdicionarCurso([FromBody] CursoCriarRequest curso)
     {
@@ -158,8 +163,9 @@ public class ConteudosController : BffController
     /// Atualizar um curso existente
     /// </summary>
     [HttpPut("cursos/{cursoId}")]
-    [ProducesResponseType(typeof(ResponseResult<CursoDto>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<CursoDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AtualizarCurso(Guid cursoId, [FromBody] AtualizarCursoRequest curso)
     {
@@ -176,8 +182,9 @@ public class ConteudosController : BffController
     /// Excluir um curso
     /// </summary>
     [HttpDelete("cursos/{cursoId}")]
-    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ExcluirCurso(Guid cursoId)
     {
@@ -192,8 +199,9 @@ public class ConteudosController : BffController
     /// Obter Aulas por Curso ID
     /// </summary>
     [HttpGet("cursos/{cursoId}/aulas")]
-    [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterAulasPorCursoId([FromRoute] Guid cursoId)
     {
@@ -207,8 +215,9 @@ public class ConteudosController : BffController
     /// Obter Conteudo Programatico por Curso ID
     /// </summary>
     [HttpGet("cursos/{cursoId}/conteudo-programatico")]
-    [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterConteudoProgramaticoPorCursoId([FromRoute] Guid cursoId)
     {

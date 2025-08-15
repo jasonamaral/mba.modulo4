@@ -9,9 +9,9 @@ namespace Alunos.API.Controllers;
 public partial class AlunoController
 {
     /// <summary>
-    /// 
+    /// Obtem a informação do aluno
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">ID do aluno</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpGet("{id}")]
@@ -31,18 +31,18 @@ public partial class AlunoController
     }
 
     /// <summary>
-    /// 
+    /// Obtem a evolução da matrícula do curso de um aluno
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="alunoId">ID do aluno</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
-    [HttpGet("{id}/evolucao")]
+    [HttpGet("{alunoId}/evolucao")]
     [ProducesResponseType(typeof(ResponseResult<EvolucaoAlunoDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid id)
+    public async Task<IActionResult> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid alunoId)
     {
-        var aluno = await _alunoQueryService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(id);
+        var aluno = await _alunoQueryService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId);
         if (aluno == null)
         {
             _notificador.AdicionarErro("Evolução da matricula do aluno não encontrado.");
@@ -53,20 +53,20 @@ public partial class AlunoController
     }
 
     /// <summary>
-    /// 
+    /// Obtem as informações de matrículas pelo aluno
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="alunoId">ID do aluno</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
-    [HttpGet("{id}/todas-matriculas")]
+    [HttpGet("{alunoId}/todas-matriculas")]
     [ProducesResponseType(typeof(ResponseResult<ICollection<MatriculaCursoDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ObterMatriculasPorAlunoId(Guid id)
+    public async Task<IActionResult> ObterMatriculasPorAlunoId(Guid alunoId)
     {
         try
         {
-            var matriculas = await _alunoQueryService.ObterMatriculasPorAlunoIdAsync(id);
+            var matriculas = await _alunoQueryService.ObterMatriculasPorAlunoIdAsync(alunoId);
             if (matriculas == null || !matriculas.Any())
             {
                 _notificador.AdicionarErro("Matrícula do aluno não encontrada.");
@@ -82,9 +82,9 @@ public partial class AlunoController
     }
 
     /// <summary>
-    /// 
+    /// Obtem o certificado de conclusão do curso
     /// </summary>
-    /// <param name="matriculaId"></param>
+    /// <param name="matriculaId">ID da matrícula do curso</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpGet("matricula/{matriculaId}/certificado")]
@@ -104,9 +104,9 @@ public partial class AlunoController
     }
 
     /// <summary>
-    /// 
+    /// Obtem as aulas de uma matrícula
     /// </summary>
-    /// <param name="matriculaId"></param>
+    /// <param name="matriculaId">ID da matrícula do curso</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpGet("aulas/{matriculaId}")]
