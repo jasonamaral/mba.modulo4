@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Conteudo.Infrastructure.Repositories
 {
     public class CategoriaRepository(ConteudoDbContext dbContext) : ICategoriaRepository
-    {   
+    {
+        private readonly DbSet<Categoria> _categoria = dbContext.Set<Categoria>();
         public IUnitOfWork UnitOfWork => dbContext;
 
-        private readonly DbSet<Categoria> _categoria = dbContext.Set<Categoria>();
         public async Task<IEnumerable<Categoria>> ObterTodosAsync()
         {
             return await _categoria

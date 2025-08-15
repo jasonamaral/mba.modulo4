@@ -1,4 +1,5 @@
 using Conteudo.Application.Commands.AtualizarCurso;
+using Conteudo.Application.Commands.CadastrarAula;
 using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.DTOs;
@@ -17,6 +18,7 @@ public class ConteudoMappingConfig : IRegister
         ConfigureCourseMappings(config);
         ConfigureLessonMappings(config);
         ConfigureCategoryMappings(config);
+        ConfigureAulaMappings(config);
     }
 
     private static void ConfigureCommandMappings(TypeAdapterConfig config)
@@ -28,6 +30,34 @@ public class ConteudoMappingConfig : IRegister
         config.NewConfig<CadastroCategoriaDto, CadastrarCategoriaCommand>().TwoWays();
     }
 
+    private static void ConfigureAulaMappings(TypeAdapterConfig config)
+    {
+        config.NewConfig<AulaDto, Aula>()
+            .ConstructUsing(x => new Aula(
+                x.CursoId,
+                x.Nome,
+                x.Descricao,
+                x.Numero,
+                x.DuracaoMinutos,
+                x.VideoUrl,
+                x.TipoAula,
+                x.IsObrigatoria,
+                x.Observacoes)
+            );
+        config.NewConfig<CadastroAulaDto, CadastrarAulaCommand>()
+            .ConstructUsing(x => new CadastrarAulaCommand(
+                x.CursoId,
+                x.Nome,
+                x.Descricao,
+                x.Numero,
+                x.DuracaoMinutos,
+                x.VideoUrl,
+                x.TipoAula,
+                x.IsObrigatoria,
+                x.Observacoes)
+            );
+        config.NewConfig<Aula, AulaDto>();
+    }
     private static void ConfigureCourseMappings(TypeAdapterConfig config)
     {
         config.NewConfig<Curso, CursoDto>()

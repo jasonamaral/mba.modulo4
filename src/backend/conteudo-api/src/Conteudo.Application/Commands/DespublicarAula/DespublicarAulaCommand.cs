@@ -1,0 +1,17 @@
+﻿using Core.Communication;
+using Core.Messages;
+using MediatR;
+
+namespace Conteudo.Application.Commands.DespublicarAula
+{
+    public class DespublicarAulaCommand : CommandRaiz, IRequest<CommandResult>
+    {
+        public Guid Id { get; private set; }
+
+        public DespublicarAulaCommand(Guid id)
+        {
+            Id = id;
+            DefinirRaizAgregacao(Id);
+        }
+    }
+}
