@@ -1,8 +1,10 @@
 ﻿using Conteudo.API.Configuration;
+using Conteudo.API.Filters;
 using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.Mappings;
 using Core.Identidade;
 using Mapster;
+using System.Text.Json;
 
 namespace Conteudo.API.Configuration;
 public static class ApiConfiguration
@@ -33,8 +35,21 @@ public static class ApiConfiguration
 
     private static WebApplicationBuilder AddControllersConfiguration(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers()
-            .ConfigureApiBehaviorOptions(opt => opt.SuppressModelStateInvalidFilter = true);
+        builder.Services.AddControllers(options =>
+        {
+            options.Filters.Add<DomainExceptionFilter>();
+            options.Filters.Add<ExceptionFilter>();
+        }).ConfigureApiBehaviorOptions(opt =>
+        {
+            opt.SuppressModelStateInvalidFilter = true;
+        }).AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.WriteIndented = false;
+            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        });
+
         return builder;
     }
 
