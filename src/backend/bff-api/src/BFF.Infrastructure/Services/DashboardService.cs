@@ -1,6 +1,5 @@
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
-using BFF.Domain.DTOs.Alunos.Response;
 using BFF.Domain.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -1,4 +1,5 @@
 using Alunos.API.Configurations;
+using Alunos.API.Helpers;
 using Alunos.Infrastructure.Data;
 
 internal class Program
@@ -11,7 +12,11 @@ internal class Program
         builder.Services.AddMessageBusConfiguration(builder.Configuration);
 
         var app = builder.Build();
-        app.UseSwaggerConfiguration();
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwaggerConfiguration();
+        }
+
         app.UseCors();
         app.UseAuthentication();
         app.UseAuthorization();
@@ -22,21 +27,9 @@ internal class Program
             .WithName("HealthCheck")
             .WithOpenApi();
 
-        // Inicializar banco de dados
-        using (var scope = app.Services.CreateScope())
-        {
-            var context = scope.ServiceProvider.GetRequiredService<AlunoDbContext>();
-
-            InitializeDatabaseAsync(context);
-        }
-
         // Migration Helper
-        app.Run();
-    }
+        app.UseDbMigrationHelper();
 
-    static void InitializeDatabaseAsync(AlunoDbContext context)
-    {
-        // Criar banco se n�o existir
-        context.Database.EnsureCreatedAsync();
+        app.Run();
     }
 }

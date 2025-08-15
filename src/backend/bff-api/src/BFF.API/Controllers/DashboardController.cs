@@ -1,9 +1,8 @@
 using BFF.API.Extensions;
-using BFF.API.Services.Aulas;
+using BFF.API.Services.Aluno;
 using BFF.API.Services.Conteudos;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
-using Core.Communication.Filters;
 using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
@@ -49,58 +48,50 @@ public class DashboardController : BffController
     [Authorize(Roles = "Usuario")]
     public async Task<IActionResult> GetDashboardAluno()
     {
-        try
+        var userId = User.GetUserId();
+        if (userId == Guid.Empty)
         {
-            var userId = User.GetUserId();
-            if (userId == Guid.Empty)
-            {
-                return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
-            }
-
-            // Busca dados em paralelo nas APIs: perfil, matrículas e evolução
-            var matriculasTask = _alunoService.ObterMatriculasPorAlunoIdAsync(userId);
-            var evolucaoTask = _alunoService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(userId);
-
-            await Task.WhenAll(matriculasTask, evolucaoTask);
-
-            var matriculasResponse = await matriculasTask;
-            var evolucaoResponse = await evolucaoTask;
-
-            var matriculas = matriculasResponse?.Data?.ToList() ?? new List<BFF.Domain.DTOs.Alunos.Response.MatriculaCursoDto>();
-            var certificados = matriculas
-                .Where(m => m.Certificado != null)
-                .Select(m => m.Certificado)
-                .ToList();
-
-            // Calcula progresso geral a partir da evolução
-            var totalAulas = evolucaoResponse?.Data?.MatriculasCursos?.Sum(m => m.QuantidadeAulasNoCurso) ?? 0;
-            var aulasRealizadas = evolucaoResponse?.Data?.MatriculasCursos?.Sum(m => m.QuantidadeAulasRealizadas) ?? 0;
-            var cursosConcluidos = matriculas.Count(m => m.DataConclusao.HasValue || string.Equals(m.EstadoMatricula, "Concluido", StringComparison.OrdinalIgnoreCase));
-            var percentualGeral = totalAulas > 0 ? Math.Round((decimal)aulasRealizadas / totalAulas * 100, 2) : 0m;
-
-            var progressoGeral = new ProgressoGeralDto
-            {
-                CursosMatriculados = matriculas.Count,
-                CursosConcluidos = cursosConcluidos,
-                CertificadosEmitidos = certificados.Count(c => c.DataEmissao.HasValue),
-                PercentualConcluidoGeral = percentualGeral,
-                HorasEstudadas = 0 // Não há dado confiável de horas no momento
-            };
-
-            var dashboard = new DashboardAlunoDto
-            {
-                Matriculas = matriculas,
-                Certificados = certificados,
-                ProgressoGeral = progressoGeral
-            };
-
-            return RespostaPadraoApi<DashboardAlunoDto>(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do aluno obtido com sucesso");
+            return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
         }
-        catch (Exception ex)
+
+        // Busca dados em paralelo nas APIs: perfil, matrículas e evolução
+        var matriculasTask = _alunoService.ObterMatriculasPorAlunoIdAsync(userId);
+        var evolucaoTask = _alunoService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(userId);
+
+        await Task.WhenAll(matriculasTask, evolucaoTask);
+
+        var matriculasResponse = await matriculasTask;
+        var evolucaoResponse = await evolucaoTask;
+
+        var matriculas = matriculasResponse?.Data?.ToList() ?? new List<BFF.Domain.DTOs.Alunos.Response.MatriculaCursoDto>();
+        var certificados = matriculas
+            .Where(m => m.Certificado != null)
+            .Select(m => m.Certificado)
+            .ToList();
+
+        // Calcula progresso geral a partir da evolução
+        var totalAulas = evolucaoResponse?.Data?.MatriculasCursos?.Sum(m => m.QuantidadeAulasNoCurso) ?? 0;
+        var aulasRealizadas = evolucaoResponse?.Data?.MatriculasCursos?.Sum(m => m.QuantidadeAulasRealizadas) ?? 0;
+        var cursosConcluidos = matriculas.Count(m => m.DataConclusao.HasValue || string.Equals(m.EstadoMatricula, "Concluido", StringComparison.OrdinalIgnoreCase));
+        var percentualGeral = totalAulas > 0 ? Math.Round((decimal)aulasRealizadas / totalAulas * 100, 2) : 0m;
+
+        var progressoGeral = new ProgressoGeralDto
         {
-            _logger.LogError(ex, "Erro ao obter dashboard do aluno");
-            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
-        }
+            CursosMatriculados = matriculas.Count,
+            CursosConcluidos = cursosConcluidos,
+            CertificadosEmitidos = certificados.Count(c => c.DataEmissao.HasValue),
+            PercentualConcluidoGeral = percentualGeral,
+            HorasEstudadas = 0 // Não há dado confiável de horas no momento
+        };
+
+        var dashboard = new DashboardAlunoDto
+        {
+            Matriculas = matriculas,
+            Certificados = certificados,
+            ProgressoGeral = progressoGeral
+        };
+
+        return RespostaPadraoApi<DashboardAlunoDto>(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do aluno obtido com sucesso");
     }
 
     /// <summary>
@@ -111,21 +102,13 @@ public class DashboardController : BffController
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetDashboardAdmin()
     {
-        try
-        {
-            var dashboard = await _dashboardService.GetDashboardAdminAsync();
+        var dashboard = await _dashboardService.GetDashboardAdminAsync();
 
-            if (dashboard != null)
-            {
-                return RespostaPadraoApi<DashboardAdminDto>(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do administrador obtido com sucesso");
-            }
-
-            return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Dashboard não encontrado");
-        }
-        catch (Exception ex)
+        if (dashboard != null)
         {
-            _logger.LogError(ex, "Erro ao obter dashboard do administrador");
-            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
+            return RespostaPadraoApi<DashboardAdminDto>(System.Net.HttpStatusCode.OK, dashboard, "Dashboard do administrador obtido com sucesso");
         }
+
+        return ProcessarErro(System.Net.HttpStatusCode.NotFound, "Dashboard não encontrado");
     }
-} 
+}

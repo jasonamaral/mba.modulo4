@@ -25,7 +25,8 @@ public class ApiClientService : IApiClientService, IDisposable
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = false,
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
         };
     }
 
@@ -119,7 +120,7 @@ public class ApiClientService : IApiClientService, IDisposable
             {
                 try
                 {
-                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent);
+                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent, _jsonOptions);
                     return ApiActionResult<TResponse>.ErrorResult(apiResponse.StatusCode, "Erro na API", errorResponse);
                 }
                 catch
@@ -158,7 +159,7 @@ public class ApiClientService : IApiClientService, IDisposable
             {
                 try
                 {
-                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent);
+                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent, _jsonOptions);
                     return ApiActionResult<TResponse>.ErrorResult(apiResponse.StatusCode, "Erro na API", errorResponse);
                 }
                 catch

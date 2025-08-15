@@ -1,24 +1,32 @@
 using Conteudo.API.Configuration;
-using Conteudo.API.Extensions;
+using Conteudo.API.Helpers;
 
-var builder = WebApplication.CreateBuilder(args);
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-builder.AddApiConfiguration();
+        builder.AddApiConfiguration();
 
-var app = builder.Build();
+        var app = builder.Build();
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwaggerConfiguration();
+        }
 
-app.UseSwaggerConfiguration();
+        app.UseCors();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
 
-app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
+        // Health Check
+        app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", DateTime = DateTime.UtcNow }))
+            .WithName("HealthCheck")
+            .WithOpenApi();
 
-// Health Check
-app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", DateTime = DateTime.UtcNow }))
-    .WithName("HealthCheck")
-    .WithOpenApi();
-
-// Migration Helper
-app.UseDbMigrationHelper();
-app.Run();
+        // Migration Helper
+        app.UseDbMigrationHelper();
+        app.Run();
+    }
+}

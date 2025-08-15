@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Plataforma.Educacao.Aluno.Application.Commands.CadastrarAluno;
 using Core.Communication;
 using Alunos.Domain.Interfaces;
 using Core.Mediator;

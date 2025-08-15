@@ -8,20 +8,13 @@ public abstract class Entidade
     public Guid Id { get; protected set; }
 
     public DateTime CreatedAt { get; protected set; }
-    public DateTime UpdatedAt { get; protected set; }
+    public DateTime? UpdatedAt { get; protected set; }
 
     protected Entidade()
     {
         Id = Guid.NewGuid();
         CreatedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    protected Entidade(Guid id)
-    {
-        Id = id;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
+        //UpdatedAt = DateTime.UtcNow;
     }
 
     public void DefinirId(Guid id)

@@ -19,104 +19,108 @@ namespace Alunos.API.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public partial class AlunoController(IMediatorHandler mediator, 
+public partial class AlunoController(IMediatorHandler mediator,
     IAlunoQueryService alunoQueryService,
     INotificationHandler<DomainNotificacaoRaiz> notifications,
     INotificador notificador) : MainController(mediator, notifications, notificador)
 {
     private readonly IAlunoQueryService _alunoQueryService = alunoQueryService;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="alunoId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/matricular-aluno")]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> MatricularAluno(Guid alunoId, MatriculaCursoRequest dto)
     {
-        try
-        {
-            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
-            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
+        if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+        if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-            var comando = new MatricularAlunoCommand(dto.AlunoId, dto.CursoId, dto.CursoDisponivel, dto.Nome, dto.Valor, dto.Observacao);
-            return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        var comando = new MatricularAlunoCommand(dto.AlunoId, dto.CursoId, dto.CursoDisponivel, dto.Nome, dto.Valor, dto.Observacao);
+        return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="alunoId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/registrar-historico-aprendizado")]
-    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RegistrarHistoricoAprendizado(Guid alunoId, RegistroHistoricoAprendizadoRequest dto)
     {
-        try
-        {
-            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
-            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
+        if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+        if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-            var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
-            if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
+        var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
+        if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
 
-            var comando = new RegistrarHistoricoAprendizadoCommand(dto.AlunoId,
-                dto.MatriculaCursoId,
-                dto.AulaId,
-                dto.NomeAula,
-                dto.DuracaoMinutos,
-                dto.DataTermino
-            );
+        var comando = new RegistrarHistoricoAprendizadoCommand(dto.AlunoId,
+            dto.MatriculaCursoId,
+            dto.AulaId,
+            dto.NomeAula,
+            dto.DuracaoMinutos,
+            dto.DataTermino
+        );
 
-            return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="alunoId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPut("{alunoId}/concluir-curso")]
-    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ConcluirCurso(Guid alunoId, ConcluirCursoRequest dto)
     {
-        try
-        {
-            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
-            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
-            if (dto.CursoDto == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Curso desta matrícula não encontrada"); }
+        if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+        if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
+        if (dto.CursoDto == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Curso desta matrícula não encontrada"); }
 
-            var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
-            if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
+        var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
+        if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
 
-            var comando = new ConcluirCursoCommand(dto.AlunoId, dto.MatriculaCursoId, dto.CursoDto);
-            return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        var comando = new ConcluirCursoCommand(dto.AlunoId, dto.MatriculaCursoId, dto.CursoDto);
+        return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="alunoId"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/solicitar-certificado")]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), 200)]
-    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SolicitarCertificado(Guid alunoId, SolicitaCertificadoRequest dto)
     {
-        try
-        {
-            if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
-            if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
+        if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
+        if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-            var comando = new SolicitarCertificadoCommand(dto.AlunoId, dto.MatriculaCursoId);
-            return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        var comando = new SolicitarCertificadoCommand(dto.AlunoId, dto.MatriculaCursoId);
+        return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
     }
 }

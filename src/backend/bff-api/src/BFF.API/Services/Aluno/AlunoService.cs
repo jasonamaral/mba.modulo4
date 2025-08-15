@@ -10,15 +10,10 @@ using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace BFF.API.Services.Aluno;
-public class AlunoService : BaseApiService, IAlunoService
+public partial class AlunoService : BaseApiService, IAlunoService
 {
     private readonly ApiSettings _apiSettings;
     private readonly IConteudoService _conteudoService;
-    private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-    };
 
     public AlunoService(IOptions<ApiSettings> apiSettings,
         IConteudoService conteudoService,
@@ -34,223 +29,80 @@ public class AlunoService : BaseApiService, IAlunoService
     #region Gets
     public async Task<ResponseResult<AlunoDto>> ObterAlunoPorIdAsync(Guid alunoId)
     {
-        //if (!ValidateToken(token, nameof(ObterAlunoPorIdAsync)))
-        //{
-        //    return new ResponseResult<AlunoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
+        var result = await ExecuteWithErrorHandling(() => ObterAlunoPorId(alunoId),
+            nameof(ObterAlunoPorIdAsync),
+            alunoId);
 
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
-
-            var url = $"api/aluno/{alunoId}";
-            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<AlunoDto>>(url);
-            if (apiResponse.IsSuccess) { return apiResponse.Data; }
-
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-                try
-                {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<AlunoDto>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<AlunoDto>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
-            }
-
-            return new ResponseResult<AlunoDto>
-            {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
-            };
-        }, nameof(ObterAlunoPorIdAsync), alunoId);
-
-        return result ?? new ResponseResult<AlunoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
+        return result ?? ReturnUnknowError<AlunoDto>();
     }
 
     public async Task<ResponseResult<EvolucaoAlunoDto>> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid alunoId)
     {
-        //if (!ValidateToken(token, nameof(ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync)))
-        //{
-        //    return new ResponseResult<EvolucaoAlunoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
+        var result = await ExecuteWithErrorHandling(() => ObterEvolucaoMatriculasCursoDoAlunoPorId(alunoId),
+            nameof(ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync),
+            alunoId);
 
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
-
-            var url = $"api/aluno/{alunoId}/evolucao";
-            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<EvolucaoAlunoDto>>(url);
-            if (apiResponse.IsSuccess) { return apiResponse.Data; }
-
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-                try
-                {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<EvolucaoAlunoDto>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<EvolucaoAlunoDto>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
-            }
-
-            return new ResponseResult<EvolucaoAlunoDto>
-            {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
-            };
-        }, nameof(ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync), alunoId);
-
-        return result ?? new ResponseResult<EvolucaoAlunoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
+        return result ?? ReturnUnknowError<EvolucaoAlunoDto>();
     }
 
     public async Task<ResponseResult<ICollection<MatriculaCursoDto>>> ObterMatriculasPorAlunoIdAsync(Guid alunoId)
     {
+        var result = await ExecuteWithErrorHandling(() => ObterMatriculasPorAlunoId(alunoId),
+            nameof(ObterMatriculasPorAlunoIdAsync),
+            alunoId);
 
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            var url = $"api/aluno/{alunoId}/todas-matriculas";
-            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<ICollection<MatriculaCursoDto>>>(url);
-            return MapApiResponse(apiResponse);
-        }, nameof(ObterMatriculasPorAlunoIdAsync), alunoId);
-
-        return result ?? new ResponseResult<ICollection<MatriculaCursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
+        return result ?? ReturnUnknowError<ICollection<MatriculaCursoDto>>();
     }
 
     public async Task<ResponseResult<CertificadoDto>> ObterCertificadoPorMatriculaIdAsync(Guid matriculaId)
     {
-        //if (!ValidateToken(token, nameof(ObterCertificadoPorMatriculaIdAsync)))
-        //{
-        //    return new ResponseResult<CertificadoDto> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
+        var result = await ExecuteWithErrorHandling(() => ObterCertificadoPorMatriculaId(matriculaId),
+            nameof(ObterCertificadoPorMatriculaIdAsync),
+            matriculaId);
 
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
-
-            var url = $"api/aluno/matricula/{matriculaId}/certificado";
-            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<CertificadoDto>>(url);
-            if (apiResponse.IsSuccess) { return apiResponse.Data; }
-
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-                try
-                {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<CertificadoDto>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<CertificadoDto>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
-                }
-            }
-
-            return new ResponseResult<CertificadoDto>
-            {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
-            };
-        }, nameof(ObterCertificadoPorMatriculaIdAsync), matriculaId);
-
-        return result ?? new ResponseResult<CertificadoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
+        return result ?? ReturnUnknowError<CertificadoDto>();
     }
 
     public async Task<ResponseResult<ICollection<AulaCursoDto>>> ObterAulasPorMatriculaIdAsync(Guid matriculaId)
     {
-        //if (!ValidateToken(token, nameof(ObterAulasPorMatriculaIdAsync)))
-        //{
-        //    return new ResponseResult<ICollection<AulaCursoDto>> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
+        var aulaCursoDto = await ExecuteWithErrorHandling(() => ObterAulasPorMatriculaId(matriculaId),
+            nameof(ObterAulasPorMatriculaIdAsync),
+            matriculaId);
 
-        // Obtenho a matrícula e aulas do aluno
-        var aulaCursoDto = await ExecuteWithErrorHandling(async () =>
+        if (aulaCursoDto.Data != null)
         {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
+            // Obtenho o curso e suas aulas para "adicionar" as aulas que não estão na matrícula (por não ter histórico ou novas aulas)
+            var cursoDto = await _conteudoService.ObterCursoPorId(matriculaId, includeAulas: true);
 
-            var url = $"api/aluno/aulas/{matriculaId}";
-            var apiResponse = await _apiClient.GetAsyncWithDetails<ResponseResult<ICollection<AulaCursoDto>>>(url);
-            if (apiResponse.IsSuccess) { return apiResponse.Data; }
-
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+            foreach (var aula in cursoDto.Data.Aulas)
             {
-                try
+                var historico = aulaCursoDto.Data.FirstOrDefault(h => h.AulaId == aula.Id);
+
+                if (historico == null)
                 {
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<ICollection<AulaCursoDto>>>(apiResponse.ErrorContent);
-                    return errorResponse;
-                }
-                catch
-                {
-                    return new ResponseResult<ICollection<AulaCursoDto>>
+                    aulaCursoDto.Data.Add(new AulaCursoDto
                     {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = [apiResponse.ErrorContent] }
-                    };
+                        AulaId = aula.Id,
+                        CursoId = aula.CursoId,
+                        NomeAula = aula.Nome,
+                        OrdemAula = aula.Ordem,
+                        //Ativo = aula.Ativo,
+                        DataInicio = null,
+                        DataTermino = null,
+                        AulaJaIniciadaRealizada = false,
+                        Url = aula.VideoUrl
+                    });
                 }
-            }
-
-            return new ResponseResult<ICollection<AulaCursoDto>>
-            {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
-            };
-        }, nameof(ObterAulasPorMatriculaIdAsync), matriculaId);
-
-        // Obtenho o curso e suas aulas para "adicionar" as aulas que não estão na matrícula (por não ter histórico ou novas aulas)
-        var cursoDto = await _conteudoService.ObterCursoPorId(matriculaId, includeAulas: true);
-
-        foreach (var aula in cursoDto.Data.Aulas)
-        {
-            var historico = aulaCursoDto.Data.FirstOrDefault(h => h.AulaId == aula.Id);
-
-            if (historico == null)
-            {
-                aulaCursoDto.Data.Add(new AulaCursoDto
-                {
-                    AulaId = aula.Id,
-                    CursoId = aula.CursoId,
-                    NomeAula = aula.Nome,
-                    OrdemAula = aula.Ordem,
-                    //Ativo = aula.Ativo,
-                    DataInicio = null,
-                    DataTermino = null,
-                    AulaJaIniciadaRealizada = false,
-                    Url = aula.VideoUrl
-                });
             }
         }
 
-        return aulaCursoDto ?? new ResponseResult<ICollection<AulaCursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = ["Erro interno do servidor"] } };
+        return aulaCursoDto ?? ReturnUnknowError<ICollection<AulaCursoDto>>();
     }
     #endregion
 
     #region Posts and Puts
     public async Task<ResponseResult<Guid>> MatricularAlunoAsync(MatriculaCursoRequest dto)
     {
-        //if (!ValidateToken(token, nameof(MatricularAlunoAsync)))
-        //{
-        //    return new ResponseResult<Guid> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
-
         var cursoDto = await _conteudoService.ObterCursoPorId(dto.CursoId, includeAulas: false);
         if (cursoDto == null || cursoDto.Data == null)
         {
@@ -267,72 +119,15 @@ public class AlunoService : BaseApiService, IAlunoService
             Observacao = dto.Observacao
         };
 
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
+        var result = await ExecuteWithErrorHandling(() => MatricularAluno(dto.AlunoId, matriculaCursoApi),
+            nameof(MatricularAlunoAsync),
+            dto.AlunoId);
 
-            var apiResponse = await _apiClient.PostAsyncWithDetails<MatriculaCursoApiRequest, ResponseResult<Guid>>($"api/aluno/{dto.AlunoId}/matricular-aluno", matriculaCursoApi);
-            if (apiResponse.IsSuccess) { return apiResponse.Data; }
-
-            // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-                return new ResponseResult<Guid>
-                {
-                    Status = apiResponse.StatusCode,
-                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
-                };
-            }
-
-            return new ResponseResult<Guid>
-            {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
-            };
-        }, nameof(MatricularAlunoAsync), dto.AlunoId);
-
-        return result ?? new ResponseResult<Guid> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
-    }
-
-    private static ResponseResult<T> MapApiResponse<T>(ApiResponse<ResponseResult<T>> apiResponse)
-    {
-        if (apiResponse.IsSuccess && apiResponse.Data != null)
-        {
-            return apiResponse.Data;
-        }
-
-        if (!string.IsNullOrWhiteSpace(apiResponse.ErrorContent))
-        {
-            try
-            {
-                var errorResponse = JsonSerializer.Deserialize<ResponseResult<T>>(apiResponse.ErrorContent, JsonOptions);
-                if (errorResponse != null) return errorResponse;
-            }
-            catch
-            {
-            }
-        }
-
-        return new ResponseResult<T>
-        {
-            Status = apiResponse.StatusCode,
-            Errors = new ResponseErrorMessages
-            {
-                Mensagens = new List<string>
-                {
-                    string.IsNullOrWhiteSpace(apiResponse.ErrorContent) ? "Erro desconhecido na API" : apiResponse.ErrorContent
-                }
-            }
-        };
+        return result ?? ReturnUnknowError<Guid>();
     }
 
     public async Task<ResponseResult<bool>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto)
     {
-        //if (!ValidateToken(token, nameof(RegistrarHistoricoAprendizadoAsync)))
-        //{
-        //    return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
 
         var matriculaCurso = await ObterMatriculasPorAlunoIdAsync(dto.AlunoId);
         if (matriculaCurso == null || matriculaCurso.Data == null || !matriculaCurso.Data.Any(x => x.Id == dto.MatriculaCursoId))
@@ -358,48 +153,21 @@ public class AlunoService : BaseApiService, IAlunoService
             DataTermino = dto.DataTermino
         };
 
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
+        var result = await ExecuteWithErrorHandling(() => RegistrarHistoricoAprendizado(dto.AlunoId, historicoAprendizado),
+            nameof(RegistrarHistoricoAprendizadoAsync),
+            dto.AlunoId);
 
-            var apiResponse = await _apiClient.PostAsyncWithDetails<RegistroHistoricoAprendizadoApiRequest, ResponseResult<bool>>($"api/aluno/{dto.AlunoId}/registrar-historico-aprendizado", historicoAprendizado);
-            if (apiResponse.IsSuccess) { return apiResponse.Data; }
-
-            // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-                return new ResponseResult<bool>
-                {
-                    Status = apiResponse.StatusCode,
-                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
-                };
-            }
-
-            return new ResponseResult<bool>
-            {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
-            };
-        }, nameof(RegistrarHistoricoAprendizadoAsync), dto.AlunoId);
-
-        return result ?? new ResponseResult<bool> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        return result ?? ReturnUnknowError<bool>();
     }
 
     public async Task<ResponseResult<bool>> ConcluirCursoAsync(ConcluirCursoRequest dto)
     {
-        //if (!ValidateToken(token, nameof(ConcluirCursoAsync)))
-        //{
-        //    return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
-
         var matriculaCurso = await ObterMatriculasPorAlunoIdAsync(dto.AlunoId);
         if (matriculaCurso == null || matriculaCurso.Data == null || !matriculaCurso.Data.Any(x => x.Id == dto.MatriculaCursoId))
         {
             return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Matrícula não encontrada"] } };
         }
-        
-        // TODO :: Isso está feio demais. Refatorar urgente! Deve ter um endpoint na AlunoApi para obter a matrícula por ID
+
         var cursoDto = await _conteudoService.ObterCursoPorId(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: false);
         if (cursoDto == null || cursoDto.Data == null)
         {
@@ -413,67 +181,20 @@ public class AlunoService : BaseApiService, IAlunoService
             CursoDto = cursoDto.Data
         };
 
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
+        var result = await ExecuteWithErrorHandling(() => ConcluirCurso(dto.AlunoId, concluirCurso),
+            nameof(ConcluirCursoAsync),
+            dto.AlunoId);
 
-            var apiResponse = await _apiClient.PutAsyncWithDetails<ConcluirCursoApiRequest, ResponseResult<bool>>($"api/aluno/{dto.AlunoId}/concluir-curso", concluirCurso);
-            if (apiResponse.IsSuccess) { return apiResponse.Data; }
-
-            // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-                return new ResponseResult<bool>
-                {
-                    Status = apiResponse.StatusCode,
-                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
-                };
-            }
-
-            return new ResponseResult<bool>
-            {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
-            };
-        }, nameof(ConcluirCursoAsync), dto.AlunoId);
-
-        return result ?? new ResponseResult<bool> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        return result ?? ReturnUnknowError<bool>();
     }
 
     public async Task<ResponseResult<Guid>> SolicitarCertificadoAsync(SolicitaCertificadoRequest dto)
     {
-        //if (!ValidateToken(token, nameof(SolicitarCertificadoAsync)))
-        //{
-        //    return new ResponseResult<Guid> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Token inválido"] } };
-        //}
+        var result = await ExecuteWithErrorHandling(() => SolicitarCertificado(dto),
+            nameof(SolicitarCertificadoAsync),
+            dto.AlunoId);
 
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            //_apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-            //ConfigureAuthToken(token);
-
-            var apiResponse = await _apiClient.PostAsyncWithDetails<SolicitaCertificadoRequest, ResponseResult<Guid>>($"api/aluno/{dto.AlunoId}/solicitar-certificado", dto);
-            if (apiResponse.IsSuccess) { return apiResponse.Data; }
-
-            // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-                return new ResponseResult<Guid>
-                {
-                    Status = apiResponse.StatusCode,
-                    Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
-                };
-            }
-
-            return new ResponseResult<Guid>
-            {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
-            };
-        }, nameof(SolicitarCertificadoAsync), dto.AlunoId);
-
-        return result ?? new ResponseResult<Guid> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        return result ?? ReturnUnknowError<Guid>();
     }
     #endregion
 }

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace BFF.API.Services.Conteudos;
 
-public class ConteudoService : BaseApiService, IConteudoService
+public partial class ConteudoService : BaseApiService, IConteudoService
 {
     private readonly ApiSettings _apiSettings;
 
@@ -20,13 +20,13 @@ public class ConteudoService : BaseApiService, IConteudoService
         ILogger<ConteudoService> logger) : base(apiClient, logger)
     {
         _apiSettings = apiSettings.Value;
+        _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
     }
 
     public async Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, bool includeAulas = false)
     {
         var result = await ExecuteWithErrorHandling(async () =>
         {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
             
             var url = includeAulas ? $"api/cursos/{cursoId}?includeAulas=true" : $"api/cursos/{cursoId}";
             return await _apiClient.GetAsync<ResponseResult<CursoDto>>(url);
@@ -41,7 +41,7 @@ public class ConteudoService : BaseApiService, IConteudoService
         {
             _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
 
-            var queryParams = new Dictionary<string, string?>
+            var queryParams = new Dictionary<string, string>
             {
                 [nameof(CursoFilter.PageSize)] = filter.PageSize > 0 ? filter.PageSize.ToString() : null,
                 [nameof(CursoFilter.PageIndex)] = filter.PageIndex > 0 ? filter.PageIndex.ToString() : null,

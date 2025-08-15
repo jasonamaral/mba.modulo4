@@ -5,7 +5,7 @@ using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.Domain.Entities;
 
-public class Aluno : Common.Entidade, IRaizAgregacao
+public class Aluno : Entidade, IRaizAgregacao
 {
     #region Atributos
     public Guid CodigoUsuarioAutenticacao { get; }

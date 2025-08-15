@@ -1,12 +1,13 @@
 using Alunos.Domain.Enumerators;
 using Alunos.Domain.ValueObjects;
+using Core.DomainObjects;
 using Core.DomainValidations;
 using Core.Utils;
 using Plataforma.Educacao.Core.Exceptions;
 using System.Text.Json.Serialization;
 
 namespace Alunos.Domain.Entities;
-public class MatriculaCurso : Common.Entidade
+public class MatriculaCurso : Entidade
 {
     #region Atributos
     public Guid AlunoId { get; }

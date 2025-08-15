@@ -1,10 +1,11 @@
+using Core.DomainObjects;
 using Core.DomainValidations;
 using Plataforma.Educacao.Core.Exceptions;
 using System.Text.Json.Serialization;
 
 namespace Alunos.Domain.Entities;
 
-public class Certificado : Common.Entidade
+public class Certificado : Entidade
 {
     #region Atributos
     public Guid MatriculaCursoId { get; }

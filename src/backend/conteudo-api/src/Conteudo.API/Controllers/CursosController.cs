@@ -44,21 +44,14 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCurso([FromRoute] Guid id, [FromQuery] bool includeAulas = false)
     {
-        try
+        var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas);
+        if (curso == null)
         {
-            var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas);
-            if (curso == null)
-            {
-                _notificador.AdicionarErro("Curso não encontrado.");
-                return RespostaPadraoApi<string>();
-            }
+            _notificador.AdicionarErro("Curso não encontrado.");
+            return RespostaPadraoApi<string>();
+        }
 
-            return RespostaPadraoApi(data: curso);
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        return RespostaPadraoApi(data: curso);
     }
 
     /// <summary>
@@ -72,15 +65,8 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursos([FromQuery] CursoFilter filter)
     {
-        try
-        {
-            var cursos = await _cursoAppService.ObterTodosAsync(filter);
-            return RespostaPadraoApi(data: cursos);
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        var cursos = await _cursoAppService.ObterTodosAsync(filter);
+        return RespostaPadraoApi(data: cursos);
     }
 
     /// <summary>
@@ -95,18 +81,11 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
     {
-        try
-        {
-            if (categoriaId == Guid.Empty)
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria inválido");
+        if (categoriaId == Guid.Empty)
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria inválido");
 
-            var cursos = await _cursoAppService.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
-            return RespostaPadraoApi(data: cursos);
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        var cursos = await _cursoAppService.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
+        return RespostaPadraoApi(data: cursos);
     }
 
     /// <summary>
@@ -119,15 +98,8 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> CadastrarCurso([FromBody] CadastroCursoDto dto)
     {
-        try
-        {
-            var command = dto.Adapt<CadastrarCursoCommand>();
-            return RespostaPadraoApi<Guid>(await _mediator.ExecutarComando(command));
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        var command = dto.Adapt<CadastrarCursoCommand>();
+        return RespostaPadraoApi<Guid>(await _mediator.ExecutarComando(command));
     }
 
     /// <summary>
@@ -141,22 +113,15 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AtualizarCurso([FromRoute] Guid id, [FromBody] AtualizarCursoDto dto)
     {
-        try
-        {
-            if (!ModelState.IsValid)
-                return RespostaPadraoApi<CommandResult>(ModelState);
+        if (!ModelState.IsValid)
+            return RespostaPadraoApi<CommandResult>(ModelState);
 
-            if (id != dto.Id)
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do curso não confere");
+        if (id != dto.Id)
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do curso não confere");
 
-            var command = dto.Adapt<AtualizarCursoCommand>();
+        var command = dto.Adapt<AtualizarCursoCommand>();
 
-            return RespostaPadraoApi<CursoDto>(await _mediator.ExecutarComando(command));
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        return RespostaPadraoApi<CursoDto>(await _mediator.ExecutarComando(command));
     }
 
     /// <summary>
@@ -170,15 +135,8 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ExcluirCurso([FromRoute] Guid id)
     {
-        try
-        {   
-            var command = new ExcluirCursoCommand(id);
-            return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
-        }
-        catch (Exception ex)
-        {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+        var command = new ExcluirCursoCommand(id);
+        return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
     }
 
     /// <summary>
@@ -192,33 +150,26 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterConteudoProgramatico([FromRoute] Guid id)
     {
-        try
+        var curso = await _cursoAppService.ObterPorIdAsync(id);
+        if (curso == null)
         {
-            var curso = await _cursoAppService.ObterPorIdAsync(id);
-            if (curso == null)
-            {
-                _notificador.AdicionarErro("Curso não encontrado.");
-                return RespostaPadraoApi<string>();
-            }
-
-            var conteudoProgramatico = new ConteudoProgramaticoDto
-            {
-                Resumo = curso.Resumo,
-                Descricao = curso.Descricao,
-                Objetivos = curso.Objetivos,
-                PreRequisitos = curso.PreRequisitos,
-                PublicoAlvo = curso.PublicoAlvo,
-                Metodologia = curso.Metodologia,
-                Recursos = curso.Recursos,
-                Avaliacao = curso.Avaliacao,
-                Bibliografia = curso.Bibliografia
-            };
-
-            return RespostaPadraoApi(data: conteudoProgramatico);
+            _notificador.AdicionarErro("Curso não encontrado.");
+            return RespostaPadraoApi<string>();
         }
-        catch (Exception ex)
+
+        var conteudoProgramatico = new ConteudoProgramaticoDto
         {
-            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-        }
+            Resumo = curso.Resumo,
+            Descricao = curso.Descricao,
+            Objetivos = curso.Objetivos,
+            PreRequisitos = curso.PreRequisitos,
+            PublicoAlvo = curso.PublicoAlvo,
+            Metodologia = curso.Metodologia,
+            Recursos = curso.Recursos,
+            Avaliacao = curso.Avaliacao,
+            Bibliografia = curso.Bibliografia
+        };
+
+        return RespostaPadraoApi(data: conteudoProgramatico);
     }
 }

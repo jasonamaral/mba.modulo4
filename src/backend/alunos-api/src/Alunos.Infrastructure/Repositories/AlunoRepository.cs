@@ -21,7 +21,7 @@ public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
 
     public async Task AtualizarAsync(Aluno aluno)
     {
-        aluno.RegistrarDataAlteracao();
+        aluno.AtualizarDataModificacao();
         _context.Alunos.Update(aluno);
         await Task.CompletedTask;
     }

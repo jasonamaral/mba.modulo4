@@ -14,37 +14,36 @@ using Core.Messages;
 using Core.Utils;
 using MediatR;
 
-namespace Conteudo.API.Configuration
+namespace Conteudo.API.Configuration;
+
+/// <summary>
+/// Configura injeção de dependências para a API de Conteúdo
+/// </summary>
+public static class DependencyInjectionConfig
 {
-    /// <summary>
-    /// Configura injeção de dependências para a API de Conteúdo
-    /// </summary>
-    public static class DependencyInjectionConfig
+    public static void RegisterServices(this IServiceCollection services)
     {
-        public static void RegisterServices(this IServiceCollection services)
-        {
-            // Application
-            services.AddScoped<IMediatorHandler, MediatorHandler>();
+        // Application
+        services.AddScoped<IMediatorHandler, MediatorHandler>();
 
-            // Commands
-            services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
-            services.AddScoped<IRequestHandler<CadastrarCursoCommand, CommandResult>, CadastrarCursoCommandHandler>();
-            services.AddScoped<IRequestHandler<CadastrarCategoriaCommand, CommandResult>, CadastrarCategoriaCommandHandler>();
-            services.AddScoped<IRequestHandler<AtualizarCursoCommand, CommandResult>, AtualizarCursoCommandHandler>();
-            services.AddScoped<IRequestHandler<AtualizarCategoriaCommand, CommandResult>, AtualizarCategoriaCommandHandler>();
-            services.AddScoped<IRequestHandler<ExcluirCursoCommand, CommandResult>, ExcluirCursoCommandHandler>();
+        // Commands
+        services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
+        services.AddScoped<IRequestHandler<CadastrarCursoCommand, CommandResult>, CadastrarCursoCommandHandler>();
+        services.AddScoped<IRequestHandler<CadastrarCategoriaCommand, CommandResult>, CadastrarCategoriaCommandHandler>();
+        services.AddScoped<IRequestHandler<AtualizarCursoCommand, CommandResult>, AtualizarCursoCommandHandler>();
+        services.AddScoped<IRequestHandler<AtualizarCategoriaCommand, CommandResult>, AtualizarCategoriaCommandHandler>();
+        services.AddScoped<IRequestHandler<ExcluirCursoCommand, CommandResult>, ExcluirCursoCommandHandler>();
 
-            // Services
-            services.AddScoped<ICursoQuery, CursoQueryService>();
-            services.AddScoped<ICategoriaAppService, CategoriaAppService>();
+        // Services
+        services.AddScoped<ICursoQuery, CursoQueryService>();
+        services.AddScoped<ICategoriaAppService, CategoriaAppService>();
 
-            // Data
-            services.AddScoped<ICursoRepository, CursoRepository>();
-            services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-            services.AddScoped<ConteudoDbContext>();
+        // Data
+        services.AddScoped<ICursoRepository, CursoRepository>();
+        services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+        services.AddScoped<ConteudoDbContext>();
 
-            // Notification
-            services.RegisterNotification();
-        }
+        // Notification
+        services.RegisterNotification();
     }
 }

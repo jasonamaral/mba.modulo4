@@ -1,9 +1,9 @@
 ﻿using Microsoft.OpenApi.Models;
 using System.Reflection;
 
-namespace Conteudo.API.Extensions;
+namespace Conteudo.API.Configuration;
 
-public static class SwaggerExtensions
+public static class SwaggerConfiguration
 {
     public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
     {

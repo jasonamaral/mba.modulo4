@@ -29,7 +29,7 @@ public class AlunosController(IAlunoService aulaService,
 
     #region Gets
     [Authorize(Roles = "Usuario")]
-    [HttpGet("{id}")]
+    [HttpGet("{alunoId}")]
     [ProducesResponseType(typeof(ResponseResult<AlunoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     public async Task<IActionResult> ObterAlunoPorIdAsync(Guid alunoId)
@@ -50,7 +50,7 @@ public class AlunosController(IAlunoService aulaService,
     }
 
     [Authorize(Roles = "Usuario")]
-    [HttpGet("{id}/evolucao")]
+    [HttpGet("{alunoId}/evolucao")]
     [ProducesResponseType(typeof(ResponseResult<EvolucaoAlunoDto>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     public async Task<IActionResult> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid alunoId)
