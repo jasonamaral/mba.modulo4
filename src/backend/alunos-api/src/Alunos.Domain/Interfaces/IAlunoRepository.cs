@@ -6,12 +6,12 @@ namespace Alunos.Domain.Interfaces;
 public interface IAlunoRepository : IRepository<Aluno>
 {
     #region Aluno
-    Task<Entities.Aluno> ObterPorIdAsync(Guid alunoId);
-    Task<Entities.Aluno> ObterPorEmailAsync(string email);
-    Task<Entities.Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario);
+    Task<Aluno> ObterPorIdAsync(Guid alunoId);
+    Task<Aluno> ObterPorEmailAsync(string email);
+    Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario);
     Task<bool> ExisteEmailAsync(string email);
-    Task AdicionarAsync(Entities.Aluno aluno);
-    Task AtualizarAsync(Entities.Aluno aluno);
+    Task AdicionarAsync(Aluno aluno);
+    Task AtualizarAsync(Aluno aluno);
     #endregion
 
     #region Matrícula

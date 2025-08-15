@@ -1,7 +1,7 @@
 ﻿using Alunos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Conteudo.API.Configuration;
+namespace Alunos.API.Helpers;
 public static class DbMigrationHelpers
 {
     public static void UseDbMigrationHelper(this WebApplication app)
@@ -29,7 +29,6 @@ public static class DbMigrationHelpers
 
     private static async Task EnsureSeedData(AlunoDbContext context)
     {   
-        await context.Database.EnsureDeletedAsync();
         await context.Database.MigrateAsync();
 
         //// Categoria

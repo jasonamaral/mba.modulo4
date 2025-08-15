@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Auth.Infrastructure.Migrations
+namespace Auth.Infrastructure.Migrations.Sqlite
 {
     [DbContext(typeof(AuthDbContext))]
     partial class AuthDbContextModelSnapshot : ModelSnapshot
@@ -29,7 +29,6 @@ namespace Auth.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("CEP")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
@@ -39,7 +38,6 @@ namespace Auth.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Cidade")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
@@ -61,7 +59,6 @@ namespace Auth.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Estado")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
@@ -70,7 +67,6 @@ namespace Auth.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Genero")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
@@ -112,7 +108,6 @@ namespace Auth.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Telefone")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
@@ -148,7 +143,6 @@ namespace Auth.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

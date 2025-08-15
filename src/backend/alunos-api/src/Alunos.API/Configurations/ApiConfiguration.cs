@@ -1,16 +1,16 @@
 ﻿using Alunos.API.Configurations;
+using Alunos.API.Filters;
 using Alunos.Application.Commands.AtualizarPagamento;
-using Conteudo.API.Configuration;
 using Core.Identidade;
 using Mapster;
+using System.Text.Json;
 
 namespace Alunos.API.Configurations;
 public static class ApiConfiguration
 {
     public static WebApplicationBuilder AddApiConfiguration(this WebApplicationBuilder builder)
     {
-        return builder
-            .AddConfiguration()
+        return builder.AddConfiguration()
             .AddDbContextConfiguration()
             .AddControllersConfiguration()
             .AddHttpContextAccessorConfiguration()
@@ -33,8 +33,21 @@ public static class ApiConfiguration
 
     private static WebApplicationBuilder AddControllersConfiguration(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers()
-            .ConfigureApiBehaviorOptions(opt => opt.SuppressModelStateInvalidFilter = true);
+        builder.Services.AddControllers(options =>
+        {
+            options.Filters.Add<DomainExceptionFilter>();
+            options.Filters.Add<ExceptionFilter>();
+        }).ConfigureApiBehaviorOptions(opt =>
+        {
+            opt.SuppressModelStateInvalidFilter = true;
+        }).AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.WriteIndented = false;
+            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        });
+            
         return builder;
     }
 

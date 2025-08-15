@@ -29,11 +29,6 @@ public class CadastrarCursoCommand : CommandRaiz
         // TODO :: Karina, podemos falar depois deste ponto? O Command precisa de uma raiz de agregação, normalmente o ID
         DefinirRaizAgregacao(Guid.NewGuid());
     }
-    //public override bool EhValido()
-    //{
-    //    CommandResult = new CommandResult(new CadastrarCursoCommandValidator().Validate(this));
-    //    return CommandResult.Success;
-    //}
 }
 
 

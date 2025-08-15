@@ -10,82 +10,68 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-namespace BFF.API.Controllers
+namespace BFF.API.Controllers;
+
+/// <summary>
+/// Controller de Pagamentos no BFF - Orquestra chamadas para Pagamento API
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+//[Authorize]
+public class PagamentosController : BffController
 {
-    /// <summary>
-    /// Controller de Pagamentos no BFF - Orquestra chamadas para Pagamento API
-    /// </summary>
-    [ApiController]
-    [Route("api/[controller]")]
-    //[Authorize]
-    public class PagamentosController : BffController
+
+    private readonly IApiClientService _apiClient;
+    private readonly ApiSettings _apiSettings;
+    private readonly ILogger<PagamentosController> _logger;
+
+    public PagamentosController(IApiClientService apiClient,
+                                IOptions<ApiSettings> apiSettings,
+                                ILogger<PagamentosController> logger,
+                                IMediatorHandler mediator,
+                                INotificationHandler<DomainNotificacaoRaiz> notifications,
+                                INotificador notificador) : base(mediator, notifications, notificador)
     {
+        _apiClient = apiClient;
+        _apiSettings = apiSettings.Value;
+        _logger = logger;
+    }
 
-        private readonly IApiClientService _apiClient;
-        private readonly ApiSettings _apiSettings;
-        private readonly ILogger<PagamentosController> _logger;
-
-        public PagamentosController(IApiClientService apiClient,
-                                    IOptions<ApiSettings> apiSettings,
-                                    ILogger<PagamentosController> logger,
-                                    IMediatorHandler mediator,
-                                    INotificationHandler<DomainNotificacaoRaiz> notifications,
-                                    INotificador notificador) : base(mediator, notifications, notificador)
+    //[Authorize(Roles = "Administrador")]
+    [HttpPost("pagamento")]
+    public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
+    {
+        var userId = User.GetUserId();
+        if (userId == Guid.Empty)
         {
-            _apiClient = apiClient;
-            _apiSettings = apiSettings.Value;
-            _logger = logger;
+            return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
         }
 
-        //[Authorize(Roles = "Administrador")]
-        [HttpPost("pagamento")]
-        public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
+        var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+        _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
+        _apiClient.ClearDefaultHeaders();
+        _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
+        _apiClient.AddDefaultHeader("Accept", "application/json");
+        _apiClient.AddDefaultHeader("Content-Type", "application/json");
+
+        var _pagamento = pagamento;
+
+        var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<string>>("/api/v1/pagamentos/pagamento", null);
+
+        if (apiResponse.IsSuccess)
         {
-
-            try
-            {
-                var userId = User.GetUserId();
-                if (userId == Guid.Empty)
-                {
-                    return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
-                }
-
-                var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-                _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-                _apiClient.ClearDefaultHeaders();
-                _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
-                _apiClient.AddDefaultHeader("Accept", "application/json");
-                _apiClient.AddDefaultHeader("Content-Type", "application/json");
-
-                var _pagamento = pagamento;
-
-                var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<string>>("/api/v1/pagamentos/pagamento", null);
-
-                if (apiResponse.IsSuccess)
-                {
-                    return Ok(apiResponse.Data);
-                }
-
-                if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-                {
-                    return StatusCode(apiResponse.StatusCode, new ResponseResult<string>
-                    {
-                        Status = apiResponse.StatusCode,
-                        Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
-                    });
-                }
-
-                return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Erro desconhecido na API de pagamentos");
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao processar pagamento via BFF");
-                return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
-            }
-
+            return Ok(apiResponse.Data);
         }
 
+        if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+        {
+            return StatusCode(apiResponse.StatusCode, new ResponseResult<string>
+            {
+                Status = apiResponse.StatusCode,
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+            });
+        }
 
+        return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Erro desconhecido na API de pagamentos");
     }
 }

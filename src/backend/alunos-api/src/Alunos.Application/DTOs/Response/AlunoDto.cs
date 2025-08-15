@@ -1,6 +1,4 @@
-﻿//using Plataforma.Educacao.Core.SharedDto.Aluno;
-
-namespace Alunos.Application.DTOs.Response;
+﻿namespace Alunos.Application.DTOs.Response;
 public class AlunoDto
 {
     public Guid Id { get; set; }

@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Auth.Infrastructure.Migrations
+namespace Auth.Infrastructure.Migrations.Sqlite
 {
     /// <inheritdoc />
     public partial class InitialSqlite : Migration
@@ -32,11 +33,11 @@ namespace Auth.Infrastructure.Migrations
                     Nome = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     DataNascimento = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CPF = table.Column<string>(type: "TEXT", maxLength: 14, nullable: false),
-                    Telefone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Genero = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Cidade = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Estado = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    CEP = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    Telefone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
+                    Genero = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
+                    Cidade = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Estado = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    CEP = table.Column<string>(type: "TEXT", maxLength: 10, nullable: true),
                     Foto = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     DataCadastro = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
@@ -67,7 +68,7 @@ namespace Auth.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Username = table.Column<string>(type: "TEXT", nullable: false),
+                    Username = table.Column<string>(type: "TEXT", nullable: true),
                     Token = table.Column<Guid>(type: "TEXT", nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },

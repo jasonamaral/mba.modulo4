@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -28,7 +29,7 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                     Cep = table.Column<string>(type: "Varchar", maxLength: 8, nullable: false),
                     Foto = table.Column<string>(type: "Varchar", maxLength: 1024, nullable: true),
                     DataCriacao = table.Column<DateTime>(type: "DateTime", nullable: false),
-                    DataAlteracao = table.Column<DateTime>(type: "DateTime", nullable: false)
+                    DataAlteracao = table.Column<DateTime>(type: "DateTime", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -48,8 +49,8 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                     DataConclusao = table.Column<DateTime>(type: "SmallDateTime", nullable: true),
                     EstadoMatricula = table.Column<int>(type: "TinyInt", nullable: false),
                     Observacao = table.Column<string>(type: "Varchar", maxLength: 2000, nullable: true),
-                    DataCriacao = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    DataAlteracao = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    DataCriacao = table.Column<DateTime>(type: "DateTime", nullable: false),
+                    DataAlteracao = table.Column<DateTime>(type: "DateTime", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -76,7 +77,7 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                     PathCertificado = table.Column<string>(type: "Varchar", maxLength: 1024, nullable: false),
                     NomeInstrutor = table.Column<string>(type: "Varchar", maxLength: 100, nullable: false),
                     DataCriacao = table.Column<DateTime>(type: "DateTime", nullable: false),
-                    DataAlteracao = table.Column<DateTime>(type: "DateTime", nullable: false)
+                    DataAlteracao = table.Column<DateTime>(type: "DateTime", nullable: true)
                 },
                 constraints: table =>
                 {

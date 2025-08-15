@@ -25,7 +25,8 @@ public class ApiClientService : IApiClientService, IDisposable
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = false,
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
         };
     }
 
@@ -50,7 +51,7 @@ public class ApiClientService : IApiClientService, IDisposable
     {
         try
         {
-            var apiResponse = await GetAsyncWithDetails<T>(endpoint);
+            var apiResponse = await GetWithDetailsAsync<T>(endpoint);
             return apiResponse.IsSuccess ? apiResponse.Data : null;
         }
         catch (Exception ex)
@@ -60,7 +61,7 @@ public class ApiClientService : IApiClientService, IDisposable
         }
     }
 
-    public async Task<ApiResponse<TResponse>> GetAsyncWithDetails<TResponse>(string endpoint)
+    public async Task<ApiResponse<TResponse>> GetWithDetailsAsync<TResponse>(string endpoint)
         where TResponse : class
     {
         try
@@ -119,7 +120,7 @@ public class ApiClientService : IApiClientService, IDisposable
             {
                 try
                 {
-                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent);
+                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent, _jsonOptions);
                     return ApiActionResult<TResponse>.ErrorResult(apiResponse.StatusCode, "Erro na API", errorResponse);
                 }
                 catch
@@ -158,7 +159,7 @@ public class ApiClientService : IApiClientService, IDisposable
             {
                 try
                 {
-                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent);
+                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent, _jsonOptions);
                     return ApiActionResult<TResponse>.ErrorResult(apiResponse.StatusCode, "Erro na API", errorResponse);
                 }
                 catch

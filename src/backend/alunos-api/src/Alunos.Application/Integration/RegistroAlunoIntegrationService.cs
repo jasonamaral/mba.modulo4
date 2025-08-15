@@ -27,8 +27,6 @@ public class RegistroAlunoIntegrationService(IMediatorHandler mediatorHandler,
                 message.Estado,
                 message.Cep,
                 message.Foto
-                //message.EhAdministrador,
-                //message.DataCadastro
             );
 
             var resultado = await _mediatorHandler.EnviarComando(registrarClienteCommand);

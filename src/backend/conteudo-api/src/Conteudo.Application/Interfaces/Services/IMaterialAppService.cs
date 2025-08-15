@@ -1,4 +1,3 @@
-using Conteudo.Application.DTOs;
 using Core.SharedDtos.Conteudo;
 
 namespace Conteudo.Application.Interfaces.Services;

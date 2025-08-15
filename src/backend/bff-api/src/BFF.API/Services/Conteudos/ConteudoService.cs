@@ -6,11 +6,10 @@ using BFF.Infrastructure.Services;
 using Core.Communication;
 using Core.Communication.Filters;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace BFF.API.Services.Conteudos;
 
-public class ConteudoService : BaseApiService, IConteudoService
+public partial class ConteudoService : BaseApiService, IConteudoService
 {
     private readonly ApiSettings _apiSettings;
 
@@ -20,210 +19,93 @@ public class ConteudoService : BaseApiService, IConteudoService
         ILogger<ConteudoService> logger) : base(apiClient, logger)
     {
         _apiSettings = apiSettings.Value;
+        _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
     }
 
-    public async Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, bool includeAulas = false)
+    public async Task<ResponseResult<CursoDto>> ObterCursoPorIdAsync(Guid cursoId, bool includeAulas = false)
     {
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            
-            var url = includeAulas ? $"api/cursos/{cursoId}?includeAulas=true" : $"api/cursos/{cursoId}";
-            return await _apiClient.GetAsync<ResponseResult<CursoDto>>(url);
-        }, nameof(ObterCursoPorId), cursoId);
+        var result = await ExecuteWithErrorHandling(() => ObterCursoPorId(cursoId, includeAulas),
+            nameof(ObterCursoPorIdAsync),
+            cursoId);
 
-        return result ?? new ResponseResult<CursoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        return result ?? ReturnUnknowError<CursoDto>();
     }
 
-    public async Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursos(CursoFilter filter)
+    public async Task<ResponseResult<PagedResult<CursoDto>>> ObterTodosCursosAsync(CursoFilter filter)
     {
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
+        var result = await ExecuteWithErrorHandling(() => ObterTodosCursos(filter),
+            nameof(ObterTodosCursosAsync),
+            Guid.NewGuid());
 
-            var queryParams = new Dictionary<string, string?>
-            {
-                [nameof(CursoFilter.PageSize)] = filter.PageSize > 0 ? filter.PageSize.ToString() : null,
-                [nameof(CursoFilter.PageIndex)] = filter.PageIndex > 0 ? filter.PageIndex.ToString() : null,
-                [nameof(CursoFilter.Query)] = string.IsNullOrWhiteSpace(filter.Query) ? null : filter.Query,
-                [nameof(CursoFilter.IncludeAulas)] = filter.IncludeAulas.ToString().ToLowerInvariant(),
-                [nameof(CursoFilter.Ativos)] = filter.Ativos.ToString().ToLowerInvariant()
-            }!;
-
-            var filteredParams = queryParams
-                .Where(p => p.Value is not null)
-                .ToDictionary(p => p.Key, p => p.Value);
-
-            var url = QueryHelpers.AddQueryString("api/cursos", filteredParams);
-            return await _apiClient.GetAsync<ResponseResult<PagedResult<CursoDto>>>(url);
-        }, nameof(ObterTodosCursos));
-
-        return result ?? new ResponseResult<PagedResult<CursoDto>>
-        {
-            Status = 500,
-            Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } }
-        };
+        return result ?? ReturnUnknowError<PagedResult<CursoDto>>();
     }
-    public async Task<ResponseResult<ConteudoProgramaticoDto>> ObterConteudoProgramaticoPorCursoId(Guid cursoId, bool includeAulas = false)
+
+    public async Task<ResponseResult<ConteudoProgramaticoDto>> ObterConteudoProgramaticoPorCursoIdAsync(Guid cursoId, bool includeAulas = false)
     {
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            
-            return await _apiClient.GetAsync<ResponseResult<ConteudoProgramaticoDto>>($"api/cursos/{cursoId}/conteudo-programatico");
-        }, nameof(ObterConteudoProgramaticoPorCursoId), cursoId);
-        return result ?? new ResponseResult<ConteudoProgramaticoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        var result = await ExecuteWithErrorHandling(() => ObterConteudoProgramaticoPorCursoId(cursoId, includeAulas),
+            nameof(ObterConteudoProgramaticoPorCursoIdAsync),
+            cursoId);
+
+        return result ?? ReturnUnknowError<ConteudoProgramaticoDto>();
     }
 
-    public async Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso)
+    public async Task<ResponseResult<Guid>> AdicionarCursoAsync(CursoCriarRequest curso)
     {
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            
-            var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<Guid>>("api/cursos", curso);
-            
-            if (apiResponse.IsSuccess)
-            {
-                return apiResponse.Data;
-            }
-            
-            // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-				try
-				{
-					var genericError = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<object>>(apiResponse.ErrorContent,
-						new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-					var mapped = new ResponseResult<Guid>
-					{
-						Title = genericError?.Title,
-						Status = genericError?.Status ?? apiResponse.StatusCode,
-						Errors = genericError?.Errors ?? new ResponseErrorMessages { Mensagens = new List<string> { "Erro ao interpretar resposta da API" } }
-					};
-					return mapped;
-				}
-                catch
-                {
-                    return new ResponseResult<Guid> 
-                    { 
-                        Status = apiResponse.StatusCode, 
-                        Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } } 
-                    };
-                }
-            }
-            
-            return new ResponseResult<Guid> 
-            { 
-                Status = apiResponse.StatusCode, 
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } } 
-            };
-        }, nameof(AdicionarCurso), curso.Nome);
+        var result = await ExecuteWithErrorHandling(() => AdicionarCurso(curso),
+            nameof(AdicionarCursoAsync),
+            Guid.NewGuid());
 
-        return result ?? new ResponseResult<Guid> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        return result ?? ReturnUnknowError<Guid>();
     }
 
-    public async Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso)
+    public async Task<ResponseResult<CursoDto>> AtualizarCursoAsync(Guid id, AtualizarCursoRequest curso)
     {
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            
-            var apiResponse = await _apiClient.PutAsyncWithDetails<AtualizarCursoRequest, ResponseResult<CursoDto>>($"api/cursos/{id}", curso);
-            
-            if (apiResponse.IsSuccess)
-            {
-                return apiResponse.Data;
-            }
-            
-            // Se não foi sucesso, criar um ResponseResult com o erro da API chamada
-            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-            {
-				try
-				{
-					var genericError = System.Text.Json.JsonSerializer.Deserialize<ResponseResult<object>>(apiResponse.ErrorContent,
-						new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-					var mapped = new ResponseResult<CursoDto>
-					{
-						Title = genericError?.Title,
-						Status = genericError?.Status ?? apiResponse.StatusCode,
-						Errors = genericError?.Errors ?? new ResponseErrorMessages { Mensagens = new List<string> { "Erro ao interpretar resposta da API" } }
-					};
-					return mapped;
-				}
-                catch
-                {
-                    return new ResponseResult<CursoDto> 
-                    { 
-                        Status = apiResponse.StatusCode, 
-                        Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } } 
-                    };
-                }
-            }
-            
-            return new ResponseResult<CursoDto> 
-            { 
-                Status = apiResponse.StatusCode, 
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } } 
-            };
-        }, nameof(AtualizarCurso), id);
+        var result = await ExecuteWithErrorHandling(() => AtualizarCurso(id, curso),
+            nameof(AtualizarCursoAsync),
+            id);
 
-        return result ?? new ResponseResult<CursoDto> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        return result ?? ReturnUnknowError<CursoDto>();
     }
 
-    public async Task<ResponseResult<bool>> ExcluirCurso(Guid cursoId)
+    public async Task<ResponseResult<bool>> ExcluirCursoAsync(Guid cursoId)
     {
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            var apiResponse = await _apiClient.DeleteAsync($"api/cursos/{cursoId}");
-            if (apiResponse)
-            {
-                return new ResponseResult<bool> { Status = 200, Data = true };
-            }
-            return new ResponseResult<bool> 
-            { 
-                Status = 400, 
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro ao excluir o curso" } } 
-            };
-        }, nameof(ExcluirCurso), cursoId);
-        return result ?? new ResponseResult<bool> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        var result = await ExecuteWithErrorHandling(() => ExcluirCurso(cursoId),
+            nameof(ExcluirCursoAsync),
+            cursoId);
+
+        return result ?? ReturnUnknowError<bool>();
     }
 
-    public Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaDto aula)
+    public Task<ResponseResult<Guid>> AdicionarAulaAsync(Guid cursoId, AulaDto aula)
     {
         throw new NotImplementedException();
     }
 
-    public Task<ResponseResult<AulaDto>> AtualizarAula(Guid cursoId, AulaDto aula)
+    public Task<ResponseResult<AulaDto>> AtualizarAulaAsync(Guid cursoId, AulaDto aula)
     {
         throw new NotImplementedException();
     }
 
-    public Task<ResponseResult<bool>> ExcluirAula(Guid cursoId, Guid aulaId)
+    public Task<ResponseResult<bool>> ExcluirAulaAsync(Guid cursoId, Guid aulaId)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaId(Guid categoriaId, bool includeAulas = false)
+    public async Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)
     {
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            var url = includeAulas ? $"api/cursos/categoria/{categoriaId}?includeAulas=true" : $"api/cursos/categoria/{categoriaId}";
-            return await _apiClient.GetAsync<ResponseResult<IEnumerable<CursoDto>>>(url);
-        }, nameof(ObterPorCategoriaId), categoriaId);
-        return result ?? new ResponseResult<IEnumerable<CursoDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        var result = await ExecuteWithErrorHandling(() => ObterPorCategoriaId(categoriaId, includeAulas),
+            nameof(ObterPorCategoriaIdAsync),
+            categoriaId);
+
+        return result ?? ReturnUnknowError<IEnumerable<CursoDto>>();
     }
 
-    public async Task<ResponseResult<IEnumerable<CategoriaDto>>> ObterTodasCategorias()
+    public async Task<ResponseResult<IEnumerable<CategoriaDto>>> ObterTodasCategoriasAsync()
     {
-        var result = await ExecuteWithErrorHandling(async () =>
-        {
-            _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
-            var url = $"api/categoria";
-            return await _apiClient.GetAsync<ResponseResult<IEnumerable<CategoriaDto>>>(url);
-        }, nameof(ObterPorCategoriaId));
-        return result ?? new ResponseResult<IEnumerable<CategoriaDto>> { Status = 500, Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro interno do servidor" } } };
+        var result = await ExecuteWithErrorHandling(() => ObterTodasCategorias(),
+            nameof(ObterTodasCategoriasAsync),
+            Guid.NewGuid());
+
+        return result ?? ReturnUnknowError<IEnumerable<CategoriaDto>>();
     }
 }

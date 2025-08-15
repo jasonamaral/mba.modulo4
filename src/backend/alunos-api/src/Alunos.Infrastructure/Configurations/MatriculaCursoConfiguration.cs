@@ -84,6 +84,15 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
             ha.HasIndex(x => x.CursoId).HasDatabaseName("HistoricosAprendizadoCursoIdIDX");
             ha.HasIndex(x => x.AulaId).HasDatabaseName("HistoricosAprendizadoAulaIdIDX");
         });
+
+        builder.Property(x => x.CreatedAt)
+            .HasColumnName("DataCriacao")
+            .HasColumnType(DatabaseTypeConstant.DateTime)
+            .IsRequired();
+
+        builder.Property(x => x.UpdatedAt)
+            .HasColumnName("DataAlteracao")
+            .HasColumnType(DatabaseTypeConstant.DateTime);
         #endregion Mapping columns
 
         #region Indexes

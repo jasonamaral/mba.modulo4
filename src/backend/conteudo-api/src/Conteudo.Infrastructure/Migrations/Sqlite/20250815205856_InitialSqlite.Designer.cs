@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Conteudo.Infrastructure.Migrations.Sqlite
 {
     [DbContext(typeof(ConteudoDbContext))]
-    [Migration("20250811165017_InitialSqlite")]
+    [Migration("20250815205856_InitialSqlite")]
     partial class InitialSqlite
     {
         /// <inheritdoc />
@@ -24,20 +24,24 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("UniqueIdentifier")
+                        .HasColumnName("AulaId");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataCriacao");
 
                     b.Property<Guid>("CursoId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("UniqueIdentifier");
 
                     b.Property<DateTime?>("DataPublicacao")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Descricao")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(1024)
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Descricao");
 
                     b.Property<int>("DuracaoMinutos")
                         .HasColumnType("INTEGER");
@@ -51,37 +55,48 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Nome");
 
                     b.Property<int>("Numero")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Observacoes")
-                        .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Observacoes");
 
                     b.Property<string>("TipoAula")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("TipoAula");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataAlteracao");
 
                     b.Property<string>("VideoUrl")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("VideoUrl");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("AulasPK");
 
-                    b.HasIndex("IsPublicada");
+                    b.HasIndex("IsPublicada")
+                        .HasDatabaseName("AlunosIsPublicadaIDX");
 
-                    b.HasIndex("TipoAula");
+                    b.HasIndex("Nome")
+                        .HasDatabaseName("AlunosNomeIDX");
+
+                    b.HasIndex("TipoAula")
+                        .HasDatabaseName("AlunosTipoAulaIDX");
 
                     b.HasIndex("CursoId", "Numero")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("AlunosCursoIdNumeroIDX");
 
                     b.ToTable("Aulas", (string)null);
                 });
@@ -90,24 +105,29 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("UniqueIdentifier")
+                        .HasColumnName("CategoriaId");
 
                     b.Property<string>("Cor")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Cor");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataCriacao");
 
                     b.Property<string>("Descricao")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(0)
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Descricao");
 
                     b.Property<string>("IconeUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("IconeUrl");
 
                     b.Property<bool>("IsAtiva")
                         .HasColumnType("INTEGER");
@@ -115,66 +135,78 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Nome");
 
                     b.Property<int>("Ordem")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataAlteracao");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("CategoriaPK");
 
-                    b.HasIndex("IsAtiva");
+                    b.HasIndex("IsAtiva")
+                        .HasDatabaseName("CategoriaIsAtivaIDX");
 
                     b.HasIndex("Nome")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("CategoriaNomeIDX");
 
-                    b.HasIndex("Ordem");
+                    b.HasIndex("Ordem")
+                        .HasDatabaseName("CategoriaOrdemIDX");
 
-                    b.ToTable("Categorias", (string)null);
+                    b.ToTable("Categoria", (string)null);
                 });
 
             modelBuilder.Entity("Conteudo.Domain.Entities.Curso", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("UniqueIdentifier")
+                        .HasColumnName("CursoId");
 
                     b.Property<bool>("Ativo")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("CategoriaId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("UniqueIdentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataCriacao");
 
                     b.Property<int>("DuracaoHoras")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ImagemUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("ImagemUrl");
 
                     b.Property<string>("Instrutor")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Instrutor");
 
                     b.Property<string>("Nivel")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Nivel");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Nome");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataAlteracao");
 
                     b.Property<int>("VagasMaximas")
                         .HasColumnType("INTEGER");
@@ -186,18 +218,22 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Valor")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("Money")
+                        .HasColumnName("Valor");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("CursosPK");
 
-                    b.HasIndex("Ativo");
-
-                    b.HasIndex("CategoriaId");
+                    b.HasIndex("CategoriaId")
+                        .HasDatabaseName("CursoCategoriaIdIDX");
 
                     b.HasIndex("Nome")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("CursoNomeIDX");
 
-                    b.HasIndex("ValidoAte");
+                    b.HasIndex("ValidoAte")
+                        .HasDatabaseName("CursoValidoAteIDX");
 
                     b.ToTable("Cursos", (string)null);
                 });
@@ -206,22 +242,26 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("UniqueIdentifier")
+                        .HasColumnName("MaterialId");
 
                     b.Property<Guid>("AulaId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("UniqueIdentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataCriacao");
 
                     b.Property<string>("Descricao")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(0)
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Descricao");
 
                     b.Property<string>("Extensao")
-                        .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Extensao");
 
                     b.Property<bool>("IsAtivo")
                         .HasColumnType("INTEGER");
@@ -232,7 +272,8 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Nome");
 
                     b.Property<int>("Ordem")
                         .HasColumnType("INTEGER");
@@ -243,26 +284,34 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                     b.Property<string>("TipoMaterial")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("TipoMaterial");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataAlteracao");
 
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("Varchar")
+                        .HasColumnName("Url");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("MateriaisPK");
 
-                    b.HasIndex("IsAtivo");
+                    b.HasIndex("IsAtivo")
+                        .HasDatabaseName("MaterialIsAtivoIDX");
 
-                    b.HasIndex("Ordem");
+                    b.HasIndex("Ordem")
+                        .HasDatabaseName("MaterialOrdemIDX");
 
-                    b.HasIndex("TipoMaterial");
+                    b.HasIndex("TipoMaterial")
+                        .HasDatabaseName("MaterialTipoMaterialIDX");
 
                     b.HasIndex("AulaId", "Nome")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("MaterialAulaIdNomeIDX");
 
                     b.ToTable("Materiais", (string)null);
                 });
@@ -288,51 +337,54 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
                     b.OwnsOne("Conteudo.Domain.ValueObjects.ConteudoProgramatico", "ConteudoProgramatico", b1 =>
                         {
                             b1.Property<Guid>("CursoId")
-                                .HasColumnType("TEXT");
+                                .HasColumnType("UniqueIdentifier");
 
                             b1.Property<string>("Avaliacao")
-                                .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(1024)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_Avaliacao");
 
                             b1.Property<string>("Bibliografia")
-                                .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(1024)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_Bibliografia");
 
                             b1.Property<string>("Descricao")
                                 .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(500)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_Descricao");
 
                             b1.Property<string>("Metodologia")
-                                .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(1024)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_Metodologia");
 
                             b1.Property<string>("Objetivos")
                                 .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(1024)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_Objetivos");
 
                             b1.Property<string>("PreRequisitos")
-                                .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(1024)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_PreRequisitos");
 
                             b1.Property<string>("PublicoAlvo")
-                                .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(1024)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_PublicoAlvo");
 
                             b1.Property<string>("Recursos")
-                                .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(1024)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_Recursos");
 
                             b1.Property<string>("Resumo")
                                 .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasMaxLength(250)
+                                .HasColumnType("Varchar")
                                 .HasColumnName("ConteudoProgramatico_Resumo");
 
                             b1.HasKey("CursoId");
@@ -345,8 +397,7 @@ namespace Conteudo.Infrastructure.Migrations.Sqlite
 
                     b.Navigation("Categoria");
 
-                    b.Navigation("ConteudoProgramatico")
-                        .IsRequired();
+                    b.Navigation("ConteudoProgramatico");
                 });
 
             modelBuilder.Entity("Conteudo.Domain.Entities.Material", b =>
