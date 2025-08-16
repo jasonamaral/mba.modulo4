@@ -57,8 +57,8 @@ public class Aluno : Entidade, IRaizAgregacao
 
     #region Métodos
     #region Manipuladores de Aluno
-    internal void AtivarAluno() => Ativo = true;
-    internal void InativarAluno() => Ativo = false;
+    public void AtivarAluno() => Ativo = true;
+    public void InativarAluno() => Ativo = false;
 
     internal void AtualizarNomeAluno(string nome)
     {
@@ -153,7 +153,7 @@ public class Aluno : Entidade, IRaizAgregacao
     #endregion
 
     #region Manipuladores de HistoricoAprendizado
-    public void RegistrarHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId, string nomeAula, byte cargaHoraria, DateTime? dataTermino = null)
+    public void RegistrarHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.RegistrarHistoricoAprendizado(aulaId, nomeAula, cargaHoraria, dataTermino);

@@ -264,8 +264,8 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                             b1.Property<Guid>("AulaId")
                                 .HasColumnType("UniqueIdentifier");
 
-                            b1.Property<byte>("CargaHoraria")
-                                .HasColumnType("TinyInt");
+                            b1.Property<int>("CargaHoraria")
+                                .HasColumnType("Int");
 
                             b1.Property<Guid>("CursoId")
                                 .HasColumnType("UniqueIdentifier");

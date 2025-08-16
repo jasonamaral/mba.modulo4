@@ -123,6 +123,7 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
 
     if (adminUser == null)
     {
+        #region Crio o ADMIN
         adminUser = new ApplicationUser
         {
             UserName = adminEmail,
@@ -137,5 +138,42 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
         {
             await userManager.AddToRoleAsync(adminUser, "Administrador");
         }
+        #endregion
+
+        #region Crio o aluno 1
+        var aluno1 = new ApplicationUser
+        {
+            Id = "06b1b8f1-f079-4048-9c8d-190c8056ea60",
+            UserName = "aluno1@auth.api",
+            Email = "aluno1@auth.api",
+            Nome = "Aluno UM do Sistema",
+            DataNascimento = new DateTime(1973, 1, 1),
+            EmailConfirmed = true
+        };
+
+        var resultAlunoUm = await userManager.CreateAsync(aluno1, "Teste@123");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(aluno1, "Usuario");
+        }
+        #endregion
+
+        #region Crio o aluno 1
+        var aluno2 = new ApplicationUser
+        {
+            Id = "ca39e314-c960-42bc-9c9d-3cad9b589a8d",
+            UserName = "aluno2@auth.api",
+            Email = "aluno2@auth.api",
+            Nome = "Aluno DOIS do Sistema",
+            DataNascimento = new DateTime(2016, 1, 1),
+            EmailConfirmed = true
+        };
+
+        var resultAlunoDois = await userManager.CreateAsync(aluno2, "Teste@123");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(aluno2, "Usuario");
+        }
+        #endregion
     }
 }

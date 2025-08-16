@@ -9,7 +9,7 @@ public class HistoricoAprendizado
     public Guid CursoId { get; }
     public Guid AulaId { get; }
     public string NomeAula { get; }
-    public byte CargaHoraria { get; }
+    public int CargaHoraria { get; }
     public DateTime DataInicio { get; }
     public DateTime? DataTermino { get; }
     #endregion
@@ -22,7 +22,7 @@ public class HistoricoAprendizado
         Guid cursoId,
         Guid aulaId,
         string nomeAula,
-        byte cargaHoraria,
+        int cargaHoraria,
         DateTime? dataInicio = null,
         DateTime? dataTermino = null)
     {
@@ -51,7 +51,7 @@ public class HistoricoAprendizado
         ValidacaoData.DeveSerValido(DataInicio, "Data de início é inválida", validacao);
         ValidacaoData.DeveSerMenorQue(DataInicio, DateTime.Now, "Data de início não pode ser superior à data atual", validacao);
         ValidacaoNumerica.DeveSerMaiorQueZero(CargaHoraria, "Carga horária deve ser maior que zero", validacao);
-        ValidacaoNumerica.DeveEstarEntre(CargaHoraria, 1, 120, "Carga horária deve estar entre 1 e 120 horas", validacao);
+        ValidacaoNumerica.DeveEstarEntre(CargaHoraria, 1, 200, "Carga horária deve estar entre 1 e 200 horas", validacao);
 
         if (DataTermino.HasValue)
         {
