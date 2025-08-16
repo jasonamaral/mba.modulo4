@@ -6,6 +6,7 @@ using Conteudo.Application.Commands.CadastrarAula;
 using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.Commands.CadastrarMaterial;
+using Conteudo.Application.Commands.ExcluirAula;
 using Conteudo.Application.Commands.ExcluirCurso;
 using Conteudo.Application.Commands.ExcluirMaterial;
 using Conteudo.Application.Interfaces.Services;
@@ -42,6 +43,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<IRequestHandler<AtualizarAulaCommand, CommandResult>, AtualizarAulaCommandHandler>();
         services.AddScoped<IRequestHandler<AtualizarMaterialCommand, CommandResult>, AtualizarMaterialCommandHandler>();
         services.AddScoped<IRequestHandler<ExcluirCursoCommand, CommandResult>, ExcluirCursoCommandHandler>();
+        services.AddScoped<IRequestHandler<ExcluirAulaCommand, CommandResult>, ExcluirAulaCommandHandler>();
         services.AddScoped<IRequestHandler<ExcluirMaterialCommand, CommandResult>, ExcluirMaterialCommandHandler>();
                 
         // Services
