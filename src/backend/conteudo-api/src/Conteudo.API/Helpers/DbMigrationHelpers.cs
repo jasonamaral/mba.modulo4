@@ -2,6 +2,7 @@
 using Conteudo.Domain.ValueObjects;
 using Conteudo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace Conteudo.API.Helpers;
 public static class DbMigrationHelpers
@@ -33,10 +34,9 @@ public static class DbMigrationHelpers
     {
         await context.Database.MigrateAsync();
 
-        #region Seed Categorias
-
         if (!context.Categorias.Any())
         {
+            #region Seed Categorias
             var categoriaProgramacao = new Categoria(
                 nome: "Programação",
                 descricao: "Cursos voltados para programação e desenvolvimento de software",
@@ -55,17 +55,15 @@ public static class DbMigrationHelpers
 
             context.Categorias.AddRange(categoriaProgramacao, categoriaDevOps);
             await context.SaveChangesAsync();
-        }
-        #endregion
+            #endregion
 
-        #region Seed Cursos
+            #region Seed Cursos
 
-        if (!context.Cursos.Any())
-        {
+            var cursos = new List<Curso>();
             var catProgramacaoId = context.Categorias.First(c => c.Nome == "Programação").Id;
             var catDevOpsId = context.Categorias.First(c => c.Nome == "DevOps").Id;
 
-            var cursos = new List<Curso>
+            cursos = new()
             {
                 new Curso(
                     nome: "C# Avançado",
@@ -256,16 +254,24 @@ public static class DbMigrationHelpers
 
             context.Cursos.AddRange(cursos);
             await context.SaveChangesAsync();
-        }
-        #endregion
+            #endregion
 
-        #region Seed Aulas e Materiais
+            #region Seed Aulas e Materiais
 
-        if (!context.Aulas.Any())
-        {
-            var cursos = context.Cursos.ToList();
-            foreach (var curso in cursos)
+            var matriz = new Dictionary<Guid, List<Guid>>();
+            matriz.Add(cursos[0].Id, [Guid.Parse("9be503ca-83fb-41cb-98e4-8f0ae98692a0"), Guid.Parse("c55fd2e3-9a07-4b1d-8b35-237c12712ad4"), Guid.Parse("fbe91473-7e59-414b-90ef-c9a13b3c24ec")]);
+            matriz.Add(cursos[1].Id, [Guid.Parse("84d09a65-8ac1-4bde-83a4-8533ab3b97a4"), Guid.Parse("6557645c-5879-4120-a6ed-a5349a3701c8"), Guid.Parse("db77ee62-b666-47d4-8e5b-c651c81e7fac")]);
+            matriz.Add(cursos[2].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
+            matriz.Add(cursos[3].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
+            matriz.Add(cursos[4].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
+            matriz.Add(cursos[5].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
+            matriz.Add(cursos[6].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
+            matriz.Add(cursos[7].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
+
+            for (int z = 0; z < 8; z++)
             {
+                var curso = cursos[z];
+
                 for (int i = 1; i <= 3; i++)
                 {
                     var aula = new Aula(
@@ -279,7 +285,8 @@ public static class DbMigrationHelpers
                         isObrigatoria: true,
                         observacoes: "Assistir antes de prosseguir"
                     );
-                    aula.DefinirId(Guid.NewGuid());
+
+                    aula.DefinirId(matriz[cursos[z].Id][i - 1]);
                     context.Aulas.Add(aula);
 
                     // Material para cada aula
@@ -297,9 +304,9 @@ public static class DbMigrationHelpers
                     material.DefinirId(Guid.NewGuid());
                     context.Materiais.Add(material);
                 }
+                await context.SaveChangesAsync();
+                #endregion
             }
-            await context.SaveChangesAsync();
         }
-        #endregion
     }
 }

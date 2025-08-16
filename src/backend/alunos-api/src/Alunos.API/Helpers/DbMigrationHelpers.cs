@@ -1,5 +1,7 @@
-﻿using Alunos.Infrastructure.Data;
+﻿using Alunos.Domain.Entities;
+using Alunos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Polly;
 
 namespace Alunos.API.Helpers;
 public static class DbMigrationHelpers
@@ -31,96 +33,45 @@ public static class DbMigrationHelpers
     {   
         await context.Database.MigrateAsync();
 
-        //// Categoria
-        //if (!context.Categorias.Any())
-        //{
-        //    context.Categorias.AddRange(
-        //        new Categoria(
-        //            nome: "Programação",
-        //            descricao: "Cursos voltados para programação e desenvolvimento de software",
-        //            cor: "#4CAF50",
-        //            iconeUrl: "https://exemplo.com/icones/programacao.png",
-        //            ordem: 1
-        //        )
-        //    );
-        //    await context.SaveChangesAsync();
-        //}
+        if (!context.Alunos.Any())
+        {
+            Guid alunoUm = Guid.Parse("06b1b8f1-f079-4048-9c8d-190c8056ea60");
+            Guid alunoDois = Guid.Parse("ca39e314-c960-42bc-9c9d-3cad9b589a8d");
 
-        //// Curso
-        //if (!context.Cursos.Any())
-        //{
-        //    var categoriaId = context.Categorias.First().Id;
-
-        //    var conteudo = new ConteudoProgramatico(
-        //        resumo: "Curso introdutório de C# e .NET",
-        //        descricao: "Aprenda os fundamentos de C# e .NET para aplicações modernas",
-        //        objetivos: "Fornecer base sólida para desenvolvimento em .NET",
-        //        preRequisitos: "Lógica de programação",
-        //        publicoAlvo: "Iniciantes em programação",
-        //        metodologia: "Aulas gravadas e exercícios práticos",
-        //        recursos: "Vídeos, PDFs e fóruns",
-        //        avaliacao: "Provas e projetos",
-        //        bibliografia: "Documentação oficial Microsoft"
-        //    );
-
-        //    context.Cursos.AddRange(
-        //        new Curso(
-        //            nome: "C# para Iniciantes",
-        //            valor: 299.90m,
-        //            conteudoProgramatico: conteudo,
-        //            duracaoHoras: 40,
-        //            nivel: "Básico",
-        //            instrutor: "João Silva",
-        //            vagasMaximas: 20,
-        //            imagemUrl: "https://exemplo.com/imagens/curso-csharp.jpg",
-        //            validoAte: DateTime.UtcNow.AddYears(1),
-        //            categoriaId: categoriaId
-        //        )
-        //    );
-        //    await context.SaveChangesAsync();
-        //}
-
-        //// Aula
-        //if (!context.Aulas.Any())
-        //{
-        //    var cursoId = context.Cursos.First().Id;
-
-        //    context.Aulas.AddRange(
-        //        new Aula(
-        //            cursoId: cursoId,
-        //            nome: "Introdução ao C#",
-        //            descricao: "Primeiros passos com a linguagem C#",
-        //            numero: 1,
-        //            duracaoMinutos: 45,
-        //            videoUrl: "https://exemplo.com/videos/aula1.mp4",
-        //            tipoAula: "Teórica",
-        //            isObrigatoria: true,
-        //            observacoes: "Assistir antes de prosseguir"
-        //        )
-        //    );
-        //    await context.SaveChangesAsync();
-        //}
-
-        //// Material
-        //if (!context.Materiais.Any())
-        //{
-        //    var aulaId = context.Aulas.First().Id;
-
-        //    context.Materiais.AddRange(
-        //        new Material(
-        //            aulaId: aulaId,
-        //            nome: "Slide da Aula 1",
-        //            descricao: "Apresentação utilizada na aula introdutória",
-        //            tipoMaterial: "PDF",
-        //            url: "https://exemplo.com/materiais/slide-aula1.pdf",
-        //            isObrigatorio: false,
-        //            tamanhoBytes: 1024 * 200, // ~200 KB
-        //            extensao: ".pdf",
-        //            ordem: 1
-        //        )
-        //    );
-        //    await context.SaveChangesAsync();
-        //}
+            await InserirAluno(context, alunoUm, "Aluno de Numero UM", "aluno1@auth.api", "12345678911", new DateTime(1973, 1, 1), "Masculino");
+            await InserirAluno(context, alunoDois, "Aluno de Numero DOIS", "aluno2@auth.api", "98765432111", new DateTime(2000, 1, 1), "Feminino");
+        }
     }
 
+    private static async Task InserirAluno(AlunoDbContext context, Guid alunoId, string nome, string email, string cpf, DateTime dataNascimento, string genero)
+    {
+        Aluno aluno = new(alunoId, nome, email, cpf, dataNascimento, genero, "Rio de Janeiro", "RJ", "00000000", "");
+        aluno.DefinirId(alunoId);
+        aluno.AtivarAluno();
+
+        // Trato o curso 1 como finalizado
+        Guid cursoIdUm = Guid.Parse("f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c");
+        aluno.MatricularAlunoEmCurso(cursoIdUm, "C# Avançado", 499.90m, $"Observação Aluno {nome} - Curso 1-C# Avançado");
+        
+        MatriculaCurso matriculaUm = aluno.MatriculasCursos.ToArray()[0];
+        aluno.AtualizarPagamentoMatricula(matriculaUm.Id);
+        aluno.RegistrarHistoricoAprendizado(matriculaUm.Id, Guid.Parse("9be503ca-83fb-41cb-98e4-8f0ae98692a0"), $"Conteúdo da aula 1 do curso {matriculaUm.NomeCurso}", 20, DateTime.UtcNow);
+        aluno.RegistrarHistoricoAprendizado(matriculaUm.Id, Guid.Parse("c55fd2e3-9a07-4b1d-8b35-237c12712ad4"), $"Conteúdo da aula 2 do curso {matriculaUm.NomeCurso}", 40, DateTime.UtcNow);
+        aluno.RegistrarHistoricoAprendizado(matriculaUm.Id, Guid.Parse("fbe91473-7e59-414b-90ef-c9a13b3c24ec"), $"Conteúdo da aula 3 do curso {matriculaUm.NomeCurso}", 125, DateTime.UtcNow);
+        aluno.ConcluirCurso(matriculaUm.Id);
+        aluno.RequisitarCertificadoConclusao(matriculaUm.Id, 10, $"/var/mnt/certificados/{aluno.Id}_{matriculaUm.Id}.pdf", "Curso Online");
+
+        // Trato o curso 2 como em andamento
+        Guid cursoIdDois = Guid.Parse("a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d");
+        aluno.MatricularAlunoEmCurso(cursoIdDois, "SQL Server do Zero ao Avançado", 499.90m, $"Observação Aluno {nome} - Curso 2-SQL Server do Zero ao Avançado");
+
+        MatriculaCurso matriculaDois = aluno.MatriculasCursos.ToArray()[1];
+        aluno.AtualizarPagamentoMatricula(matriculaDois.Id);
+        aluno.RegistrarHistoricoAprendizado(matriculaDois.Id, Guid.Parse("84d09a65-8ac1-4bde-83a4-8533ab3b97a4"), $"Conteúdo da aula 1 do curso {matriculaDois.NomeCurso}", 20, DateTime.UtcNow);
+        aluno.RegistrarHistoricoAprendizado(matriculaDois.Id, Guid.Parse("6557645c-5879-4120-a6ed-a5349a3701c8"), $"Conteúdo da aula 2 do curso {matriculaDois.NomeCurso}", 60, null);
+        aluno.RegistrarHistoricoAprendizado(matriculaDois.Id, Guid.Parse("db77ee62-b666-47d4-8e5b-c651c81e7fac"), $"Conteúdo da aula 3 do curso {matriculaDois.NomeCurso}", 90, null);
+
+        context.Alunos.Add(aluno);
+        await context.SaveChangesAsync();
+    }
 }

@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Pagamentos.Infrastructure.Migrations
+namespace Pagamentos.Infrastructure.Migrations.Sqlite
 {
     /// <inheritdoc />
-    public partial class Migration_001 : Migration
+    public partial class InitialSqlite : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,14 +18,14 @@ namespace Pagamentos.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     CobrancaCursoId = table.Column<Guid>(type: "TEXT", nullable: false),
                     AlunoId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Status = table.Column<string>(type: "varchar(100)", nullable: false),
+                    Status = table.Column<string>(type: "varchar(100)", nullable: true),
                     Valor = table.Column<decimal>(type: "TEXT", nullable: false),
                     NomeCartao = table.Column<string>(type: "varchar(250)", nullable: false),
                     NumeroCartao = table.Column<string>(type: "varchar(16)", nullable: false),
                     ExpiracaoCartao = table.Column<string>(type: "varchar(10)", nullable: false),
                     CvvCartao = table.Column<string>(type: "varchar(4)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -41,7 +42,7 @@ namespace Pagamentos.Infrastructure.Migrations
                     Total = table.Column<decimal>(type: "TEXT", nullable: false),
                     StatusTransacao = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

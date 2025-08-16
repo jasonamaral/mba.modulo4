@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Alunos.Infrastructure.Migrations.Sqlite
 {
     [DbContext(typeof(AlunoDbContext))]
-    [Migration("20250815205809_InitialSqlite")]
+    [Migration("20250816114914_InitialSqlite")]
     partial class InitialSqlite
     {
         /// <inheritdoc />
@@ -267,8 +267,8 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                             b1.Property<Guid>("AulaId")
                                 .HasColumnType("UniqueIdentifier");
 
-                            b1.Property<byte>("CargaHoraria")
-                                .HasColumnType("TinyInt");
+                            b1.Property<int>("CargaHoraria")
+                                .HasColumnType("Int");
 
                             b1.Property<Guid>("CursoId")
                                 .HasColumnType("UniqueIdentifier");
