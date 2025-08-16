@@ -57,17 +57,6 @@ namespace Pagamentos.API.Controllers
 
             return RespostaPadraoApi(HttpStatusCode.OK, "");
 
-
-            //return RespostaPadraoApi<bool>(HttpStatusCode.OK,await _mediator.PublicarEvento(command));
-
-
-
-
-            //TODO
-            // return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
-
-            return null;
-
         }
 
         [Authorize(Roles = "Admin")]
