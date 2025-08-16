@@ -12,11 +12,12 @@ import { ConteudoService } from 'src/app/services/conteudo.service';
 import { CursoCreateModel } from 'src/app/models/curso.model';
 import { CursosService } from 'src/app/services/cursos.service';
 import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
+import { NgxCurrencyDirective } from "ngx-currency";
 
 @Component({
   selector: 'app-conteudo-update',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, NgxCurrencyDirective],
   templateUrl: './conteudo-update.component.html',
   styleUrl: './conteudo-add.component.scss'
 })

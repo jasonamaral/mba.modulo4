@@ -9,6 +9,11 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+      RABBITMQ_NODE_TYPE: stats
+      RABBITMQ_NODE_PORT: 5672
+      RABBITMQ_NODENAME: rabbit@localhost
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
@@ -18,6 +23,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 30s
 
   redis:
     image: redis:7-alpine
@@ -42,7 +48,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5001
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/auth-dev.db
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/auth-dev.db;Cache=Shared;Mode=ReadWriteCreate
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
@@ -51,12 +57,21 @@ services:
       - RabbitMQ__Port=5672
       - RabbitMQ__Username=admin
       - RabbitMQ__Password=admin123
+      - RabbitMQ__VirtualHost=/
+      - MessageQueueConnection__MessageBus=host=rabbitmq:5672;username=admin;password=admin123;publisherConfirms=true;timeout=120;requestedHeartbeat=60;prefetchCount=1
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:rw
     networks:
       - plataforma-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   conteudo-api:
     build:
@@ -68,7 +83,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5002
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/conteudo-dev.db
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/conteudo-dev.db;Cache=Shared;Mode=ReadWriteCreate
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
@@ -77,13 +92,23 @@ services:
       - RabbitMQ__Port=5672
       - RabbitMQ__Username=admin
       - RabbitMQ__Password=admin123
+      - RabbitMQ__VirtualHost=/
+      - MessageQueueConnection__MessageBus=host=rabbitmq:5672;username=admin;password=admin123;publisherConfirms=true;timeout=120;requestedHeartbeat=60;prefetchCount=1
     depends_on:
-      - rabbitmq
-      - auth-api
+      rabbitmq:
+        condition: service_healthy
+      auth-api:
+        condition: service_healthy
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:rw
     networks:
       - plataforma-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   alunos-api:
     build:
@@ -95,7 +120,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5003
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/alunos-dev.db
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/alunos-dev.db;Cache=Shared;Mode=ReadWriteCreate
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
@@ -104,14 +129,26 @@ services:
       - RabbitMQ__Port=5672
       - RabbitMQ__Username=admin
       - RabbitMQ__Password=admin123
+      - RabbitMQ__VirtualHost=/
       - AppSettings__AutenticacaoJwksUrl=http://auth-api:5001/jwks
+      - MessageQueueConnection__MessageBus=host=rabbitmq:5672;username=admin;password=admin123;publisherConfirms=true;timeout=120;requestedHeartbeat=60;prefetchCount=1
     depends_on:
-      - rabbitmq
-      - auth-api
+      rabbitmq:
+        condition: service_healthy
+      auth-api:
+        condition: service_healthy
+      conteudo-api:
+        condition: service_healthy
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:rw
     networks:
       - plataforma-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   pagamentos-api:
     build:
@@ -123,7 +160,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5004
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/pagamentos-dev.db
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/pagamentos-dev.db;Cache=Shared;Mode=ReadWriteCreate
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
@@ -131,14 +168,24 @@ services:
       - RabbitMQ__Port=5672
       - RabbitMQ__Username=admin
       - RabbitMQ__Password=admin123
+      - RabbitMQ__VirtualHost=/
       - AppSettings__AutenticacaoJwksUrl=http://auth-api:5001/jwks
+      - MessageQueueConnection__MessageBus=host=rabbitmq:5672;username=admin;password=admin123;publisherConfirms=true;timeout=120;requestedHeartbeat=60;prefetchCount=1
     depends_on:
-      - rabbitmq
-      - auth-api
+      rabbitmq:
+        condition: service_healthy
+      auth-api:
+        condition: service_healthy
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:rw
     networks:
       - plataforma-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   bff-api:
     build:
@@ -160,14 +207,26 @@ services:
       - ApiSettings__AlunosApiUrl=http://alunos-api:5003
       - ApiSettings__PagamentosApiUrl=http://pagamentos-api:5004
       - AppSettings__AutenticacaoJwksUrl=http://auth-api:5001/jwks
+      - MessageQueueConnection__MessageBus=host=rabbitmq:5672;username=admin;password=admin123;publisherConfirms=true;timeout=120;requestedHeartbeat=60;prefetchCount=1
     depends_on:
-      - redis
-      - auth-api
-      - conteudo-api
-      - alunos-api
-      - pagamentos-api
+      redis:
+        condition: service_started
+      auth-api:
+        condition: service_healthy
+      conteudo-api:
+        condition: service_healthy
+      alunos-api:
+        condition: service_healthy
+      pagamentos-api:
+        condition: service_healthy
     networks:
       - plataforma-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build:

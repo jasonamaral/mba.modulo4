@@ -13,11 +13,12 @@ import { CursoCreateModel } from 'src/app/models/curso.model';
 import { CursosService } from 'src/app/services/cursos.service';
 import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
 import { AulaAddDialogComponent } from './aula-add-dialog.component';
+import { NgxCurrencyDirective } from "ngx-currency";
 
 @Component({
   selector: 'app-conteudo-add',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, MatButtonModule, NgxCurrencyDirective],
   templateUrl: './conteudo-add.component.html',
   styleUrl: './conteudo-add.component.scss'
 })

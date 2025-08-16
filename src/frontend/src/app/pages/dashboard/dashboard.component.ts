@@ -3,9 +3,11 @@ import { MaterialModule } from '../../material.module';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
 import { DashboardAlunoModel, ProgressoGeralModel } from '../../models/dashboard-aluno.model';
+import { DashboardAdminModel } from '../../models/dashboard-admin.model';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ApexNonAxisChartSeries, ApexChart, ApexPlotOptions, ApexStroke, ApexFill } from 'ng-apexcharts';
 import { ToastrService } from 'ngx-toastr';
+import { LocalStorageUtils } from '../../utils/localstorage';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,6 +23,8 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class DashboardComponent {
   progressoGeral?: ProgressoGeralModel;
+  dashboardAdmin?: DashboardAdminModel;
+  isAdmin = false;
   carregando = false;
 
   // Configuração do gráfico radial (percentual concluído)
@@ -42,10 +46,36 @@ export class DashboardComponent {
     labels: ['Concluído']
   };
 
-  constructor(private dashboard: DashboardService, private toastr: ToastrService) { }
+  constructor(
+    private dashboard: DashboardService, 
+    private toastr: ToastrService,
+    private localStorageUtils: LocalStorageUtils
+  ) { }
 
   ngOnInit() {
+    this.isAdmin = this.localStorageUtils.isUserAdmin();
     this.carregando = true;
+
+    if (this.isAdmin) {
+      this.carregarDashboardAdmin();
+    } else {
+      this.carregarDashboardAluno();
+    }
+  }
+
+  private carregarDashboardAdmin() {
+    this.dashboard.getDashboardAdmin().subscribe({
+      next: (data: DashboardAdminModel) => {
+        this.dashboardAdmin = data;
+      },
+      error: (error) => {
+        this.processFailAdmin(error, this.toastr);
+      },
+      complete: () => this.carregando = false
+    });
+  }
+
+  private carregarDashboardAluno() {
     this.dashboard.getDashboardAluno().subscribe({
       next: (data: DashboardAlunoModel) => {
         this.progressoGeral = data?.progressoGeral ?? {
@@ -77,5 +107,33 @@ export class DashboardComponent {
         horasEstudadas: 0
     };
     this.chartSeries = [0];
+  }
+
+  protected processFailAdmin(fail: any, toastr: ToastrService): void {
+    const error = (Array.isArray(fail?.error?.errors) ? fail.error.errors.join('\n') : fail.error.errors) || (fail?.error?.message || fail?.message || 'Erro desconhecido');
+    toastr.error(error);
+    this.dashboardAdmin = undefined;
+  }
+
+  // Método para traduzir status das vendas
+  protected traduzirStatus(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'Approved': 'Aprovado',
+      'Processing': 'Processando',
+      'Cancelled': 'Cancelado',
+      'Pending': 'Pendente',
+      'Completed': 'Concluído',
+      'Failed': 'Falhou',
+      'Refunded': 'Reembolsado',
+      'Aprovado': 'Aprovado',
+      'Processando': 'Processando',
+      'Cancelado': 'Cancelado',
+      'Pendente': 'Pendente',
+      'Concluído': 'Concluído',
+      'Falhou': 'Falhou',
+      'Reembolsado': 'Reembolsado'
+    };
+    
+    return statusMap[status] || status;
   }
 }

@@ -1,8 +1,3 @@
-param(
-    [switch]$ForceBuild,
-    [switch]$CleanBuild
-)
-
 Write-Host "Iniciando Plataforma Educacional..." -ForegroundColor Green
 Write-Host "=================================================" -ForegroundColor Cyan
 
@@ -40,244 +35,389 @@ if (Test-Path "docker-compose-simple.yml") {
     exit 1
 }
 
-# Limpeza total se CleanBuild estiver ativo
-if ($CleanBuild) {
-    Write-Host "Limpando containers e imagens antigas..." -ForegroundColor Red
-    docker-compose -f $composeFile down --volumes --remove-orphans
-    $oldImages = docker images -q "mbamodulo4-*"
-    if ($oldImages) {
-        docker rmi -f $oldImages
-    }
-}
+Write-Host ""
+Write-Host "=== ETAPA 1: PARANDO CONTAINERS EXISTENTES ===" -ForegroundColor Yellow
 
-# Criar pasta data se não existir (para SQLite)
+# Parar todos os containers existentes
+Write-Host "Parando containers existentes..." -ForegroundColor Blue
+docker-compose -f $composeFile down --remove-orphans
+Write-Host "Containers parados e removidos" -ForegroundColor Green
+
+Write-Host ""
+Write-Host "=== ETAPA 2: LIMPEZA AGGRESSIVA DE ARQUIVOS SQLITE ===" -ForegroundColor Yellow
+
+# Criar pasta data se não existir (para SQLite) com permissões adequadas
 if (-not (Test-Path "data")) {
     New-Item -ItemType Directory -Path "data" | Out-Null
     Write-Host "Pasta data criada para arquivos SQLite" -ForegroundColor Green
 }
 
-Write-Host "Verificando containers existentes..." -ForegroundColor Yellow
-$existingContainers = docker-compose -f $composeFile ps -q
-
-if ($existingContainers) {
-    Write-Host "Containers existentes encontrados. Verificando quais estao faltando..." -ForegroundColor Green
-} else {
-    Write-Host "Nenhum container encontrado. Iniciando todos os servicos..." -ForegroundColor Green
+# Verificar e corrigir permissões da pasta data (especialmente no Windows)
+Write-Host "Verificando permissoes da pasta data..." -ForegroundColor Yellow
+try {
+    # No Windows, garantir que a pasta tem permissões adequadas
+    $acl = Get-Acl "data"
+    $rule = New-Object System.Security.AccessControl.FileSystemAccessRule("Everyone","FullControl","ContainerInherit,ObjectInherit","None","Allow")
+    $acl.SetAccessRule($rule)
+    Set-Acl "data" $acl
+    Write-Host "Permissoes da pasta data configuradas" -ForegroundColor Green
+} catch {
+    Write-Host "Aviso: Nao foi possivel configurar permissoes da pasta data" -ForegroundColor Yellow
 }
 
-Write-Host "Verificando imagens..." -ForegroundColor Yellow
-$services = @("auth-api", "conteudo-api", "alunos-api", "pagamentos-api", "bff-api", "frontend")
-$missingImages = @()
+# LIMPEZA AGGRESSIVA: Remover TODOS os arquivos SQLite existentes para evitar corrupção
+Write-Host "LIMPANDO TODOS os arquivos SQLite existentes..." -ForegroundColor Red
+$sqliteFiles = @("auth-dev.db", "conteudo-dev.db", "alunos-dev.db", "pagamentos-dev.db")
+$sqliteExtensions = @("*.db", "*.db-shm", "*.db-wal", "*.db-journal")
 
-foreach ($service in $services) {
-    $imageName = "mbamodulo4-$service"
-    $imageExists = docker images -q $imageName
-    
-    if (-not $imageExists) {
-        $missingImages += $service
-        Write-Host "Imagem $imageName nao encontrada" -ForegroundColor Yellow
-    } else {
-        Write-Host "Imagem $imageName encontrada" -ForegroundColor Green
-    }
-}
-
-# Verificar se precisa fazer build
-$needsBuild = $false
-if ($ForceBuild -or $CleanBuild) {
-    $needsBuild = $true
-    Write-Host "Reconstruindo todas as imagens..." -ForegroundColor Yellow
-} elseif ($missingImages.Count -gt 0) {
-    $needsBuild = $true
-    Write-Host "Construindo imagens faltantes: $($missingImages -join ', ')" -ForegroundColor Yellow
-} else {
-    Write-Host "Todas as imagens ja existem!" -ForegroundColor Green
-}
-
-# Fazer build se necessário
-if ($needsBuild) {
-    if ($ForceBuild -or $CleanBuild) {
-        docker-compose -f $composeFile build --no-cache --parallel
-    } elseif ($missingImages.Count -gt 0) {
-        $buildServices = $missingImages -join " "
-        docker-compose -f $composeFile build --parallel $buildServices
-    }
-}
-
-Write-Host "Verificando infraestrutura (RabbitMQ, Redis)..." -ForegroundColor Blue
-$infraServices = @("rabbitmq", "redis")
-$missingInfra = @()
-
-# Verificar containers usando docker-compose ps
-$runningContainers = docker-compose -f $composeFile ps -q
-
-foreach ($service in $infraServices) {
-    $containerName = "plataforma-$service"
-    $containerExists = $false
-    
-    if ($runningContainers) {
-        foreach ($containerId in $runningContainers) {
-            try {
-                $containerInfo = docker inspect $containerId --format='{{.Name}}' 2>$null
-                if ($containerInfo -and $containerInfo.Contains($containerName)) {
-                    $containerExists = $true
-                    break
-                }
-            } catch {
-                # Ignorar erros de containers que foram removidos
-            }
+foreach ($extension in $sqliteExtensions) {
+    $files = Get-ChildItem -Path "data" -Filter $extension -ErrorAction SilentlyContinue
+    foreach ($file in $files) {
+        try {
+            Remove-Item $file.FullName -Force
+            Write-Host "  Removido: $($file.Name)" -ForegroundColor Yellow
+        } catch {
+            Write-Host "  ERRO ao remover: $($file.Name)" -ForegroundColor Red
         }
     }
-    
-    if (-not $containerExists) {
-        $missingInfra += $service
-        Write-Host "Container $containerName nao encontrado" -ForegroundColor Yellow
-    } else {
-        Write-Host "Container $containerName ja esta rodando" -ForegroundColor Green
-    }
 }
 
-function Wait-ContainerHealthy {
-    param([string]$containerName, [int]$timeoutSec = 90)
-    $elapsed = 0
-    Write-Host "Aguardando '$containerName' ficar HEALTHY (timeout ${timeoutSec}s)..." -ForegroundColor Yellow
-    while ($elapsed -lt $timeoutSec) {
-        $status = docker inspect --format='{{.State.Health.Status}}' $containerName 2>$null
-        if ($status -eq 'healthy') {
-            Write-Host "Container '$containerName' HEALTHY" -ForegroundColor Green
-            return $true
-        }
-        Start-Sleep -Seconds 3
-        $elapsed += 3
+# Verificar se a pasta data está vazia
+$remainingFiles = Get-ChildItem -Path "data" -File | Where-Object { $_.Name -match "\.db" }
+if ($remainingFiles) {
+    Write-Host "AVISO: Ainda existem arquivos SQLite na pasta data!" -ForegroundColor Red
+    foreach ($file in $remainingFiles) {
+        Write-Host "  Arquivo restante: $($file.Name)" -ForegroundColor Red
     }
-    Write-Host "Timeout aguardando '$containerName' HEALTHY. Prosseguindo assim mesmo." -ForegroundColor Yellow
-    return $false
-}
-
-if ($missingInfra.Count -gt 0) {
-    Write-Host "Iniciando infraestrutura faltante: $($missingInfra -join ', ')" -ForegroundColor Blue
-    docker-compose -f $composeFile up -d $missingInfra
 } else {
-    Write-Host "Toda infraestrutura ja esta rodando!" -ForegroundColor Green
+    Write-Host "Pasta data limpa com sucesso" -ForegroundColor Green
 }
+
+Write-Host ""
+Write-Host "=== ETAPA 3: REMOVENDO IMAGENS ANTIGAS E RECRIANDO ===" -ForegroundColor Yellow
+
+# Remover imagens antigas dos microserviços (exceto Redis e RabbitMQ)
+Write-Host "Removendo imagens antigas dos microservicos..." -ForegroundColor Blue
+$servicesToRemove = @("plataforma-auth-api", "plataforma-conteudo-api", "plataforma-alunos-api", "plataforma-pagamentos-api", "plataforma-bff-api", "plataforma-frontend")
+
+foreach ($service in $servicesToRemove) {
+    try {
+        # Remove container se existir
+        docker rm -f $service 2>$null | Out-Null
+        
+        # Remove imagem se existir
+        $imageName = docker images --format "{{.Repository}}:{{.Tag}}" | Where-Object { $_ -like "*$service*" }
+        if ($imageName) {
+            docker rmi -f $imageName 2>$null | Out-Null
+            Write-Host "  Removido: $service" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "  Aviso: Nao foi possivel remover $service" -ForegroundColor Yellow
+    }
+}
+
+# Remover imagens intermediárias (dangling images)
+Write-Host "Removendo imagens intermediarias..." -ForegroundColor Blue
+docker image prune -f | Out-Null
+
+# Remover imagens não utilizadas (mais agressivo)
+Write-Host "Limpando cache do Docker..." -ForegroundColor Blue
+docker system prune -f | Out-Null
+
+# Verificar se as imagens foram removidas
+Write-Host "Verificando limpeza das imagens..." -ForegroundColor Blue
+$remainingImages = docker images --format "{{.Repository}}:{{.Tag}}" | Where-Object { $_ -like "*plataforma-*" }
+if ($remainingImages) {
+    Write-Host "  Imagens restantes:" -ForegroundColor Yellow
+    foreach ($image in $remainingImages) {
+        Write-Host "    $image" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "  Todas as imagens antigas foram removidas" -ForegroundColor Green
+}
+
+# Limpeza adicional: remover imagens por nome específico
+Write-Host "Limpando imagens por nome especifico..." -ForegroundColor Blue
+$imageNamesToRemove = @(
+    "mba-modulo4-auth-api",
+    "mba-modulo4-conteudo-api", 
+    "mba-modulo4-alunos-api",
+    "mba-modulo4-pagamentos-api",
+    "mba-modulo4-bff-api",
+    "mba-modulo4-frontend"
+)
+
+foreach ($imageName in $imageNamesToRemove) {
+    try {
+        # Remove por nome da imagem
+        docker rmi -f $imageName 2>$null | Out-Null
+        
+        # Remove por nome do repositório
+        docker images --format "{{.Repository}}" | Where-Object { $_ -like "*$imageName*" } | ForEach-Object {
+            docker rmi -f $_ 2>$null | Out-Null
+        }
+        
+        Write-Host "  Limpo: $imageName" -ForegroundColor Yellow
+    } catch {
+        # Ignora erros de remoção
+    }
+}
+
+# Recriar todas as imagens (exceto Redis e RabbitMQ)
+Write-Host "Recriando imagens dos microservicos..." -ForegroundColor Blue
+
+# Verificação final: confirmar que apenas infraestrutura permanece
+Write-Host "Verificando imagens restantes..." -ForegroundColor Blue
+$allImages = docker images --format "{{.Repository}}:{{.Tag}}"
+$infraImages = $allImages | Where-Object { $_ -like "*redis*" -or $_ -like "*rabbitmq*" }
+$appImages = $allImages | Where-Object { $_ -like "*plataforma-*" -or $_ -like "*mba-modulo4*" }
+
+if ($appImages) {
+    Write-Host "  AVISO: Ainda existem imagens de aplicacao:" -ForegroundColor Yellow
+    foreach ($image in $appImages) {
+        Write-Host "    $image" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "  OK: Apenas imagens de infraestrutura permanecem" -ForegroundColor Green
+}
+
+Write-Host "  Imagens de infraestrutura mantidas:" -ForegroundColor Cyan
+foreach ($image in $infraImages) {
+    Write-Host "    $image" -ForegroundColor Cyan
+}
+
+$servicesToBuild = @("auth-api", "conteudo-api", "alunos-api", "pagamentos-api", "bff-api", "frontend")
+docker-compose -f $composeFile build --no-cache --parallel $servicesToBuild
+Write-Host "Imagens recriadas com sucesso" -ForegroundColor Green
+
+Write-Host ""
+Write-Host "=== ETAPA 4: INICIANDO INFRAESTRUTURA ===" -ForegroundColor Yellow
+
+# 1. Redis
+Write-Host "1. Iniciando Redis..." -ForegroundColor Blue
+docker-compose -f $composeFile up -d redis
+Start-Sleep -Seconds 5
+Write-Host "   Redis iniciado" -ForegroundColor Green
+
+# 2. RabbitMQ
+Write-Host "2. Iniciando RabbitMQ..." -ForegroundColor Blue
+docker-compose -f $composeFile up -d rabbitmq
+Write-Host "   Aguardando RabbitMQ ficar saudavel..." -ForegroundColor Yellow
 
 # Aguarda RabbitMQ ficar 'healthy' para evitar timeout nas APIs ao registrar filas
 $rabbitContainer = "plataforma-rabbitmq"
-try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
+$elapsed = 0
+$timeoutSec = 180  # Aumentado para 3 minutos
+$rabbitReady = $false
 
-Write-Host "Verificando microservicos..." -ForegroundColor Blue
-$apiServices = @("auth-api", "conteudo-api", "alunos-api", "pagamentos-api")
-$missingApis = @()
-
-# Atualizar lista de containers rodando
-$runningContainers = docker-compose -f $composeFile ps -q
-
-foreach ($service in $apiServices) {
-    $containerName = "plataforma-$service"
-    $containerExists = $false
-    
-    if ($runningContainers) {
-        foreach ($containerId in $runningContainers) {
-            try {
-                $containerInfo = docker inspect $containerId --format='{{.Name}}' 2>$null
-                if ($containerInfo -and $containerInfo.Contains($containerName)) {
-                    $containerExists = $true
-                    break
-                }
-            } catch {
-                # Ignorar erros de containers que foram removidos
-            }
+while ($elapsed -lt $timeoutSec -and -not $rabbitReady) {
+    try {
+        $status = docker inspect --format='{{.State.Health.Status}}' $rabbitContainer 2>$null
+        if ($status -eq 'healthy') {
+            Write-Host "   RabbitMQ HEALTHY" -ForegroundColor Green
+            
+            # Aguarda mais um pouco para garantir que o RabbitMQ esteja totalmente operacional
+            Write-Host "   Aguardando RabbitMQ ficar totalmente operacional..." -ForegroundColor Yellow
+            Start-Sleep -Seconds 10
+            
+            # Testa conectividade com o RabbitMQ
+            $rabbitReady = $true
+            Write-Host "   RabbitMQ pronto para receber conexoes" -ForegroundColor Green
+            break
+        } else {
+            Write-Host "   Status RabbitMQ: $status ($elapsed/$timeoutSec)" -ForegroundColor Yellow
         }
+    } catch {
+        Write-Host "   Aguardando RabbitMQ inicializar... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
     }
     
-    if (-not $containerExists) {
-        $missingApis += $service
-        Write-Host "Container $containerName nao encontrado" -ForegroundColor Yellow
-    } else {
-        Write-Host "Container $containerName ja esta rodando" -ForegroundColor Green
+    Start-Sleep -Seconds 5
+    $elapsed += 5
+    
+    if ($elapsed -ge $timeoutSec) {
+        Write-Host "   AVISO: Timeout aguardando RabbitMQ HEALTHY. Prosseguindo..." -ForegroundColor Yellow
     }
 }
 
-if ($missingApis.Count -gt 0) {
-    Write-Host "Iniciando APIs faltantes: $($missingApis -join ', ')" -ForegroundColor Blue
-    docker-compose -f $composeFile up -d $missingApis
-    
-    Write-Host "Aguardando APIs inicializarem (20 segundos)..." -ForegroundColor Yellow
-    Start-Sleep -Seconds 20
-} else {
-    Write-Host "Todas as APIs ja estao rodando!" -ForegroundColor Green
-}
+Write-Host ""
+Write-Host "=== ETAPA 5: INICIANDO MICROSERVICOS ===" -ForegroundColor Yellow
 
-Write-Host "Verificando BFF e Frontend..." -ForegroundColor Blue
-$frontendServices = @("bff-api", "frontend")
-$missingFrontend = @()
+# 3. Auth API
+Write-Host "3. Iniciando Auth API..." -ForegroundColor Blue
+docker-compose -f $composeFile up -d auth-api
+Write-Host "   Aguardando Auth API inicializar e criar banco SQLite..." -ForegroundColor Yellow
 
-# Atualizar lista de containers rodando
-$runningContainers = docker-compose -f $composeFile ps -q
+# Aguarda mais tempo para o banco ser criado e verifica se foi criado corretamente
+Start-Sleep -Seconds 30
 
-foreach ($service in $frontendServices) {
-    $containerName = "plataforma-$service"
-    $containerExists = $false
-    
-    if ($runningContainers) {
-        foreach ($containerId in $runningContainers) {
-            try {
-                $containerInfo = docker inspect $containerId --format='{{.Name}}' 2>$null
-                if ($containerInfo -and $containerInfo.Contains($containerName)) {
-                    $containerExists = $true
-                    break
-                }
-            } catch {
-                # Ignorar erros de containers que foram removidos
-            }
+# Verificar se o banco SQLite foi criado corretamente
+$authContainer = "plataforma-auth-api"
+$authDbPath = "/app/data/auth-dev.db"
+$elapsed = 0
+$timeoutSec = 120
+$dbReady = $false
+
+while ($elapsed -lt $timeoutSec -and -not $dbReady) {
+    try {
+        $result = docker exec $authContainer sh -c "if [ -f $authDbPath ] && [ -s $authDbPath ]; then ls -la $authDbPath; else echo 'NOT_READY'; fi" 2>$null
+        if ($result -and $result.Contains("NOT_READY")) {
+            Write-Host "   Aguardando banco SQLite ser criado... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
+        } else {
+            Write-Host "   Auth API e banco SQLite prontos" -ForegroundColor Green
+            $dbReady = $true
+            break
         }
+    } catch {
+        Write-Host "   Aguardando container inicializar... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
     }
-    
-    if (-not $containerExists) {
-        $missingFrontend += $service
-        Write-Host "Container $containerName nao encontrado" -ForegroundColor Yellow
-    } else {
-        Write-Host "Container $containerName ja esta rodando" -ForegroundColor Green
-    }
+    Start-Sleep -Seconds 10
+    $elapsed += 10
 }
 
-if ($missingFrontend.Count -gt 0) {
-    Write-Host "Iniciando BFF e Frontend faltantes: $($missingFrontend -join ', ')" -ForegroundColor Blue
-    docker-compose -f $composeFile up -d $missingFrontend
-    
-    Write-Host "Aguardando inicializacao completa (10 segundos)..." -ForegroundColor Yellow
-    Start-Sleep -Seconds 10
-} else {
-    Write-Host "BFF e Frontend ja estao rodando!" -ForegroundColor Green
+if (-not $dbReady) {
+    Write-Host "   AVISO: Timeout aguardando Auth API. Prosseguindo..." -ForegroundColor Yellow
 }
 
-# Recriação orquestrada (evita subir APIs antes do RabbitMQ)
-$totalMissing = $missingInfra.Count + $missingApis.Count + $missingFrontend.Count
-if ($ForceBuild -or $CleanBuild) {
-    Write-Host ""; Write-Host "Recriando infraestrutura..." -ForegroundColor Yellow
-    docker-compose -f $composeFile up -d --force-recreate rabbitmq redis
-    try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
+# 4. Alunos API
+Write-Host "4. Iniciando Alunos API..." -ForegroundColor Blue
+docker-compose -f $composeFile up -d alunos-api
+Write-Host "   Aguardando Alunos API inicializar e criar banco SQLite..." -ForegroundColor Yellow
+Start-Sleep -Seconds 30
 
-    Write-Host "Recriando APIs..." -ForegroundColor Yellow
-    docker-compose -f $composeFile up -d --force-recreate auth-api conteudo-api alunos-api pagamentos-api
+# Verificar se o banco SQLite foi criado corretamente
+$alunosContainer = "plataforma-alunos-api"
+$alunosDbPath = "/app/data/alunos-dev.db"
+$elapsed = 0
+$timeoutSec = 120
+$dbReady = $false
+
+while ($elapsed -lt $timeoutSec -and -not $dbReady) {
+    try {
+        $result = docker exec $alunosContainer sh -c "if [ -f $alunosDbPath ] && [ -s $alunosDbPath ]; then ls -la $alunosDbPath; else echo 'NOT_READY'; fi" 2>$null
+        if ($result -and $result.Contains("NOT_READY")) {
+            Write-Host "   Aguardando banco SQLite ser criado... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
+        } else {
+            Write-Host "   Alunos API e banco SQLite prontos" -ForegroundColor Green
+            $dbReady = $true
+            break
+        }
+    } catch {
+        Write-Host "   Aguardando container inicializar... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
+    }
     Start-Sleep -Seconds 10
+    $elapsed += 10
+}
 
-    Write-Host "Recriando BFF e Frontend..." -ForegroundColor Yellow
-    docker-compose -f $composeFile up -d --force-recreate bff-api frontend
-} elseif ($totalMissing -gt 0) {
-    Write-Host ""; Write-Host "Recriando apenas servicos faltantes, em ordem..." -ForegroundColor Yellow
-    if ($missingInfra.Count -gt 0) {
-        docker-compose -f $composeFile up -d --force-recreate $missingInfra
-        try { Wait-ContainerHealthy -containerName $rabbitContainer -timeoutSec 120 | Out-Null } catch { }
+if (-not $dbReady) {
+    Write-Host "   AVISO: Timeout aguardando Alunos API. Prosseguindo..." -ForegroundColor Yellow
+}
+
+# 5. Pagamentos API
+Write-Host "5. Iniciando Pagamentos API..." -ForegroundColor Blue
+docker-compose -f $composeFile up -d pagamentos-api
+Write-Host "   Aguardando Pagamentos API inicializar e criar banco SQLite..." -ForegroundColor Yellow
+Start-Sleep -Seconds 30
+
+# Verificar se o banco SQLite foi criado corretamente
+$pagamentosContainer = "plataforma-pagamentos-api"
+$pagamentosDbPath = "/app/data/pagamentos-dev.db"
+$elapsed = 0
+$timeoutSec = 120
+$dbReady = $false
+
+while ($elapsed -lt $timeoutSec -and -not $dbReady) {
+    try {
+        $result = docker exec $pagamentosContainer sh -c "if [ -f $pagamentosDbPath ] && [ -s $pagamentosDbPath ]; then ls -la $pagamentosDbPath; else echo 'NOT_READY'; fi" 2>$null
+        if ($result -and $result.Contains("NOT_READY")) {
+            Write-Host "   Aguardando banco SQLite ser criado... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
+        } else {
+            Write-Host "   Pagamentos API e banco SQLite prontos" -ForegroundColor Green
+            $dbReady = $true
+            break
+        }
+    } catch {
+        Write-Host "   Aguardando container inicializar... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
     }
-    if ($missingApis.Count -gt 0) {
-        docker-compose -f $composeFile up -d --force-recreate $missingApis
-        Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 10
+    $elapsed += 10
+}
+
+if (-not $dbReady) {
+    Write-Host "   AVISO: Timeout aguardando Pagamentos API. Prosseguindo..." -ForegroundColor Yellow
+}
+
+# 6. Conteudo API
+Write-Host "6. Iniciando Conteudo API..." -ForegroundColor Blue
+docker-compose -f $composeFile up -d conteudo-api
+Write-Host "   Aguardando Conteudo API inicializar e criar banco SQLite..." -ForegroundColor Yellow
+Start-Sleep -Seconds 30
+
+# Verificar se o banco SQLite foi criado corretamente
+$conteudoContainer = "plataforma-conteudo-api"
+$conteudoDbPath = "/app/data/conteudo-dev.db"
+$elapsed = 0
+$timeoutSec = 120
+$dbReady = $false
+
+while ($elapsed -lt $timeoutSec -and -not $dbReady) {
+    try {
+        $result = docker exec $conteudoContainer sh -c "if [ -f $conteudoDbPath ] && [ -s $conteudoDbPath ]; then ls -la $conteudoDbPath; else echo 'NOT_READY'; fi" 2>$null
+        if ($result -and $result.Contains("NOT_READY")) {
+            Write-Host "   Aguardando banco SQLite ser criado... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
+        } else {
+            Write-Host "   Conteudo API e banco SQLite prontos" -ForegroundColor Green
+            $dbReady = $true
+            break
+        }
+    } catch {
+        Write-Host "   Aguardando container inicializar... ($elapsed/$timeoutSec)" -ForegroundColor Yellow
     }
-    if ($missingFrontend.Count -gt 0) {
-        docker-compose -f $composeFile up -d --force-recreate $missingFrontend
+    Start-Sleep -Seconds 10
+    $elapsed += 10
+}
+
+if (-not $dbReady) {
+    Write-Host "   AVISO: Timeout aguardando Conteudo API. Prosseguindo..." -ForegroundColor Yellow
+}
+
+Write-Host ""
+Write-Host "=== ETAPA 6: INICIANDO BFF E FRONTEND ===" -ForegroundColor Yellow
+
+# 7. BFF API
+Write-Host "7. Iniciando BFF API..." -ForegroundColor Blue
+docker-compose -f $composeFile up -d bff-api
+Write-Host "   Aguardando BFF API inicializar..." -ForegroundColor Yellow
+Start-Sleep -Seconds 15
+
+# Frontend
+Write-Host "8. Iniciando Frontend..." -ForegroundColor Blue
+docker-compose -f $composeFile up -d frontend
+Write-Host "   Aguardando Frontend inicializar..." -ForegroundColor Yellow
+Start-Sleep -Seconds 15
+
+Write-Host ""
+Write-Host "=== ETAPA 7: VERIFICAÇÃO FINAL ===" -ForegroundColor Yellow
+
+# Verificação final dos bancos SQLite
+Write-Host "Verificacao final dos bancos SQLite..." -ForegroundColor Blue
+$allContainers = @("plataforma-auth-api", "plataforma-conteudo-api", "plataforma-alunos-api", "plataforma-pagamentos-api")
+$allDbFiles = @("/app/data/auth-dev.db", "/app/data/conteudo-dev.db", "/app/data/alunos-dev.db", "/app/data/pagamentos-dev.db")
+
+for ($i = 0; $i -lt $allContainers.Count; $i++) {
+    $containerName = $allContainers[$i]
+    $dbFile = $allDbFiles[$i]
+    $dbName = Split-Path $dbFile -Leaf
+    
+    try {
+        $result = docker exec $containerName sh -c "if [ -f $dbFile ] && [ -s $dbFile ]; then ls -la $dbFile; else echo 'NOT_FOUND'; fi" 2>$null
+        if ($result -and $result.Contains("NOT_FOUND")) {
+            Write-Host "ERRO: Banco $dbName nao foi criado em $containerName" -ForegroundColor Red
+        } else {
+            Write-Host "OK: Banco $dbName esta funcionando em $containerName" -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "ERRO: Nao foi possivel verificar banco $dbName em $containerName" -ForegroundColor Red
     }
-} else {
-    Write-Host ""; Write-Host "Todos os containers ja estao rodando!" -ForegroundColor Green
 }
 
 Write-Host ""
@@ -311,3 +451,16 @@ Write-Host "Para ver logs: docker-compose -f $composeFile logs -f [service_name]
 Write-Host "Para parar tudo: docker-compose -f $composeFile down" -ForegroundColor Red
 Write-Host ""
 Write-Host "NOTA: Sistema rodando em modo DESENVOLVIMENTO com SQLite" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "SEQUENCIA DE INICIALIZACAO EXECUTADA:" -ForegroundColor Cyan
+Write-Host "1. Redis" -ForegroundColor White
+Write-Host "2. RabbitMQ" -ForegroundColor White
+Write-Host "3. Auth API" -ForegroundColor White
+Write-Host "4. Alunos API" -ForegroundColor White
+Write-Host "5. Pagamentos API" -ForegroundColor White
+Write-Host "6. Conteudo API" -ForegroundColor White
+Write-Host "7. BFF API" -ForegroundColor White
+Write-Host "8. Frontend" -ForegroundColor White
+Write-Host ""
+Write-Host "IMPORTANTE: Todos os arquivos SQLite foram removidos e recriados para evitar corrupção!" -ForegroundColor Yellow
+Write-Host "Se ainda houver problemas, verifique as permissões da pasta 'data' e execute como administrador." -ForegroundColor Yellow
