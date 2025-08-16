@@ -39,9 +39,9 @@ namespace Pagamentos.API.Configuration
         }
 
 
-        private static async Task EnsureSeedProducts(IServiceProvider serviceProvider)
+        private static Task EnsureSeedProducts(IServiceProvider serviceProvider)
         {
-                return;
+                return Task.CompletedTask;
         }
     }
 }

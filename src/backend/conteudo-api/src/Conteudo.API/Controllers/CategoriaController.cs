@@ -80,7 +80,8 @@ public class CategoriaController(IMediatorHandler mediator
     /// <summary>
     /// Atualiza uma categoria existente.
     /// </summary>
-    /// param name="dto">Dados da categoria</param>
+    /// <param name="id">ID da categoria</param>
+    /// <param name="dto">Dados da categoria</param>
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador")]
     [ProducesResponseType(typeof(ResponseResult<bool>), 200)]

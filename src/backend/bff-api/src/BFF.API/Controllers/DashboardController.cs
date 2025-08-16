@@ -99,7 +99,7 @@ public class DashboardController : BffController
     /// </summary>
     /// <returns>Dados do dashboard do administrador</returns>
     [HttpGet("admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> GetDashboardAdmin()
     {
         var dashboard = await _dashboardService.GetDashboardAdminAsync();
