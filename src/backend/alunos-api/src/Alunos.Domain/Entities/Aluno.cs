@@ -86,11 +86,6 @@ public class Aluno : Entidade, IRaizAgregacao
     #endregion
 
     #region Manipuladores de MatriculaCurso
-    public int ObterQuantidadeAulasMatriculaCurso(Guid cursoId)
-    {
-        return _matriculasCursos.Count(m => m.CursoId == cursoId);
-    }
-
     public int ObterQuantidadeAulasPendenteMatriculaCurso(Guid cursoId)
     {
         return _matriculasCursos.Count(m => m.CursoId == cursoId && m.PodeConcluirCurso() == false);
@@ -165,6 +160,12 @@ public class Aluno : Entidade, IRaizAgregacao
         var historico = matriculaCurso.HistoricoAprendizado.FirstOrDefault(h => h.AulaId == aulaId);
         //if (historico == null) { throw new DomainException("Histórico de aprendizado não foi localizado"); }
         return historico;
+    }
+
+    public int ObterQuantidadeAulasMatriculaCurso(Guid matriculaCursoId)
+    {
+        var matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        return matriculaCurso.ObterQuantidadeAulasRegistradas();
     }
     #endregion
 

@@ -12,7 +12,7 @@ public interface IAlunoService
     Task<ResponseResult<ICollection<AulaCursoDto>>> ObterAulasPorMatriculaIdAsync(Guid matriculaId);
 
     Task<ResponseResult<Guid?>> MatricularAlunoAsync(MatriculaCursoRequest dto);
-    Task<ResponseResult<bool>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto);
-    Task<ResponseResult<bool>> ConcluirCursoAsync(ConcluirCursoRequest dto);
+    Task<ResponseResult<bool?>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto);
+    Task<ResponseResult<bool?>> ConcluirCursoAsync(ConcluirCursoRequest dto);
     Task<ResponseResult<Guid?>> SolicitarCertificadoAsync(SolicitaCertificadoRequest dto);
 }

@@ -178,7 +178,7 @@ namespace Conteudo.API.Controllers
         /// <param name="id">ID do material</param>
         /// <param name="dto">Dados atualizados do material</param>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Atualizar(Guid id, [FromBody] AtualizarMaterialDto dto)
@@ -189,7 +189,7 @@ namespace Conteudo.API.Controllers
                     return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do material não confere");
 
                 var command = dto.Adapt<AtualizarMaterialCommand>();
-                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
             {
@@ -202,7 +202,7 @@ namespace Conteudo.API.Controllers
         /// </summary>
         /// <param name="id">ID do material</param>
         [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Excluir(Guid id)
@@ -210,7 +210,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = new ExcluirMaterialCommand(id);
-                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
             {

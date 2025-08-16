@@ -130,13 +130,13 @@ public class CursosController(ICursoQuery cursoAppService
     /// <param name="id">ID do curso</param>
     /// <returns>Confirmação da exclusão</returns>
     [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ExcluirCurso([FromRoute] Guid id)
     {
         var command = new ExcluirCursoCommand(id);
-        return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+        return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
     }
 
     /// <summary>

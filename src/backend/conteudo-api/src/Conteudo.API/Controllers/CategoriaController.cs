@@ -84,7 +84,7 @@ public class CategoriaController(IMediatorHandler mediator
     /// <param name="dto">Dados da categoria</param>
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador")]
-    [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     public async Task<IActionResult> AtualizarCategoria(Guid id, [FromBody] AtualizarCategoriaDto dto)
     {
@@ -92,6 +92,6 @@ public class CategoriaController(IMediatorHandler mediator
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria não confere.");
 
         var command = dto.Adapt<AtualizarCategoriaCommand>();
-        return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+        return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
     }
 }

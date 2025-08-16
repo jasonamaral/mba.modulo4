@@ -67,13 +67,13 @@ public partial class ConteudoService : BaseApiService, IConteudoService
         return result ?? ReturnUnknowError<CursoDto>();
     }
 
-    public async Task<ResponseResult<bool>> ExcluirCursoAsync(Guid cursoId)
+    public async Task<ResponseResult<bool?>> ExcluirCursoAsync(Guid cursoId)
     {
         var result = await ExecuteWithErrorHandling(() => ExcluirCurso(cursoId),
             nameof(ExcluirCursoAsync),
             cursoId);
 
-        return result ?? ReturnUnknowError<bool>();
+        return result ?? ReturnUnknowError<bool?>();
     }
 
     public Task<ResponseResult<Guid?>> AdicionarAulaAsync(Guid cursoId, AulaDto aula)
@@ -86,7 +86,7 @@ public partial class ConteudoService : BaseApiService, IConteudoService
         throw new NotImplementedException();
     }
 
-    public Task<ResponseResult<bool>> ExcluirAulaAsync(Guid cursoId, Guid aulaId)
+    public Task<ResponseResult<bool?>> ExcluirAulaAsync(Guid cursoId, Guid aulaId)
     {
         throw new NotImplementedException();
     }

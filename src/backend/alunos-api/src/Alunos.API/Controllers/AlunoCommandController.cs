@@ -55,7 +55,7 @@ public partial class AlunoController(IMediatorHandler mediator,
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/registrar-historico-aprendizado")]
-    [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<bool?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
@@ -75,7 +75,7 @@ public partial class AlunoController(IMediatorHandler mediator,
             dto.DataTermino
         );
 
-        return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
+        return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public partial class AlunoController(IMediatorHandler mediator,
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPut("{alunoId}/concluir-curso")]
-    [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<bool?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]

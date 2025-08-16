@@ -180,7 +180,7 @@ namespace Conteudo.API.Controllers
         /// <param name="id">ID da aula</param>
         /// <param name="dto">Dados atualizados da aula</param>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Atualizar(Guid id, [FromBody] AtualizarAulaDto dto)
@@ -191,7 +191,7 @@ namespace Conteudo.API.Controllers
                     return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da aula não confere");
 
                 var command = dto.Adapt<AtualizarAulaCommand>();
-                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
             {
@@ -204,7 +204,7 @@ namespace Conteudo.API.Controllers
         /// </summary>
         /// <param name="id">ID da aula</param>
         [HttpPost("{id}/publicar")]
-        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Publicar(Guid id)
@@ -212,7 +212,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = new PublicarAulaCommand(id);
-                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
             {
@@ -225,7 +225,7 @@ namespace Conteudo.API.Controllers
         /// </summary>
         /// <param name="id">ID da aula</param>
         [HttpPost("{id}/despublicar")]
-        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Despublicar(Guid id)
@@ -233,7 +233,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = new DespublicarAulaCommand(id);
-                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
             {

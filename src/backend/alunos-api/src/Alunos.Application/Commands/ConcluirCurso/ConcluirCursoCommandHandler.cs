@@ -21,7 +21,7 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
         if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
         var matriculaCurso = aluno.ObterMatriculaCursoPeloId(request.MatriculaCursoId);
 
-        if (!ValidarSeMatriculaCursoPodeSerConcluido(aluno, request.CursoDto)) { return request.Resultado; }
+        if (!ValidarSeMatriculaCursoPodeSerConcluido(aluno, request.CursoDto, request.MatriculaCursoId)) { return request.Resultado; }
 
         aluno.ConcluirCurso(request.MatriculaCursoId);
 
@@ -58,21 +58,22 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
         return true;
     }
 
-    private bool ValidarSeMatriculaCursoPodeSerConcluido(Aluno aluno, CursoDto cursoDto)
+    private bool ValidarSeMatriculaCursoPodeSerConcluido(Aluno aluno, CursoDto cursoDto, Guid matriculaCursoId)
     {
         bool retorno = true;
-        if (aluno.ObterQuantidadeAulasPendenteMatriculaCurso(cursoDto.Id) > 0)
+        int quantidadeAulasPendentes = aluno.ObterQuantidadeAulasPendenteMatriculaCurso(cursoDto.Id);
+        if (quantidadeAulasPendentes > 0)
         {
             retorno = false;
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Existem aulas pendentes para este curso")).GetAwaiter().GetResult();
+            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), $"Existe(m) {quantidadeAulasPendentes} aula(s) pendente(s) para este curso")).GetAwaiter().GetResult();
         }
 
         int totalAulasAtivos = cursoDto.Aulas.Count();
-        int totalAulasMatricula = aluno.ObterQuantidadeAulasMatriculaCurso(cursoDto.Id);
+        int totalAulasMatricula = aluno.ObterQuantidadeAulasMatriculaCurso(matriculaCursoId);
         if (totalAulasMatricula < totalAulasAtivos)
         {
             retorno = false;
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Curso não pode ser concluído. Aulas pendentes.")).GetAwaiter().GetResult();
+            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), $"Curso não pode ser concluído. Exist(m) {totalAulasAtivos - totalAulasMatricula} aula(s) não iniciada(s)")).GetAwaiter().GetResult();
         }
 
         return retorno;

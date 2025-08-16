@@ -53,6 +53,7 @@ public class MatriculaCurso : Entidade
     internal short QuantidadeTotalCargaHoraria() => (short)_historicoAprendizado.Sum(x => x.CargaHoraria);
     public int QuantidadeAulasFinalizadas() => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
     public int QuantidadeAulasEmAndamento() => _historicoAprendizado.Count(h => !h.DataTermino.HasValue);
+    public int ObterQuantidadeAulasRegistradas() => QuantidadeAulasFinalizadas() + QuantidadeAulasEmAndamento();
     public bool MatriculaCursoConcluido() => DataConclusao.HasValue;
     internal bool MatriculaCursoDisponivel() => !DataConclusao.HasValue && EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado;
     internal bool PodeConcluirCurso() => EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado && _historicoAprendizado.Count(h => !h.DataTermino.HasValue) == 0;
