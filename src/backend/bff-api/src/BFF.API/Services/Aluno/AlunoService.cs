@@ -99,12 +99,12 @@ public partial class AlunoService : BaseApiService, IAlunoService
     #endregion
 
     #region Posts and Puts
-    public async Task<ResponseResult<Guid>> MatricularAlunoAsync(MatriculaCursoRequest dto)
+    public async Task<ResponseResult<Guid?>> MatricularAlunoAsync(MatriculaCursoRequest dto)
     {
         var cursoDto = await _conteudoService.ObterCursoPorIdAsync(dto.CursoId, includeAulas: false);
         if (cursoDto == null || cursoDto.Data == null)
         {
-            return new ResponseResult<Guid> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };
+            return new ResponseResult<Guid?> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };
         }
 
         var matriculaCursoApi = new MatriculaCursoApiRequest()
@@ -121,7 +121,7 @@ public partial class AlunoService : BaseApiService, IAlunoService
             nameof(MatricularAlunoAsync),
             dto.AlunoId);
 
-        return result ?? ReturnUnknowError<Guid>();
+        return result ?? ReturnUnknowError<Guid?>();
     }
 
     public async Task<ResponseResult<bool>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto)
@@ -186,13 +186,13 @@ public partial class AlunoService : BaseApiService, IAlunoService
         return result ?? ReturnUnknowError<bool>();
     }
 
-    public async Task<ResponseResult<Guid>> SolicitarCertificadoAsync(SolicitaCertificadoRequest dto)
+    public async Task<ResponseResult<Guid?>> SolicitarCertificadoAsync(SolicitaCertificadoRequest dto)
     {
         var result = await ExecuteWithErrorHandling(() => SolicitarCertificado(dto),
             nameof(SolicitarCertificadoAsync),
             dto.AlunoId);
 
-        return result ?? ReturnUnknowError<Guid>();
+        return result ?? ReturnUnknowError<Guid?>();
     }
     #endregion
 }

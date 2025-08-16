@@ -34,7 +34,7 @@ public partial class AlunoController(IMediatorHandler mediator,
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/matricular-aluno")]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<Guid?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
@@ -44,7 +44,7 @@ public partial class AlunoController(IMediatorHandler mediator,
         if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
         var comando = new MatricularAlunoCommand(dto.AlunoId, dto.CursoId, dto.CursoDisponivel, dto.Nome, dto.Valor, dto.Observacao);
-        return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(comando));
+        return RespostaPadraoApi<Guid?>(await _mediatorHandler.ExecutarComando(comando));
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public partial class AlunoController(IMediatorHandler mediator,
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/solicitar-certificado")]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<Guid?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
@@ -121,6 +121,6 @@ public partial class AlunoController(IMediatorHandler mediator,
         if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
         var comando = new SolicitarCertificadoCommand(dto.AlunoId, dto.MatriculaCursoId);
-        return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(comando));
+        return RespostaPadraoApi<Guid?>(await _mediatorHandler.ExecutarComando(comando));
     }
 }

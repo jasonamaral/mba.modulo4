@@ -93,13 +93,13 @@ public class CursosController(ICursoQuery cursoAppService
     /// </summary>
     /// <param name="dto">Dados do curso</param>
     [HttpPost]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
+    [ProducesResponseType(typeof(ResponseResult<Guid?>), 201)]
     [ProducesResponseType(typeof(ResponseResult<string>), 400)]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> CadastrarCurso([FromBody] CadastroCursoDto dto)
     {
         var command = dto.Adapt<CadastrarCursoCommand>();
-        return RespostaPadraoApi<Guid>(await _mediator.ExecutarComando(command));
+        return RespostaPadraoApi<Guid?>(await _mediator.ExecutarComando(command));
     }
 
     /// <summary>

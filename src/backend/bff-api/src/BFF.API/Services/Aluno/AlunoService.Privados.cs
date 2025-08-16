@@ -45,11 +45,11 @@ public partial class AlunoService
         else { return CaptureRequestError<ICollection<AulaCursoDto>>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
-    public async Task<ResponseResult<Guid>> MatricularAluno(Guid alunoId, MatriculaCursoApiRequest matriculaCursoApi)
+    public async Task<ResponseResult<Guid?>> MatricularAluno(Guid alunoId, MatriculaCursoApiRequest matriculaCursoApi)
     {
-        var apiResponse = await _apiClient.PostAsyncWithDetails<MatriculaCursoApiRequest, ResponseResult<Guid>>($"api/aluno/{alunoId}/matricular-aluno", matriculaCursoApi);
+        var apiResponse = await _apiClient.PostAsyncWithDetails<MatriculaCursoApiRequest, ResponseResult<Guid?>>($"api/aluno/{alunoId}/matricular-aluno", matriculaCursoApi);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
-        else { return CaptureRequestError<Guid>(apiResponse.ErrorContent, apiResponse.StatusCode); }
+        else { return CaptureRequestError<Guid?>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
     public async Task<ResponseResult<bool>> RegistrarHistoricoAprendizado(Guid alunoId, RegistroHistoricoAprendizadoApiRequest historicoAprendizado)
@@ -66,10 +66,10 @@ public partial class AlunoService
         else { return CaptureRequestError<bool>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
-    public async Task<ResponseResult<Guid>> SolicitarCertificado(SolicitaCertificadoRequest dto)
+    public async Task<ResponseResult<Guid?>> SolicitarCertificado(SolicitaCertificadoRequest dto)
     {
-        var apiResponse = await _apiClient.PostAsyncWithDetails<SolicitaCertificadoRequest, ResponseResult<Guid>>($"api/aluno/{dto.AlunoId}/solicitar-certificado", dto);
+        var apiResponse = await _apiClient.PostAsyncWithDetails<SolicitaCertificadoRequest, ResponseResult<Guid?>>($"api/aluno/{dto.AlunoId}/solicitar-certificado", dto);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
-        else { return CaptureRequestError<Guid>(apiResponse.ErrorContent, apiResponse.StatusCode); }
+        else { return CaptureRequestError<Guid?>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 }

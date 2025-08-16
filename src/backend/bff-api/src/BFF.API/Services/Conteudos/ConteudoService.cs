@@ -49,13 +49,13 @@ public partial class ConteudoService : BaseApiService, IConteudoService
         return result ?? ReturnUnknowError<ConteudoProgramaticoDto>();
     }
 
-    public async Task<ResponseResult<Guid>> AdicionarCursoAsync(CursoCriarRequest curso)
+    public async Task<ResponseResult<Guid?>> AdicionarCursoAsync(CursoCriarRequest curso)
     {
         var result = await ExecuteWithErrorHandling(() => AdicionarCurso(curso),
             nameof(AdicionarCursoAsync),
             Guid.NewGuid());
 
-        return result ?? ReturnUnknowError<Guid>();
+        return result ?? ReturnUnknowError<Guid?>();
     }
 
     public async Task<ResponseResult<CursoDto>> AtualizarCursoAsync(Guid id, AtualizarCursoRequest curso)
@@ -76,7 +76,7 @@ public partial class ConteudoService : BaseApiService, IConteudoService
         return result ?? ReturnUnknowError<bool>();
     }
 
-    public Task<ResponseResult<Guid>> AdicionarAulaAsync(Guid cursoId, AulaDto aula)
+    public Task<ResponseResult<Guid?>> AdicionarAulaAsync(Guid cursoId, AulaDto aula)
     {
         throw new NotImplementedException();
     }

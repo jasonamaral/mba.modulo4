@@ -43,12 +43,12 @@ public partial class ConteudoService
         else { return CaptureRequestError<ConteudoProgramaticoDto>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
-    public async Task<ResponseResult<Guid>> AdicionarCurso(CursoCriarRequest curso)
+    public async Task<ResponseResult<Guid?>> AdicionarCurso(CursoCriarRequest curso)
     {
         var url = "api/cursos";
-        var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<Guid>>(url, curso);
+        var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<Guid?>>(url, curso);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
-        else { return CaptureRequestError<Guid>(apiResponse.ErrorContent, apiResponse.StatusCode); }
+        else { return CaptureRequestError<Guid?>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
     public async Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso)
@@ -77,7 +77,7 @@ public partial class ConteudoService
         }
     }
 
-    public Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaDto aula)
+    public Task<ResponseResult<Guid?>> AdicionarAula(Guid cursoId, AulaDto aula)
     {
         throw new NotImplementedException();
     }

@@ -1,4 +1,5 @@
 using Core.DomainObjects;
+using Plataforma.Educacao.Core.Exceptions;
 
 namespace Conteudo.Domain.Entities;
 
@@ -36,16 +37,16 @@ public class Categoria : Entidade, IRaizAgregacao
     private static void ValidarDados(string nome, string descricao, string cor)
     {
         if (string.IsNullOrWhiteSpace(nome))
-            throw new ArgumentException("Nome da categoria é obrigatório", nameof(nome));
+            throw new DomainException("Nome da categoria é obrigatório");
             
         if (nome.Length > 100)
-            throw new ArgumentException("Nome da categoria não pode ter mais de 100 caracteres", nameof(nome));
+            throw new DomainException("Nome da categoria não pode ter mais de 100 caracteres");
             
         if (string.IsNullOrWhiteSpace(descricao))
-            throw new ArgumentException("Descrição da categoria é obrigatória", nameof(descricao));
+            throw new DomainException("Descrição da categoria é obrigatória");
             
         if (string.IsNullOrWhiteSpace(cor))
-            throw new ArgumentException("Cor da categoria é obrigatória", nameof(cor));
+            throw new DomainException("Cor da categoria é obrigatória");
     }
 
     public void AtualizarInformacoes(
@@ -75,7 +76,7 @@ public class Categoria : Entidade, IRaizAgregacao
     public void Desativar()
     {
         if (_cursos.Any(c => c.Ativo))
-            throw new InvalidOperationException("Não é possível desativar categoria com cursos ativos");
+            throw new DomainException("Não é possível desativar categoria com cursos ativos");
             
         IsAtiva = false;
         AtualizarDataModificacao();
@@ -84,7 +85,7 @@ public class Categoria : Entidade, IRaizAgregacao
     public void AlterarOrdem(int novaOrdem)
     {
         if (novaOrdem < 0)
-            throw new ArgumentException("Ordem não pode ser negativa", nameof(novaOrdem));
+            throw new DomainException("Ordem não pode ser negativa");
             
         Ordem = novaOrdem;
         AtualizarDataModificacao();

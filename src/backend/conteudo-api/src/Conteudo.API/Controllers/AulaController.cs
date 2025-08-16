@@ -158,7 +158,7 @@ namespace Conteudo.API.Controllers
         /// </summary>
         /// <param name="dto">Dados da aula</param>
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
+        [ProducesResponseType(typeof(ResponseResult<Guid?>), 201)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Cadastrar([FromBody] CadastroAulaDto dto)
