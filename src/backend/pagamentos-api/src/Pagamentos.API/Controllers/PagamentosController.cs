@@ -16,7 +16,7 @@ namespace Pagamentos.API.Controllers
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/pagamentos")]
-    //[Authorize]
+    [Authorize]
 
     public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService,
                                       IPagamentoComandoAppService pagamentoComandoAppService,
@@ -55,17 +55,6 @@ namespace Pagamentos.API.Controllers
             await _mediator.PublicarEvento(evento);
 
             return RespostaPadraoApi(HttpStatusCode.OK, "");
-
-
-            //return RespostaPadraoApi<bool>(HttpStatusCode.OK,await _mediator.PublicarEvento(command));
-
-
-
-
-            //TODO
-            // return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
-
-            return null;
 
         }
 

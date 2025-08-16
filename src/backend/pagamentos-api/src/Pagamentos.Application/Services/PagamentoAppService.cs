@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.ViewModels;
 using Pagamentos.Domain.Interfaces;
@@ -9,24 +9,23 @@ namespace Pagamentos.Application.Services
     {
 
         private readonly IPagamentoRepository _pagamentoRepository;
-        private readonly IMapper _mapper;
 
-        public PagamentoAppService(IPagamentoRepository pagamentoRepository,
-                                   IMapper mapper)
+        public PagamentoAppService(IPagamentoRepository pagamentoRepository)
         {
             _pagamentoRepository = pagamentoRepository;
-            _mapper = mapper;
         }
-
 
         public async Task<PagamentoViewModel> ObterPorId(Guid id)
         {
-            return _mapper.Map<PagamentoViewModel>(await _pagamentoRepository.ObterPorId(id));
+            var pagamento = await _pagamentoRepository.ObterPorId(id);
+            return pagamento.Adapt<PagamentoViewModel>();
         }
 
         public async Task<IEnumerable<PagamentoViewModel>> ObterTodos()
         {
-            return _mapper.Map<IEnumerable<PagamentoViewModel>>(await _pagamentoRepository.ObterTodos());
+            var pagamentos = await _pagamentoRepository.ObterTodos();
+
+            return pagamentos.Adapt<IEnumerable<PagamentoViewModel>>();
         }
 
         public void Dispose()

@@ -47,8 +47,6 @@ namespace Pagamentos.API.Configuration
             services.AddScoped<IPayPalGateway, PayPalGateway>();
             services.AddScoped<Pagamento.AntiCorruption.Interfaces.IConfigurationManager, Pagamento.AntiCorruption.Services.ConfigurationManager>();
 
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
             return services;
         }
     }

@@ -10,7 +10,7 @@ builder
     .AddSwaggerConfig()
     .AddDbContextConfig()
     .AddJwtConfiguration()
-    .AddAutoMapperConfig()
+    .AddMapsterConfiguration()
     .AddMediatrConfig()
     .AddDependencyInjectionConfig();
     
