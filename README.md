@@ -210,6 +210,13 @@ cd mba.modulo4
 # Script completo com configuração automática do RabbitMQ
 # Pode ser executado da raiz ou da pasta scripts
 .\scripts\start-all.ps1
+📋 O que o Script faz:
+🛑 Para todos os containers
+�� Limpa arquivos SQLite
+🗑️ Remove TODAS as imagens antigas (exceto Redis/RabbitMQ)
+🔍 Verifica limpeza completa
+🏗️ Recria imagens dos microserviços
+🚀 Inicia na ordem correta
 
 # Ou se estiver na pasta scripts:
 cd scripts
