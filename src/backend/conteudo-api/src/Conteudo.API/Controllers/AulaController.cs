@@ -1,6 +1,7 @@
 ﻿using Conteudo.Application.Commands.AtualizarAula;
 using Conteudo.Application.Commands.CadastrarAula;
 using Conteudo.Application.Commands.DespublicarAula;
+using Conteudo.Application.Commands.ExcluirAula;
 using Conteudo.Application.Commands.PublicarAula;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
@@ -192,6 +193,27 @@ namespace Conteudo.API.Controllers
 
                 var command = dto.Adapt<AtualizarAulaCommand>();
                 return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
+            }
+            catch (Exception ex)
+            {
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Exclui uma aula
+        /// </summary>
+        /// <param name="id">ID da aula</param>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Excluir(Guid id)
+        {
+            try
+            {
+                var command = new ExcluirAulaCommand(id);
+                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
             {
