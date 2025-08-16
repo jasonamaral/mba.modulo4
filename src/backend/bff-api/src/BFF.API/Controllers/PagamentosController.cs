@@ -1,5 +1,7 @@
 ﻿using BFF.API.Extensions;
 using BFF.API.Models.Request;
+using BFF.API.Services.Conteudos;
+using BFF.API.Services.Pagamentos;
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using Core.Communication;
@@ -9,7 +11,9 @@ using Core.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net;
 
 namespace BFF.API.Controllers
 {
@@ -21,60 +25,37 @@ namespace BFF.API.Controllers
     [Authorize]
     public class PagamentosController : BffController
     {
-
-        private readonly IApiClientService _apiClient;
-        private readonly ApiSettings _apiSettings;
+        private readonly IPagamentoService _pagamentoService;
+        private readonly ICacheService _cacheService;
         private readonly ILogger<PagamentosController> _logger;
 
-        public PagamentosController(IApiClientService apiClient,
-                                    IOptions<ApiSettings> apiSettings,
-                                    ILogger<PagamentosController> logger,
-                                    IMediatorHandler mediator,
+        public PagamentosController(IMediatorHandler mediator,
                                     INotificationHandler<DomainNotificacaoRaiz> notifications,
-                                    INotificador notificador) : base(mediator, notifications, notificador)
+                                    INotificador notificador,
+                                    ILogger<PagamentosController> logger,
+                                    IPagamentoService pagamentoService,
+                                    ICacheService cacheService) : base(mediator, notifications, notificador)
         {
-            _apiClient = apiClient;
-            _apiSettings = apiSettings.Value;
+            _pagamentoService = pagamentoService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Usuario, Administrador")]
         [HttpPost("pagamento")]
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
 
             try
             {
-                var userId = User.GetUserId();
-                if (userId == Guid.Empty)
+                var resultado = await _pagamentoService.ExecutarPagamento(pagamento);
+
+                if (resultado?.Status == (int)HttpStatusCode.OK)
                 {
-                    return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
+                    return Ok(resultado);
                 }
 
-                var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-                _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-                _apiClient.ClearDefaultHeaders();
-                _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
-                _apiClient.AddDefaultHeader("Accept", "application/json");
-                _apiClient.AddDefaultHeader("Content-Type", "application/json");
-
-                var _pagamento = pagamento;
-
-                var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<string>>("/api/v1/pagamentos/pagamento", null);
-
-                if (apiResponse.IsSuccess)
-                {
-                    return null;
-                    //return apiResponse.Data;
-                }
-
-
-                //if (response?.Data != null)
-                //{
-                //    return RespostaPadraoApi(System.Net.HttpStatusCode.OK, response.Data, "MSG SUCESSO TODO");
-                //}
-
-                return ProcessarErro(System.Net.HttpStatusCode.NotFound, "MSG ERRO TODO");
+                return BadRequest(resultado);
 
             }
             catch (Exception ex)
