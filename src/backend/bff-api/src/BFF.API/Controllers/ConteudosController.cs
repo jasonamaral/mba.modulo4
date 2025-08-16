@@ -143,7 +143,7 @@ public class ConteudosController : BffController
     /// Cadastrar um novo curso
     /// </summary>
     [HttpPost("cursos")]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ResponseResult<Guid?>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Administrador")]

@@ -170,7 +170,7 @@ public class AlunosController(IAlunoService aulaService,
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/matricular-aluno")]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<Guid?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
@@ -248,7 +248,7 @@ public class AlunosController(IAlunoService aulaService,
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
     [HttpPost("{alunoId}/solicitar-certificado")]
-    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<Guid?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]

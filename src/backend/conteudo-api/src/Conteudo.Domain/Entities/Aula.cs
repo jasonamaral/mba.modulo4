@@ -1,4 +1,5 @@
 using Core.DomainObjects;
+using Plataforma.Educacao.Core.Exceptions;
 
 namespace Conteudo.Domain.Entities;
 
@@ -50,25 +51,25 @@ public class Aula : Entidade, IRaizAgregacao
     private static void ValidarDados(string nome, string descricao, int numero, int duracaoMinutos, string videoUrl, string tipoAula)
     {
         if (string.IsNullOrWhiteSpace(nome))
-            throw new ArgumentException("Nome da aula é obrigatório", nameof(nome));
+            throw new DomainException("Nome da aula é obrigatório");
             
         if (nome.Length > 200)
-            throw new ArgumentException("Nome da aula não pode ter mais de 200 caracteres", nameof(nome));
+            throw new DomainException("Nome da aula não pode ter mais de 200 caracteres");
             
         if (string.IsNullOrWhiteSpace(descricao))
-            throw new ArgumentException("Descrição da aula é obrigatória", nameof(descricao));
+            throw new DomainException("Descrição da aula é obrigatória");
             
         if (numero <= 0)
-            throw new ArgumentException("Número da aula deve ser maior que zero", nameof(numero));
+            throw new DomainException("Número da aula deve ser maior que zero");
             
         if (duracaoMinutos <= 0)
-            throw new ArgumentException("Duração da aula deve ser maior que zero", nameof(duracaoMinutos));
+            throw new DomainException("Duração da aula deve ser maior que zero");
             
         if (string.IsNullOrWhiteSpace(videoUrl))
-            throw new ArgumentException("URL do vídeo é obrigatória", nameof(videoUrl));
+            throw new DomainException("URL do vídeo é obrigatória");
             
         if (string.IsNullOrWhiteSpace(tipoAula))
-            throw new ArgumentException("Tipo da aula é obrigatório", nameof(tipoAula));
+            throw new DomainException("Tipo da aula é obrigatório");
     }
 
     public void AtualizarInformacoes(
@@ -98,7 +99,7 @@ public class Aula : Entidade, IRaizAgregacao
     public void Publicar()
     {
         if (IsPublicada)
-            throw new InvalidOperationException("Aula já está publicada");
+            throw new DomainException("Aula já está publicada");
             
         IsPublicada = true;
         DataPublicacao = DateTime.UtcNow;
@@ -108,7 +109,7 @@ public class Aula : Entidade, IRaizAgregacao
     public void Despublicar()
     {
         if (!IsPublicada)
-            throw new InvalidOperationException("Aula não está publicada");
+            throw new DomainException("Aula não está publicada");
             
         IsPublicada = false;
         DataPublicacao = null;
@@ -118,10 +119,10 @@ public class Aula : Entidade, IRaizAgregacao
     public void AdicionarMaterial(Material material)
     {
         if (material == null)
-            throw new ArgumentException("Material não pode ser nulo", nameof(material));
+            throw new DomainException("Material não pode ser nulo");
             
         if (_materiais.Any(m => m.Nome == material.Nome))
-            throw new InvalidOperationException($"Já existe um material com o nome {material.Nome}");
+            throw new DomainException($"Já existe um material com o nome {material.Nome}");
             
         _materiais.Add(material);
         AtualizarDataModificacao();

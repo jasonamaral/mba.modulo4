@@ -42,6 +42,7 @@ public abstract class MainController(IMediatorHandler mediator
         {
             Status = (int)HttpStatusCode.BadRequest,
             Title = message ?? "Ocorreu um ou mais erros durante a operação",
+            Data = data,
             Errors = new ResponseErrorMessages
             {
                 Mensagens = mensagens
