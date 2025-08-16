@@ -77,19 +77,36 @@ public partial class ConteudoService
         }
     }
 
-    public Task<ResponseResult<Guid?>> AdicionarAula(Guid cursoId, AulaDto aula)
+    public async Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaCriarRequest aula)
     {
-        throw new NotImplementedException();
+        var url = $"api/cursos/{cursoId}/aulas";
+        var apiResponse = await _apiClient.PostAsyncWithDetails<AulaCriarRequest, ResponseResult<Guid>>(url, aula);
+        
+        return apiResponse.IsSuccess
+            ? apiResponse.Data
+            : CaptureRequestError<Guid>(apiResponse.ErrorContent, apiResponse.StatusCode);
     }
 
-    public Task<ResponseResult<AulaDto>> AtualizarAula(Guid cursoId, AulaDto aula)
+    public async Task<ResponseResult<AulaDto>> AtualizarAula(Guid cursoId, Guid aulaId, AulaAtualizarRequest aula)
     {
-        throw new NotImplementedException();
+        if (aulaId != aula.Id)
+            return new ResponseResult<AulaDto> { Status = 400, Errors = new() { Mensagens = new List<string> { "ID da aula não confere" } } };
+
+        var url = $"api/cursos/{cursoId}/aulas/{aulaId}";
+        var apiResponse = await _apiClient.PutAsyncWithDetails<AulaAtualizarRequest, ResponseResult<AulaDto>>(url, aula);
+        
+        return apiResponse.IsSuccess
+            ? apiResponse.Data
+            : CaptureRequestError<AulaDto>(apiResponse.ErrorContent, apiResponse.StatusCode);
     }
 
-    public Task<ResponseResult<bool?>> ExcluirAula(Guid cursoId, Guid aulaId)
+    public async Task<ResponseResult<bool>> ExcluirAula(Guid cursoId, Guid aulaId)
     {
-        throw new NotImplementedException();
+        var url = $"api/cursos/{cursoId}/aulas/{aulaId}";
+        var apiResponse = await _apiClient.DeleteAsync(url);
+        return apiResponse
+            ? new ResponseResult<bool> { Status = 200, Data = true }
+            : new ResponseResult<bool> { Status = 400, Errors = new() { Mensagens = new List<string> { "Erro ao excluir aula" } } };
     }
 
     public async Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaId(Guid categoriaId, bool includeAulas = false)

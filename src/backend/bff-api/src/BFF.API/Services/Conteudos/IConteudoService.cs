@@ -1,4 +1,4 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
 using BFF.Domain.DTOs;
 using Core.Communication;
 using Core.Communication.Filters;
@@ -15,7 +15,7 @@ public interface IConteudoService
     Task<ResponseResult<Guid?>> AdicionarCursoAsync(CursoCriarRequest curso);
     Task<ResponseResult<CursoDto>> AtualizarCursoAsync(Guid id, AtualizarCursoRequest curso);
     Task<ResponseResult<bool?>> ExcluirCursoAsync(Guid cursoId);
-    Task<ResponseResult<Guid?>> AdicionarAulaAsync(Guid cursoId, AulaDto aula);
-    Task<ResponseResult<AulaDto>> AtualizarAulaAsync(Guid cursoId, AulaDto aula);
-    Task<ResponseResult<bool?>> ExcluirAulaAsync(Guid cursoId, Guid aulaId);
+    Task<ResponseResult<Guid>> AdicionarAulaAsync(Guid cursoId, AulaCriarRequest aula);
+    Task<ResponseResult<AulaDto>> AtualizarAulaAsync(Guid cursoId, AulaAtualizarRequest aula);
+    Task<ResponseResult<bool>> ExcluirAulaAsync(Guid cursoId, Guid aulaId);
 }
