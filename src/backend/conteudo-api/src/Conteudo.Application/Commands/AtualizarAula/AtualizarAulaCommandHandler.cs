@@ -73,6 +73,21 @@ namespace Conteudo.Application.Commands.AtualizarAula
                     new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), "Aula não encontrada"));
                 return false;
             }
+            
+            var curso = await _cursoRepository.ObterPorIdAsync(request.CursoId);
+            if (curso == null)
+            {
+                await _mediatorHandler.PublicarNotificacaoDominio(
+                    new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), "Curso não encontrado"));
+                return false;
+            }
+
+            if (aula.CursoId != request.CursoId)
+            {
+                await _mediatorHandler.PublicarNotificacaoDominio(
+                    new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), "Aula não pertence ao curso informado"));
+                return false;
+            }
 
             if (await _aulaRepository.ExistePorNumeroAsync(aula.CursoId, request.Numero, request.Id))
             {
