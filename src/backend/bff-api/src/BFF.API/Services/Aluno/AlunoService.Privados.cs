@@ -52,18 +52,18 @@ public partial class AlunoService
         else { return CaptureRequestError<Guid?>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
-    public async Task<ResponseResult<bool>> RegistrarHistoricoAprendizado(Guid alunoId, RegistroHistoricoAprendizadoApiRequest historicoAprendizado)
+    public async Task<ResponseResult<bool?>> RegistrarHistoricoAprendizado(Guid alunoId, RegistroHistoricoAprendizadoApiRequest historicoAprendizado)
     {
-        var apiResponse = await _apiClient.PostAsyncWithDetails<RegistroHistoricoAprendizadoApiRequest, ResponseResult<bool>>($"api/aluno/{alunoId}/registrar-historico-aprendizado", historicoAprendizado);
+        var apiResponse = await _apiClient.PostAsyncWithDetails<RegistroHistoricoAprendizadoApiRequest, ResponseResult<bool?>>($"api/aluno/{alunoId}/registrar-historico-aprendizado", historicoAprendizado);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
-        else { return CaptureRequestError<bool>(apiResponse.ErrorContent, apiResponse.StatusCode); }
+        else { return CaptureRequestError<bool?>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
-    public async Task<ResponseResult<bool>> ConcluirCurso(Guid alunoId, ConcluirCursoApiRequest concluirCurso)
+    public async Task<ResponseResult<bool?>> ConcluirCurso(Guid alunoId, ConcluirCursoApiRequest concluirCurso)
     {
-        var apiResponse = await _apiClient.PutAsyncWithDetails<ConcluirCursoApiRequest, ResponseResult<bool>>($"api/aluno/{alunoId}/concluir-curso", concluirCurso);
+        var apiResponse = await _apiClient.PutAsyncWithDetails<ConcluirCursoApiRequest, ResponseResult<bool?>>($"api/aluno/{alunoId}/concluir-curso", concluirCurso);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
-        else { return CaptureRequestError<bool>(apiResponse.ErrorContent, apiResponse.StatusCode); }
+        else { return CaptureRequestError<bool?>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
     public async Task<ResponseResult<Guid?>> SolicitarCertificado(SolicitaCertificadoRequest dto)

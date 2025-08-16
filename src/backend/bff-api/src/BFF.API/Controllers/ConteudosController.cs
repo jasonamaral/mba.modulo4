@@ -61,7 +61,7 @@ public class ConteudosController : BffController
             return RespostaPadraoApi(HttpStatusCode.OK, cachedCurso, "Curso obtido do cache com sucesso");
         }
         
-        var resultado = await _conteudoService.ObterCursoPorIdAsync(cursoId);
+        var resultado = await _conteudoService.ObterCursoPorIdAsync(cursoId, includeAulas);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -182,7 +182,7 @@ public class ConteudosController : BffController
     /// Excluir um curso
     /// </summary>
     [HttpDelete("cursos/{cursoId}")]
-    [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<bool?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Administrador")]

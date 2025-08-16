@@ -124,20 +124,25 @@ public partial class AlunoService : BaseApiService, IAlunoService
         return result ?? ReturnUnknowError<Guid?>();
     }
 
-    public async Task<ResponseResult<bool>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto)
+    public async Task<ResponseResult<bool?>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto)
     {
 
         var matriculaCurso = await ObterMatriculasPorAlunoIdAsync(dto.AlunoId);
         if (matriculaCurso == null || matriculaCurso.Data == null || !matriculaCurso.Data.Any(x => x.Id == dto.MatriculaCursoId))
         {
-            return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Matrícula não encontrada"] } };
+            return new ResponseResult<bool?> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Matrícula não encontrada"] } };
         }
 
         // TODO :: Isso está feio demais. Refatorar urgente! Deve ter um endpoint na AlunoApi para obter a matrícula por ID
-        var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: false);
+        var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: true);
         if (cursoDto == null || cursoDto.Data == null)
         {
-            return new ResponseResult<bool> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };
+            return new ResponseResult<bool?> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };
+        }
+
+        if (!cursoDto.Data.Aulas.Any(x => x.Id == dto.AulaId))
+        {
+            return new ResponseResult<bool?> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Aula não encontrada"] } };
         }
 
         var historicoAprendizado = new RegistroHistoricoAprendizadoApiRequest
@@ -155,21 +160,21 @@ public partial class AlunoService : BaseApiService, IAlunoService
             nameof(RegistrarHistoricoAprendizadoAsync),
             dto.AlunoId);
 
-        return result ?? ReturnUnknowError<bool>();
+        return result ?? ReturnUnknowError<bool?>();
     }
 
-    public async Task<ResponseResult<bool>> ConcluirCursoAsync(ConcluirCursoRequest dto)
+    public async Task<ResponseResult<bool?>> ConcluirCursoAsync(ConcluirCursoRequest dto)
     {
         var matriculaCurso = await ObterMatriculasPorAlunoIdAsync(dto.AlunoId);
         if (matriculaCurso == null || matriculaCurso.Data == null || !matriculaCurso.Data.Any(x => x.Id == dto.MatriculaCursoId))
         {
-            return new ResponseResult<bool> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Matrícula não encontrada"] } };
+            return new ResponseResult<bool?> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Matrícula não encontrada"] } };
         }
 
-        var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: false);
+        var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: true);
         if (cursoDto == null || cursoDto.Data == null)
         {
-            return new ResponseResult<bool> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };
+            return new ResponseResult<bool?> { Status = 404, Errors = new ResponseErrorMessages { Mensagens = ["Curso não encontrado"] } };
         }
 
         var concluirCurso = new ConcluirCursoApiRequest
@@ -183,7 +188,7 @@ public partial class AlunoService : BaseApiService, IAlunoService
             nameof(ConcluirCursoAsync),
             dto.AlunoId);
 
-        return result ?? ReturnUnknowError<bool>();
+        return result ?? ReturnUnknowError<bool?>();
     }
 
     public async Task<ResponseResult<Guid?>> SolicitarCertificadoAsync(SolicitaCertificadoRequest dto)

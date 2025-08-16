@@ -59,17 +59,17 @@ public partial class ConteudoService
         else { return CaptureRequestError<CursoDto>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
-    public async Task<ResponseResult<bool>> ExcluirCurso(Guid cursoId)
+    public async Task<ResponseResult<bool?>> ExcluirCurso(Guid cursoId)
     {
         var url = $"api/cursos/{cursoId}";
         var apiResponse = await _apiClient.DeleteAsync(url);
         if (apiResponse) 
         { 
-            return new ResponseResult<bool> { Status = 200, Data = true }; 
+            return new ResponseResult<bool?> { Status = 200, Data = true }; 
         }
         else
         {
-            return new ResponseResult<bool>
+            return new ResponseResult<bool?>
             {
                 Status = 400,
                 Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro ao excluir o curso" } }
@@ -87,7 +87,7 @@ public partial class ConteudoService
         throw new NotImplementedException();
     }
 
-    public Task<ResponseResult<bool>> ExcluirAula(Guid cursoId, Guid aulaId)
+    public Task<ResponseResult<bool?>> ExcluirAula(Guid cursoId, Guid aulaId)
     {
         throw new NotImplementedException();
     }
