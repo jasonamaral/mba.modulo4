@@ -2,20 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pagamentos.Infrastructure.Context;
 
 #nullable disable
 
-namespace Pagamentos.Infrastructure.Migrations
+namespace Pagamentos.Infrastructure.Migrations.Sqlite
 {
     [DbContext(typeof(PagamentoContext))]
-    [Migration("20250811174505_Migration_001")]
-    partial class Migration_001
+    partial class PagamentoContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -52,10 +49,9 @@ namespace Pagamentos.Infrastructure.Migrations
                         .HasColumnType("varchar(16)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Valor")
@@ -87,7 +83,7 @@ namespace Pagamentos.Infrastructure.Migrations
                     b.Property<decimal>("Total")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -110,8 +106,7 @@ namespace Pagamentos.Infrastructure.Migrations
 
             modelBuilder.Entity("Pagamentos.Domain.Entities.Pagamento", b =>
                 {
-                    b.Navigation("Transacao")
-                        .IsRequired();
+                    b.Navigation("Transacao");
                 });
 #pragma warning restore 612, 618
         }

@@ -119,7 +119,7 @@ public class MatriculaCurso : Entidade
     #endregion
 
     #region Manipuladores de HistoricoAprendizado
-    internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, byte cargaHoraria, DateTime? dataTermino = null)
+    internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         if (!MatriculaCursoDisponivel()) { throw new DomainException("Matrícula não está disponível para registrar histórico de aprendizado"); }
 

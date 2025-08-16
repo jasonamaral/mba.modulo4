@@ -99,7 +99,7 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                     CursoId = table.Column<Guid>(type: "UniqueIdentifier", nullable: false),
                     AulaId = table.Column<Guid>(type: "UniqueIdentifier", nullable: false),
                     NomeAula = table.Column<string>(type: "Varchar", maxLength: 100, nullable: false),
-                    CargaHoraria = table.Column<byte>(type: "TinyInt", nullable: false),
+                    CargaHoraria = table.Column<int>(type: "Int", nullable: false),
                     DataInicio = table.Column<DateTime>(type: "SmallDateTime", nullable: false),
                     DataTermino = table.Column<DateTime>(type: "SmallDateTime", nullable: true)
                 },
