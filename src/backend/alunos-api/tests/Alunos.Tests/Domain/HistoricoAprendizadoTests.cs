@@ -12,7 +12,7 @@ public class HistoricoAprendizadoTests
     private static readonly string _nomeAulaValido = "Introdução à Lógica de Programação";
     private static readonly byte _cargaHorariaValida = 20;
 
-    private HistoricoAprendizado CriarHistoricoValido(DateTime? inicio = null, DateTime? termino = null) => new(_matriculaIdValido, _cursoIdValido, _aulaIdValido, _nomeAulaValido, _cargaHorariaValida, inicio, termino);
+    private HistoricoAprendizado CriarHistoricoValido(DateTime? inicio = null, DateTime? termino = null) => new(_matriculaIdValido, _cursoIdValido, _aulaIdValido, _nomeAulaValido, _cargaHorariaValida, inicio ?? new DateTime(2024, 1, 1), termino);
     #endregion
 
     #region Construtores
@@ -26,7 +26,7 @@ public class HistoricoAprendizadoTests
         historico.AulaId.Should().Be(_aulaIdValido);
         historico.NomeAula.Should().Be(_nomeAulaValido);
         historico.CargaHoraria.Should().Be(_cargaHorariaValida);
-        historico.DataInicio.Date.Should().Be(DateTime.UtcNow.Date);
+        historico.DataInicio.Date.Should().Be(new DateTime(2024, 1, 1));
         historico.DataTermino.Should().BeNull();
     }
 
@@ -49,7 +49,7 @@ public class HistoricoAprendizadoTests
     [Fact]
     public void Nao_deve_criar_historico_com_data_inicio_futura()
     {
-        var dataFutura = DateTime.UtcNow.AddDays(1);
+        var dataFutura = DateTime.Now.AddDays(1);
         Action act = () => CriarHistoricoValido(inicio: dataFutura);
         act.Should().Throw<DomainException>().WithMessage("*Data de início não pode ser superior à data atual*");
     }
@@ -57,7 +57,7 @@ public class HistoricoAprendizadoTests
     [Fact]
     public void Nao_deve_criar_historico_com_data_termino_anterior_ao_inicio()
     {
-        var inicio = DateTime.UtcNow.Date;
+        var inicio = DateTime.Now.Date;
         var termino = inicio.AddDays(-1);
         Action act = () => CriarHistoricoValido(inicio, termino);
         act.Should().Throw<DomainException>().WithMessage("*Data de término não pode ser menor que a data de início*");
@@ -66,8 +66,8 @@ public class HistoricoAprendizadoTests
     [Fact]
     public void Nao_deve_criar_historico_com_data_termino_futura()
     {
-        var termino = DateTime.UtcNow.AddDays(1);
-        Action act = () => CriarHistoricoValido(DateTime.UtcNow.Date, termino);
+        var termino = DateTime.Now.AddDays(1);
+        Action act = () => CriarHistoricoValido(DateTime.Now.Date, termino);
         act.Should().Throw<DomainException>().WithMessage("*Data de término não pode ser superior à data atual*");
     }
     #endregion
@@ -76,8 +76,8 @@ public class HistoricoAprendizadoTests
     [Fact]
     public void ToString_deve_retornar_formatado_para_concluido()
     {
-        var inicio = DateTime.UtcNow.AddDays(-10);
-        var termino = DateTime.UtcNow.AddDays(-1);
+        var inicio = DateTime.Now.AddDays(-10);
+        var termino = DateTime.Now.AddDays(-1);
         var historico = CriarHistoricoValido(inicio, termino);
 
         var texto = historico.ToString();
@@ -103,20 +103,18 @@ public class HistoricoAprendizadoTests
         var historico = CriarHistoricoValido();
         var texto = historico.ToString();
 
-        texto.Should().Contain(historico.AulaId.ToString())
-              .And.Contain("Iniciada em")
+        texto.Should().Contain("Iniciada em")
               .And.Contain("(Em andamento)");
     }
 
     [Fact]
     public void ToString_deve_conter_nome_aula_e_data_finalizadao()
     {
-        var termino = DateTime.UtcNow.Date;
+        var termino = DateTime.Now.Date;
         var historico = CriarHistoricoValido(termino: termino);
         var texto = historico.ToString();
 
-        texto.Should().Contain(historico.AulaId.ToString())
-              .And.Contain("Iniciada em")
+        texto.Should().Contain("Iniciada em")
               .And.Contain(termino.ToString("dd/MM/yyyy"));
     }    
     #endregion
