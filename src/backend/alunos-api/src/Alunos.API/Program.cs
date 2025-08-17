@@ -1,7 +1,7 @@
 using Alunos.API.Configurations;
 using Alunos.API.Helpers;
 
-internal class Program
+public class Program
 {
     private static void Main(string[] args)
     {

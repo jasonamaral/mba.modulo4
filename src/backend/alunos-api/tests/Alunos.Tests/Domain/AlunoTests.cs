@@ -42,7 +42,7 @@ public class AlunoTests
 
     [Theory]
     [InlineData("", "*Nome não pode ser nulo ou vazio*")]
-    [InlineData("Jo", "*Nome deve ter entre 3 e 50 caracteres*")]
+    [InlineData("Jo", "*Nome deve ter entre 3 e 100 caracteres*")]
     public void Nao_deve_criar_aluno_com_nome_invalido(string nome, string msgErro)
     {
         Action act = () => new Aluno(_codigoUsuario, nome, _emailValido, _cpfValido, _dataNascimentoValida, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
@@ -117,10 +117,11 @@ public class AlunoTests
     public void Nao_deve_matricular_aluno_em_curso_duplicado()
     {
         var aluno = CriarAlunoValido();
+        aluno.AtivarAluno(); // Ativar o aluno antes de matricular
         var cursoId = Guid.NewGuid();
-        aluno.MatricularAlunoEmCurso(cursoId, "Curso A", 1000, "obs");
+        aluno.MatricularAlunoEmCurso(cursoId, "Curso de Programação Avançada", 1000, "obs");
 
-        Action act = () => aluno.MatricularAlunoEmCurso(cursoId, "Curso A", 1000, "obs");
+        Action act = () => aluno.MatricularAlunoEmCurso(cursoId, "Curso de Programação Avançada", 1000, "obs");
         act.Should().Throw<DomainException>().WithMessage("*Aluno já está matriculado neste curso*");
     }
     #endregion

@@ -13,7 +13,7 @@ public class CertificadoTests
     private static readonly string _pathValido = "/certificados/teste.pdf";
     private static readonly string _instrutorValido = "Eduardo Pires";
 
-    private Certificado CriarCertificadoValido() => new(_matriculaIdValido, _nomeCursoValido, DateTime.UtcNow, null, _cargaHorariaValida, _notaFinalValida, _pathValido, _instrutorValido);
+    private Certificado CriarCertificadoValido() => new(_matriculaIdValido, _nomeCursoValido, DateTime.Now, null, _cargaHorariaValida, _notaFinalValida, _pathValido, _instrutorValido);
     #endregion
 
     #region Construtores
@@ -29,7 +29,7 @@ public class CertificadoTests
         certificado.NotaFinal.Should().Be(_notaFinalValida);
         certificado.PathCertificado.Should().Be(_pathValido);
         certificado.NomeInstrutor.Should().Be(_instrutorValido);
-        certificado.DataSolicitacao.Date.Should().Be(DateTime.UtcNow.Date);
+        certificado.DataSolicitacao.Date.Should().Be(DateTime.Now.Date);
     }
 
     [Theory]
@@ -37,28 +37,28 @@ public class CertificadoTests
     [InlineData(null, "Path do certificado não pode ser nulo ou vazio")]
     public void Nao_deve_criar_certificado_com_path_invalido(string path, string mensagem)
     {
-        Action act = () => new Certificado(_matriculaIdValido, _nomeCursoValido, DateTime.UtcNow, null, _cargaHorariaValida, _notaFinalValida, path, _instrutorValido);
+        Action act = () => new Certificado(_matriculaIdValido, _nomeCursoValido, DateTime.Now, null, _cargaHorariaValida, _notaFinalValida, path, _instrutorValido);
         act.Should().Throw<DomainException>().WithMessage($"*{mensagem}*");
     }
 
     [Fact]
     public void Nao_deve_criar_certificado_com_carga_horaria_zero()
     {
-        Action act = () => new Certificado(_matriculaIdValido, _nomeCursoValido, DateTime.UtcNow, null, 0, _notaFinalValida, _pathValido, _instrutorValido);
+        Action act = () => new Certificado(_matriculaIdValido, _nomeCursoValido, DateTime.Now, null, 0, _notaFinalValida, _pathValido, _instrutorValido);
         act.Should().Throw<DomainException>().WithMessage("*Carga horária deve ser maior que zero*");
     }
 
     [Fact]
     public void Nao_deve_criar_certificado_com_nota_maior_que_10()
     {
-        Action act = () => new Certificado(_matriculaIdValido, _nomeCursoValido, DateTime.UtcNow, null, _cargaHorariaValida, 11, _pathValido, _instrutorValido);
+        Action act = () => new Certificado(_matriculaIdValido, _nomeCursoValido, DateTime.Now, null, _cargaHorariaValida, 11, _pathValido, _instrutorValido);
         act.Should().Throw<DomainException>().WithMessage("*Nota final deve estar entre 0 e 10*");
     }
 
     [Fact]
     public void Nao_deve_criar_certificado_com_nome_curso_vazio()
     {
-        Action act = () => new Certificado(_matriculaIdValido, "", DateTime.UtcNow, null, _cargaHorariaValida, _notaFinalValida, _pathValido, _instrutorValido);
+        Action act = () => new Certificado(_matriculaIdValido, "", DateTime.Now, null, _cargaHorariaValida, _notaFinalValida, _pathValido, _instrutorValido);
         act.Should().Throw<DomainException>().WithMessage("*Nome do curso não pode ser nulo ou vazio*");
     }
     #endregion
@@ -76,7 +76,7 @@ public class CertificadoTests
     public void Nao_deve_atualizar_path_se_emitido()
     {
         var certificado = CriarCertificadoValido();
-        certificado.AtualizarDataEmissao(DateTime.UtcNow);
+        certificado.AtualizarDataEmissao(DateTime.Now);
         Action act = () => certificado.AtualizarPathCertificado("/novo.pdf");
         act.Should().Throw<DomainException>().WithMessage("*Certificado foi emitido e não pode sofrer alterações*");
     }
