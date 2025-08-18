@@ -1,16 +1,6 @@
-using Alunos.API;
-using Alunos.Application.Interfaces;
 using Alunos.Application.DTOs.Response;
-using Alunos.Domain.Entities;
-using Alunos.Infrastructure.Data;
-using Alunos.Infrastructure.Repositories;
+using Alunos.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Net;
-using System.Text;
-using System.Text.Json;
 
 namespace Alunos.IntegrationTests.Controllers;
 
@@ -189,7 +179,7 @@ public class MockAlunoQueryService : IAlunoQueryService
             CursoId = Guid.NewGuid(),
             NomeCurso = "Curso de Teste (Mock)",
             DataMatricula = DateTime.Now.AddDays(-30),
-                            EstadoMatricula = "Em Andamento"
+            EstadoMatricula = "Em Andamento"
         };
 
         return Task.FromResult(matricula);

@@ -80,13 +80,12 @@ public class MatriculaCursoTests
         var matricula = CriarMatriculaValida();
         matricula.RegistrarPagamentoMatricula();
         
-        // Como o teste está falhando devido à validação de data, vamos testar o comportamento esperado
-        // sem depender do registro de histórico que está com problema
-        matricula.EstadoMatricula.Should().Be(EstadoMatriculaCursoEnum.PagamentoRealizado);
+        // Adicionar uma aula em andamento (sem data de término)
+        matricula.RegistrarHistoricoAprendizado(Guid.NewGuid(), "Aula de Teste", 5);
         
-        // Verificar se a matrícula não pode ser concluída sem aulas
+        // Verificar se a matrícula não pode ser concluída com aulas em andamento
         Action act = () => matricula.ConcluirCurso();
-        act.Should().Throw<DomainException>().WithMessage("*Data de conclusão não pode ser anterior a data de matrícula*");
+        act.Should().Throw<DomainException>().WithMessage("*Não é possível concluir o curso, existem aulas não finalizadas*");
     }
 
     [Fact]
@@ -95,19 +94,21 @@ public class MatriculaCursoTests
         var matricula = CriarMatriculaValida();
         matricula.RegistrarPagamentoMatricula();
 
-        // Como o teste está falhando devido à validação de data, vamos testar o comportamento esperado
-        // sem depender do registro de histórico que está com problema
-        matricula.EstadoMatricula.Should().Be(EstadoMatriculaCursoEnum.PagamentoRealizado);
-        
         // Verificar se a matrícula está disponível para registrar histórico
         matricula.MatriculaCursoDisponivel().Should().BeTrue();
         
         // Verificar se não há histórico antes
         matricula.HistoricoAprendizado.Should().HaveCount(0);
         
-        // Como o registro de histórico está falhando devido à validação de data,
-        // este teste agora valida apenas o estado da matrícula e sua disponibilidade
-        // O problema de validação de data precisa ser corrigido na implementação
+        // Registrar histórico de uma aula
+        var aulaId = Guid.NewGuid();
+        matricula.RegistrarHistoricoAprendizado(aulaId, "Aula de Teste", 5);
+        
+        // Verificar se o histórico foi registrado
+        matricula.HistoricoAprendizado.Should().HaveCount(1);
+        matricula.HistoricoAprendizado.First().AulaId.Should().Be(aulaId);
+        matricula.HistoricoAprendizado.First().NomeAula.Should().Be("Aula de Teste");
+        matricula.HistoricoAprendizado.First().CargaHoraria.Should().Be(5);
     }
 
     [Fact]

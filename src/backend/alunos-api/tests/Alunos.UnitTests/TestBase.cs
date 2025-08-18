@@ -1,13 +1,11 @@
-using Alunos.Application.Interfaces;
 using Alunos.Application.DTOs.Response;
+using Alunos.Application.Interfaces;
 using Core.Communication;
 using Core.Mediator;
+using Core.Messages;
 using Core.Notification;
 using Core.Services.Controllers;
-using Core.Messages;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
 
 namespace Alunos.UnitTests;
 
@@ -15,22 +13,30 @@ public abstract class TestBase
 {
     protected readonly Mock<IMediatorHandler> MockMediatorHandler;
     protected readonly Mock<IAlunoQueryService> MockAlunoQueryService;
-    protected readonly Mock<IDomainNotificacaoHandler> MockNotifications;
+    protected readonly TestableDomainNotificacaoHandler Notifications;
     protected readonly Mock<INotificador> MockNotificador;
 
     protected TestBase()
     {
         MockMediatorHandler = new Mock<IMediatorHandler>();
         MockAlunoQueryService = new Mock<IAlunoQueryService>();
-        MockNotifications = new Mock<IDomainNotificacaoHandler>();
+        Notifications = new TestableDomainNotificacaoHandler();
         MockNotificador = new Mock<INotificador>();
+
+        // Configuração padrão para evitar listas nulas
+        MockNotificador
+            .Setup(x => x.ObterErros())
+            .Returns(new List<string>());
+        MockNotificador
+            .Setup(x => x.TemErros())
+            .Returns(false);
     }
 
     protected MainController CreateMainController()
     {
         return new TestMainController(
             MockMediatorHandler.Object,
-            MockNotifications.Object,
+            Notifications,
             MockNotificador.Object);
     }
 
@@ -66,11 +72,11 @@ public abstract class TestBase
     {
         MockNotificador
             .Setup(x => x.AdicionarErro(It.IsAny<string>()));
-        
+
         MockNotificador
             .Setup(x => x.TemErros())
             .Returns(true);
-            
+
         MockNotificador
             .Setup(x => x.ObterErros())
             .Returns(new List<string> { "Erro de teste" });
@@ -78,25 +84,29 @@ public abstract class TestBase
 
     protected void SetupMockNotifications()
     {
-        MockNotifications
-            .Setup(x => x.TemNotificacao())
-            .Returns(false);
+        Notifications.Limpar();
     }
 
     protected void SetupMockMediatorHandlerForNotifications()
     {
         MockMediatorHandler
-            .Setup(x => x.PublicarNotificacaoDominio(It.IsAny<DomainNotificacaoRaiz>()));
+            .Setup(x => x.PublicarNotificacaoDominio(It.IsAny<DomainNotificacaoRaiz>()))
+            .Callback<DomainNotificacaoRaiz>(n => Notifications.Handle(n, CancellationToken.None).Wait());
     }
 
     private class TestMainController : MainController
     {
         public TestMainController(
             IMediatorHandler mediator,
-            IDomainNotificacaoHandler notifications,
+            INotificationHandler<DomainNotificacaoRaiz> notifications,
             INotificador notificador)
             : base(mediator, notifications, notificador)
         {
         }
+    }
+
+    // Classe de teste que herda de DomainNotificacaoHandler para evitar problemas de cast
+    public class TestableDomainNotificacaoHandler : DomainNotificacaoHandler
+    {
     }
 }
