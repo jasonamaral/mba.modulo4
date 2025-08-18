@@ -1,8 +1,5 @@
-﻿using BFF.API.Extensions;
-using BFF.API.Models.Request;
-using BFF.API.Services.Conteudos;
+﻿using BFF.API.Models.Request;
 using BFF.API.Services.Pagamentos;
-using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Mediator;
@@ -11,8 +8,6 @@ using Core.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Net;
 
 namespace BFF.API.Controllers
@@ -42,12 +37,17 @@ namespace BFF.API.Controllers
         }
 
         [Authorize(Roles = "Usuario, Administrador")]
-        [HttpPost("pagamento")]
+        [HttpPost("registrar-pagamento")]
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
 
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return RespostaPadraoApi<CommandResult>(ModelState);
+                }
+
                 var resultado = await _pagamentoService.ExecutarPagamento(pagamento);
 
                 if (resultado?.Status == (int)HttpStatusCode.OK)

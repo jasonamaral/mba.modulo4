@@ -23,14 +23,38 @@ namespace BFF.API.Services.Pagamentos
         {
             _apiClient.SetBaseAddress(_apiSettings.PagamentosApiUrl);
 
-            var apiResponse = await _apiClient.PostAsyncWithDetails<PagamentoCursoInputModel, ResponseResult<bool>>("/api/v1/pagamentos/pagamento", pagamentoCursoInputModel);
+            var apiResponse = await _apiClient.PostAsyncWithDetails<PagamentoCursoInputModel, ResponseResult<object>>("/api/v1/pagamentos/pagamento", pagamentoCursoInputModel);
 
             if (apiResponse.IsSuccess)
             {
-                return apiResponse.Data;
+                return new ResponseResult<bool> { Status = 200, Data = true };
             }
 
-            return null;
+            if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
+            {
+                try
+                {
+                    return new ResponseResult<bool>
+                    {
+                        Status = 400,
+                        Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                    };
+                }
+                catch
+                {
+                    return new ResponseResult<bool>
+                    {
+                        Status = apiResponse.StatusCode,
+                        Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
+                    };
+                }
+            }
+
+            return new ResponseResult<bool>
+            {
+                Status = apiResponse.StatusCode,
+                Errors = new ResponseErrorMessages { Mensagens = new List<string> { "Erro desconhecido na API" } }
+            };
 
         }
     }
