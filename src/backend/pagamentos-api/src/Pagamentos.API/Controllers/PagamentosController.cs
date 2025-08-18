@@ -58,7 +58,7 @@ namespace Pagamentos.API.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("obter_todos")]
         [SwaggerOperation(Summary = "Obtém todos os pagamentos", Description = "Retorna uma lista com todos os pagamentos.")]
         [ProducesResponseType(typeof(IEnumerable<PagamentoViewModel>), StatusCodes.Status200OK)]
@@ -68,7 +68,7 @@ namespace Pagamentos.API.Controllers
             return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("obter/{id:guid}")]
         [SwaggerOperation(Summary = "Obtém pagamento por ID", Description = "Retorna os dados de um pagamento específico.")]
         [ProducesResponseType(typeof(PagamentoViewModel), StatusCodes.Status200OK)]

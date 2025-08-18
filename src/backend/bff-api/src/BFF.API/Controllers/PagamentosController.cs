@@ -1,6 +1,7 @@
 ﻿using BFF.API.Models.Request;
 using BFF.API.Services.Pagamentos;
 using BFF.Application.Interfaces.Services;
+using BFF.Domain.DTOs.Pagamentos.Response;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -40,7 +41,6 @@ namespace BFF.API.Controllers
         [HttpPost("registrar-pagamento")]
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
-
             try
             {
                 if (!ModelState.IsValid)
@@ -63,9 +63,43 @@ namespace BFF.API.Controllers
                 _logger.LogError(ex, "Erro ao processar pagamento via BFF");
                 return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
             }
-
         }
 
 
+        [Authorize(Roles = "Usuario, Administrador")]
+        [HttpGet("obter_todos")]
+        [ProducesResponseType(typeof(IEnumerable<PagamentoDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult> ObterTodos()
+        {
+            try
+            {
+                var pagamentos = await _pagamentoService.ObterTodos();
+                return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao obter pagamentos via BFF");
+                return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao obter pagamentos via BFF");
+            }
+        }
+
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("obter/{id:guid}")]
+        [ProducesResponseType(typeof(PagamentoDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ObterPorId(Guid id)
+        {
+            try
+            {
+               var pagamentos = await _pagamentoService.ObterPorIdPagamento(id);
+                return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao obter pagamentos via BFF");
+                return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao obter pagamentos via BFF");
+            }
+        }
     }
 }
