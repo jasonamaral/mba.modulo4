@@ -6,6 +6,9 @@ import { AulaModel } from 'src/app/models/aula.model';
 import { CursoModel } from 'src/app/models/curso.model';
 import { LocalStorageUtils } from 'src/app/utils/localstorage';
 import { MatDialog } from '@angular/material/dialog';
+import { AulaEditDialogComponent } from './aula-edit-dialog.component';
+import { CursosService } from '../../services/cursos.service';
+import { ToastrService } from 'ngx-toastr';
 import { AulaAddDialogComponent } from './aula-add-dialog.component';
 
 interface DialogData {
@@ -22,7 +25,7 @@ interface DialogData {
       <ng-container *ngIf="aulas?.length; else empty">
         <div class="aula" *ngFor="let a of aulas; let i = index">
           <div class="aula-header">
-            <span class="ordem">#{{ a.ordem }}</span>
+            <span class="ordem">#{{ a.numero }}</span>
             <span class="nome">{{ a.nome }}</span>
             <span class="duracao" *ngIf="a.duracaoMinutos !== undefined">
               <span class="iconify" data-icon="mdi:clock-outline" data-width="18" data-height="18"></span>
@@ -48,7 +51,10 @@ interface DialogData {
         </div>
       </ng-container>
       <ng-template #empty>
-        <p>Nenhuma aula cadastrada para este curso.</p>
+        <div class="empty-state">
+          <p>Nenhuma aula cadastrada para este curso.</p>
+          <button mat-raised-button color="primary" (click)="adicionarAula()">Adicionar Aula</button>
+        </div>
       </ng-template>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
@@ -81,6 +87,8 @@ export class AulasListDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private dialogRef: MatDialogRef<AulasListDialogComponent>,
     private dialog: MatDialog,
+    private cursosService: CursosService,
+    private toastr: ToastrService
   ) {
     this.aulas = (data.curso.aulas || []) as (AulaModel & { status?: string })[];
     this.isUserAdmin = new LocalStorageUtils().isUserAdmin();
@@ -90,18 +98,45 @@ export class AulasListDialogComponent {
     this.dialogRef.close();
   }
 
-  editarAula(aula: AulaModel): void {
-    // Reaproveita o diálogo atual preenchendo os campos com os dados da aula
+  adicionarAula(): void {
     const ref = this.dialog.open(AulaAddDialogComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      data: { cursoId: this.data.curso.id }
+    });
+
+    ref.afterClosed().subscribe(result => {
+      if (result?.createdCount) {
+        this.loadAulas(this.data.curso.id);
+      }
+    });
+  }
+
+  editarAula(aula: AulaModel): void {
+    const ref = this.dialog.open(AulaEditDialogComponent, {
       width: '720px',
       maxWidth: '95vw',
       disableClose: true,
       autoFocus: false,
       data: { cursoId: aula.cursoId, cursoNome: this.data.curso.nome, aula }
     });
+    
+    ref.afterClosed().subscribe(result => {
+      if (result?.updated) {
+        this.loadAulas(this.data.curso.id);
+      }
+    });
+  }
 
-    ref.afterClosed().subscribe(() => {
-      // Em uma evolução, poderíamos recarregar a lista ao concluir uma edição real.
+  private loadAulas(cursoId: string): void {
+    this.cursosService.getAulasByCurso(cursoId).subscribe({
+      next: (aulas) => {
+        this.aulas = aulas;
+      },
+      error: (err) => {
+        const errors = (err?.error?.errors ?? err?.errors ?? []) as string[];
+        this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao carregar aulas.');
+      }
     });
   }
 }

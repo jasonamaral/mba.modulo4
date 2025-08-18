@@ -1,14 +1,6 @@
 using Alunos.API.Controllers;
 using Alunos.Application.DTOs.Response;
-using Alunos.Application.Interfaces;
-using Core.Communication;
-using Core.Notification;
-using Core.Services.Controllers;
-using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
-using System.Net;
 
 namespace Alunos.UnitTests.Controllers;
 
@@ -21,7 +13,7 @@ public class AlunoQueryControllerTests : TestBase
         _controller = new AlunoController(
             MockMediatorHandler.Object,
             MockAlunoQueryService.Object,
-            MockNotifications.Object,
+            Notifications,
             MockNotificador.Object);
     }
 
@@ -56,7 +48,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockAlunoQueryService.Verify(x => x.ObterAlunoPorIdAsync(alunoId), Times.Once);
     }
 
@@ -77,7 +69,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockNotificador.Verify(x => x.AdicionarErro("Aluno não encontrado."), Times.Once);
     }
 
@@ -123,7 +115,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockAlunoQueryService.Verify(x => x.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId), Times.Once);
     }
 
@@ -144,7 +136,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockNotificador.Verify(x => x.AdicionarErro("Evolução da matricula do aluno não encontrado."), Times.Once);
     }
 
@@ -187,7 +179,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockAlunoQueryService.Verify(x => x.ObterMatriculasPorAlunoIdAsync(alunoId), Times.Once);
     }
 
@@ -208,7 +200,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockNotificador.Verify(x => x.AdicionarErro("Matrícula do aluno não encontrada."), Times.Once);
     }
 
@@ -229,7 +221,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockAlunoQueryService.Verify(x => x.ObterMatriculasPorAlunoIdAsync(alunoId), Times.Once);
     }
 
@@ -262,7 +254,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockAlunoQueryService.Verify(x => x.ObterCertificadoPorMatriculaIdAsync(matriculaId), Times.Once);
     }
 
@@ -283,7 +275,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockNotificador.Verify(x => x.AdicionarErro("Certificado não encontrado."), Times.Once);
     }
 
@@ -326,7 +318,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockAlunoQueryService.Verify(x => x.ObterAulasPorMatriculaIdAsync(matriculaId), Times.Once);
     }
 
@@ -347,7 +339,7 @@ public class AlunoQueryControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockAlunoQueryService.Verify(x => x.ObterAulasPorMatriculaIdAsync(matriculaId), Times.Once);
     }
 }

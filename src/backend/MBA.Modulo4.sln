@@ -93,6 +93,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pagamentos.UnitTests", "pag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "building-blocks\Tests\Core.Tests\Core.Tests.csproj", "{5381FF7A-5FD9-48CE-8321-495696660A1A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alunos.UnitTests", "alunos-api\tests\Alunos.UnitTests\Alunos.UnitTests.csproj", "{BFAFFA00-DDF5-5B46-F1F0-9CB631F1EEBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alunos.IntegrationTests", "alunos-api\tests\Alunos.IntegrationTests\Alunos.IntegrationTests.csproj", "{EF311CA7-91FC-C0D4-29B9-3FAAD38473D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -231,6 +235,14 @@ Global
 		{5381FF7A-5FD9-48CE-8321-495696660A1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5381FF7A-5FD9-48CE-8321-495696660A1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5381FF7A-5FD9-48CE-8321-495696660A1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFAFFA00-DDF5-5B46-F1F0-9CB631F1EEBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFAFFA00-DDF5-5B46-F1F0-9CB631F1EEBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFAFFA00-DDF5-5B46-F1F0-9CB631F1EEBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFAFFA00-DDF5-5B46-F1F0-9CB631F1EEBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF311CA7-91FC-C0D4-29B9-3FAAD38473D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF311CA7-91FC-C0D4-29B9-3FAAD38473D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF311CA7-91FC-C0D4-29B9-3FAAD38473D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF311CA7-91FC-C0D4-29B9-3FAAD38473D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,6 +287,8 @@ Global
 		{9DE62A0E-A363-786E-DE58-1A5946D785F7} = {56BD3245-F575-45D3-8467-C6F836DE9E9C}
 		{3579C683-278A-14E8-7067-A945AAAE9FB3} = {56BD3245-F575-45D3-8467-C6F836DE9E9C}
 		{5381FF7A-5FD9-48CE-8321-495696660A1A} = {77638560-3E73-4810-B543-33278C13646D}
+		{BFAFFA00-DDF5-5B46-F1F0-9CB631F1EEBC} = {904054D2-FFF3-489B-A945-2DF46FB0FB32}
+		{EF311CA7-91FC-C0D4-29B9-3FAAD38473D4} = {904054D2-FFF3-489B-A945-2DF46FB0FB32}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBEC1BAF-9C8B-4F5F-9FEC-20641AD3871D}

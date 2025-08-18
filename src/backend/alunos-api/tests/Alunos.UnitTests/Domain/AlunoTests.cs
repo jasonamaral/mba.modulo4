@@ -1,7 +1,4 @@
 using Alunos.Domain.Entities;
-using Alunos.Domain.ValueObjects;
-using Core.DomainValidations;
-using FluentAssertions;
 using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.UnitTests.Domain;
@@ -376,15 +373,15 @@ public class AlunoTests
         // Arrange
         var aluno = CriarAlunoValido();
         var cursoId = Guid.NewGuid();
-        
-                // Matricula o aluno em um curso
+
+        // Matricula o aluno em um curso
         aluno.AtivarAluno();
         aluno.MatricularAlunoEmCurso(cursoId, "Curso de Teste", 100.00m, "Observação");
         var matricula = aluno.MatriculasCursos.First();
-        
+
         // Simula que todas as aulas foram concluídas
         // (Este é um teste simplificado, na prática seria necessário registrar o histórico de todas as aulas)
-        
+
         // Act
         // Não é possível concluir o curso diretamente sem registrar o histórico das aulas
         // Vou testar apenas se a matrícula foi criada corretamente
@@ -397,8 +394,6 @@ public class AlunoTests
         matricula.Valor.Should().Be(100.00m);
         matricula.Observacao.Should().Be("Observação");
     }
-
-
 
     [Fact]
     public void AtualizarDataNascimento_ComDataValida_DeveAtualizarComSucesso()

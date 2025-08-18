@@ -1,21 +1,13 @@
 using Alunos.API.Controllers;
+using Alunos.Application.Commands.ConcluirCurso;
 using Alunos.Application.Commands.MatricularAluno;
 using Alunos.Application.Commands.RegistrarHistoricoAprendizado;
-using Alunos.Application.Commands.ConcluirCurso;
 using Alunos.Application.Commands.SolicitarCertificado;
 using Alunos.Application.DTOs.Request;
 using Alunos.Application.DTOs.Response;
-using Alunos.Application.Interfaces;
 using Core.Communication;
-using Core.Mediator;
-using Core.Notification;
-using Core.Services.Controllers;
 using Core.Messages;
-using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
-using System.Net;
 
 namespace Alunos.UnitTests.Controllers;
 
@@ -28,7 +20,7 @@ public class AlunoCommandControllerTests : TestBase
         _controller = new AlunoController(
             MockMediatorHandler.Object,
             MockAlunoQueryService.Object,
-            MockNotifications.Object,
+            Notifications,
             MockNotificador.Object);
     }
 
@@ -58,7 +50,7 @@ public class AlunoCommandControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockMediatorHandler.Verify(x => x.ExecutarComando(It.IsAny<MatricularAlunoCommand>()), Times.Once);
     }
 
@@ -86,7 +78,7 @@ public class AlunoCommandControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockNotificador.Verify(x => x.AdicionarErro(It.IsAny<string>()), Times.Never);
     }
 
@@ -109,10 +101,9 @@ public class AlunoCommandControllerTests : TestBase
 
         // Configurar mocks para notificações de domínio
         SetupMockMediatorHandlerForNotifications();
-        
-        // Configurar o mock para retornar true quando TemNotificacao() for chamado
-        MockNotifications.Setup(x => x.TemNotificacao()).Returns(true);
-        MockNotifications.Setup(x => x.ObterMensagens()).Returns(new List<string> { "Nome é obrigatório" });
+
+        // Popular notificações simulando mensagens de ModelState
+        await Notifications.Handle(new DomainNotificacaoRaiz("ModelState", "Nome é obrigatório"), CancellationToken.None);
 
         // Act
         var result = await _controller.MatricularAluno(alunoId, dto);
@@ -121,7 +112,7 @@ public class AlunoCommandControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         // Deve chamar PublicarNotificacaoDominio para cada erro do ModelState
         MockMediatorHandler.Verify(x => x.PublicarNotificacaoDominio(It.IsAny<DomainNotificacaoRaiz>()), Times.Once);
     }
@@ -156,7 +147,7 @@ public class AlunoCommandControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockMediatorHandler.Verify(x => x.ExecutarComando(It.IsAny<RegistrarHistoricoAprendizadoCommand>()), Times.Once);
     }
 
@@ -188,7 +179,7 @@ public class AlunoCommandControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockNotificador.Verify(x => x.AdicionarErro(It.IsAny<string>()), Times.Never);
     }
 
@@ -202,9 +193,9 @@ public class AlunoCommandControllerTests : TestBase
         {
             AlunoId = alunoId,
             MatriculaCursoId = matriculaId,
-            CursoDto = new Core.SharedDtos.Conteudo.CursoDto 
-            { 
-                Id = Guid.NewGuid(), 
+            CursoDto = new Core.SharedDtos.Conteudo.CursoDto
+            {
+                Id = Guid.NewGuid(),
                 Nome = "Curso Teste",
                 Aulas = new List<Core.SharedDtos.Conteudo.AulaDto>()
             }
@@ -224,7 +215,7 @@ public class AlunoCommandControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockMediatorHandler.Verify(x => x.ExecutarComando(It.IsAny<ConcluirCursoCommand>()), Times.Once);
     }
 
@@ -250,7 +241,7 @@ public class AlunoCommandControllerTests : TestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.StatusCode.Should().Be(400);
-        
+
         MockNotificador.Verify(x => x.AdicionarErro(It.IsAny<string>()), Times.Never);
     }
 
@@ -276,7 +267,7 @@ public class AlunoCommandControllerTests : TestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(200);
-        
+
         MockMediatorHandler.Verify(x => x.ExecutarComando(It.IsAny<SolicitarCertificadoCommand>()), Times.Once);
     }
 

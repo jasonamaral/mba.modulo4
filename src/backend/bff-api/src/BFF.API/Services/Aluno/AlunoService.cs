@@ -1,4 +1,4 @@
-﻿using BFF.API.Services.Conteudos;
+using BFF.API.Services.Conteudos;
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs.Alunos.Request;
@@ -83,7 +83,7 @@ public partial class AlunoService : BaseApiService, IAlunoService
                         AulaId = aula.Id,
                         CursoId = aula.CursoId,
                         NomeAula = aula.Nome,
-                        OrdemAula = aula.Ordem,
+                        OrdemAula = aula.Numero,
                         //Ativo = aula.Ativo,
                         DataInicio = null,
                         DataTermino = null,

@@ -85,16 +85,19 @@
       <mat-form-field appearance="outline" floatLabel="always" class="col-12">
         <mat-label>Resumo</mat-label>
         <textarea matInput rows="2" formControlName="resumo" placeholder="Resumo curto e objetivo"></textarea>
+        <mat-error *ngIf="form.get('resumo')?.hasError('required')">Informe o resumo.</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" floatLabel="always" class="col-12">
         <mat-label>Descrição</mat-label>
         <textarea matInput rows="3" formControlName="descricao" placeholder="Explique os principais tópicos, metodologia e resultados esperados"></textarea>
+        <mat-error *ngIf="form.get('descricao')?.hasError('required')">Informe a descrição.</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" floatLabel="always" class="col-12">
         <mat-label>Objetivos</mat-label>
         <textarea matInput rows="2" formControlName="objetivos" placeholder="Ex.: Dominar conceitos X, Y e Z"></textarea>
+        <mat-error *ngIf="form.get('objetivos')?.hasError('required')">Informe os objetivos.</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" floatLabel="always" class="col-12">

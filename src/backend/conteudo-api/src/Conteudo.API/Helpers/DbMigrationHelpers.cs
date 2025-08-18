@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.ValueObjects;
 using Conteudo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -258,15 +258,17 @@ public static class DbMigrationHelpers
 
             #region Seed Aulas e Materiais
 
-            var matriz = new Dictionary<Guid, List<Guid>>();
-            matriz.Add(cursos[0].Id, [Guid.Parse("9be503ca-83fb-41cb-98e4-8f0ae98692a0"), Guid.Parse("c55fd2e3-9a07-4b1d-8b35-237c12712ad4"), Guid.Parse("fbe91473-7e59-414b-90ef-c9a13b3c24ec")]);
-            matriz.Add(cursos[1].Id, [Guid.Parse("84d09a65-8ac1-4bde-83a4-8533ab3b97a4"), Guid.Parse("6557645c-5879-4120-a6ed-a5349a3701c8"), Guid.Parse("db77ee62-b666-47d4-8e5b-c651c81e7fac")]);
-            matriz.Add(cursos[2].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
-            matriz.Add(cursos[3].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
-            matriz.Add(cursos[4].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
-            matriz.Add(cursos[5].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
-            matriz.Add(cursos[6].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
-            matriz.Add(cursos[7].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()]);
+            var matriz = new Dictionary<Guid, List<Guid>>
+            {
+                { cursos[0].Id, [Guid.Parse("9be503ca-83fb-41cb-98e4-8f0ae98692a0"), Guid.Parse("c55fd2e3-9a07-4b1d-8b35-237c12712ad4"), Guid.Parse("fbe91473-7e59-414b-90ef-c9a13b3c24ec")] },
+                { cursos[1].Id, [Guid.Parse("84d09a65-8ac1-4bde-83a4-8533ab3b97a4"), Guid.Parse("6557645c-5879-4120-a6ed-a5349a3701c8"), Guid.Parse("db77ee62-b666-47d4-8e5b-c651c81e7fac")] },
+                { cursos[2].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()] },
+                { cursos[3].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()] },
+                { cursos[4].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()] },
+                { cursos[5].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()] },
+                { cursos[6].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()] },
+                { cursos[7].Id, [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()] }
+            };
 
             for (int z = 0; z < 8; z++)
             {

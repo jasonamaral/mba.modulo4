@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Alunos.UnitTests;
 
 public class SimpleTest
@@ -42,4 +40,3 @@ public class SimpleTest
         Assert.NotEqual(verdadeiro, falso);
     }
 }
-

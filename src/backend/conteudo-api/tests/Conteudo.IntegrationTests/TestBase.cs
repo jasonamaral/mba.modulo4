@@ -1,17 +1,14 @@
-using FluentAssertions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
+using System.Text.Encodings.Web;
 
 namespace Conteudo.IntegrationTests;
 
@@ -34,7 +31,7 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Test");
-        
+
         builder.ConfigureServices(services =>
         {
             // Remover serviços de infraestrutura que dependem de banco de dados
@@ -48,11 +45,11 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
 
             // Configurar autenticação para testes
             services.RemoveAll<JwtBearerHandler>();
-            
+
             // Adicionar autenticação de teste que sempre retorna sucesso
             services.AddAuthentication("Test")
                 .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
-            
+
             // Configurar a autenticação de teste como padrão
             services.Configure<AuthenticationOptions>(options =>
             {

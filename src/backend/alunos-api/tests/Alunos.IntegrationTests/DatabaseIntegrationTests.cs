@@ -4,7 +4,6 @@ using Alunos.Infrastructure.Data;
 using Alunos.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Alunos.IntegrationTests;
 
@@ -17,7 +16,7 @@ public class DatabaseIntegrationTests : IDisposable
     {
         // Configuração do banco em memória para testes
         var services = new ServiceCollection();
-        
+
         services.AddDbContext<AlunoDbContext>(options =>
         {
             options.UseInMemoryDatabase($"TestDatabase_{Guid.NewGuid()}");
@@ -26,10 +25,10 @@ public class DatabaseIntegrationTests : IDisposable
         services.AddScoped<IAlunoRepository, AlunoRepository>();
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         _context = serviceProvider.GetRequiredService<AlunoDbContext>();
         _alunoRepository = serviceProvider.GetRequiredService<IAlunoRepository>();
-        
+
         // Garante que o banco seja criado
         _context.Database.EnsureCreated();
     }

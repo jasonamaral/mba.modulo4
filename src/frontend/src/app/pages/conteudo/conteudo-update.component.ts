@@ -5,7 +5,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { CommonModule } from '@angular/common';
 import { FormBaseComponent } from 'src/app/components/base-components/form-base.component';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, FormControlName, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControlName, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CategoryModel } from 'src/app/models/conteudo.model';
 import { CursoModel } from 'src/app/models/curso.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
@@ -32,6 +32,7 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
   categorias: CategoryModel[] = [];
 
   constructor(public dialog: MatDialog,
+    private fb: FormBuilder,
     private categoriasService: ConteudoService,
     private cursosService: CursosService,
     private toastr: ToastrService,
@@ -66,6 +67,15 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
       },
       categoriaId: {
         required: 'Selecione a categoria.'
+      },
+      resumo: {
+        required: 'Informe o resumo do curso.'
+      },
+      descricao: {
+        required: 'Informe a descrição do curso.'
+      },
+      objetivos: {
+        required: 'Informe os objetivos do curso.'
       }
     };
 
@@ -73,63 +83,9 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
   }
 
   ngOnInit(): void {
-    this.form = new FormGroup({
-      nome: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]),
-      valor: new FormControl(0, [Validators.required, Validators.min(0)]),
-      duracaoHoras: new FormControl(0, [Validators.required, Validators.min(1)]),
-      nivel: new FormControl('', [Validators.required]),
-      instrutor: new FormControl('', [Validators.required]),
-      vagasMaximas: new FormControl(0, [Validators.required, Validators.min(1)]),
-      imagemUrl: new FormControl(''),
-      validoAte: new FormControl<string | null>(null),
-      categoriaId: new FormControl('', [Validators.required]),
-      resumo: new FormControl(''),
-      descricao: new FormControl(''),
-      objetivos: new FormControl(''),
-      preRequisitos: new FormControl(''),
-      publicoAlvo: new FormControl(''),
-      metodologia: new FormControl(''),
-      recursos: new FormControl(''),
-      avaliacao: new FormControl(''),
-      bibliografia: new FormControl(''),
-    });
-
-    // Preenche o formulário caso um curso tenha sido informado via diálogo
-    if (this.data) {
-      const curso = this.data;
-      this.form.patchValue({
-        nome: curso.nome ?? '',
-        valor: curso.valor ?? 0,
-        duracaoHoras: curso.duracaoHoras ?? 0,
-        nivel: curso.nivel ?? '',
-        instrutor: curso.instrutor ?? '',
-        vagasMaximas: curso.vagasMaximas ?? 0,
-        imagemUrl: curso.imagemUrl ?? '',
-        validoAte: curso.validoAte ? new Date(curso.validoAte).toISOString().slice(0, 10) : null,
-        categoriaId: curso.categoriaId ?? '',
-        resumo: curso.resumo ?? '',
-        descricao: curso.descricao ?? '',
-        objetivos: curso.objetivos ?? '',
-        preRequisitos: curso.preRequisitos ?? '',
-        // Demais campos não existem no modelo de leitura, deixam padrão
-      });
-    }
-
-    // Ajuste para novo endpoint de categorias
-    this.categoriasService.getAllCategories()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (cats) => {
-          const raw = (cats as any[]) ?? [];
-          this.categorias = raw.map((c: any) => ({
-            categoryId: c?.id ?? c?.categoryId ?? '',
-            userId: '',
-            description: c?.nome ?? c?.description ?? c?.descricao ?? '',
-            type: 0,
-          } as CategoryModel));
-        },
-        error: () => this.categorias = []
-      });
+    this.form = this.buildForm();
+    this.patchForm();
+    this.loadCategorias();
   }
 
   ngAfterViewInit(): void {
@@ -152,13 +108,12 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
-
           if (!result) {
             this.toastr.error('Erro ao salvar o curso.');
             return;
           }
 
-          this.toastr.success('Curso criado com sucesso.');
+          this.toastr.success('Curso atualizado com sucesso.');
           this.dialogRef.close({ inserted: true })
         },
         error: (fail) => {
@@ -168,6 +123,7 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
         }
       });
   }
+
   openAddCategory(): void {
     const ref = this.dialog.open(CategoriaAddDialogComponent, {
       width: '840px',
@@ -177,30 +133,83 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
     });
 
     ref.afterClosed().subscribe(result => {
-      if (result?.inserted) {
-        // Recarrega categorias
-        this.categoriasService.getAllCategories().pipe(takeUntil(this.destroy$)).subscribe({
-          next: (cats) => {
-            const raw = (cats as any[]) ?? [];
-            this.categorias = raw.map((c: any) => ({
-              categoryId: c?.id ?? c?.categoryId ?? '',
-              userId: '',
-              description: c?.nome ?? c?.description ?? c?.descricao ?? '',
-              type: 0,
-            } as CategoryModel));
-          },
-          error: () => {}
-        });
-      }
+      if (result?.inserted)
+        this.loadCategorias();
     });
   }
+
   cancel() {
     this.dialogRef.close({ inserted: false });
+  }
+
+  private buildForm(): FormGroup {
+    return this.fb.group({
+      nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      valor: [0, [Validators.required]],
+      duracaoHoras: [0, [Validators.required]],
+      nivel: ['', [Validators.required]],
+      instrutor: ['', [Validators.required]],
+      vagasMaximas: [0, [Validators.required]],
+      imagemUrl: [''],
+      validoAte: [''],
+      categoriaId: ['', [Validators.required]],
+      resumo: ['', [Validators.required]],
+      descricao: ['', [Validators.required]],
+      objetivos: ['', [Validators.required]],
+      preRequisitos: [''],
+      publicoAlvo: [''],
+      metodologia: [''],
+      recursos: [''],
+      avaliacao: [''],
+      bibliografia: [''],
+    });
+  }
+
+  private patchForm(): void {
+    if (!this.data) return;
+
+    const curso = this.data;
+    this.form.patchValue({
+        nome: curso.nome ?? '',
+        valor: curso.valor ?? 0,
+        duracaoHoras: curso.duracaoHoras ?? 0,
+        nivel: curso.nivel ?? '',
+        instrutor: curso.instrutor ?? '',
+        vagasMaximas: curso.vagasMaximas ?? 0,
+        imagemUrl: curso.imagemUrl ?? '',
+        validoAte: curso.validoAte ? new Date(curso.validoAte).toISOString().slice(0, 10) : null,
+        categoriaId: curso.categoriaId ?? '',
+        resumo: curso.resumo ?? '',
+        descricao: curso.descricao ?? '',
+        objetivos: curso.objetivos ?? '',
+        preRequisitos: curso.preRequisitos ?? '',
+        publicoAlvo: curso.publicoAlvo ?? '',
+        metodologia: curso.metodologia ?? '',
+        recursos: curso.recursos ?? '',
+        avaliacao: curso.avaliacao ?? '',
+        bibliografia: curso.bibliografia ?? '',
+      });
+  }
+
+  private loadCategorias(): void {
+    this.categoriasService.getAllCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (cats) => {
+          const raw = (cats as any[]) ?? [];
+          this.categorias = raw.map((c: any) => ({
+            categoryId: c?.id ?? c?.categoryId ?? '',
+            userId: '',
+            description: c?.nome ?? c?.description ?? c?.descricao ?? '',
+            type: 0,
+          } as CategoryModel));
+        },
+        error: () => this.categorias = []
+      });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.complete();
   }
-
 }

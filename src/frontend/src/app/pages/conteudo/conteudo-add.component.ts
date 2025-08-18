@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBaseComponent } from 'src/app/components/base-components/form-base.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, FormControlName, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControlName, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CategoryModel } from 'src/app/models/conteudo.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
 import { CursoCreateModel } from 'src/app/models/curso.model';
@@ -33,6 +33,7 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
   categorias: CategoryModel[] = [];
 
   constructor(public dialog: MatDialog,
+    private fb: FormBuilder,
     private categoriasService: ConteudoService,
     private cursosService: CursosService,
     private toastr: ToastrService,
@@ -66,6 +67,15 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
       },
       categoriaId: {
         required: 'Selecione a categoria.'
+      },
+      resumo: {
+        required: 'Informe o resumo do curso.'
+      },
+      descricao: {
+        required: 'Informe a descrição do curso.'
+      },
+      objetivos: {
+        required: 'Informe os objetivos do curso.'
       }
     };
 
@@ -73,42 +83,8 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
   }
 
   ngOnInit(): void {
-    this.form = new FormGroup({
-      nome: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]),
-      valor: new FormControl(0, [Validators.required, Validators.min(0)]),
-      duracaoHoras: new FormControl(0, [Validators.required, Validators.min(1)]),
-      nivel: new FormControl('', [Validators.required]),
-      instrutor: new FormControl('', [Validators.required]),
-      vagasMaximas: new FormControl(0, [Validators.required, Validators.min(1)]),
-      imagemUrl: new FormControl(''),
-      validoAte: new FormControl<string | null>(null),
-      categoriaId: new FormControl('', [Validators.required]),
-      resumo: new FormControl(''),
-      descricao: new FormControl(''),
-      objetivos: new FormControl(''),
-      preRequisitos: new FormControl(''),
-      publicoAlvo: new FormControl(''),
-      metodologia: new FormControl(''),
-      recursos: new FormControl(''),
-      avaliacao: new FormControl(''),
-      bibliografia: new FormControl(''),
-    });
-
-    // Ajuste para novo endpoint de categorias
-    this.categoriasService.getAllCategories()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (cats) => {
-          const raw = (cats as any[]) ?? [];
-          this.categorias = raw.map((c: any) => ({
-            categoryId: c?.id ?? c?.categoryId ?? '',
-            userId: '',
-            description: c?.nome ?? c?.description ?? c?.descricao ?? '',
-            type: 0,
-          } as CategoryModel));
-        },
-        error: () => this.categorias = []
-      });
+    this.form = this.buildForm();
+    this.loadCategorias();
   }
 
   ngAfterViewInit(): void {
@@ -124,21 +100,8 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
     });
 
     ref.afterClosed().subscribe(result => {
-      if (result?.inserted) {
-        // Recarrega categorias
-        this.categoriasService.getAllCategories().pipe(takeUntil(this.destroy$)).subscribe({
-          next: (cats) => {
-            const raw = (cats as any[]) ?? [];
-            this.categorias = raw.map((c: any) => ({
-              categoryId: c?.id ?? c?.categoryId ?? '',
-              userId: '',
-              description: c?.nome ?? c?.description ?? c?.descricao ?? '',
-              type: 0,
-            } as CategoryModel));
-          },
-          error: () => {}
-        });
-      }
+      if (result?.inserted)
+        this.loadCategorias();
     });
   }
 
@@ -196,6 +159,46 @@ export class ConteudoAddComponent extends FormBaseComponent implements OnInit, O
 
   cancel() {
     this.dialogRef.close({ inserted: false });
+  }
+
+  private buildForm(): FormGroup {
+    return this.fb.group({
+      nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      valor: [0, [Validators.required]],
+      duracaoHoras: [0, [Validators.required]],
+      nivel: ['', [Validators.required]],
+      instrutor: ['', [Validators.required]],
+      vagasMaximas: [0, [Validators.required]],
+      imagemUrl: [''],
+      validoAte: [''],
+      categoriaId: ['', [Validators.required]],
+      resumo: ['', [Validators.required]],
+      descricao: ['', [Validators.required]],
+      objetivos: ['', [Validators.required]],
+      preRequisitos: [''],
+      publicoAlvo: [''],
+      metodologia: [''],
+      recursos: [''],
+      avaliacao: [''],
+      bibliografia: [''],
+    });
+  }
+
+  private loadCategorias(): void {
+    this.categoriasService.getAllCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (cats) => {
+          const raw = (cats as any[]) ?? [];
+          this.categorias = raw.map((c: any) => ({
+            categoryId: c?.id ?? c?.categoryId ?? '',
+            userId: '',
+            description: c?.nome ?? c?.description ?? c?.descricao ?? '',
+            type: 0,
+          } as CategoryModel));
+        },
+        error: () => this.categorias = []
+      });
   }
 
   ngOnDestroy(): void {

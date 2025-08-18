@@ -21,6 +21,11 @@ export interface CursoModel {
   validoAte?: string;
   objetivos?: string;
   preRequisitos?: string;
+  publicoAlvo?: string;
+  metodologia?: string;
+  recursos?: string;
+  avaliacao?: string;
+  bibliografia?: string;
   aulas?: AulaModel[];
 }
 

@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
 import { CursoCreateModel, CursoModel } from '../models/curso.model';
-import { AulaCreateModel } from '../models/aula.model';
+import { AulaCreateModel, AulaEditModel } from '../models/aula.model';
 
 @Injectable({ providedIn: 'root' })
 export class CursosService extends BaseService {
@@ -74,9 +74,21 @@ export class CursosService extends BaseService {
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 
-  adicionarAula(cursoId: string, aula: AulaCreateModel): Observable<any> {
+  getAulasByCurso(cursoId: string): Observable<any>{
     return this.http
-      .post(this.UrlServiceV1 + `Conteudos/curso/${cursoId}/aula`, aula, this.getAuthHeaderJson())
+      .get(this.UrlServiceV1 + `Conteudos/cursos/${cursoId}/aulas`, this.getAuthHeaderJson())
+      .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
+  }
+
+  addAula(cursoId: string, aula: AulaCreateModel): Observable<any> {
+    return this.http
+      .post(this.UrlServiceV1 + `Conteudos/cursos/${cursoId}/aulas`, aula, this.getAuthHeaderJson())
+      .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
+  }
+
+  updateAula(cursoId: string, aulaId: string, aula: AulaEditModel): Observable<any> {
+    return this.http
+      .put(this.UrlServiceV1 + `Conteudos/cursos/${cursoId}/aulas/${aulaId}`, aula, this.getAuthHeaderJson())
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 

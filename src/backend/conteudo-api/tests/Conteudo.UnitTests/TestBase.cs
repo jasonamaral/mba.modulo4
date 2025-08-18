@@ -1,6 +1,3 @@
-using FluentAssertions;
-using Xunit;
-
 namespace Conteudo.UnitTests;
 
 public abstract class TestBase
