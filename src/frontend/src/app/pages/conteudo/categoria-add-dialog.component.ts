@@ -64,8 +64,9 @@ import { ToastrService } from 'ngx-toastr';
     `.form-grid{display:grid;grid-template-columns:1fr;gap:16px}`,
     `.nome-field{margin-top:8px}`,
     `.row-color{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}`,
-    `.palette-btn{width:28px;height:28px;align-self:center}`,
-    `.color-overlay{position:absolute;opacity:0;width:0;height:0}`
+    `.palette-btn{width:48px;height:48px;align-self:start}`,
+    `.color-overlay{position:absolute;opacity:0;width:0;height:0}`,
+    `mat-form-field{padding:0px}`
   ]
 })
 export class CategoriaAddDialogComponent {
