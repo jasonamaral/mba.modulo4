@@ -1,77 +1,105 @@
-﻿using BFF.API.Extensions;
-using BFF.API.Models.Request;
-using BFF.API.Settings;
+﻿using BFF.API.Models.Request;
+using BFF.API.Services.Pagamentos;
 using BFF.Application.Interfaces.Services;
+using BFF.Domain.DTOs.Pagamentos.Response;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+using System.Net;
 
-namespace BFF.API.Controllers;
-
-/// <summary>
-/// Controller de Pagamentos no BFF - Orquestra chamadas para Pagamento API
-/// </summary>
-[ApiController]
-[Route("api/[controller]")]
-//[Authorize]
-public class PagamentosController : BffController
+namespace BFF.API.Controllers
 {
-
-    private readonly IApiClientService _apiClient;
-    private readonly ApiSettings _apiSettings;
-    private readonly ILogger<PagamentosController> _logger;
-
-    public PagamentosController(IApiClientService apiClient,
-                                IOptions<ApiSettings> apiSettings,
-                                ILogger<PagamentosController> logger,
-                                IMediatorHandler mediator,
-                                INotificationHandler<DomainNotificacaoRaiz> notifications,
-                                INotificador notificador) : base(mediator, notifications, notificador)
+    /// <summary>
+    /// Controller de Pagamentos no BFF - Orquestra chamadas para Pagamento API
+    /// </summary>
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
+    public class PagamentosController : BffController
     {
-        _apiClient = apiClient;
-        _apiSettings = apiSettings.Value;
-        _logger = logger;
-    }
+        private readonly IPagamentoService _pagamentoService;
+        private readonly ICacheService _cacheService;
+        private readonly ILogger<PagamentosController> _logger;
 
-    //[Authorize(Roles = "Administrador")]
-    [HttpPost("pagamento")]
-    public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
-    {
-        var userId = User.GetUserId();
-        if (userId == Guid.Empty)
+        public PagamentosController(IMediatorHandler mediator,
+                                    INotificationHandler<DomainNotificacaoRaiz> notifications,
+                                    INotificador notificador,
+                                    ILogger<PagamentosController> logger,
+                                    IPagamentoService pagamentoService,
+                                    ICacheService cacheService) : base(mediator, notifications, notificador)
         {
-            return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
+            _pagamentoService = pagamentoService;
+            _logger = logger;
+            _cacheService = cacheService;
         }
 
-        var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-        _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
-        _apiClient.ClearDefaultHeaders();
-        _apiClient.AddDefaultHeader("Authorization", $"Bearer {token}");
-        _apiClient.AddDefaultHeader("Accept", "application/json");
-        _apiClient.AddDefaultHeader("Content-Type", "application/json");
-
-        var _pagamento = pagamento;
-
-        var apiResponse = await _apiClient.PostAsyncWithDetails<CursoCriarRequest, ResponseResult<string>>("/api/v1/pagamentos/pagamento", null);
-
-        if (apiResponse.IsSuccess)
+        [Authorize(Roles = "Usuario, Administrador")]
+        [HttpPost("registrar-pagamento")]
+        public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
-            return Ok(apiResponse.Data);
-        }
-
-        if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
-        {
-            return StatusCode(apiResponse.StatusCode, new ResponseResult<string>
+            try
             {
-                Status = apiResponse.StatusCode,
-                Errors = new ResponseErrorMessages { Mensagens = new List<string> { apiResponse.ErrorContent } }
-            });
+                if (!ModelState.IsValid)
+                {
+                    return RespostaPadraoApi<CommandResult>(ModelState);
+                }
+
+                var resultado = await _pagamentoService.ExecutarPagamento(pagamento);
+
+                if (resultado?.Status == (int)HttpStatusCode.OK)
+                {
+                    return Ok(resultado);
+                }
+
+                return BadRequest(resultado);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao processar pagamento via BFF");
+                return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
+            }
         }
 
-        return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Erro desconhecido na API de pagamentos");
+
+        [Authorize(Roles = "Usuario, Administrador")]
+        [HttpGet("obter_todos")]
+        [ProducesResponseType(typeof(IEnumerable<PagamentoDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult> ObterTodos()
+        {
+            try
+            {
+                var pagamentos = await _pagamentoService.ObterTodos();
+                return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao obter pagamentos via BFF");
+                return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao obter pagamentos via BFF");
+            }
+        }
+
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("obter/{id:guid}")]
+        [ProducesResponseType(typeof(PagamentoDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ObterPorId(Guid id)
+        {
+            try
+            {
+               var pagamentos = await _pagamentoService.ObterPorIdPagamento(id);
+                return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao obter pagamentos via BFF");
+                return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao obter pagamentos via BFF");
+            }
+        }
     }
 }

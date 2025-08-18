@@ -26,8 +26,17 @@ namespace Pagamentos.API.Configuration
         {
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
+            //services.AddScoped<IMediatorHandler, MediatorHandler>();
+            //services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
+
+
+            services.AddScoped<DomainNotificacaoHandler>();
+            services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>>(sp =>
+                               sp.GetRequiredService<DomainNotificacaoHandler>());
+
             services.AddScoped<IMediatorHandler, MediatorHandler>();
-            services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
+
+
             services.AddScoped<INotificador, Notificador>();
 
             services.AddScoped<IPagamentoConsultaAppService, PagamentoAppService>();
@@ -37,8 +46,6 @@ namespace Pagamentos.API.Configuration
             services.AddScoped<IPagamentoCartaoCreditoFacade, PagamentoCartaoCreditoFacade>();
             services.AddScoped<IPayPalGateway, PayPalGateway>();
             services.AddScoped<Pagamento.AntiCorruption.Interfaces.IConfigurationManager, Pagamento.AntiCorruption.Services.ConfigurationManager>();
-
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             return services;
         }

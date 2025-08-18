@@ -1,11 +1,12 @@
-﻿using BFF.Application.Interfaces.Services;
-using Core.Utils;
-using Core.Notification;
+using BFF.API.Services.Aluno;
+using BFF.API.Services.Conteudos;
+using BFF.API.Services.Pagamentos;
+using BFF.Application.Interfaces.Services;
 using Core.Mediator;
 using Core.Messages;
+using Core.Notification;
+using Core.Utils;
 using MediatR;
-using BFF.API.Services.Conteudos;
-using BFF.API.Services.Aluno;
 
 namespace BFF.API.Configuration;
 
@@ -26,7 +27,8 @@ public static class DependencyInjectionConfig
         // Serviços de API
         services.AddScoped<IConteudoService, ConteudoService>();
         services.AddScoped<IAlunoService, AlunoService>();
-        
+        services.AddScoped<IPagamentoService, PagamentoService>();
+
         // Serviços de infraestrutura
         services.AddScoped<ICacheService, Infrastructure.Services.CacheService>();
         services.AddTransient<IApiClientService, Infrastructure.Services.ApiClientService>();

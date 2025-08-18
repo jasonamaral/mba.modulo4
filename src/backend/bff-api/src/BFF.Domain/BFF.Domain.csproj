@@ -7,4 +7,8 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Pagamentos\Request\" />
+  </ItemGroup>
+
 </Project>

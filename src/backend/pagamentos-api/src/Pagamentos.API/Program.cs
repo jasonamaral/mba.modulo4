@@ -10,9 +10,10 @@ builder
     .AddSwaggerConfig()
     .AddDbContextConfig()
     .AddJwtConfiguration()
-    .AddAutoMapperConfig()
-    .AddDependencyInjectionConfig()
-    .AddMediatrConfig();
+    .AddMapsterConfiguration()
+    .AddMediatrConfig()
+    .AddDependencyInjectionConfig();
+    
 
 var app = builder.Build();
 

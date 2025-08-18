@@ -1,4 +1,6 @@
-﻿namespace Pagamentos.API.Configuration
+﻿using Core.Messages;
+
+namespace Pagamentos.API.Configuration
 {
     public static class MediatRConfig
     {
@@ -7,6 +9,13 @@
             builder.Services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies())
             );
+
+
+            //builder.Services.AddMediatR(cfg =>
+            //                cfg.RegisterServicesFromAssemblies(
+            //                    typeof(Program).Assembly,
+            //                    typeof(Pagamentos.Domain.Events.PagamentoEventHandler).Assembly
+            //                ));
 
             return builder;
         }

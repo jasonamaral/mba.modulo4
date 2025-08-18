@@ -1,3 +1,4 @@
+using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using Core.Messages.Integration;
@@ -15,7 +16,7 @@ namespace Pagamentos.API.Controllers
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/pagamentos")]
-    //[Authorize]
+    [Authorize]
 
     public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService,
                                       IPagamentoComandoAppService pagamentoComandoAppService,
@@ -36,7 +37,9 @@ namespace Pagamentos.API.Controllers
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
             if (!ModelState.IsValid)
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
+            {
+                return RespostaPadraoApi<CommandResult>(ModelState);
+            }
 
 
             var evento = new PagamentoCursoEvent(pagamento.MatriculaId,
@@ -49,17 +52,13 @@ namespace Pagamentos.API.Controllers
 
 
 
-
-            //var xxx = await _mediator.PublicarEvento(command);
-
-
             await _mediator.PublicarEvento(evento);
 
             return RespostaPadraoApi(HttpStatusCode.OK, "");
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("obter_todos")]
         [SwaggerOperation(Summary = "Obtém todos os pagamentos", Description = "Retorna uma lista com todos os pagamentos.")]
         [ProducesResponseType(typeof(IEnumerable<PagamentoViewModel>), StatusCodes.Status200OK)]
@@ -69,7 +68,7 @@ namespace Pagamentos.API.Controllers
             return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("obter/{id:guid}")]
         [SwaggerOperation(Summary = "Obtém pagamento por ID", Description = "Retorna os dados de um pagamento específico.")]
         [ProducesResponseType(typeof(PagamentoViewModel), StatusCodes.Status200OK)]
