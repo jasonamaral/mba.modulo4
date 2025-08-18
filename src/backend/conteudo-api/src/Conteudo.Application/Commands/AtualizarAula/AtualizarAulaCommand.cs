@@ -7,6 +7,7 @@ namespace Conteudo.Application.Commands.AtualizarAula
     public class AtualizarAulaCommand : CommandRaiz, IRequest<CommandResult>
     {
         public Guid Id { get; private set; }
+        public Guid CursoId { get; private set; }
         public string Nome { get; private set; }
         public string Descricao { get; private set; }
         public int Numero { get; private set; }
@@ -18,6 +19,7 @@ namespace Conteudo.Application.Commands.AtualizarAula
 
         public AtualizarAulaCommand(
             Guid id,
+            Guid cursoId,
             string nome,
             string descricao,
             int numero,
@@ -28,6 +30,7 @@ namespace Conteudo.Application.Commands.AtualizarAula
             string observacoes)
         {
             Id = id;
+            CursoId = cursoId;
             Nome = nome;
             Descricao = descricao;
             Numero = numero;

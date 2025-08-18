@@ -29,7 +29,6 @@ public class CadastroAulaDto
     [Required(ErrorMessage = "Tipo da aula é obrigatório")]
     [StringLength(50, ErrorMessage = "Tipo da aula deve ter no máximo 50 caracteres")]
     public string TipoAula { get; set; } = string.Empty;
-
     public bool IsObrigatoria { get; set; } = true;
     public string Observacoes { get; set; } = string.Empty;
 }
@@ -38,6 +37,9 @@ public class AtualizarAulaDto
 {
     [Required(ErrorMessage = "ID é obrigatório")]
     public Guid Id { get; set; }
+
+    [Required(ErrorMessage = "ID do curso é obrigatório")]
+    public Guid CursoId { get; set; }
 
     [Required(ErrorMessage = "Nome é obrigatório")]
     [StringLength(200, ErrorMessage = "Nome deve ter no máximo 200 caracteres")]
@@ -61,7 +63,6 @@ public class AtualizarAulaDto
     [Required(ErrorMessage = "Tipo da aula é obrigatório")]
     [StringLength(50, ErrorMessage = "Tipo da aula deve ter no máximo 50 caracteres")]
     public string TipoAula { get; set; } = string.Empty;
-
     public bool IsObrigatoria { get; set; } = true;
     public string Observacoes { get; set; } = string.Empty;
 }
