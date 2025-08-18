@@ -1,4 +1,4 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
@@ -13,10 +13,9 @@ public partial class ConteudoService : BaseApiService, IConteudoService
 {
     private readonly ApiSettings _apiSettings;
 
-    public ConteudoService(
-        IOptions<ApiSettings> apiSettings, 
-        IApiClientService apiClient, 
-        ILogger<ConteudoService> logger) : base(apiClient, logger)
+    public ConteudoService( IOptions<ApiSettings> apiSettings, 
+                            IApiClientService apiClient, 
+                            ILogger<ConteudoService> logger) : base(apiClient, logger)
     {
         _apiSettings = apiSettings.Value;
         _apiClient.SetBaseAddress(_apiSettings.ConteudoApiUrl);
@@ -76,19 +75,34 @@ public partial class ConteudoService : BaseApiService, IConteudoService
         return result ?? ReturnUnknowError<bool?>();
     }
 
-    public Task<ResponseResult<Guid?>> AdicionarAulaAsync(Guid cursoId, AulaDto aula)
+    public async Task<ResponseResult<Guid>> AdicionarAulaAsync(Guid cursoId, AulaCriarRequest aula)
     {
-        throw new NotImplementedException();
+
+        var result = await ExecuteWithErrorHandling(() => AdicionarAula(cursoId, aula),
+            nameof(AdicionarAulaAsync),
+            cursoId);
+
+        return result ?? ReturnUnknowError<Guid>();
     }
 
-    public Task<ResponseResult<AulaDto>> AtualizarAulaAsync(Guid cursoId, AulaDto aula)
+    public async Task<ResponseResult<AulaDto>> AtualizarAulaAsync(Guid cursoId, AulaAtualizarRequest aula)
     {
-        throw new NotImplementedException();
+        var result = await ExecuteWithErrorHandling(
+            () => AtualizarAula(cursoId, aula.Id, aula),
+            nameof(AtualizarAulaAsync),
+            aula.Id);
+
+        return result ?? ReturnUnknowError<AulaDto>();
     }
 
-    public Task<ResponseResult<bool?>> ExcluirAulaAsync(Guid cursoId, Guid aulaId)
+    public async Task<ResponseResult<bool>> ExcluirAulaAsync(Guid cursoId, Guid aulaId)
     {
-        throw new NotImplementedException();
+        var result = await ExecuteWithErrorHandling(
+            () => ExcluirAula(cursoId, aulaId),
+            nameof(ExcluirAulaAsync),
+            aulaId);
+
+        return result ?? ReturnUnknowError<bool>();
     }
 
     public async Task<ResponseResult<IEnumerable<CursoDto>>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false)

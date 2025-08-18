@@ -211,6 +211,7 @@ public class ConteudosController : BffController
         return BadRequest(resultado);
     }
 
+
     /// <summary>
     /// Obter Conteudo Programatico por Curso ID
     /// </summary>
@@ -225,5 +226,71 @@ public class ConteudosController : BffController
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
         return BadRequest(resultado);
+    }
+
+    /// <summary>
+    /// Cadastrar uma nova aula em um curso
+    /// </summary>
+    [HttpPost("cursos/{cursoId}/aulas")]
+    [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> AdicionarAula( [FromRoute] Guid cursoId,
+                                                    [FromBody] AulaCriarRequest request)
+    {
+        var response = await _conteudoService.AdicionarAulaAsync(cursoId, request);
+
+        if (response?.Status == (int)HttpStatusCode.BadRequest)
+            return BadRequest(response);
+
+        await _cacheService.RemovePatternAsync($"Curso_{cursoId}_IncludeAulas_*");
+
+        return StatusCode(StatusCodes.Status201Created, response);
+    }
+
+    /// <summary>
+    /// Atualizar uma aula existente
+    /// </summary>
+    [HttpPut("cursos/{cursoId}/aulas/{aulaId}")]
+    [ProducesResponseType(typeof(ResponseResult<AulaDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> AtualizarAula(
+        [FromRoute] Guid cursoId,
+        [FromRoute] Guid aulaId,
+        [FromBody] AulaAtualizarRequest request)
+    {
+        if (aulaId != request.Id)
+            return ProcessarErro(HttpStatusCode.BadRequest, "ID da aula na rota não confere com o corpo.");
+
+        var response = await _conteudoService.AtualizarAulaAsync(cursoId, request);
+
+        if (response?.Status == (int)HttpStatusCode.BadRequest)
+            return BadRequest(response);
+
+        await _cacheService.RemovePatternAsync($"Curso_{cursoId}_IncludeAulas_*");
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Excluir uma aula
+    /// </summary>
+    [HttpDelete("cursos/{cursoId}/aulas/{aulaId}")]
+    [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ExcluirAula(
+        [FromRoute] Guid cursoId,
+        [FromRoute] Guid aulaId)
+    {
+        var response = await _conteudoService.ExcluirAulaAsync(cursoId, aulaId);
+
+        if (response?.Status == (int)HttpStatusCode.BadRequest)
+            return BadRequest(response);
+
+        await _cacheService.RemovePatternAsync($"Curso_{cursoId}_IncludeAulas_*");
+
+        return Ok(response);
     }
 }
