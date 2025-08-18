@@ -48,16 +48,19 @@ export class UserRegisterComponent extends FormBaseComponent implements OnInit, 
       dataNascimento: {
         required: 'Informe a data de nascimento.',
       },
+      genero: {
+        required: 'Informe o gênero.',
+      },
       cpf: {
         required: 'Informe o CPF.',
       },
-      fone: {
+      telefone: {
         required: 'Informe o telefone.',
       },
       cidade: {
         required: 'Informe a cidade.',
       },
-      uf: {
+      estado: {
         required: 'Informe a UF.',
       },
       cep: {
@@ -91,10 +94,11 @@ export class UserRegisterComponent extends FormBaseComponent implements OnInit, 
           Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/),
         ]),
         dataNascimento: new FormControl<string>('', [Validators.required]),
-        fone: new FormControl<string>('', [Validators.required]),
+        genero: new FormControl<string>('', [Validators.required]),
+        telefone: new FormControl<string>('', [Validators.required]),
         cpf: new FormControl<string>('', [Validators.required]),
         cidade: new FormControl<string>('', [Validators.required]),
-        uf: new FormControl<string>('', [Validators.required]),
+        estado: new FormControl<string>('', [Validators.required]),
         cep: new FormControl<string>('', [Validators.required]),
         foto: new FormControl<string>('', [Validators.required]),
         confirmaSenha: new FormControl<string>('', [Validators.required]),

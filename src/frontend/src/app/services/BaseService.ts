@@ -46,34 +46,56 @@ export abstract class BaseService {
             }
         }
 
-        // Tratamento específico para erros de validação (400 Bad Request)
-        if (response.status === 400) {
-            if (response.error && response.error.errors) {
-                const validationErrors = response.error.errors;
-                
-                if (typeof validationErrors === 'object' && !Array.isArray(validationErrors)) {
-                    Object.keys(validationErrors).forEach(field => {
-                        const fieldErrors = validationErrors[field];
-                        if (Array.isArray(fieldErrors)) {
-                            fieldErrors.forEach((errorMessage: string) => {
-                                customError.push(errorMessage);
-                            });
-                        }
-                    });
-                } else if (Array.isArray(validationErrors)) {
-                    validationErrors.forEach((errorMessage: string) => {
-                        customError.push(errorMessage);
-                    });
-                }
-            } else if (response.error && response.error.title) {
-                customError.push(response.error.title);
-            } else {
-                customError.push("Dados inválidos. Verifique as informações fornecidas.");
-            }
+		// Tratamento específico para erros de validação (400 Bad Request)
+		if (response.status === 400) {
+			const apiError = response?.error ?? {};
 
-            customResponse.error.errors = customError;
-            return throwError(() => customResponse);
-        }
+			// 1) Novo contrato: erros podem vir em error.data.errors (array de objetos)
+			const dataErrors = apiError?.data?.errors;
+			if (Array.isArray(dataErrors)) {
+				dataErrors.forEach((e: any) => {
+					if (e && typeof e === 'object' && (e.errorMessage || e.message)) {
+						customError.push(String(e.errorMessage ?? e.message));
+					} else if (typeof e === 'string') {
+						customError.push(e);
+					}
+				});
+			}
+
+			// 2) Contrato tradicional: error.errors pode ser objeto dicionário ou array
+			if (apiError && apiError.errors) {
+				const validationErrors = apiError.errors;
+				if (typeof validationErrors === 'object' && !Array.isArray(validationErrors)) {
+					Object.keys(validationErrors).forEach(field => {
+						const fieldErrors = validationErrors[field];
+						if (Array.isArray(fieldErrors)) {
+							fieldErrors.forEach((errorMessage: string) => {
+								customError.push(errorMessage);
+							});
+						} else if (fieldErrors) {
+							customError.push(String(fieldErrors));
+						}
+					});
+				} else if (Array.isArray(validationErrors)) {
+					validationErrors.forEach((errorMessage: string) => {
+						customError.push(errorMessage);
+					});
+				}
+			}
+
+			// 3) Fallback para título
+			if (customError.length === 0) {
+				const title = apiError?.title ?? apiError?.data?.title;
+				if (title) {
+					customError.push(String(title));
+				} else {
+					customError.push("Dados inválidos. Verifique as informações fornecidas.");
+				}
+			}
+
+			customResponse.error.errors = customError;
+			return throwError(() => customResponse);
+		}
         else if (response.status === 500) {
             customError.push("Ocorreu um erro no processamento, tente novamente mais tarde ou contate o nosso suporte.");
             customResponse.error.errors = customError;

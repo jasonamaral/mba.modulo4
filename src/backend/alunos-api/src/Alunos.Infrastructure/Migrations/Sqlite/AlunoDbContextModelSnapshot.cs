@@ -49,11 +49,7 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                         .HasColumnType("Varchar")
                         .HasColumnName("Cpf");
 
-                    b.Property<DateTime>("DataAlteracao")
-                        .HasColumnType("DateTime")
-                        .HasColumnName("DataAlteracao");
-
-                    b.Property<DateTime>("DataCriacao")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("DateTime")
                         .HasColumnName("DataCriacao");
 
@@ -94,6 +90,10 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                         .HasColumnType("Varchar")
                         .HasColumnName("Telefone");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataAlteracao");
+
                     b.HasKey("Id")
                         .HasName("AlunosPK");
 
@@ -118,11 +118,7 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                         .HasColumnType("SmallInt")
                         .HasColumnName("CargaHoraria");
 
-                    b.Property<DateTime>("DataAlteracao")
-                        .HasColumnType("DateTime")
-                        .HasColumnName("DataAlteracao");
-
-                    b.Property<DateTime>("DataCriacao")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("DateTime")
                         .HasColumnName("DataCriacao");
 
@@ -160,6 +156,10 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                         .HasColumnType("Varchar")
                         .HasColumnName("PathCertificado");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataAlteracao");
+
                     b.HasKey("Id")
                         .HasName("CertificadosPK");
 
@@ -181,19 +181,17 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                         .HasColumnType("UniqueIdentifier")
                         .HasColumnName("AlunoId");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataCriacao");
+
                     b.Property<Guid>("CursoId")
                         .HasColumnType("UniqueIdentifier")
                         .HasColumnName("CursoId");
 
-                    b.Property<DateTime>("DataAlteracao")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime?>("DataConclusao")
                         .HasColumnType("SmallDateTime")
                         .HasColumnName("DataConclusao");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DataMatricula")
                         .HasColumnType("SmallDateTime")
@@ -213,6 +211,10 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                         .HasMaxLength(2000)
                         .HasColumnType("Varchar")
                         .HasColumnName("Observacao");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("DataAlteracao");
 
                     b.Property<decimal>("Valor")
                         .HasPrecision(10, 2)
@@ -262,8 +264,8 @@ namespace Alunos.Infrastructure.Migrations.Sqlite
                             b1.Property<Guid>("AulaId")
                                 .HasColumnType("UniqueIdentifier");
 
-                            b1.Property<byte>("CargaHoraria")
-                                .HasColumnType("TinyInt");
+                            b1.Property<int>("CargaHoraria")
+                                .HasColumnType("Int");
 
                             b1.Property<Guid>("CursoId")
                                 .HasColumnType("UniqueIdentifier");

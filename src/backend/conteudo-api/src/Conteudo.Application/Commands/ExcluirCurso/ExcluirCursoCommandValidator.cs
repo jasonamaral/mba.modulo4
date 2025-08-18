@@ -1,14 +1,12 @@
 ﻿using FluentValidation;
 
-namespace Conteudo.Application.Commands.ExcluirCurso
+namespace Conteudo.Application.Commands.ExcluirCurso;
+public class ExcluirCursoCommandValidator : AbstractValidator<ExcluirCursoCommand>
 {
-    public class ExcluirCursoCommandValidator : AbstractValidator<ExcluirCursoCommand>
+    public ExcluirCursoCommandValidator()
     {
-        public ExcluirCursoCommandValidator()
-        {
-            RuleFor(c => c.Id)
-                .NotEmpty().WithMessage("O ID do curso é obrigatório.")
-                .NotEqual(Guid.Empty).WithMessage("ID do curso inválido.");
-        }
-    }  
-}
+        RuleFor(c => c.Id)
+            .NotEmpty().WithMessage("O ID do curso é obrigatório.")
+            .NotEqual(Guid.Empty).WithMessage("ID do curso inválido.");
+    }
+}  

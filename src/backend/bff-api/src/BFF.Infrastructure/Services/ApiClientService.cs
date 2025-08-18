@@ -25,7 +25,8 @@ public class ApiClientService : IApiClientService, IDisposable
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = false,
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
         };
     }
 
@@ -50,23 +51,54 @@ public class ApiClientService : IApiClientService, IDisposable
     {
         try
         {
-            var response = await _httpClient.GetAsync(endpoint);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<T>(content, _jsonOptions);
-
-                return result;
-            }
-
-            _logger.LogWarning("GET falhou para {Endpoint}. Status: {StatusCode}", endpoint, response.StatusCode);
-            return null;
+            var apiResponse = await GetWithDetailsAsync<T>(endpoint);
+            return apiResponse.IsSuccess ? apiResponse.Data : null;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro na requisição GET para {Endpoint}", endpoint);
             return null;
+        }
+    }
+
+    public async Task<ApiResponse<TResponse>> GetWithDetailsAsync<TResponse>(string endpoint)
+        where TResponse : class
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync(endpoint);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = JsonSerializer.Deserialize<TResponse>(responseContent, _jsonOptions);
+                return new ApiResponse<TResponse>
+                {
+                    IsSuccess = true,
+                    StatusCode = (int)response.StatusCode,
+                    Data = result
+                };
+            }
+
+            _logger.LogWarning("GET falhou para {Endpoint}. Status: {StatusCode}. Response: {ErrorContent}",
+                endpoint, response.StatusCode, responseContent);
+
+            return new ApiResponse<TResponse>
+            {
+                IsSuccess = false,
+                StatusCode = (int)response.StatusCode,
+                ErrorContent = responseContent
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro na requisição GET para {Endpoint}", endpoint);
+            return new ApiResponse<TResponse>
+            {
+                IsSuccess = false,
+                StatusCode = 500,
+                ErrorContent = "Erro interno do cliente HTTP"
+            };
         }
     }
 
@@ -88,7 +120,7 @@ public class ApiClientService : IApiClientService, IDisposable
             {
                 try
                 {
-                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent);
+                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent, _jsonOptions);
                     return ApiActionResult<TResponse>.ErrorResult(apiResponse.StatusCode, "Erro na API", errorResponse);
                 }
                 catch
@@ -127,7 +159,7 @@ public class ApiClientService : IApiClientService, IDisposable
             {
                 try
                 {
-                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent);
+                    var errorResponse = JsonSerializer.Deserialize<object>(apiResponse.ErrorContent, _jsonOptions);
                     return ApiActionResult<TResponse>.ErrorResult(apiResponse.StatusCode, "Erro na API", errorResponse);
                 }
                 catch

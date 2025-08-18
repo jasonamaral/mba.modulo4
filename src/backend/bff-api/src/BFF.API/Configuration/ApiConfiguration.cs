@@ -1,8 +1,13 @@
 ﻿using BFF.API.Extensions;
+using BFF.API.Filters;
+using BFF.API.Handlers;
 using BFF.API.Settings;
 using BFF.Domain.Settings;
 using Core.Identidade;
 using Mapster;
+using Polly;
+using System.Net;
+using System.Text.Json;
 
 namespace BFF.API.Configuration;
 
@@ -19,7 +24,8 @@ public static class ApiConfiguration
             .AddCorsConfiguration()
             .AddServicesConfiguration()
             .AddMapsterConfiguration()
-            .AddSwaggerConfigurationExtension();
+            .AddSwaggerConfigurationExtension()
+            .AddResilienceConfiguration();
     }
 
     private static WebApplicationBuilder AddConfiguration(this WebApplicationBuilder builder)
@@ -60,8 +66,20 @@ public static class ApiConfiguration
 
     private static WebApplicationBuilder AddControllersConfiguration(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers()
-            .ConfigureApiBehaviorOptions(opt => opt.SuppressModelStateInvalidFilter = true);
+        builder.Services.AddControllers(options =>
+        {
+            options.Filters.Add<ExceptionFilter>();
+        }).ConfigureApiBehaviorOptions(opt =>
+        {
+            opt.SuppressModelStateInvalidFilter = true;
+        }).AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.WriteIndented = false;
+            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        });
+
         return builder;
     }
 
@@ -115,5 +133,69 @@ public static class ApiConfiguration
     {
         builder.Services.AddSwaggerConfiguration();
         return builder;
+    }
+
+    private static WebApplicationBuilder AddResilienceConfiguration(this WebApplicationBuilder builder)
+    {
+        // HttpClient para comunicação com outras APIs com Polly
+        var resilienceSettings = builder.Configuration.GetSection("ResilienceSettings").Get<ResilienceSettings>();
+        builder.Services.AddTransient<AuthorizationDelegatingHandler>();
+        builder.Services.AddHttpClient("ApiClient")
+            .AddHttpMessageHandler<AuthorizationDelegatingHandler>()
+            .AddPolicyHandler(GetRetryPolicy(resilienceSettings))
+            .AddPolicyHandler(GetCircuitBreakerPolicy(resilienceSettings));
+
+        //services.AddHttpClient("ApiClient", c => { /* ... */ })
+        //    .AddPolicyHandler((sp, req) =>
+        //        Policy.WrapAsync(
+        //            GetCircuitBreakerPolicy(sp.GetRequiredService<IOptions<ResilienceSettings>>().Value),
+        //            GetRetryPolicy(sp.GetRequiredService<IOptions<ResilienceSettings>>().Value)
+        //        ));
+
+        return builder;
+    }
+
+    // Métodos auxiliares para políticas de resiliência
+    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ResilienceSettings settings)
+    {
+        var retryCount = settings?.RetryCount ?? 3;
+
+        return Policy<HttpResponseMessage>
+            .Handle<HttpRequestException>()                          // erro de rede/DNS/reset
+            .Or<TaskCanceledException>()                             // timeout do HttpClient
+            .OrResult(r =>
+                r.StatusCode == HttpStatusCode.BadGateway || // 502
+                r.StatusCode == HttpStatusCode.ServiceUnavailable || // 503
+                r.StatusCode == HttpStatusCode.GatewayTimeout || // 504
+                r.StatusCode == HttpStatusCode.RequestTimeout || // 408
+                (int)r.StatusCode == 429)                            // too many requests
+            .WaitAndRetryAsync(
+                retryCount,
+                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                onRetry: (outcome, timespan, retryCount, context) =>
+                {
+                    Console.WriteLine($"Tentativa {retryCount} em {timespan}s");
+                });
+    }
+
+    private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy(ResilienceSettings settings)
+    {
+        var threshold = settings?.CircuitBreakerThreshold ?? 3;
+        var duration = settings?.CircuitBreakerDuration ?? TimeSpan.FromSeconds(5);
+
+        return Policy<HttpResponseMessage>
+            .Handle<HttpRequestException>()
+            .Or<TaskCanceledException>()
+            .OrResult(r =>
+                r.StatusCode == HttpStatusCode.BadGateway || // 502
+                r.StatusCode == HttpStatusCode.ServiceUnavailable || // 503
+                r.StatusCode == HttpStatusCode.GatewayTimeout || // 504
+                r.StatusCode == HttpStatusCode.RequestTimeout || // 408
+                (int)r.StatusCode == 429)                            // too many requests
+            .CircuitBreakerAsync(
+                threshold,
+                duration,
+                onBreak: (outcome, duration) => Console.WriteLine($"Circuit breaker ABERTO por {duration}s"),
+                onReset: () => Console.WriteLine("Circuit breaker FECHADO"));
     }
 }

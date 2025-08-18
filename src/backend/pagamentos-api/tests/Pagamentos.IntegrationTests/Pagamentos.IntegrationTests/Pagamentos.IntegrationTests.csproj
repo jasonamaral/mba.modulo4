@@ -12,10 +12,21 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="9.0.7" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Pagamentos.Domain\Pagamentos.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Pagamentos.Application\Pagamentos.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\building-blocks\core\Core.csproj" />
   </ItemGroup>
 
 </Project>

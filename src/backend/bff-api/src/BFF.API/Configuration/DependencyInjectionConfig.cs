@@ -5,8 +5,7 @@ using Core.Mediator;
 using Core.Messages;
 using MediatR;
 using BFF.API.Services.Conteudos;
-using BFF.API.Services.Aulas;
-using BFF.API.Services.Pagamentos;
+using BFF.API.Services.Aluno;
 
 namespace BFF.API.Configuration;
 
@@ -27,8 +26,6 @@ public static class DependencyInjectionConfig
         // Serviços de API
         services.AddScoped<IConteudoService, ConteudoService>();
         services.AddScoped<IAlunoService, AlunoService>();
-        services.AddScoped<IPagamentoService, PagamentoService>();
-
         
         // Serviços de infraestrutura
         services.AddScoped<ICacheService, Infrastructure.Services.CacheService>();

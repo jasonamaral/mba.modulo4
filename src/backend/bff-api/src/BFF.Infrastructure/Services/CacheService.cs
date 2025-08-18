@@ -16,6 +16,7 @@ public class CacheService : ICacheService
     private readonly RedisSettings _redisSettings;
     private readonly ILogger<CacheService> _logger;
     private readonly bool _useDistributedCache;
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _memoryKeys = new();
 
     public CacheService(
         IServiceProvider serviceProvider,
@@ -102,6 +103,7 @@ public class CacheService : ICacheService
                 };
                 
                 _memoryCache.Set(fullKey, value, options);
+                _memoryKeys.TryAdd(fullKey, 0);
             }
         }
         catch (Exception ex)
@@ -123,6 +125,7 @@ public class CacheService : ICacheService
             else if (_memoryCache != null)
             {
                 _memoryCache.Remove(fullKey);
+                _memoryKeys.TryRemove(fullKey, out _);
             }
         }
         catch (Exception ex)
@@ -133,10 +136,56 @@ public class CacheService : ICacheService
 
     public async Task RemovePatternAsync(string pattern)
     {
-        // Para memory cache, não há suporte nativo a patterns
-        // Para Redis, seria necessário usar StackExchange.Redis diretamente
-        _logger.LogWarning("RemovePatternAsync não implementado para o tipo de cache atual");
-        await Task.CompletedTask;
+        try
+        {
+            if (_useDistributedCache && !string.IsNullOrEmpty(_redisSettings.ConnectionString))
+            {
+                // Usa StackExchange.Redis para varrer e remover por padrão
+                var multiplexer = await StackExchange.Redis.ConnectionMultiplexer.ConnectAsync(_redisSettings.ConnectionString);
+                try
+                {
+                    var endpoints = multiplexer.GetEndPoints();
+                    var db = multiplexer.GetDatabase(_redisSettings.Database);
+                    var serverPattern = $"{_redisSettings.KeyPrefix}{GetFullKey(pattern)}*";
+
+                    foreach (var endpoint in endpoints)
+                    {
+                        var server = multiplexer.GetServer(endpoint);
+                        if (!server.IsConnected) continue;
+
+                        foreach (var key in server.Keys(_redisSettings.Database, serverPattern))
+                        {
+                            await db.KeyDeleteAsync(key);
+                        }
+                    }
+                }
+                finally
+                {
+                    await multiplexer.CloseAsync();
+                }
+            }
+            else
+            {
+                if (_memoryCache == null)
+                {
+                    _logger.LogWarning("RemovePatternAsync: MemoryCache não disponível.");
+                    return;
+                }
+
+                var fullPrefix = GetFullKey(pattern);
+                var keysToRemove = _memoryKeys.Keys.Where(k => k.StartsWith(fullPrefix, StringComparison.OrdinalIgnoreCase)).ToList();
+                foreach (var k in keysToRemove)
+                {
+                    _memoryCache.Remove(k);
+                    _memoryKeys.TryRemove(k, out _);
+                }
+                _logger.LogInformation("RemovePatternAsync: {Count} chaves removidas do MemoryCache com prefixo {Prefix}", keysToRemove.Count, fullPrefix);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao remover itens do cache por padrão: {Pattern}", pattern);
+        }
     }
 
     private string GetFullKey(string key)

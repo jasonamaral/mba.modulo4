@@ -6,7 +6,6 @@ import {
   DEFAULT_CURRENCY_CODE,
 } from '@angular/core';
 import {
-  HttpClient,
   provideHttpClient,
   withInterceptorsFromDi,
   HTTP_INTERCEPTORS,
@@ -36,6 +35,8 @@ import { LocalStorageUtils } from './utils/localstorage';
 import { registerLocaleData } from '@angular/common';
 import { GlobalErrorInterceptor } from './interceptors/global-error.interceptor';
 import localePt from '@angular/common/locales/pt';
+import { PaginatorPtBr } from './components/PaginatorPtBr';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 
 registerLocaleData(localePt, 'pt-BR');
 
@@ -72,6 +73,7 @@ export const appConfig: ApplicationConfig = {
     AuthGuard,
     { provide: LOCALE_ID, useValue: 'pt-BR' }, // Set the locale globally
     { provide: DEFAULT_CURRENCY_CODE, useValue: 'BRL' }, // Set the default currency to BRL
-    { provide: HTTP_INTERCEPTORS, useClass: GlobalErrorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: GlobalErrorInterceptor, multi: true },
+    { provide: MatPaginatorIntl, useClass: PaginatorPtBr }
   ],
 };

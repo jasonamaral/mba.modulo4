@@ -11,7 +11,7 @@ public class CursoDto
     public string NomeCategoria { get; set; } = string.Empty;
     public int DuracaoHoras { get; set; }
     public string Nivel { get; set; } = string.Empty;
-    public string IimagemUrl { get; set; } = string.Empty;
+    public string ImagemUrl { get; set; } = string.Empty;
     public string Instrutor { get; set; } = string.Empty;
     public int VagasMaximas { get; set; }
     public int VagasOcupadas { get; set; }

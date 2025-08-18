@@ -5,14 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogTitle, Ma
 import { MaterialModule } from 'src/app/material.module';
 import { ToastrService } from 'ngx-toastr';
 import { CursosService } from 'src/app/services/cursos.service';
-
-export interface AulaCreateModel {
-  cursoId: string;
-  nome: string;
-  descricao: string;
-  duracaoMinutos: number;
-  videoUrl: string;
-}
+import { AulaCreateModel } from 'src/app/models/aula.model';
 
 interface DialogData {
   cursoId: string;
@@ -28,10 +21,13 @@ interface DialogData {
 })
 export class AulaAddDialogComponent {
   form: FormGroup = new FormGroup({
+    cursoId: new FormControl(this.data.cursoId),
     nome: new FormControl('', [Validators.required, Validators.minLength(3)]),
     descricao: new FormControl('', [Validators.required, Validators.minLength(3)]),
     duracaoMinutos: new FormControl(0, [Validators.required, Validators.min(1)]),
-    videoUrl: new FormControl('', [Validators.required])
+    videoUrl: new FormControl('', [Validators.required]),
+    tipoAula: new FormControl('', [Validators.required]),
+    numero: new FormControl(0, [Validators.required, Validators.min(1)])
   });
 
   saving = false;
@@ -42,16 +38,21 @@ export class AulaAddDialogComponent {
     private dialogRef: MatDialogRef<AulaAddDialogComponent>,
     private cursosService: CursosService,
     private toastr: ToastrService
-  ) {}
+  ) { }
+
+  ngOnInit(): void {
+  }
 
   private buildPayload(): AulaCreateModel {
     const v = this.form.value;
     return {
-      cursoId: this.data.cursoId,
+      cursoId: v.cursoId,
       nome: v.nome,
       descricao: v.descricao,
       duracaoMinutos: Number(v.duracaoMinutos ?? 0),
-      videoUrl: v.videoUrl
+      videoUrl: v.videoUrl,
+      tipoAula: v.tipoAula,
+      numero: Number(v.numero ?? 0)
     } as AulaCreateModel;
   }
 
@@ -63,7 +64,7 @@ export class AulaAddDialogComponent {
 
     const payload = this.buildPayload();
     this.saving = true;
-    this.cursosService.adicionarAula(this.data.cursoId, payload).subscribe({
+    this.cursosService.addAula(this.data.cursoId, payload).subscribe({
       next: () => {
         this.toastr.success('Aula cadastrada com sucesso.');
         this.createdCount++;
@@ -76,6 +77,7 @@ export class AulaAddDialogComponent {
       error: (e) => {
         const errors = (e?.error?.errors ?? e?.errors ?? []) as string[];
         this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao salvar a aula.');
+        this.saving = false;
       },
       complete: () => (this.saving = false)
     });

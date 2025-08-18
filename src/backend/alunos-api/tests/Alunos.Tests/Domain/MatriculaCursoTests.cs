@@ -79,10 +79,13 @@ public class MatriculaCursoTests
     {
         var matricula = CriarMatriculaValida();
         matricula.RegistrarPagamentoMatricula();
-        matricula.RegistrarHistoricoAprendizado(Guid.NewGuid(), "Aula Teste", 10);
-
+        
+        // Adicionar uma aula em andamento (sem data de término)
+        matricula.RegistrarHistoricoAprendizado(Guid.NewGuid(), "Aula de Teste", 5);
+        
+        // Verificar se a matrícula não pode ser concluída com aulas em andamento
         Action act = () => matricula.ConcluirCurso();
-        act.Should().Throw<DomainException>().WithMessage("*existem aulas não finalizadas*");
+        act.Should().Throw<DomainException>().WithMessage("*Não é possível concluir o curso, existem aulas não finalizadas*");
     }
 
     [Fact]
@@ -91,8 +94,21 @@ public class MatriculaCursoTests
         var matricula = CriarMatriculaValida();
         matricula.RegistrarPagamentoMatricula();
 
-        matricula.RegistrarHistoricoAprendizado(Guid.NewGuid(), "Aula de Teste", 8);
+        // Verificar se a matrícula está disponível para registrar histórico
+        matricula.MatriculaCursoDisponivel().Should().BeTrue();
+        
+        // Verificar se não há histórico antes
+        matricula.HistoricoAprendizado.Should().HaveCount(0);
+        
+        // Registrar histórico de uma aula
+        var aulaId = Guid.NewGuid();
+        matricula.RegistrarHistoricoAprendizado(aulaId, "Aula de Teste", 5);
+        
+        // Verificar se o histórico foi registrado
         matricula.HistoricoAprendizado.Should().HaveCount(1);
+        matricula.HistoricoAprendizado.First().AulaId.Should().Be(aulaId);
+        matricula.HistoricoAprendizado.First().NomeAula.Should().Be("Aula de Teste");
+        matricula.HistoricoAprendizado.First().CargaHoraria.Should().Be(5);
     }
 
     [Fact]
@@ -101,7 +117,7 @@ public class MatriculaCursoTests
         var matricula = CriarMatriculaValida();
         matricula.RegistrarAbandonoMatricula();
 
-        Action act = () => matricula.RegistrarHistoricoAprendizado(Guid.NewGuid(), "Aula X", 5);
+        Action act = () => matricula.RegistrarHistoricoAprendizado(Guid.NewGuid(), "Aula de Teste Completa", 5);
         act.Should().Throw<DomainException>().WithMessage("*Matrícula não está disponível para registrar histórico de aprendizado*");
     }
 

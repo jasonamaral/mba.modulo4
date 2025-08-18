@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Plataforma.Educacao.Aluno.Application.Commands.CadastrarAluno;
 using Core.Communication;
 using Alunos.Domain.Interfaces;
 using Core.Mediator;
@@ -32,6 +31,7 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
                 request.Cep,
                 request.Foto);
 
+            aluno.AtivarAluno();
             await _alunoRepository.AdicionarAsync(aluno);
             if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = aluno.Id; }
 

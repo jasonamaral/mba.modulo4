@@ -87,12 +87,12 @@ public class AlunoConfiguration : IEntityTypeConfiguration<Aluno>
             .HasColumnType(DatabaseTypeConstant.Varchar)
             .HasMaxLength(1024);
 
-        builder.Property(x => x.DataCriacao)
+        builder.Property(x => x.CreatedAt)
             .HasColumnName("DataCriacao")
             .HasColumnType(DatabaseTypeConstant.DateTime)
             .IsRequired();
 
-        builder.Property(x => x.DataAlteracao)
+        builder.Property(x => x.UpdatedAt)
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
         #endregion

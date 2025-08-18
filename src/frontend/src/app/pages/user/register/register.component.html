@@ -29,13 +29,22 @@
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Nascimento</mat-label>
             <mat-form-field appearance="outline" class="w-100">
               <input matInput [matDatepicker]="picker" formControlName="dataNascimento">
-              <mat-hint>DD/MM/AAAA</mat-hint>
               <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
             <small class="text-error" *ngIf="displayMessage['dataNascimento']">
               <p [innerHTML]="displayMessage['dataNascimento']"></p>
             </small>
+
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Gênero</mat-label>
+            <mat-radio-group color="primary" formControlName="genero" class="w-100">
+              <mat-radio-button class="m-r-16" value="Masculino">Masculino</mat-radio-button>
+              <mat-radio-button class="m-r-16" value="Feminino">Feminino</mat-radio-button>
+              <mat-radio-button value="Outros">Outros</mat-radio-button>
+            </mat-radio-group>
+            <span *ngIf="displayMessage['genero']">
+              <mat-error>{{displayMessage['genero']}}</mat-error>
+            </span>
 
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">CPF</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
@@ -47,10 +56,10 @@
 
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Fone</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput type="tel" formControlName="fone" />
+              <input matInput type="tel" formControlName="telefone" />
             </mat-form-field>
-            <span *ngIf="displayMessage['fone']">
-              <mat-error>{{displayMessage['fone']}}</mat-error>
+            <span *ngIf="displayMessage['telefone']">
+              <mat-error>{{displayMessage['telefone']}}</mat-error>
             </span>
 
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Cidade</mat-label>
@@ -63,10 +72,10 @@
 
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">UF</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput type="text" formControlName="uf" />
+              <input matInput type="text" formControlName="estado" />
             </mat-form-field>
-            <span *ngIf="displayMessage['uf']">
-              <mat-error>{{displayMessage['uf']}}</mat-error>
+            <span *ngIf="displayMessage['estado']">
+              <mat-error>{{displayMessage['estado']}}</mat-error>
             </span>
 
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">CEP</mat-label>

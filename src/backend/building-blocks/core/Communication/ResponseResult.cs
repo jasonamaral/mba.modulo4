@@ -9,7 +9,7 @@ public class ResponseResult<T>
 
     public string Title { get; set; }
     public int Status { get; set; }
-    public T? Data { get; set; }
+    public T Data { get; set; }
     public ResponseErrorMessages Errors { get; set; }
 }
 

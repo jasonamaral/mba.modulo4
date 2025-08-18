@@ -1,32 +1,45 @@
+import { FilterCurso, PagedResult } from './../../models/paged-result.model';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { CursosService } from '../../services/cursos.service';
 import { CursoModel } from '../../models/curso.model';
 import { MatriculasService } from '../../services/matriculas.service';
 import { MessageService } from 'src/app/services/message.service ';
 import { ToastrService } from 'ngx-toastr';
-import { MatGridListModule } from '@angular/material/grid-list';
 import { BreakpointObserver, LayoutModule } from '@angular/cdk/layout';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConteudoAddComponent } from './conteudo-add.component';
 import { LocalStorageUtils } from 'src/app/utils/localstorage';
 import { ConteudoUpdateComponent } from './conteudo-update.component';
 import { AulasListDialogComponent } from './aulas-list-dialog.component';
+import { MaterialModule } from "src/app/material.module";
 
 @Component({
   standalone: true,
   selector: 'app-cursos-list',
   templateUrl: './cursos-list.component.html',
   styleUrls: ['./cursos-list.component.scss'],
-  imports: [CommonModule, MatCardModule, MatButtonModule, RouterModule, MatGridListModule, LayoutModule, MatDialogModule]
+  imports: [CommonModule, RouterModule, LayoutModule, MatDialogModule, MaterialModule]
 })
 export class CursosListComponent {
-  cursos: CursoModel[] = [];
   gridCols = 2;
   isUserAdmin = false;
+  pagedResult: PagedResult<CursoModel> = {
+    items: [],
+    pageSize: 0,
+    pageIndex: 0,
+    totalResults: 0
+  };
+  filterCurso: FilterCurso = {
+    pageSize: 6,
+    pageIndex: 0,
+    query: '',
+    includeAulas: true,
+    ativos: true
+  };
+  loading = false;
+
   constructor(
     private cursosService: CursosService,
     private matriculas: MatriculasService,
@@ -46,9 +59,14 @@ export class CursosListComponent {
   }
 
   private loadCursos(): void {
-    this.cursosService.listar().subscribe({
-      next: d => this.cursos = d,
+    this.loading = true;
+    this.cursosService.listar(this.filterCurso).subscribe({
+      next: d => {
+        this.pagedResult = d;
+        this.loading = false;
+      },
       error: (err) => {
+        this.loading = false;
         const errors = (err?.error?.errors ?? err?.errors ?? []) as string[];
         if (Array.isArray(errors) && errors.length > 0) {
           errors.forEach(message => this.messageService.setMessage('Erro', message));
@@ -111,6 +129,12 @@ export class CursosListComponent {
         else this.toastr.error('Não foi possível realizar a matrícula.');
       }
     });
+  }
+  
+  onPageChange(event: any) {
+    this.filterCurso.pageSize = event.pageSize;
+    this.filterCurso.pageIndex = event.pageIndex + 1;
+    this.loadCursos();
   }
 }
 

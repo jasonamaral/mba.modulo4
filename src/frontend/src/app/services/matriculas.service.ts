@@ -21,9 +21,9 @@ export class MatriculasService extends BaseService {
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 
-  listarMatriculas(): Observable<MatriculaModel[]> {
+  listarMatriculas(alunoId: string): Observable<MatriculaModel[]> {
     return this.http
-      .get(this.UrlServiceV1 + 'alunos/minhas-matriculas', this.getAuthHeaderJson())
+      .get(this.UrlServiceV1 + `alunos/${alunoId}/todas-matriculas`, this.getAuthHeaderJson())
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 

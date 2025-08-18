@@ -1,7 +1,7 @@
 ﻿using Alunos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Conteudo.API.Configuration;
+namespace Alunos.API.Configurations;
 public static class DbContextConfiguration
 {
     public static WebApplicationBuilder AddDbContextConfiguration(this WebApplicationBuilder builder)

@@ -19,6 +19,8 @@ public class RegistrarProblemaHistoricoAprendizadoEventHandler(IMediatorHandler 
 
         _raizAgregacao = notification.RaizAgregacao;
         if (!ValidarRequisicao(notification)) { return; }
+
+        await Task.CompletedTask;
     }
 
     private bool ValidarRequisicao(RegistrarProblemaHistoricoAprendizadoEvent notification)

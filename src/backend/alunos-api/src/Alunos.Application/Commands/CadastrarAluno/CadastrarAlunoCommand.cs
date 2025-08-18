@@ -17,8 +17,6 @@ public class CadastrarAlunoCommand : CommandRaiz, IRequest<CommandResult>
     public string Estado { get; private set; }
     public string Cep { get; private set; }
     public string? Foto { get; private set; }
-    //public bool EhAdministrador { get; private set; }
-    //public DateTime DataCadastro { get; private set; }
 
 
     public CadastrarAlunoCommand(Guid id, 
@@ -32,8 +30,6 @@ public class CadastrarAlunoCommand : CommandRaiz, IRequest<CommandResult>
         string estado, 
         string cep, 
         string foto)
-        //bool ehAdministrador, 
-        //DateTime dataCadastro)
     {
         DefinirRaizAgregacao(Id);
         Id = id;
@@ -47,7 +43,5 @@ public class CadastrarAlunoCommand : CommandRaiz, IRequest<CommandResult>
         Estado = estado;
         Cep = cep;
         Foto = foto;
-        //EhAdministrador = ehAdministrador;
-        //DataCadastro = dataCadastro;
     }
 }

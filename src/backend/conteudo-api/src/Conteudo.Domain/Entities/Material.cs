@@ -1,8 +1,9 @@
 using Core.DomainObjects;
+using Plataforma.Educacao.Core.Exceptions;
 
 namespace Conteudo.Domain.Entities;
 
-public class Material : Entidade
+public class Material : Entidade, IRaizAgregacao
 {
     public Guid AulaId { get; private set; }
     public Aula Aula { get; private set; }
@@ -46,19 +47,19 @@ public class Material : Entidade
     private static void ValidarDados(string nome, string descricao, string tipoMaterial, string url)
     {
         if (string.IsNullOrWhiteSpace(nome))
-            throw new ArgumentException("Nome do material é obrigatório", nameof(nome));
+            throw new DomainException("Nome do material é obrigatório");
             
         if (nome.Length > 200)
-            throw new ArgumentException("Nome do material não pode ter mais de 200 caracteres", nameof(nome));
+            throw new DomainException("Nome do material não pode ter mais de 200 caracteres");
             
         if (string.IsNullOrWhiteSpace(descricao))
-            throw new ArgumentException("Descrição do material é obrigatória", nameof(descricao));
+            throw new DomainException("Descrição do material é obrigatória");
             
         if (string.IsNullOrWhiteSpace(tipoMaterial))
-            throw new ArgumentException("Tipo do material é obrigatório", nameof(tipoMaterial));
+            throw new DomainException("Tipo do material é obrigatório");
             
         if (string.IsNullOrWhiteSpace(url))
-            throw new ArgumentException("URL do material é obrigatória", nameof(url));
+            throw new DomainException("URL do material é obrigatória");
     }
 
     public void AtualizarInformacoes(
@@ -100,7 +101,7 @@ public class Material : Entidade
     public void AlterarOrdem(int novaOrdem)
     {
         if (novaOrdem < 0)
-            throw new ArgumentException("Ordem não pode ser negativa", nameof(novaOrdem));
+            throw new DomainException("Ordem não pode ser negativa");
             
         Ordem = novaOrdem;
         AtualizarDataModificacao();

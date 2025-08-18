@@ -3,8 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <NullableReferenceTypes>enable</NullableReferenceTypes>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!--<NoWarn>$(NoWarn);1591</NoWarn>-->
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

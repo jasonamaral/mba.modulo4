@@ -3,18 +3,13 @@ export interface AulaModel {
   cursoId: string;
   nome: string;
   descricao: string;
-  ordem: number;
+  numero: number;
   duracaoMinutos: number;
   videoUrl: string;
+  tipoAula?: string;
   // Campos opcionais que podem vir da API e serão exibidos
   status?: string;
 }
 
-export interface AulaCreateModel {
-  nome: string;
-  descricao: string;
-  duracaoMinutos: number;
-  videoUrl: string;
-}
-
-
+export interface AulaCreateModel extends Omit<AulaModel, 'id'> {}
+export interface AulaEditModel extends Partial<AulaModel> {}

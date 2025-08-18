@@ -13,113 +13,85 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace Conteudo.API.Controllers
+namespace Conteudo.API.Controllers;
+
+/// <summary>
+/// Controller de Categorias
+/// </summary>
+[Route("api/[controller]")]
+[Authorize]
+[Produces("application/json")]
+public class CategoriaController(IMediatorHandler mediator
+                              , ICategoriaAppService categoriaAppService
+                              , INotificationHandler<DomainNotificacaoRaiz> notifications
+                              , INotificador notificador) : MainController(mediator, notifications, notificador)
 {
+    private readonly IMediatorHandler _mediator = mediator;
+    private readonly ICategoriaAppService _categoriaAppService = categoriaAppService;
+
     /// <summary>
-    /// Controller de Categorias
+    /// Retorna uma categoria pelo ID.
     /// </summary>
-    [Route("api/[controller]")]
-    [Authorize]
-    [Produces("application/json")]
-    public class CategoriaController(IMediatorHandler mediator
-                                  , ICategoriaAppService categoriaAppService
-                                  , INotificationHandler<DomainNotificacaoRaiz> notifications
-                                  , INotificador notificador) : MainController(mediator, notifications, notificador)
+    /// <param name="id">ID do curso</param>
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(ResponseResult<CategoriaDto>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 404)]
+    [Authorize(Roles = "Usuario, Administrador")]
+    public async Task<IActionResult> ObterPorId(Guid id)
     {
-        private readonly IMediatorHandler _mediator = mediator;
-        private readonly ICategoriaAppService _categoriaAppService = categoriaAppService;
+        var categoria = await _categoriaAppService.ObterPorIdAsync(id);
 
-        /// <summary>
-        /// Retorna uma categoria pelo ID.
-        /// </summary>
-        /// <param name="id">ID do curso</param>
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ResponseResult<CategoriaDto>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 404)]
-        [Authorize(Roles = "Usuario, Administrador")]
-        public async Task<IActionResult> ObterPorId(Guid id)
+        if (categoria == null)
         {
-            try
-            {
-                var categoria = await _categoriaAppService.ObterPorIdAsync(id);
-
-                if (categoria == null)
-                {
-                    _notificador.AdicionarErro("Categoria não encontrada.");
-                    return RespostaPadraoApi<string>();
-                }
-
-                return RespostaPadraoApi(data: categoria);
-            }
-            catch (Exception ex)
-            {
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-            }
+            _notificador.AdicionarErro("Categoria não encontrada.");
+            return RespostaPadraoApi<string>();
         }
 
-        /// <summary>
-        /// Retorna todas as categorias.
-        /// </summary>
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<CategoriaDto>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
-        [Authorize(Roles = "Usuario, Administrador")]
-        public async Task<IActionResult> ObterTodos()
-        {
-            try
-            {
-                var categorias = await _categoriaAppService.ObterTodasCategoriasAsync();
-                return RespostaPadraoApi(data: categorias);
-            }
-            catch (Exception ex)
-            {
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-            }
-        }
+        return RespostaPadraoApi(data: categoria);
+    }
 
-        /// <summary>
-        /// Cadastra uma nova categoria.
-        /// </summary>
-        /// <param name="dto">Dados da categoria</param>
-        [HttpPost]
-        [ProducesResponseType(typeof(ResponseResult<Guid>), 201)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> CadastrarCategoria([FromBody] CadastroCategoriaDto dto)
-        {
-            try
-            {
-                var command = dto.Adapt<CadastrarCategoriaCommand>();
-                return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.ExecutarComando(command));
-            }
-            catch (Exception ex)
-            {
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-            }
-        }
+    /// <summary>
+    /// Retorna todas as categorias.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<CategoriaDto>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Usuario, Administrador")]
+    public async Task<IActionResult> ObterTodos()
+    {
+        var categorias = await _categoriaAppService.ObterTodasCategoriasAsync();
+        return RespostaPadraoApi(data: categorias);
+    }
 
-        /// <summary>
-        /// Atualiza uma categoria existente.
-        /// </summary>
-        /// param name="dto">Dados da categoria</param>
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Administrador")]
-        [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
-        public async Task<IActionResult> AtualizarCategoria(Guid id, [FromBody] AtualizarCategoriaDto dto)
-        {
-            try
-            {
-                if (id != dto.Id)
-                    return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria não confere.");
+    /// <summary>
+    /// Cadastra uma nova categoria.
+    /// </summary>
+    /// <param name="dto">Dados da categoria</param>
+    [HttpPost]
+    [ProducesResponseType(typeof(ResponseResult<Guid?>), 201)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> CadastrarCategoria([FromBody] CadastroCategoriaDto dto)
+    {
+        var command = dto.Adapt<CadastrarCategoriaCommand>();
+        return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.ExecutarComando(command));
+    }
 
-                var command = dto.Adapt<AtualizarCategoriaCommand>();
-                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
-            }
-            catch (Exception ex)
-            {
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-            }
-        }
+    /// <summary>
+    /// Atualiza uma categoria existente.
+    /// </summary>
+    /// <param name="id">ID da categoria</param>
+    /// <param name="dto">Dados da categoria</param>
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrador")]
+    [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
+    [ProducesResponseType(typeof(ResponseResult<string>), 400)]
+    public async Task<IActionResult> AtualizarCategoria(Guid id, [FromBody] AtualizarCategoriaDto dto)
+    {
+        if (id != dto.Id)
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria não confere.");
+
+        var command = dto.Adapt<AtualizarCategoriaCommand>();
+        return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
     }
 }

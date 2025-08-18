@@ -1,7 +1,6 @@
-﻿using Alunos.Application.Commands.CadastrarAluno;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace Plataforma.Educacao.Aluno.Application.Commands.CadastrarAluno;
+namespace Alunos.Application.Commands.CadastrarAluno;
 
 public class CadastrarAlunoCommandValidator : AbstractValidator<CadastrarAlunoCommand>
 {

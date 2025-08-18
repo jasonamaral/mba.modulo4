@@ -21,7 +21,7 @@ public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
 
     public async Task AtualizarAsync(Aluno aluno)
     {
-        aluno.RegistrarDataAlteracao();
+        aluno.AtualizarDataModificacao();
         _context.Alunos.Update(aluno);
         await Task.CompletedTask;
     }
@@ -32,7 +32,7 @@ public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
             .Include(a => a.MatriculasCursos)
             .ThenInclude(m => m.Certificado)
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Id == alunoId);
+            .FirstOrDefaultAsync(a => a.CodigoUsuarioAutenticacao == alunoId);
     }
 
     public async Task<Aluno> ObterPorEmailAsync(string email)

@@ -1,12 +1,13 @@
 using Alunos.Domain.Enumerators;
 using Alunos.Domain.ValueObjects;
+using Core.DomainObjects;
 using Core.DomainValidations;
 using Core.Utils;
 using Plataforma.Educacao.Core.Exceptions;
 using System.Text.Json.Serialization;
 
 namespace Alunos.Domain.Entities;
-public class MatriculaCurso : Common.Entidade
+public class MatriculaCurso : Entidade
 {
     #region Atributos
     public Guid AlunoId { get; }
@@ -52,6 +53,7 @@ public class MatriculaCurso : Common.Entidade
     internal short QuantidadeTotalCargaHoraria() => (short)_historicoAprendizado.Sum(x => x.CargaHoraria);
     public int QuantidadeAulasFinalizadas() => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
     public int QuantidadeAulasEmAndamento() => _historicoAprendizado.Count(h => !h.DataTermino.HasValue);
+    public int ObterQuantidadeAulasRegistradas() => QuantidadeAulasFinalizadas() + QuantidadeAulasEmAndamento();
     public bool MatriculaCursoConcluido() => DataConclusao.HasValue;
     internal bool MatriculaCursoDisponivel() => !DataConclusao.HasValue && EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado;
     internal bool PodeConcluirCurso() => EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado && _historicoAprendizado.Count(h => !h.DataTermino.HasValue) == 0;
@@ -118,7 +120,7 @@ public class MatriculaCurso : Common.Entidade
     #endregion
 
     #region Manipuladores de HistoricoAprendizado
-    internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, byte cargaHoraria, DateTime? dataTermino = null)
+    internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         if (!MatriculaCursoDisponivel()) { throw new DomainException("Matrícula não está disponível para registrar histórico de aprendizado"); }
 

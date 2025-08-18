@@ -32,27 +32,19 @@ public class HealthController : BffController
     [HttpGet]
     public IActionResult Get()
     {
-        try
+        var healthData = new HealthCheckResponse
         {
-            var healthData = new HealthCheckResponse
-            {
-                Status = "Healthy",
-                Timestamp = DateTime.UtcNow,
-                Version = "1.0.0",
-                Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
-                Services = new List<ServiceHealthResponse>
+            Status = "Healthy",
+            Timestamp = DateTime.UtcNow,
+            Version = "1.0.0",
+            Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
+            Services = new List<ServiceHealthResponse>
                 {
                     new() { Name = "BFF API", Status = "Healthy", ResponseTime = "0ms", LastCheck = DateTime.UtcNow }
                 }
-            };
+        };
 
-            return RespostaPadraoApi<HealthCheckResponse>(System.Net.HttpStatusCode.OK, healthData, "API funcionando normalmente");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro ao verificar saúde da API");
-            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
-        }
+        return RespostaPadraoApi<HealthCheckResponse>(System.Net.HttpStatusCode.OK, healthData, "API funcionando normalmente");
     }
 
     /// <summary>
@@ -62,30 +54,22 @@ public class HealthController : BffController
     [HttpGet("status")]
     public IActionResult GetStatus()
     {
-        try
+        var statusData = new ApiStatusResponse
         {
-            var statusData = new ApiStatusResponse
-            {
-                Name = "BFF API",
-                Version = "1.0.0",
-                Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
-                StartTime = DateTime.UtcNow.AddHours(-1), // Simulado
-                Uptime = TimeSpan.FromHours(1), // Simulado
-                Status = "Running",
-                Configuration = new Dictionary<string, object>
+            Name = "BFF API",
+            Version = "1.0.0",
+            Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
+            StartTime = DateTime.UtcNow.AddHours(-1), // Simulado
+            Uptime = TimeSpan.FromHours(1), // Simulado
+            Status = "Running",
+            Configuration = new Dictionary<string, object>
                 {
                     { "LogLevel", "Information" },
                     { "Caching", "Enabled" },
                     { "Compression", "Enabled" }
                 }
-            };
+        };
 
-            return RespostaPadraoApi<ApiStatusResponse>(System.Net.HttpStatusCode.OK, statusData, "Status da API obtido com sucesso");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro ao obter status da API");
-            return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
-        }
+        return RespostaPadraoApi<ApiStatusResponse>(System.Net.HttpStatusCode.OK, statusData, "Status da API obtido com sucesso");
     }
-} 
+}

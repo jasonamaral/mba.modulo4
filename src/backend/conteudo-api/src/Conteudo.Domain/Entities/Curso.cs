@@ -1,5 +1,6 @@
 using Conteudo.Domain.ValueObjects;
 using Core.DomainObjects;
+using Plataforma.Educacao.Core.Exceptions;
 
 namespace Conteudo.Domain.Entities;
 
@@ -56,28 +57,28 @@ public class Curso : Entidade, IRaizAgregacao
         int duracaoHoras, string nivel, string instrutor, int vagasMaximas)
     {
         if (string.IsNullOrWhiteSpace(nome))
-            throw new ArgumentException("Nome do curso é obrigatório", nameof(nome));
+            throw new DomainException("Nome do curso é obrigatório");
             
         if (nome.Length > 200)
-            throw new ArgumentException("Nome do curso não pode ter mais de 200 caracteres", nameof(nome));
-            
+            throw new DomainException("Nome do curso não pode ter mais de 200 caracteres");
+
         if (valor < 0)
-            throw new ArgumentException("Valor do curso não pode ser negativo", nameof(valor));
+            throw new DomainException("Valor do curso não pode ser negativo");
             
         if (conteudoProgramatico == null)
-            throw new ArgumentException("Conteúdo programático é obrigatório", nameof(conteudoProgramatico));
-            
+            throw new DomainException("Conteúdo programático é obrigatório");
+
         if (duracaoHoras <= 0)
-            throw new ArgumentException("Duração do curso deve ser maior que zero", nameof(duracaoHoras));
+            throw new DomainException("Duração do curso deve ser maior que zero");
             
         if (string.IsNullOrWhiteSpace(nivel))
-            throw new ArgumentException("Nível do curso é obrigatório", nameof(nivel));
+            throw new DomainException("Nível do curso é obrigatório");
             
         if (string.IsNullOrWhiteSpace(instrutor))
-            throw new ArgumentException("Instrutor é obrigatório", nameof(instrutor));
+            throw new DomainException("Instrutor é obrigatório");
             
         if (vagasMaximas <= 0)
-            throw new ArgumentException("Número de vagas deve ser maior que zero", nameof(vagasMaximas));
+            throw new DomainException("Número de vagas deve ser maior que zero");
     }
 
     public void AtualizarInformacoes(
@@ -123,10 +124,10 @@ public class Curso : Entidade, IRaizAgregacao
     public void AdicionarAula(Aula aula)
     {
         if (aula == null)
-            throw new ArgumentException("Aula não pode ser nula", nameof(aula));
+            throw new DomainException("Aula não pode ser nula");
             
         if (_aulas.Any(a => a.Numero == aula.Numero))
-            throw new InvalidOperationException($"Já existe uma aula com o número {aula.Numero}");
+            throw new DomainException($"Já existe uma aula com o número {aula.Numero}");
             
         _aulas.Add(aula);
         AtualizarDataModificacao();
@@ -145,7 +146,7 @@ public class Curso : Entidade, IRaizAgregacao
     public void AdicionarMatricula()
     {
         if (VagasOcupadas >= VagasMaximas)
-            throw new InvalidOperationException("Não há vagas disponíveis para este curso");
+            throw new DomainException("Não há vagas disponíveis para este curso");
             
         VagasOcupadas++;
         AtualizarDataModificacao();

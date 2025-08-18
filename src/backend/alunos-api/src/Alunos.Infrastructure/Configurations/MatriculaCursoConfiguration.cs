@@ -78,12 +78,21 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
             ha.Property(x => x.CursoId).HasColumnType(DatabaseTypeConstant.UniqueIdentifier).IsRequired();
             ha.Property(x => x.AulaId).HasColumnType(DatabaseTypeConstant.UniqueIdentifier).IsRequired();
             ha.Property(x => x.NomeAula).HasColumnType(DatabaseTypeConstant.Varchar).HasMaxLength(100).IsRequired();
-            ha.Property(x => x.CargaHoraria).HasColumnType(DatabaseTypeConstant.Byte).IsRequired();
+            ha.Property(x => x.CargaHoraria).HasColumnType(DatabaseTypeConstant.Int32).IsRequired();
             ha.Property(x => x.DataInicio).HasColumnType(DatabaseTypeConstant.SmallDateTime).IsRequired();
             ha.Property(x => x.DataTermino).HasColumnType(DatabaseTypeConstant.SmallDateTime);
             ha.HasIndex(x => x.CursoId).HasDatabaseName("HistoricosAprendizadoCursoIdIDX");
             ha.HasIndex(x => x.AulaId).HasDatabaseName("HistoricosAprendizadoAulaIdIDX");
         });
+
+        builder.Property(x => x.CreatedAt)
+            .HasColumnName("DataCriacao")
+            .HasColumnType(DatabaseTypeConstant.DateTime)
+            .IsRequired();
+
+        builder.Property(x => x.UpdatedAt)
+            .HasColumnName("DataAlteracao")
+            .HasColumnType(DatabaseTypeConstant.DateTime);
         #endregion Mapping columns
 
         #region Indexes

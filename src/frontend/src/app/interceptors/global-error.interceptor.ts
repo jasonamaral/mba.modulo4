@@ -22,6 +22,9 @@ export class GlobalErrorInterceptor implements HttpInterceptor {
           if (error.status === 401) {
             return throwError(() => error);
           }
+          if (error.status === 403) {
+            return throwError(() => error);
+          }
 
           const extracted = this.extractErrors(error);
           if (extracted && extracted.length > 0) {
@@ -39,9 +42,35 @@ export class GlobalErrorInterceptor implements HttpInterceptor {
   }
 
   private extractErrors(error: HttpErrorResponse): string[] {
-    const errors = (error?.error?.errors ?? []) as string[];
-    if (Array.isArray(errors) && errors.length > 0) return errors;
-    const title = (error?.error?.title ?? error?.message ?? '') as string;
+    // 1) errors como array simples
+    const errors = (error?.error?.errors ?? []) as any[];
+    if (Array.isArray(errors) && errors.length > 0) {
+      return errors.map(e => (typeof e === 'string' ? e : (e?.errorMessage ?? e?.message ?? JSON.stringify(e))));
+    }
+
+    // 2) novo contrato: error.data.errors é um array de objetos com errorMessage
+    const dataErrors = (error?.error?.data?.errors ?? []) as any[];
+    if (Array.isArray(dataErrors) && dataErrors.length > 0) {
+      return dataErrors.map(e => (typeof e === 'string' ? e : (e?.errorMessage ?? e?.message ?? JSON.stringify(e))));
+    }
+
+    // 3) dicionário de erros
+    const dict = error?.error?.errors;
+    if (dict && typeof dict === 'object' && !Array.isArray(dict)) {
+      const list: string[] = [];
+      Object.keys(dict).forEach(key => {
+        const fieldErrors = (dict as any)[key];
+        if (Array.isArray(fieldErrors)) {
+          fieldErrors.forEach((msg: any) => list.push(String(msg)));
+        } else if (fieldErrors) {
+          list.push(String(fieldErrors));
+        }
+      });
+      if (list.length > 0) return list;
+    }
+
+    // 4) fallback por título/mensagem
+    const title = (error?.error?.title ?? error?.error?.data?.title ?? error?.message ?? '') as string;
     return title ? [title] : [];
   }
 }

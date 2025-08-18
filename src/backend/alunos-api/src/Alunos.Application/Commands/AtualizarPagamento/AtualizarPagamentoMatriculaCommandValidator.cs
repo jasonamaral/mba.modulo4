@@ -8,7 +8,6 @@ namespace Alunos.Application.Commands.AtualizarPagamento
         {
             RuleFor(c => c.AlunoId).NotEqual(Guid.Empty).WithMessage("Id do aluno é inválido");
             RuleFor(c => c.CursoId).NotEqual(Guid.Empty).WithMessage("Id do curso é inválido");
-            //RuleFor(c => c.CursoDisponivel).NotEqual(false).WithMessage("Curso precisa estar disponível para realizar o pagamento");
         }
     }
 }

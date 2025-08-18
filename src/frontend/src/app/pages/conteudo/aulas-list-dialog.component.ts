@@ -4,6 +4,12 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MaterialModule } from 'src/app/material.module';
 import { AulaModel } from 'src/app/models/aula.model';
 import { CursoModel } from 'src/app/models/curso.model';
+import { LocalStorageUtils } from 'src/app/utils/localstorage';
+import { MatDialog } from '@angular/material/dialog';
+import { AulaEditDialogComponent } from './aula-edit-dialog.component';
+import { CursosService } from '../../services/cursos.service';
+import { ToastrService } from 'ngx-toastr';
+import { AulaAddDialogComponent } from './aula-add-dialog.component';
 
 interface DialogData {
   curso: CursoModel;
@@ -19,21 +25,36 @@ interface DialogData {
       <ng-container *ngIf="aulas?.length; else empty">
         <div class="aula" *ngFor="let a of aulas; let i = index">
           <div class="aula-header">
-            <span class="ordem">#{{ a.ordem }}</span>
+            <span class="ordem">#{{ a.numero }}</span>
             <span class="nome">{{ a.nome }}</span>
-            <span class="duracao" *ngIf="a.duracaoMinutos !== undefined">{{ a.duracaoMinutos }} min</span>
+            <span class="duracao" *ngIf="a.duracaoMinutos !== undefined">
+              <span class="iconify" data-icon="mdi:clock-outline" data-width="18" data-height="18"></span>
+              {{ a.duracaoMinutos }} min
+            </span>
           </div>
           <div class="descricao" *ngIf="a.descricao">{{ a.descricao }}</div>
           <div class="meta">
             <span *ngIf="a.videoUrl">
-              Vídeo: <a [href]="a.videoUrl" target="_blank" rel="noopener">abrir</a>
+              <span class="iconify" data-icon="mdi:play-circle-outline" data-width="18" data-height="18"></span>
+              <a [href]="a.videoUrl" target="_blank" rel="noopener">Assistir vídeo</a>
             </span>
-            <span *ngIf="a.status">Status: {{ a.status }}</span>
+            <span *ngIf="a.status" [ngClass]="{
+              'status-pendente': a.status === 'Pendente',
+              'status-concluida': a.status === 'Concluída'
+            }">
+              Status: {{ a.status }}
+            </span>
+          </div>
+          <div class="actions bottom" *ngIf="isUserAdmin">
+            <button mat-stroked-button color="primary" (click)="editarAula(a)">editar</button>
           </div>
         </div>
       </ng-container>
       <ng-template #empty>
-        <p>Nenhuma aula cadastrada para este curso.</p>
+        <div class="empty-state">
+          <p>Nenhuma aula cadastrada para este curso.</p>
+          <button mat-raised-button color="primary" (click)="adicionarAula()">Adicionar Aula</button>
+        </div>
       </ng-template>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
@@ -42,28 +63,81 @@ interface DialogData {
   `,
   styles: [
     `.content{max-height:70vh;min-width:300px;display:block}`,
-    `.aula{padding:12px 0;border-bottom:1px solid rgba(0,0,0,.08)}`,
+    `.aula{padding:8px 0;border-bottom:1px solid rgba(0,0,0,.08)}`,
     `.aula:last-child{border-bottom:none}`,
     `.aula-header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}`,
-    `.ordem{font-weight:600;color:#666}`,
-    `.nome{font-weight:600;flex:1 1 auto}`,
-    `.duracao{color:#666}`,
-    `.descricao{margin:6px 0}`,
-    `.meta{display:flex;gap:16px;color:#555}`
+    `.ordem{font-weight:600;color:#1976d2}`,
+    `.nome{font-weight:600;flex:1 1 auto;font-size:1.05rem}`,
+    `.duracao{color:#555;display:flex;align-items:center;gap:4px}`,
+    `.descricao{margin:6px 0;font-size:.98rem;color:#444}`,
+    `.meta{display:flex;gap:16px;color:#555;margin-top:4px;align-items:center}`,
+    `.meta span{display:flex;align-items:center;gap:6px}`,
+    `.meta a{display:inline-flex;align-items:center;text-decoration:none;color:#007ACC}`,
+    `.status-pendente{color:#f57c00;font-weight:500}`,
+    `.status-concluida{color:#388e3c;font-weight:500}`,
+    `.actions{margin-top:12px}`,
+    `.actions.bottom{align-self:flex-start}`
   ]
 })
 export class AulasListDialogComponent {
   aulas: (AulaModel & { status?: string })[] = [];
+  isUserAdmin = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private dialogRef: MatDialogRef<AulasListDialogComponent>,
+    private dialog: MatDialog,
+    private cursosService: CursosService,
+    private toastr: ToastrService
   ) {
     this.aulas = (data.curso.aulas || []) as (AulaModel & { status?: string })[];
+    this.isUserAdmin = new LocalStorageUtils().isUserAdmin();
   }
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  adicionarAula(): void {
+    const ref = this.dialog.open(AulaAddDialogComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      data: { cursoId: this.data.curso.id }
+    });
+
+    ref.afterClosed().subscribe(result => {
+      if (result?.createdCount) {
+        this.loadAulas(this.data.curso.id);
+      }
+    });
+  }
+
+  editarAula(aula: AulaModel): void {
+    const ref = this.dialog.open(AulaEditDialogComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      disableClose: true,
+      autoFocus: false,
+      data: { cursoId: aula.cursoId, cursoNome: this.data.curso.nome, aula }
+    });
+    
+    ref.afterClosed().subscribe(result => {
+      if (result?.updated) {
+        this.loadAulas(this.data.curso.id);
+      }
+    });
+  }
+
+  private loadAulas(cursoId: string): void {
+    this.cursosService.getAulasByCurso(cursoId).subscribe({
+      next: (aulas) => {
+        this.aulas = aulas;
+      },
+      error: (err) => {
+        const errors = (err?.error?.errors ?? err?.errors ?? []) as string[];
+        this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao carregar aulas.');
+      }
+    });
   }
 }
 

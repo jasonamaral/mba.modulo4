@@ -5,7 +5,7 @@ using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.Domain.Entities;
 
-public class Aluno : Common.Entidade, IRaizAgregacao
+public class Aluno : Entidade, IRaizAgregacao
 {
     #region Atributos
     public Guid CodigoUsuarioAutenticacao { get; }
@@ -57,8 +57,8 @@ public class Aluno : Common.Entidade, IRaizAgregacao
 
     #region Métodos
     #region Manipuladores de Aluno
-    internal void AtivarAluno() => Ativo = true;
-    internal void InativarAluno() => Ativo = false;
+    public void AtivarAluno() => Ativo = true;
+    public void InativarAluno() => Ativo = false;
 
     internal void AtualizarNomeAluno(string nome)
     {
@@ -86,11 +86,6 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     #endregion
 
     #region Manipuladores de MatriculaCurso
-    public int ObterQuantidadeAulasMatriculaCurso(Guid cursoId)
-    {
-        return _matriculasCursos.Count(m => m.CursoId == cursoId);
-    }
-
     public int ObterQuantidadeAulasPendenteMatriculaCurso(Guid cursoId)
     {
         return _matriculasCursos.Count(m => m.CursoId == cursoId && m.PodeConcluirCurso() == false);
@@ -153,7 +148,7 @@ public class Aluno : Common.Entidade, IRaizAgregacao
     #endregion
 
     #region Manipuladores de HistoricoAprendizado
-    public void RegistrarHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId, string nomeAula, byte cargaHoraria, DateTime? dataTermino = null)
+    public void RegistrarHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.RegistrarHistoricoAprendizado(aulaId, nomeAula, cargaHoraria, dataTermino);
@@ -165,6 +160,12 @@ public class Aluno : Common.Entidade, IRaizAgregacao
         var historico = matriculaCurso.HistoricoAprendizado.FirstOrDefault(h => h.AulaId == aulaId);
         //if (historico == null) { throw new DomainException("Histórico de aprendizado não foi localizado"); }
         return historico;
+    }
+
+    public int ObterQuantidadeAulasMatriculaCurso(Guid matriculaCursoId)
+    {
+        var matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
+        return matriculaCurso.ObterQuantidadeAulasRegistradas();
     }
     #endregion
 
@@ -227,7 +228,7 @@ public class Aluno : Common.Entidade, IRaizAgregacao
         ValidacaoTexto.DevePossuirConteudo(Cidade, "Cidade não pode ser nulo ou vazio", validacao);
         ValidacaoTexto.DevePossuirTamanho(Cidade, 1, 50, "Cidade deve ter entre 1 e 50 caracteres", validacao);
         ValidacaoTexto.DevePossuirConteudo(Cidade, "Cidade não pode ser nulo ou vazio", validacao);
-        ValidacaoTexto.DevePossuirTamanho(Cidade, 1, 2, "Estado entre 1 e ter entre 1 e 2 caracteres", validacao);
+        ValidacaoTexto.DevePossuirTamanho(Estado, 2, 2, "Estado deve ter 2 caracteres", validacao);
         ValidacaoTexto.DevePossuirConteudo(Cep, "Cep não pode ser nulo ou vazio", validacao);
         ValidacaoTexto.DevePossuirTamanho(Cep, 1, 8, "Cep deve ter até 8 caracteres", validacao);
 
