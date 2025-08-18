@@ -30,13 +30,14 @@ public static class SwaggerExtensions
                 c.IncludeXmlComments(xmlPath);
             }
 
+            // Configuração para Swashbuckle 9.0.3 - padrão correto: "Bearer {token}"
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
                 BearerFormat = "JWT"
             });
 
