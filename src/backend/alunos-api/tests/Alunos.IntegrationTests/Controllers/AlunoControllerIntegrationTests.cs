@@ -1,12 +1,10 @@
 using Alunos.Application.DTOs.Response;
 using Alunos.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Alunos.IntegrationTests.Controllers;
 
 public class AlunoControllerIntegrationTests : IDisposable
 {
-    private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
     public AlunoControllerIntegrationTests()
