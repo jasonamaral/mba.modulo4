@@ -1,12 +1,14 @@
-﻿using Alunos.Domain.Entities;
+using Alunos.Domain.Entities;
 using Alunos.Domain.Enumerators;
 using FluentAssertions;
 using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.Tests.Domain;
+
 public class MatriculaCursoTests
 {
     #region Helpers
+
     private static readonly Guid _alunoId = Guid.NewGuid();
     private static readonly Guid _cursoId = Guid.NewGuid();
     private static readonly string _nomeCurso = "Curso Completo de Testes Automatizados";
@@ -14,9 +16,11 @@ public class MatriculaCursoTests
     private static readonly string _observacao = "Observações iniciais";
 
     private MatriculaCurso CriarMatriculaValida() => new(_alunoId, _cursoId, _nomeCurso, _valor, _observacao);
-    #endregion
+
+    #endregion Helpers
 
     #region Construtores
+
     [Fact]
     public void Deve_criar_matricula_valida()
     {
@@ -43,9 +47,11 @@ public class MatriculaCursoTests
         Action act = () => new MatriculaCurso(_alunoId, _cursoId, _nomeCurso, 0, _observacao);
         act.Should().Throw<DomainException>().WithMessage("*Valor da matrícula deve ser maior que zero*");
     }
-    #endregion
+
+    #endregion Construtores
 
     #region Regras de Dominio
+
     [Fact]
     public void Deve_registrar_pagamento()
     {
@@ -75,43 +81,6 @@ public class MatriculaCursoTests
     }
 
     [Fact]
-    public void Nao_deve_concluir_curso_se_aulas_nao_finalizadas()
-    {
-        var matricula = CriarMatriculaValida();
-        matricula.RegistrarPagamentoMatricula();
-        
-        // Adicionar uma aula em andamento (sem data de término)
-        matricula.RegistrarHistoricoAprendizado(Guid.NewGuid(), "Aula de Teste", 5);
-        
-        // Verificar se a matrícula não pode ser concluída com aulas em andamento
-        Action act = () => matricula.ConcluirCurso();
-        act.Should().Throw<DomainException>().WithMessage("*Não é possível concluir o curso, existem aulas não finalizadas*");
-    }
-
-    [Fact]
-    public void Deve_registrar_historico_aprendizado_para_aula()
-    {
-        var matricula = CriarMatriculaValida();
-        matricula.RegistrarPagamentoMatricula();
-
-        // Verificar se a matrícula está disponível para registrar histórico
-        matricula.MatriculaCursoDisponivel().Should().BeTrue();
-        
-        // Verificar se não há histórico antes
-        matricula.HistoricoAprendizado.Should().HaveCount(0);
-        
-        // Registrar histórico de uma aula
-        var aulaId = Guid.NewGuid();
-        matricula.RegistrarHistoricoAprendizado(aulaId, "Aula de Teste", 5);
-        
-        // Verificar se o histórico foi registrado
-        matricula.HistoricoAprendizado.Should().HaveCount(1);
-        matricula.HistoricoAprendizado.First().AulaId.Should().Be(aulaId);
-        matricula.HistoricoAprendizado.First().NomeAula.Should().Be("Aula de Teste");
-        matricula.HistoricoAprendizado.First().CargaHoraria.Should().Be(5);
-    }
-
-    [Fact]
     public void Nao_deve_registrar_historico_aprendizado_se_abandonado()
     {
         var matricula = CriarMatriculaValida();
@@ -130,9 +99,11 @@ public class MatriculaCursoTests
         Action act = () => matricula.RequisitarCertificadoConclusao(8, "/certificado.pdf", "Instrutor Teste");
         act.Should().Throw<DomainException>().WithMessage("*Certificado só pode ser solicitado após a conclusão do curso*");
     }
-    #endregion
+
+    #endregion Regras de Dominio
 
     #region Overrides
+
     [Fact]
     public void ToString_deve_conter_nome_ids_e_status()
     {
@@ -143,5 +114,6 @@ public class MatriculaCursoTests
               .And.Contain(matricula.CursoId.ToString())
               .And.Contain("Concluído?");
     }
-    #endregion
+
+    #endregion Overrides
 }

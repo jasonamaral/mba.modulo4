@@ -29,4 +29,10 @@
     <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Pagamentos.Domain\Pagamentos.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Pagamentos.Application\Pagamentos.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\building-blocks\core\Core.csproj" />
+  </ItemGroup>
+
 </Project>
