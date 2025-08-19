@@ -7,18 +7,6 @@
         "Action": "Start"
       },
       {
-        "Path": "alunos-api\\src\\Alunos.API\\Alunos.API.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "conteudo-api\\src\\Conteudo.API\\Conteudo.API.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "auth-api\\src\\Auth.API\\Auth.API.csproj",
-        "Action": "Start"
-      },
-      {
         "Path": "pagamentos-api\\src\\Pagamentos.API\\Pagamentos.API.csproj",
         "Action": "Start"
       }

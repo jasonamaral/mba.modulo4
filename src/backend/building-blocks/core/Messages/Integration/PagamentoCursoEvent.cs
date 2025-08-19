@@ -1,7 +1,8 @@
-﻿namespace Core.Messages.Integration
+namespace Core.Messages.Integration
 {
     public class PagamentoCursoEvent : IntegrationEvent
     {
+        public Guid AggregateID { get; private set; }
         public Guid CursoId { get; private set; }
         public Guid AlunoId { get; private set; }
         public decimal Total { get; private set; }
@@ -18,7 +19,7 @@
                                      string expiracaoCartao,
                                      string cvvCartao)
         {
-            //AggregateID = cursoId;
+            AggregateID = cursoId;
             CursoId = cursoId;
             AlunoId = clienteId;
             Total = total;

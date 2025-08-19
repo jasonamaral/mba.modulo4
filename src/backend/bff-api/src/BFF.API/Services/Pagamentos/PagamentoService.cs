@@ -1,4 +1,4 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
@@ -33,6 +33,7 @@ namespace BFF.API.Services.Pagamentos
             _apiClient.SetBaseAddress(_apiSettings.PagamentosApiUrl);
 
             ApiResponse<ResponseResult<object>> apiResponse;
+
             try
             {
                 apiResponse = await _apiClient.PostAsyncWithDetails<PagamentoCursoInputModel, ResponseResult<object>>("/api/v1/pagamentos/pagamento",pagamentoCursoInputModel);

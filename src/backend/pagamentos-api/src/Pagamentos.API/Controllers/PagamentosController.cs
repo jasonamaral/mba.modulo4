@@ -5,6 +5,7 @@ using Core.Messages.Integration;
 using Core.Notification;
 using Core.Services.Controllers;
 using MediatR;
+using MessageBus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pagamentos.Application.Interfaces;
@@ -22,8 +23,10 @@ namespace Pagamentos.API.Controllers
                                       IPagamentoComandoAppService pagamentoComandoAppService,
                                       IMediatorHandler mediator,
                                       INotificador notificador,
-                                      INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
+                                      INotificationHandler<DomainNotificacaoRaiz> notifications,
+                                      IMessageBus bus ) : MainController(mediator, notifications, notificador)
     {
+        private readonly IMessageBus _bus = bus;
         private readonly IMediatorHandler _mediator = mediator;
         private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService = pagamentoConsultaAppService;
         private readonly IPagamentoComandoAppService _pagamentoComandoAppService = pagamentoComandoAppService;
@@ -42,7 +45,7 @@ namespace Pagamentos.API.Controllers
             }
 
 
-            var evento = new PagamentoCursoEvent(pagamento.MatriculaId,
+            var eventoPagamento = new PagamentoCursoEvent(pagamento.MatriculaId,
                                                     pagamento.AlunoId,
                                                     pagamento.Total,
                                                     pagamento.NomeCartao,
@@ -52,7 +55,20 @@ namespace Pagamentos.API.Controllers
 
 
 
-            await _mediator.PublicarEvento(evento);
+            await _mediator.PublicarEvento(eventoPagamento);
+
+
+            try
+            {
+                var xxx =  await _bus.RequestAsync<PagamentoCursoEvent, ResponseMessage>(eventoPagamento);
+            }
+            catch (Exception ex)
+            {
+                // Converte falhas de infraestrutura em ValidationResult inválido para ser retornado ao cliente
+                //var validationResult = new ValidationResult();
+                //validationResult.Errors.Add(new ValidationFailure("RegistroAluno", $"Falha ao registrar aluno no serviço de Alunos: {ex.Message}"));
+               // return new ResponseMessage(validationResult);
+            }
 
             return RespostaPadraoApi(HttpStatusCode.OK, "");
 
