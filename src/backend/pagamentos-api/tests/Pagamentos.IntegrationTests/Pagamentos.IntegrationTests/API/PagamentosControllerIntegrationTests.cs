@@ -167,7 +167,7 @@ namespace Pagamentos.IntegrationTests.API
 
             _mockPagamentoConsultaService
                 .Setup(x => x.ObterPorId(id))
-                .ReturnsAsync((PagamentoViewModel)null);
+                .ReturnsAsync((PagamentoViewModel?)null);
 
             // Act
             var resultado = await _mockPagamentoConsultaService.Object.ObterPorId(id);

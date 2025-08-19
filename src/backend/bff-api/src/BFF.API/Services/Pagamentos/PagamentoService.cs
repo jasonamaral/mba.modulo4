@@ -109,7 +109,7 @@ namespace BFF.API.Services.Pagamentos
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao chamar Pagamentos API (GET /obter/{IdPagamento}).");
+                _logger.LogError(ex, "Erro ao chamar Pagamentos API (GET /obter/{{IdPagamento}}). IdPagamento: {IdPagamento}", idPagamento);
                 return FailObterPagamento(502, "Falha ao comunicar com a API de pagamentos.");
             }
         }

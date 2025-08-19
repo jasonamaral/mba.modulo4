@@ -39,6 +39,9 @@ namespace BFF.API.Controllers
 
         [Authorize(Roles = "Usuario, Administrador")]
         [HttpPost("registrar-pagamento")]
+        [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
             try
@@ -68,7 +71,8 @@ namespace BFF.API.Controllers
 
         [Authorize(Roles = "Usuario, Administrador")]
         [HttpGet("obter_todos")]
-        [ProducesResponseType(typeof(IEnumerable<PagamentoDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseResult<IEnumerable<PagamentoDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ObterTodos()
         {
             try
@@ -86,8 +90,9 @@ namespace BFF.API.Controllers
 
         [Authorize(Roles = "Administrador")]
         [HttpGet("obter/{id:guid}")]
-        [ProducesResponseType(typeof(PagamentoDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseResult<PagamentoDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ObterPorId(Guid id)
         {
             try

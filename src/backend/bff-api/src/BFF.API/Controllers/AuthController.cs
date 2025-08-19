@@ -42,6 +42,9 @@ public class AuthController : BffController
     /// <param name="request">Dados de registro</param>
     /// <returns>Resposta da autenticação</returns>
     [HttpPost("registro")]
+    [ProducesResponseType(typeof(ResponseResult<AuthRegistroResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Registro([FromBody] RegistroRequest request)
     {
         try
@@ -89,6 +92,9 @@ public class AuthController : BffController
     /// <param name="request">Credenciais de login</param>
     /// <returns>Resposta da autenticação</returns>
     [HttpPost("login")]
+    [ProducesResponseType(typeof(ResponseResult<AuthLoginResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         try
@@ -136,6 +142,9 @@ public class AuthController : BffController
     /// <param name="request">Request de refresh token</param>
     /// <returns>Novo token</returns>
     [HttpPost("refresh-token")]
+    [ProducesResponseType(typeof(ResponseResult<AuthRefreshTokenResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         try
