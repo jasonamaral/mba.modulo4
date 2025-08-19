@@ -59,8 +59,8 @@ public class HealthControllerIntegrationTests
 
         // Assert
         publicMethods.Should().NotBeEmpty();
-        publicMethods.Should().Contain(m => m.Name == "Get");
-        publicMethods.Should().Contain(m => m.Name == "GetStatus");
+        publicMethods.Should().Contain(m => m.Name == "Obter");
+        publicMethods.Should().Contain(m => m.Name == "ObterStatus");
     }
 
     [Fact]

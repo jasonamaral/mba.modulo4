@@ -40,7 +40,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
                 DataConclusao = m.DataConclusao,
                 NotaFinal = m.ObterNotaFinalCurso(),
                 Observacao = m.Observacao,
-                EstadoMatricula = m.EstadoMatricula.GetDescription(),
+                EstadoMatricula = m.EstadoMatricula.ObterDescricao(),
                 Certificado = m.Certificado != null ? new CertificadoDto
                 {
                     Id = m.Certificado.Id,
@@ -76,7 +76,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
                 Valor = m.Valor,
                 DataMatricula = m.DataMatricula,
                 DataConclusao = m.DataConclusao,
-                EstadoMatricula = m.EstadoMatricula.GetDescription(),
+                EstadoMatricula = m.EstadoMatricula.ObterDescricao(),
                 //QuantidadeAulasNoCurso = cursos.FirstOrDefault(c => c.Id == m.CursoId)?.QuantidadeAulas ?? -1,
                 QuantidadeAulasRealizadas = m.QuantidadeAulasFinalizadas(),
                 QuantidadeAulasEmAndamento = m.QuantidadeAulasEmAndamento(),
@@ -107,7 +107,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
             DataConclusao = m.DataConclusao,
             NotaFinal = m.ObterNotaFinalCurso(),
             Observacao = m.Observacao,
-            EstadoMatricula = m.EstadoMatricula.GetDescription(),
+            EstadoMatricula = m.EstadoMatricula.ObterDescricao(),
             Certificado = m.Certificado != null ? new CertificadoDto
             {
                 Id = m.Certificado.Id,
@@ -140,7 +140,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
             DataConclusao = matriculaCurso.DataConclusao,
             NotaFinal = matriculaCurso.ObterNotaFinalCurso(),
             Observacao = matriculaCurso.Observacao,
-            EstadoMatricula = matriculaCurso.EstadoMatricula.GetDescription(),
+            EstadoMatricula = matriculaCurso.EstadoMatricula.ObterDescricao(),
             Certificado = matriculaCurso.Certificado != null ? new CertificadoDto
             {
                 Id = matriculaCurso.Certificado.Id,

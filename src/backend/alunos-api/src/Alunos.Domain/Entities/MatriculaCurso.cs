@@ -244,7 +244,7 @@ public class MatriculaCurso : Entidade
 
                 case EstadoMatriculaCursoEnum.PendentePagamento:
                 case EstadoMatriculaCursoEnum.Abandonado:
-                    validacao.AdicionarErro($"Não é possível concluir um curso com estado de pagamento {EstadoMatricula.GetDescription()}");
+                    validacao.AdicionarErro($"Não é possível concluir um curso com estado de pagamento {EstadoMatricula.ObterDescricao()}");
                     break;
             }
         }

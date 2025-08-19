@@ -32,7 +32,7 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
         {
             try
             {
-                SetResponder();
+                DefinirResponder();
                 _logger.LogInformation("Responder de RegistroUsuario configurado com sucesso");
                 break;
             }
@@ -45,7 +45,7 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
         }
     }
 
-    private void SetResponder()
+    private void DefinirResponder()
     {
         _bus.RespondAsync<AlunoRegistradoIntegrationEvent, ResponseMessage>(async request => await ProcessarUsuarioRegistrado(request));
         _bus.AdvancedBus.Connected += OnConnect;
@@ -53,7 +53,7 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
 
     private void OnConnect(object? s, EventArgs e)
     {
-        SetResponder();
+        DefinirResponder();
     }
 
     private async Task<ResponseMessage> ProcessarUsuarioRegistrado(AlunoRegistradoIntegrationEvent message)
