@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Conteudo.Domain.ValueObjects;
 using Core.Communication;
@@ -7,6 +7,7 @@ using Core.Messages;
 using MediatR;
 
 namespace Conteudo.Application.Commands.AtualizarCurso;
+
 public class AtualizarCursoCommandHandler(IMediatorHandler mediatorHandler
                                         , ICursoRepository cursoRepository
                                         , ICategoriaRepository categoriaRepository)
@@ -26,23 +27,22 @@ public class AtualizarCursoCommandHandler(IMediatorHandler mediatorHandler
 
         curso.AtualizarInformacoes(request.Nome,
                         request.Valor,
-                        new ConteudoProgramatico(request.Resumo, 
-                                                request.Descricao, 
-                                                request.Objetivos, 
-                                                request.PreRequisitos, 
-                                                request.PublicoAlvo, 
-                                                request.Metodologia, 
-                                                request.Recursos, 
-                                                request.Avaliacao, 
+                        new ConteudoProgramatico(request.Resumo,
+                                                request.Descricao,
+                                                request.Objetivos,
+                                                request.PreRequisitos,
+                                                request.PublicoAlvo,
+                                                request.Metodologia,
+                                                request.Recursos,
+                                                request.Avaliacao,
                                                 request.Bibliografia),
                         request.DuracaoHoras,
                         request.Nivel,
                         request.Instrutor,
                         request.VagasMaximas,
-                        request.ImagemUrl, 
-                        request.ValidoAte, 
+                        request.ImagemUrl,
+                        request.ValidoAte,
                         request.CategoriaId);
-
 
         await _cursoRepository.Atualizar(curso);
         request.Resultado.Data = await _cursoRepository.UnitOfWork.Commit();
@@ -57,7 +57,7 @@ public class AtualizarCursoCommandHandler(IMediatorHandler mediatorHandler
         {
             foreach (var erro in request.Erros)
             {
-               await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), erro));
+                await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), erro));
             }
             return false;
         }

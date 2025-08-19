@@ -1,6 +1,5 @@
 using BFF.API.Models.Response;
 using FluentAssertions;
-using Xunit;
 
 namespace BFF.UnitTests;
 

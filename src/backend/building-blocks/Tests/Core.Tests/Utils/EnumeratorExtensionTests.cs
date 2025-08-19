@@ -1,7 +1,5 @@
 using Core.Utils;
-using FluentAssertions;
 using System.ComponentModel;
-using Xunit;
 
 namespace Core.Tests.Utils;
 
@@ -11,10 +9,13 @@ public class EnumeratorExtensionTests : TestBase
     {
         [Description("Ativo")]
         Ativo,
+
         [Description("Inativo")]
         Inativo,
+
         [Description("Pendente")]
         Pendente,
+
         SemDescricao
     }
 
@@ -22,6 +23,7 @@ public class EnumeratorExtensionTests : TestBase
     {
         [Description("Valor A")]
         ValorA,
+
         [Description("Valor B")]
         ValorB
     }

@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 namespace Alunos.API.Configurations;
+
 public static class SwaggerConfiguration
 {
     public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
@@ -9,8 +10,8 @@ public static class SwaggerConfiguration
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo 
-            { 
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
                 Title = "Alunos API",
                 Version = "v1",
                 Description = "API de Gestão de Alunos para a Plataforma Educacional",
@@ -75,4 +76,4 @@ public static class SwaggerConfiguration
 
         return app;
     }
-} 
+}

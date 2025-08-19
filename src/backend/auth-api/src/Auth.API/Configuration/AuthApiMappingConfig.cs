@@ -21,8 +21,8 @@ public class AuthApiMappingConfig : IRegister
                 src.Estado,
                 src.CEP,
                 src.Foto
-                //src.EhAdministrador,
-                //DateTime.UtcNow
+            //src.EhAdministrador,
+            //DateTime.UtcNow
             ));
     }
-} 
+}

@@ -7,14 +7,9 @@ using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
-using FluentAssertions;
-using FluentValidation;
 using FluentValidation.Results;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
-using System.Net;
 
 namespace Conteudo.UnitTests.API.Controllers;
 
@@ -216,7 +211,7 @@ public class CategoriaControllerTests : TestBase
 
         var objectResult = result as ObjectResult;
         objectResult!.StatusCode.Should().Be(400);
-        
+
         // Verificar que o valor é um ResponseResult<string> com a mensagem correta
         objectResult.Value.Should().BeOfType<ResponseResult<string>>();
         var responseResult = objectResult.Value as ResponseResult<string>;

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Alunos.Infrastructure.Services;
+
 public class RegistroAlunoIntegrationHandler : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
@@ -14,7 +15,7 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
     private readonly ILogger<RegistroAlunoIntegrationHandler> _logger;
 
     public RegistroAlunoIntegrationHandler(
-        IServiceProvider serviceProvider, 
+        IServiceProvider serviceProvider,
         IMessageBus bus,
         ILogger<RegistroAlunoIntegrationHandler> logger)
     {
@@ -54,7 +55,6 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
     {
         SetResponder();
     }
-
 
     private async Task<ResponseMessage> ProcessarUsuarioRegistrado(AlunoRegistradoIntegrationEvent message)
     {

@@ -1,4 +1,5 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
+using BFF.API.Services.Conteudos;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
 using Core.Communication;
@@ -6,12 +7,11 @@ using Core.Communication.Filters;
 using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json;
-using MediatR;
-using BFF.API.Services.Conteudos;
 
 namespace BFF.API.Controllers;
 
@@ -60,7 +60,7 @@ public class ConteudosController : BffController
         {
             return RespostaPadraoApi(HttpStatusCode.OK, cachedCurso, "Curso obtido do cache com sucesso");
         }
-        
+
         var resultado = await _conteudoService.ObterCursoPorIdAsync(cursoId, includeAulas);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
@@ -211,7 +211,6 @@ public class ConteudosController : BffController
         return BadRequest(resultado);
     }
 
-
     /// <summary>
     /// Obter Conteudo Programatico por Curso ID
     /// </summary>
@@ -235,7 +234,7 @@ public class ConteudosController : BffController
     [ProducesResponseType(typeof(ResponseResult<Guid>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Administrador")]
-    public async Task<IActionResult> AdicionarAula( [FromRoute] Guid cursoId,
+    public async Task<IActionResult> AdicionarAula([FromRoute] Guid cursoId,
                                                     [FromBody] AulaCriarRequest request)
     {
         var response = await _conteudoService.AdicionarAulaAsync(cursoId, request);

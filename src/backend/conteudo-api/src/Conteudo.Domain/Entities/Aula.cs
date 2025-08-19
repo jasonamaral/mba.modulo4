@@ -17,11 +17,12 @@ public class Aula : Entidade, IRaizAgregacao
     public bool IsPublicada { get; private set; }
     public DateTime? DataPublicacao { get; private set; }
     public string Observacoes { get; private set; }
-    
+
     private readonly List<Material> _materiais = [];
     public IReadOnlyCollection<Material> Materiais => _materiais.AsReadOnly();
 
-    protected Aula() { }
+    protected Aula()
+    { }
 
     public Aula(
         Guid cursoId,
@@ -35,7 +36,7 @@ public class Aula : Entidade, IRaizAgregacao
         string observacoes = "")
     {
         ValidarDados(nome, descricao, numero, duracaoMinutos, videoUrl, tipoAula);
-        
+
         CursoId = cursoId;
         Nome = nome;
         Descricao = descricao;
@@ -52,22 +53,22 @@ public class Aula : Entidade, IRaizAgregacao
     {
         if (string.IsNullOrWhiteSpace(nome))
             throw new DomainException("Nome da aula é obrigatório");
-            
+
         if (nome.Length > 200)
             throw new DomainException("Nome da aula não pode ter mais de 200 caracteres");
-            
+
         if (string.IsNullOrWhiteSpace(descricao))
             throw new DomainException("Descrição da aula é obrigatória");
-            
+
         if (numero <= 0)
             throw new DomainException("Número da aula deve ser maior que zero");
-            
+
         if (duracaoMinutos <= 0)
             throw new DomainException("Duração da aula deve ser maior que zero");
-            
+
         if (string.IsNullOrWhiteSpace(videoUrl))
             throw new DomainException("URL do vídeo é obrigatória");
-            
+
         if (string.IsNullOrWhiteSpace(tipoAula))
             throw new DomainException("Tipo da aula é obrigatório");
     }
@@ -83,7 +84,7 @@ public class Aula : Entidade, IRaizAgregacao
         string observacoes = "")
     {
         ValidarDados(nome, descricao, numero, duracaoMinutos, videoUrl, tipoAula);
-        
+
         Nome = nome;
         Descricao = descricao;
         Numero = numero;
@@ -92,7 +93,7 @@ public class Aula : Entidade, IRaizAgregacao
         TipoAula = tipoAula;
         IsObrigatoria = isObrigatoria;
         Observacoes = observacoes;
-        
+
         AtualizarDataModificacao();
     }
 
@@ -100,7 +101,7 @@ public class Aula : Entidade, IRaizAgregacao
     {
         if (IsPublicada)
             throw new DomainException("Aula já está publicada");
-            
+
         IsPublicada = true;
         DataPublicacao = DateTime.UtcNow;
         AtualizarDataModificacao();
@@ -110,7 +111,7 @@ public class Aula : Entidade, IRaizAgregacao
     {
         if (!IsPublicada)
             throw new DomainException("Aula não está publicada");
-            
+
         IsPublicada = false;
         DataPublicacao = null;
         AtualizarDataModificacao();
@@ -120,10 +121,10 @@ public class Aula : Entidade, IRaizAgregacao
     {
         if (material == null)
             throw new DomainException("Material não pode ser nulo");
-            
+
         if (_materiais.Any(m => m.Nome == material.Nome))
             throw new DomainException($"Já existe um material com o nome {material.Nome}");
-            
+
         _materiais.Add(material);
         AtualizarDataModificacao();
     }
@@ -140,4 +141,4 @@ public class Aula : Entidade, IRaizAgregacao
 
     public bool PodeSerVisualizada => IsPublicada;
     public string DuracaoFormatada => $"{DuracaoMinutos / 60:D2}:{DuracaoMinutos % 60:D2}";
-} 
+}

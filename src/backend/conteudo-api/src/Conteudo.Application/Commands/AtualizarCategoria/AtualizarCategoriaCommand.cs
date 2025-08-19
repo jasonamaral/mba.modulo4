@@ -1,6 +1,7 @@
-﻿using Core.Messages;
+using Core.Messages;
 
 namespace Conteudo.Application.Commands.AtualizarCategoria;
+
 public class AtualizarCategoriaCommand : CommandRaiz
 {
     public Guid Id { get; set; }

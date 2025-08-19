@@ -2,21 +2,15 @@ namespace BFF.Domain.DTOs;
 
 public class ApiActionResult<T>
 {
-
     public bool Success { get; set; }
-
 
     public int StatusCode { get; set; }
 
-
     public string Message { get; set; } = string.Empty;
-
 
     public T? Data { get; set; }
 
-
     public object? ErrorContent { get; set; }
-
 
     public static ApiActionResult<T> SuccessResult(T data, string message = "Operação realizada com sucesso")
     {
@@ -29,7 +23,6 @@ public class ApiActionResult<T>
         };
     }
 
-
     public static ApiActionResult<T> ErrorResult(int statusCode, string message, object? errorContent = null)
     {
         return new ApiActionResult<T>
@@ -40,4 +33,4 @@ public class ApiActionResult<T>
             ErrorContent = errorContent
         };
     }
-} 
+}

@@ -17,7 +17,6 @@ namespace Pagamentos.API.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/pagamentos")]
     [Authorize]
-
     public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService,
                                       IPagamentoComandoAppService pagamentoComandoAppService,
                                       IMediatorHandler mediator,
@@ -27,8 +26,6 @@ namespace Pagamentos.API.Controllers
         private readonly IMediatorHandler _mediator = mediator;
         private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService = pagamentoConsultaAppService;
         private readonly IPagamentoComandoAppService _pagamentoComandoAppService = pagamentoComandoAppService;
-
-
 
         [HttpPost("pagamento")]
         [SwaggerOperation(Summary = "Executa pagamento", Description = "Executa o pagamento do curso.")]
@@ -41,7 +38,6 @@ namespace Pagamentos.API.Controllers
                 return RespostaPadraoApi<CommandResult>(ModelState);
             }
 
-
             var evento = new PagamentoCursoEvent(pagamento.MatriculaId,
                                                     pagamento.AlunoId,
                                                     pagamento.Total,
@@ -50,12 +46,9 @@ namespace Pagamentos.API.Controllers
                                                     pagamento.ExpiracaoCartao,
                                                     pagamento.CvvCartao);
 
-
-
             await _mediator.PublicarEvento(evento);
 
             return RespostaPadraoApi(HttpStatusCode.OK, "");
-
         }
 
         [Authorize(Roles = "Administrador")]
@@ -88,5 +81,4 @@ namespace Pagamentos.API.Controllers
             return RespostaPadraoApi(HttpStatusCode.NotFound, message);
         }
     }
-
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Pagamentos.Infrastructure.Context;
 
 namespace Pagamentos.API.Configuration
@@ -25,7 +25,6 @@ namespace Pagamentos.API.Configuration
 
                 return builder;
             }
-
         }
     }
 }

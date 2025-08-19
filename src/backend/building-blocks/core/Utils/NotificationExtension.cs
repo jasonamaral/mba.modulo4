@@ -1,4 +1,4 @@
-﻿using Core.Notification;
+using Core.Notification;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Utils

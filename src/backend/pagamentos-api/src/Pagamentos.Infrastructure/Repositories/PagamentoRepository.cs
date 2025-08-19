@@ -1,4 +1,4 @@
-﻿using Core.Data;
+using Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Interfaces;
@@ -16,7 +16,6 @@ namespace Pagamentos.Infrastructure.Repositories
         }
 
         public IUnitOfWork UnitOfWork => _context;
-
 
         public void Adicionar(Pagamento pagamento)
         {

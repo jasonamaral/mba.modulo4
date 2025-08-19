@@ -10,8 +10,8 @@ public static class SwaggerExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo 
-            { 
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
                 Title = "Auth API",
                 Version = "v1",
                 Description = "API de Autenticação para a Plataforma Educacional",
@@ -76,4 +76,4 @@ public static class SwaggerExtensions
 
         return app;
     }
-} 
+}

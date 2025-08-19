@@ -25,7 +25,7 @@ public class DashboardService : IDashboardService
     public async Task<DashboardAdminDto> GetDashboardAdminAsync()
     {
         var cacheKey = "dashboard:admin";
-        
+
         // Tenta buscar do cache primeiro
         var cachedData = await _cacheService.GetAsync<DashboardAdminDto>(cacheKey);
         if (cachedData != null)
@@ -127,10 +127,10 @@ public class DashboardService : IDashboardService
 
         // Salva no cache usando a configuração específica para dashboard
         await _cacheService.SetAsync(cacheKey, dashboardData, _cacheSettings.DashboardExpiration);
-        
-        _logger.LogInformation("Dashboard do admin salvo no cache por {Minutes} minutos", 
+
+        _logger.LogInformation("Dashboard do admin salvo no cache por {Minutes} minutos",
             _cacheSettings.DashboardExpiration.TotalMinutes);
 
         return dashboardData;
     }
-} 
+}

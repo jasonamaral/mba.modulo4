@@ -1,7 +1,5 @@
-using FluentAssertions;
 using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Enum;
-using Xunit;
 
 namespace Pagamentos.UnitTests.Domain
 {

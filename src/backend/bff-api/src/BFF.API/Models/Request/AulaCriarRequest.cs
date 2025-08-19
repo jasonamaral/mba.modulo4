@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace BFF.API.Models.Request
 {
@@ -18,6 +18,5 @@ namespace BFF.API.Models.Request
 
         [Required(ErrorMessage = "URL do vídeo é obrigatória")]
         public string VideoUrl { get; set; } = string.Empty;
-
     }
 }

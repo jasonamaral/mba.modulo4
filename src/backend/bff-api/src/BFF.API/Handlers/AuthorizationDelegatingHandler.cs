@@ -33,5 +33,3 @@ public class AuthorizationDelegatingHandler : DelegatingHandler
         return base.SendAsync(request, cancellationToken);
     }
 }
-
-

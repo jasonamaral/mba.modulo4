@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Core.Data.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,6 +12,7 @@ public class MaterialConfiguration : IEntityTypeConfiguration<Material>
     public void Configure(EntityTypeBuilder<Material> entity)
     {
         #region Mapping columns
+
         entity.ToTable("Materiais");
 
         entity.HasKey(a => a.Id)
@@ -58,9 +59,11 @@ public class MaterialConfiguration : IEntityTypeConfiguration<Material>
         entity.Property(a => a.UpdatedAt)
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
-        #endregion
+
+        #endregion Mapping columns
 
         #region Indexes
+
         // Índices
         entity.HasIndex(m => new { m.AulaId, m.Nome })
             .HasDatabaseName("MaterialAulaIdNomeIDX")
@@ -74,14 +77,17 @@ public class MaterialConfiguration : IEntityTypeConfiguration<Material>
 
         entity.HasIndex(m => m.Ordem)
             .HasDatabaseName("MaterialOrdemIDX");
-        #endregion
+
+        #endregion Indexes
 
         #region Relationships
+
         // Relacionamento com Aula
         entity.HasOne(m => m.Aula)
             .WithMany(a => a.Materiais)
             .HasForeignKey(m => m.AulaId)
             .OnDelete(DeleteBehavior.Cascade);
-        #endregion
+
+        #endregion Relationships
     }
 }

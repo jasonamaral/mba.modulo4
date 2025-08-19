@@ -39,5 +39,6 @@ public interface INotificador
 public interface IMediatorHandler
 {
     Task<TResponse> EnviarComando<TResponse>(IRequest<TResponse> comando);
+
     Task PublicarNotificacaoDominio<T>(T notificacao) where T : DomainNotificacaoRaiz;
 }

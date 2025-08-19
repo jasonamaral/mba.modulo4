@@ -1,6 +1,4 @@
-using FluentAssertions;
 using Pagamentos.Domain.Entities;
-using Xunit;
 
 namespace Pagamentos.UnitTests.Domain
 {

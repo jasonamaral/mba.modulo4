@@ -1,14 +1,11 @@
 using BFF.API.Controllers;
-using BFF.API.Models.Response;
 using Core.Mediator;
-using Core.Notification;
 using Core.Messages;
+using Core.Notification;
 using FluentAssertions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Moq;
-using MediatR;
-using Xunit;
 
 namespace BFF.IntegrationTests.Controllers;
 

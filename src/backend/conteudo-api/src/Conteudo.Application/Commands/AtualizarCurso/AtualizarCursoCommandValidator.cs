@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Conteudo.Application.Commands.AtualizarCurso;
+
 public class AtualizarCursoCommandValidator : AbstractValidator<AtualizarCursoCommand>
 {
     public AtualizarCursoCommandValidator()

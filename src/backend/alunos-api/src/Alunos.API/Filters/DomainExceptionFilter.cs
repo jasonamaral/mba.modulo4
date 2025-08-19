@@ -1,10 +1,11 @@
-﻿using Core.Communication;
+using Core.Communication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.API.Filters;
+
 public class DomainExceptionFilter(IActionResultExecutor<ObjectResult> executor, ILogger<ExceptionFilter> logger) : IExceptionFilter
 {
     private readonly IActionResultExecutor<ObjectResult> _executor = executor;

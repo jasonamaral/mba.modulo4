@@ -1,6 +1,4 @@
 using Auth.Domain.Entities;
-using FluentAssertions;
-using Xunit;
 
 namespace Auth.UnitTests.Domain;
 

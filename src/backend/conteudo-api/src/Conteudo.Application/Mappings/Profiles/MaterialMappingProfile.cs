@@ -1,10 +1,9 @@
-﻿using Conteudo.Application.Commands.AtualizarMaterial;
+using Conteudo.Application.Commands.AtualizarMaterial;
 using Conteudo.Application.Commands.CadastrarMaterial;
 using Conteudo.Application.DTOs;
 using Conteudo.Domain.Entities;
 using Core.SharedDtos.Conteudo;
 using Mapster;
-
 
 namespace Conteudo.Application.Mappings.Profiles
 {

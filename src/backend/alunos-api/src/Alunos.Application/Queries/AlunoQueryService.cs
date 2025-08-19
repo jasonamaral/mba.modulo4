@@ -1,9 +1,10 @@
-﻿using Alunos.Application.DTOs.Response;
+using Alunos.Application.DTOs.Response;
 using Alunos.Application.Interfaces;
 using Alunos.Domain.Interfaces;
 using Core.Utils;
 
 namespace Alunos.Application.Queries;
+
 public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQueryService
 {
     private readonly IAlunoRepository _alunoRepository = alunoRepository;

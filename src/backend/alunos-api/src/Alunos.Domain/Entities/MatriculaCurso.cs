@@ -7,9 +7,11 @@ using Plataforma.Educacao.Core.Exceptions;
 using System.Text.Json.Serialization;
 
 namespace Alunos.Domain.Entities;
+
 public class MatriculaCurso : Entidade
 {
     #region Atributos
+
     public Guid AlunoId { get; }
     public Guid CursoId { get; }
     public string NomeCurso { get; }
@@ -25,11 +27,14 @@ public class MatriculaCurso : Entidade
 
     [JsonIgnore]
     public Aluno Aluno { get; private set; }
-    #endregion
+
+    #endregion Atributos
 
     #region CTOR
+
     // EF Compatibility
-    protected MatriculaCurso() { }
+    protected MatriculaCurso()
+    { }
 
     public MatriculaCurso(Guid alunoId,
         Guid cursoId,
@@ -47,17 +52,27 @@ public class MatriculaCurso : Entidade
 
         ValidarIntegridadeMatriculaCurso();
     }
-    #endregion
+
+    #endregion CTOR
 
     #region Métodos
+
     internal short QuantidadeTotalCargaHoraria() => (short)_historicoAprendizado.Sum(x => x.CargaHoraria);
+
     public int QuantidadeAulasFinalizadas() => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
+
     public int QuantidadeAulasEmAndamento() => _historicoAprendizado.Count(h => !h.DataTermino.HasValue);
+
     public int ObterQuantidadeAulasRegistradas() => QuantidadeAulasFinalizadas() + QuantidadeAulasEmAndamento();
+
     public bool MatriculaCursoConcluido() => DataConclusao.HasValue;
+
     internal bool MatriculaCursoDisponivel() => !DataConclusao.HasValue && EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado;
+
     internal bool PodeConcluirCurso() => EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado && _historicoAprendizado.Count(h => !h.DataTermino.HasValue) == 0;
+
     public bool PagamentoPodeSerRealizado() => EstadoMatricula == EstadoMatriculaCursoEnum.PendentePagamento || EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado;
+
     public decimal CalcularMediaFinalCurso()
     {
         var totalCargaHoraria = QuantidadeTotalCargaHoraria();
@@ -80,6 +95,7 @@ public class MatriculaCurso : Entidade
     //}
 
     #region Manipuladores de MatriculaCurso
+
     internal void AtualizarNotaFinalCurso(byte notaFinal)
     {
         ValidarIntegridadeMatriculaCurso(novaNotaFinal: notaFinal);
@@ -117,9 +133,11 @@ public class MatriculaCurso : Entidade
         ValidarIntegridadeMatriculaCurso(novaObservacao: observacao ?? string.Empty);
         Observacao = observacao;
     }
-    #endregion
+
+    #endregion Manipuladores de MatriculaCurso
 
     #region Manipuladores de HistoricoAprendizado
+
     internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         if (!MatriculaCursoDisponivel()) { throw new DomainException("Matrícula não está disponível para registrar histórico de aprendizado"); }
@@ -135,9 +153,11 @@ public class MatriculaCurso : Entidade
 
         _historicoAprendizado.Add(new HistoricoAprendizado(Id, CursoId, aulaId, nomeAula, cargaHoraria, dataInicio, dataTermino));
     }
-    #endregion
+
+    #endregion Manipuladores de HistoricoAprendizado
 
     #region Manipuladores de Certificado
+
     internal void RequisitarCertificadoConclusao(decimal notaFinal, string pathCertificado, string nomeInstrutor)
     {
         if (Certificado != null) { throw new DomainException("Certificado já foi solicitado para esta matrícula"); }
@@ -171,15 +191,17 @@ public class MatriculaCurso : Entidade
         VerificarSeCertificadoExiste();
         Certificado.AtualizarNomeInstrutor(nomeInstrutor ?? string.Empty);
     }
+
     private void VerificarSeCertificadoExiste()
     {
         if (Certificado == null) { throw new DomainException("Certificado não foi solicitado para esta matrícula"); }
     }
-    #endregion
+
+    #endregion Manipuladores de Certificado
 
     private void ValidarIntegridadeMatriculaCurso(int? novaNotaFinal = null,
         DateTime? novaDataConclusao = null,
-        EstadoMatriculaCursoEnum? novoEstadoMatriculaCurso = null, 
+        EstadoMatriculaCursoEnum? novoEstadoMatriculaCurso = null,
         string novaObservacao = null)
     {
         novaDataConclusao ??= DataConclusao;
@@ -219,6 +241,7 @@ public class MatriculaCurso : Entidade
                     ValidacaoData.DeveSerValido(dataConclusao.Value, "Data de conclusão deve ser informada", validacao);
                     ValidacaoData.DeveTerRangeValido(DataMatricula, dataConclusao.Value, "Data de conclusão não pode ser anterior a data de matrícula", validacao);
                     break;
+
                 case EstadoMatriculaCursoEnum.PendentePagamento:
                 case EstadoMatriculaCursoEnum.Abandonado:
                     validacao.AdicionarErro($"Não é possível concluir um curso com estado de pagamento {EstadoMatricula.GetDescription()}");
@@ -234,7 +257,8 @@ public class MatriculaCurso : Entidade
             validacao.AdicionarErro("Não é possível alterar o estado da matrícula para pagamento abandonado com o curso concluído");
         }
     }
-    #endregion
+
+    #endregion Métodos
 
     public override string ToString()
     {

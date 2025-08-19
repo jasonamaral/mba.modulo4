@@ -1,4 +1,4 @@
-﻿using Core.Mediator;
+using Core.Mediator;
 using Core.Messages;
 using Core.Messages.Integration;
 using Pagamentos.Domain.Entities;

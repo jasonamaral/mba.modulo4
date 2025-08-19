@@ -1,15 +1,17 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Conteudo.Infrastructure.Data;
 using Core.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conteudo.Infrastructure.Repositories;
+
 public class CategoriaRepository(ConteudoDbContext dbContext) : ICategoriaRepository
-{   
+{
     public IUnitOfWork UnitOfWork => dbContext;
 
     private readonly DbSet<Categoria> _categoria = dbContext.Set<Categoria>();
+
     public async Task<IEnumerable<Categoria>> ObterTodosAsync()
     {
         return await _categoria
@@ -18,7 +20,7 @@ public class CategoriaRepository(ConteudoDbContext dbContext) : ICategoriaReposi
     }
 
     public async Task<Categoria> ObterPorIdAsync(Guid id, bool noTracking = true)
-    {   
+    {
         var query = _categoria.AsQueryable();
         if (noTracking)
         {
@@ -40,6 +42,7 @@ public class CategoriaRepository(ConteudoDbContext dbContext) : ICategoriaReposi
     {
         _categoria.Add(categoria);
     }
+
     public void Atualizar(Categoria categoria)
     {
         _categoria.Update(categoria);

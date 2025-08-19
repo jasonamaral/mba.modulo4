@@ -1,11 +1,8 @@
-using FluentAssertions;
-using Moq;
+using Core.Mediator;
+using Core.Messages.Integration;
+using Core.Notification;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.ViewModels;
-using Core.Mediator;
-using Core.Notification;
-using Core.Messages.Integration;
-using Xunit;
 
 namespace Pagamentos.IntegrationTests.API
 {
@@ -201,7 +198,7 @@ namespace Pagamentos.IntegrationTests.API
                 .ThrowsAsync(new Exception("Erro no mediator"));
 
             // Act & Assert
-            var excecao = await Assert.ThrowsAsync<Exception>(() => 
+            var excecao = await Assert.ThrowsAsync<Exception>(() =>
                 _mockMediator.Object.PublicarEvento(new PagamentoCursoEvent(
                     pagamentoRequest.MatriculaId,
                     pagamentoRequest.AlunoId,

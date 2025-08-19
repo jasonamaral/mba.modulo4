@@ -11,8 +11,5 @@ public class ConteudoMappingConfig : IRegister
         new MaterialMappingProfile().Register(config);
         new CursoMappingProfile().Register(config);
         new CategoriaMappingProfile().Register(config);
-
     }
-
-
 }

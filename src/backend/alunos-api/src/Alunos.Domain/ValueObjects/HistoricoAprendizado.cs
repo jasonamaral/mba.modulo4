@@ -1,9 +1,11 @@
 using Core.DomainValidations;
 
 namespace Alunos.Domain.ValueObjects;
+
 public class HistoricoAprendizado
 {
     #region Atributos
+
     public Guid Id { get; }
     public Guid MatriculaCursoId { get; }
     public Guid CursoId { get; }
@@ -12,11 +14,14 @@ public class HistoricoAprendizado
     public int CargaHoraria { get; }
     public DateTime DataInicio { get; }
     public DateTime? DataTermino { get; }
-    #endregion
+
+    #endregion Atributos
 
     #region CTOR
+
     // EF Compatibility
-    protected HistoricoAprendizado() { }
+    protected HistoricoAprendizado()
+    { }
 
     public HistoricoAprendizado(Guid matriculaCursoId,
         Guid cursoId,
@@ -37,9 +42,11 @@ public class HistoricoAprendizado
 
         ValidarIntegridadeHistoricoAprendizado();
     }
-    #endregion
+
+    #endregion CTOR
 
     #region Métodos
+
     private void ValidarIntegridadeHistoricoAprendizado()
     {
         var validacao = new ResultadoValidacao<HistoricoAprendizado>();
@@ -62,7 +69,8 @@ public class HistoricoAprendizado
 
         validacao.DispararExcecaoDominioSeInvalido();
     }
-    #endregion
+
+    #endregion Métodos
 
     public override string ToString()
     {

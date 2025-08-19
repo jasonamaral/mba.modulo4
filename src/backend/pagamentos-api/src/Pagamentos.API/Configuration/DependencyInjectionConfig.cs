@@ -1,4 +1,4 @@
-﻿using Core.Mediator;
+using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
 using MediatR;
@@ -29,13 +29,11 @@ namespace Pagamentos.API.Configuration
             //services.AddScoped<IMediatorHandler, MediatorHandler>();
             //services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
 
-
             services.AddScoped<DomainNotificacaoHandler>();
             services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>>(sp =>
                                sp.GetRequiredService<DomainNotificacaoHandler>());
 
             services.AddScoped<IMediatorHandler, MediatorHandler>();
-
 
             services.AddScoped<INotificador, Notificador>();
 

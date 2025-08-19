@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Alunos.Application.Commands.CadastrarAluno;
 
@@ -18,7 +18,7 @@ public class CadastrarAlunoCommandValidator : AbstractValidator<CadastrarAlunoCo
             .Length(11).WithMessage("CPF deve ter 11 caracteres");
 
         RuleFor(c => c.DataNascimento).LessThan(DateTime.Today).WithMessage("Data de nascimento deve ser no passado.");
-          
+
         RuleFor(c => c.Telefone).MaximumLength(25).WithMessage("Telefone deve ter no máximo 25 caracteres");
 
         RuleFor(c => c.Genero).MaximumLength(20).WithMessage("Gênero deve ter no máximo 20 caracteres");

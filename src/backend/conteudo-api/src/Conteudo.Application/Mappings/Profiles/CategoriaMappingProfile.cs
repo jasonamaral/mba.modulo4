@@ -1,4 +1,4 @@
-﻿using Conteudo.Application.Commands.CadastrarCategoria;
+using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.DTOs;
 using Conteudo.Domain.Entities;
 using Mapster;

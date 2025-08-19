@@ -1,4 +1,4 @@
-﻿using Core.Identidade;
+using Core.Identidade;
 
 namespace Pagamentos.API.Configuration
 {
@@ -10,7 +10,4 @@ namespace Pagamentos.API.Configuration
             return builder;
         }
     }
-
-
-
 }

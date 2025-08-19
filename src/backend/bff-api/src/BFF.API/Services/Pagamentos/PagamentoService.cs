@@ -1,12 +1,10 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
 using BFF.API.Settings;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
 using BFF.Infrastructure.Services;
 using Core.Communication;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using System.Text.Json;
 
 namespace BFF.API.Services.Pagamentos
@@ -35,7 +33,7 @@ namespace BFF.API.Services.Pagamentos
             ApiResponse<ResponseResult<object>> apiResponse;
             try
             {
-                apiResponse = await _apiClient.PostAsyncWithDetails<PagamentoCursoInputModel, ResponseResult<object>>("/api/v1/pagamentos/pagamento",pagamentoCursoInputModel);
+                apiResponse = await _apiClient.PostAsyncWithDetails<PagamentoCursoInputModel, ResponseResult<object>>("/api/v1/pagamentos/pagamento", pagamentoCursoInputModel);
             }
             catch (Exception ex)
             {
@@ -79,7 +77,6 @@ namespace BFF.API.Services.Pagamentos
             }
         }
 
-
         public async Task<ResponseResult<PagamentoDto>> ObterPorIdPagamento(Guid idPagamento)
         {
             _apiClient.SetBaseAddress(_apiSettings.PagamentosApiUrl);
@@ -114,7 +111,6 @@ namespace BFF.API.Services.Pagamentos
             }
         }
 
-
         private static ResponseResult<bool> Success() => new()
         {
             Status = 200,
@@ -134,7 +130,6 @@ namespace BFF.API.Services.Pagamentos
             Data = new PagamentoDto(), // ou null, se preferir
             Errors = new ResponseErrorMessages { Mensagens = mensagens?.ToList() ?? new List<string>() }
         };
-
 
         private ResponseResult<bool> MapApiError(ApiResponse<ResponseResult<object>> apiResponse)
         {
@@ -170,7 +165,7 @@ namespace BFF.API.Services.Pagamentos
                     return msgs;
                 }
             }
-            catch {}
+            catch { }
 
             try
             {
@@ -181,7 +176,7 @@ namespace BFF.API.Services.Pagamentos
                     return msgs;
                 }
             }
-            catch {}
+            catch { }
 
             msgs.Add(errorContent);
             return msgs;
@@ -196,6 +191,5 @@ namespace BFF.API.Services.Pagamentos
                 Mensagens = mensagens?.ToList() ?? new List<string>()
             }
         };
-
     }
 }

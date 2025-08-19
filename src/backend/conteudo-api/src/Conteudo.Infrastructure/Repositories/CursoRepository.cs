@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Conteudo.Infrastructure.Data;
 using Core.Communication;
@@ -7,8 +7,9 @@ using Core.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conteudo.Infrastructure.Repositories;
+
 public class CursoRepository(ConteudoDbContext dbContext) : ICursoRepository
-{   
+{
     private readonly DbSet<Curso> _curso = dbContext.Set<Curso>();
     public IUnitOfWork UnitOfWork => dbContext;
 
@@ -44,8 +45,9 @@ public class CursoRepository(ConteudoDbContext dbContext) : ICursoRepository
             Query = filter.Query
         };
     }
+
     public async Task<IEnumerable<Curso>> ObterTodosAsync(bool includeAulas = false)
-    {   
+    {
         var query = _curso.AsQueryable();
 
         if (includeAulas)
@@ -84,7 +86,6 @@ public class CursoRepository(ConteudoDbContext dbContext) : ICursoRepository
             .ToListAsync();
     }
 
-
     public async Task<IEnumerable<Curso>> ObterAtivosAsync(bool includeAulas = false)
     {
         var query = _curso
@@ -96,7 +97,6 @@ public class CursoRepository(ConteudoDbContext dbContext) : ICursoRepository
 
         return await query.ToListAsync();
     }
-
 
     public Task<IEnumerable<Curso>> ObterPorPesquisaAsync(string searchTerm, bool includeAulas = false)
     {
@@ -121,7 +121,7 @@ public class CursoRepository(ConteudoDbContext dbContext) : ICursoRepository
     public async Task Atualizar(Curso curso)
     {
         _curso.Update(curso);
-        await Task.CompletedTask; 
+        await Task.CompletedTask;
     }
 
     public async Task Deletar(Curso curso)

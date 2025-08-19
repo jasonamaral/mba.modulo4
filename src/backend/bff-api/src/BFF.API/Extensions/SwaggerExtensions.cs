@@ -10,8 +10,8 @@ public static class SwaggerExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo 
-            { 
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
                 Title = "BFF API",
                 Version = "v1",
                 Description = "Backend for Frontend API - Orquestração dos Microsserviços da Plataforma Educacional",
@@ -77,4 +77,4 @@ public static class SwaggerExtensions
 
         return app;
     }
-} 
+}

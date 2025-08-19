@@ -1,4 +1,4 @@
-﻿using Conteudo.Application.Commands.AtualizarCurso;
+using Conteudo.Application.Commands.AtualizarCurso;
 using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.DTOs;
 using Conteudo.Domain.Entities;
@@ -13,7 +13,7 @@ namespace Conteudo.Application.Mappings.Profiles
         public void Register(TypeAdapterConfig config)
         {
             config.NewConfig<CadastroCursoDto, CadastrarCursoCommand>().TwoWays();
-            
+
             config.NewConfig<AtualizarCursoDto, AtualizarCursoCommand>().TwoWays();
 
             config.NewConfig<Curso, CursoDto>()

@@ -17,7 +17,8 @@ public class Material : Entidade, IRaizAgregacao
     public int Ordem { get; private set; }
     public bool IsAtivo { get; private set; }
 
-    protected Material() { }
+    protected Material()
+    { }
 
     public Material(
         Guid aulaId,
@@ -31,7 +32,7 @@ public class Material : Entidade, IRaizAgregacao
         int ordem = 0)
     {
         ValidarDados(nome, descricao, tipoMaterial, url);
-        
+
         AulaId = aulaId;
         Nome = nome;
         Descricao = descricao;
@@ -48,16 +49,16 @@ public class Material : Entidade, IRaizAgregacao
     {
         if (string.IsNullOrWhiteSpace(nome))
             throw new DomainException("Nome do material é obrigatório");
-            
+
         if (nome.Length > 200)
             throw new DomainException("Nome do material não pode ter mais de 200 caracteres");
-            
+
         if (string.IsNullOrWhiteSpace(descricao))
             throw new DomainException("Descrição do material é obrigatória");
-            
+
         if (string.IsNullOrWhiteSpace(tipoMaterial))
             throw new DomainException("Tipo do material é obrigatório");
-            
+
         if (string.IsNullOrWhiteSpace(url))
             throw new DomainException("URL do material é obrigatória");
     }
@@ -73,7 +74,7 @@ public class Material : Entidade, IRaizAgregacao
         int ordem = 0)
     {
         ValidarDados(nome, descricao, tipoMaterial, url);
-        
+
         Nome = nome;
         Descricao = descricao;
         TipoMaterial = tipoMaterial;
@@ -82,7 +83,7 @@ public class Material : Entidade, IRaizAgregacao
         TamanhoBytes = tamanhoBytes;
         Extensao = extensao;
         Ordem = ordem;
-        
+
         AtualizarDataModificacao();
     }
 
@@ -102,7 +103,7 @@ public class Material : Entidade, IRaizAgregacao
     {
         if (novaOrdem < 0)
             throw new DomainException("Ordem não pode ser negativa");
-            
+
         Ordem = novaOrdem;
         AtualizarDataModificacao();
     }
@@ -117,4 +118,4 @@ public class Material : Entidade, IRaizAgregacao
 
     public bool EhArquivo => !string.IsNullOrEmpty(Extensao);
     public bool EhLink => string.IsNullOrEmpty(Extensao);
-} 
+}

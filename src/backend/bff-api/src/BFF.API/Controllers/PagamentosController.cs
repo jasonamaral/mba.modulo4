@@ -1,4 +1,4 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
 using BFF.API.Services.Pagamentos;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs.Pagamentos.Response;
@@ -59,7 +59,6 @@ namespace BFF.API.Controllers
                 }
 
                 return BadRequest(resultado);
-
             }
             catch (Exception ex)
             {
@@ -67,7 +66,6 @@ namespace BFF.API.Controllers
                 return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
             }
         }
-
 
         [Authorize(Roles = "Usuario, Administrador")]
         [HttpGet("obter_todos")]
@@ -87,7 +85,6 @@ namespace BFF.API.Controllers
             }
         }
 
-
         [Authorize(Roles = "Administrador")]
         [HttpGet("obter/{id:guid}")]
         [ProducesResponseType(typeof(ResponseResult<PagamentoDto>), StatusCodes.Status200OK)]
@@ -97,7 +94,7 @@ namespace BFF.API.Controllers
         {
             try
             {
-               var pagamentos = await _pagamentoService.ObterPorIdPagamento(id);
+                var pagamentos = await _pagamentoService.ObterPorIdPagamento(id);
                 return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
             }
             catch (Exception ex)

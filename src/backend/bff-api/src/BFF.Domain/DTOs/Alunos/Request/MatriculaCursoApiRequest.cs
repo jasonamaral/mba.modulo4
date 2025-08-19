@@ -1,4 +1,5 @@
-﻿namespace BFF.Domain.DTOs.Alunos.Request;
+namespace BFF.Domain.DTOs.Alunos.Request;
+
 public class MatriculaCursoApiRequest
 {
     public Guid AlunoId { get; set; }

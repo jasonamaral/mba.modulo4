@@ -1,4 +1,4 @@
-﻿using Alunos.Domain.Entities;
+using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
 using Core.Communication;
 using Core.Mediator;
@@ -7,6 +7,7 @@ using Core.SharedDtos.Conteudo;
 using MediatR;
 
 namespace Alunos.Application.Commands.ConcluirCurso;
+
 public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<ConcluirCursoCommand, CommandResult>
 {

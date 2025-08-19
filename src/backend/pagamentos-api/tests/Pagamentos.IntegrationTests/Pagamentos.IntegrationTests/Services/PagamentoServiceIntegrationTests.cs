@@ -1,12 +1,8 @@
-using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.ViewModels;
+using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Interfaces;
 using Pagamentos.Domain.Models;
-using Pagamentos.Domain.Entities;
-using Xunit;
 
 namespace Pagamentos.IntegrationTests.Services
 {
@@ -171,7 +167,7 @@ namespace Pagamentos.IntegrationTests.Services
             resultado.Total.Should().Be(pagamentoCurso.Total);
 
             _mockPagamentoService.Verify(
-                x => x.RealizarPagamento(It.Is<PagamentoCurso>(p => 
+                x => x.RealizarPagamento(It.Is<PagamentoCurso>(p =>
                     p.CursoId == pagamentoCurso.CursoId &&
                     p.ClienteId == pagamentoCurso.ClienteId &&
                     p.Total == pagamentoCurso.Total &&
@@ -280,7 +276,7 @@ namespace Pagamentos.IntegrationTests.Services
                 .ThrowsAsync(new Exception("Erro no processamento do pagamento"));
 
             // Act & Assert
-            var excecao = await Assert.ThrowsAsync<Exception>(() => 
+            var excecao = await Assert.ThrowsAsync<Exception>(() =>
                 _mockPagamentoService.Object.RealizarPagamento(pagamentoCurso));
 
             excecao.Message.Should().Be("Erro no processamento do pagamento");

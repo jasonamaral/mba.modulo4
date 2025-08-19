@@ -1,8 +1,9 @@
-﻿using BFF.Domain.DTOs.Alunos.Request;
+using BFF.Domain.DTOs.Alunos.Request;
 using BFF.Domain.DTOs.Alunos.Response;
 using Core.Communication;
 
 namespace BFF.API.Services.Aluno;
+
 public partial class AlunoService
 {
     private async Task<ResponseResult<AlunoDto>> ObterAlunoPorId(Guid alunoId)

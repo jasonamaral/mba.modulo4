@@ -4,9 +4,9 @@ using Auth.Application.Services;
 using Auth.Application.Settings;
 using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
-using Mapster;
 using Core.Utils;
+using Mapster;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -124,6 +124,7 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
     if (adminUser == null)
     {
         #region Crio o ADMIN
+
         adminUser = new ApplicationUser
         {
             UserName = adminEmail,
@@ -138,9 +139,11 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
         {
             await userManager.AddToRoleAsync(adminUser, "Administrador");
         }
-        #endregion
+
+        #endregion Crio o ADMIN
 
         #region Crio o aluno 1
+
         var aluno1 = new ApplicationUser
         {
             Id = "06b1b8f1-f079-4048-9c8d-190c8056ea60",
@@ -156,9 +159,11 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
         {
             await userManager.AddToRoleAsync(aluno1, "Usuario");
         }
-        #endregion
+
+        #endregion Crio o aluno 1
 
         #region Crio o aluno 1
+
         var aluno2 = new ApplicationUser
         {
             Id = "ca39e314-c960-42bc-9c9d-3cad9b589a8d",
@@ -174,6 +179,7 @@ static async Task InitializeDatabaseAsync(AuthDbContext context, UserManager<App
         {
             await userManager.AddToRoleAsync(aluno2, "Usuario");
         }
-        #endregion
+
+        #endregion Crio o aluno 1
     }
 }

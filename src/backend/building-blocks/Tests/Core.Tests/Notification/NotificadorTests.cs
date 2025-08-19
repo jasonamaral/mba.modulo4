@@ -1,6 +1,4 @@
 using Core.Notification;
-using FluentAssertions;
-using Xunit;
 
 namespace Core.Tests.Notification;
 

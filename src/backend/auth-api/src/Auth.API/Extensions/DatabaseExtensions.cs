@@ -7,8 +7,8 @@ namespace Auth.API.Extensions;
 public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabaseConfiguration(
-        this IServiceCollection services, 
-        IConfiguration configuration, 
+        this IServiceCollection services,
+        IConfiguration configuration,
         IWebHostEnvironment environment)
     {
         var databaseSettings = configuration.GetSection("DatabaseSettings").Get<DatabaseSettings>() ?? new DatabaseSettings();
@@ -18,16 +18,16 @@ public static class DatabaseExtensions
         if (isDevelopment)
         {
             services.AddDbContext<AuthDbContext>(options =>
-                options.UseSqlite(connectionString ?? databaseSettings.DevelopmentConnection, 
+                options.UseSqlite(connectionString ?? databaseSettings.DevelopmentConnection,
                     b => b.MigrationsAssembly("Auth.Infrastructure")));
         }
         else
         {
             services.AddDbContext<AuthDbContext>(options =>
-                options.UseSqlServer(connectionString ?? databaseSettings.ProductionConnection, 
+                options.UseSqlServer(connectionString ?? databaseSettings.ProductionConnection,
                     b => b.MigrationsAssembly("Auth.Infrastructure")));
         }
 
         return services;
     }
-} 
+}

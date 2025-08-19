@@ -1,6 +1,4 @@
 using Core.Messages.Integration;
-using FluentAssertions;
-using Xunit;
 
 namespace Pagamentos.UnitTests.Domain
 {

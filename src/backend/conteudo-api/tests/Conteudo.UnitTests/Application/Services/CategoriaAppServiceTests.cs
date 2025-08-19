@@ -2,8 +2,6 @@ using Conteudo.Application.DTOs;
 using Conteudo.Application.Services;
 using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
-using FluentAssertions;
-using Moq;
 
 namespace Conteudo.UnitTests.Application.Services;
 

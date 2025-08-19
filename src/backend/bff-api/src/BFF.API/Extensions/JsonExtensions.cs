@@ -1,4 +1,5 @@
 using System.Text.Json;
+
 namespace BFF.API.Extensions;
 
 public static class JsonExtensions
@@ -10,7 +11,6 @@ public static class JsonExtensions
         WriteIndented = false,
         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
     };
-
 
     public static IServiceCollection AddJsonConfiguration(this IServiceCollection services)
     {
@@ -30,4 +30,4 @@ public static class JsonExtensions
 
         return services;
     }
-} 
+}
