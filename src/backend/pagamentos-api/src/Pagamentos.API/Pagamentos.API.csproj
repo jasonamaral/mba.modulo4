@@ -39,6 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\bff-api\src\BFF.API\BFF.API.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\core\Core.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\MessageBus\MessageBus.csproj" />
     <ProjectReference Include="..\Pagamento.AntiCorruption\Pagamento.AntiCorruption.csproj" />
