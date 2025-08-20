@@ -1,4 +1,5 @@
-﻿namespace Alunos.Application.DTOs.Response;
+namespace Alunos.Application.DTOs.Response;
+
 public class EvolucaoMatriculaCursoDto
 {
     public Guid Id { get; set; }

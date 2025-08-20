@@ -1,7 +1,4 @@
 using Auth.Application.Settings;
-using Auth.UnitTests;
-using FluentAssertions;
-using Xunit;
 
 namespace Auth.UnitTests.Application.Settings;
 

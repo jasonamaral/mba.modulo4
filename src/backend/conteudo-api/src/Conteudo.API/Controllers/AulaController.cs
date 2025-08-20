@@ -1,4 +1,4 @@
-﻿using Conteudo.Application.Commands.AtualizarAula;
+using Conteudo.Application.Commands.AtualizarAula;
 using Conteudo.Application.Commands.CadastrarAula;
 using Conteudo.Application.Commands.DespublicarAula;
 using Conteudo.Application.Commands.ExcluirAula;
@@ -153,7 +153,7 @@ namespace Conteudo.API.Controllers
                 return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
             }
         }
-        
+
         /// <summary>
         /// Cadastra uma nova aula
         /// </summary>
@@ -262,6 +262,5 @@ namespace Conteudo.API.Controllers
                 return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
             }
         }
-
     }
 }

@@ -1,6 +1,7 @@
-﻿using Core.Messages;
+using Core.Messages;
 
 namespace Conteudo.Application.Commands.CadastrarCurso;
+
 public class CadastrarCursoCommand : CommandRaiz
 {
     public string Nome { get; set; } = string.Empty;
@@ -15,6 +16,7 @@ public class CadastrarCursoCommand : CommandRaiz
 
     // Conteúdo Programático
     public string Resumo { get; set; } = string.Empty;
+
     public string Descricao { get; set; } = string.Empty;
     public string Objetivos { get; set; } = string.Empty;
     public string PreRequisitos { get; set; } = string.Empty;
@@ -30,5 +32,3 @@ public class CadastrarCursoCommand : CommandRaiz
         DefinirRaizAgregacao(Guid.NewGuid());
     }
 }
-
-

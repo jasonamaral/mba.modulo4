@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Pagamentos.Infrastructure.Context;
 
 namespace Pagamentos.API.Configuration
@@ -38,10 +38,9 @@ namespace Pagamentos.API.Configuration
             await contextPagamento.Database.MigrateAsync();
         }
 
-
         private static Task EnsureSeedProducts(IServiceProvider serviceProvider)
         {
-                return Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }

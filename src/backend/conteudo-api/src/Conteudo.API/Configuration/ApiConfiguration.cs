@@ -1,4 +1,4 @@
-﻿using Conteudo.API.Configuration;
+using Conteudo.API.Configuration;
 using Conteudo.API.Filters;
 using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.Mappings;
@@ -7,6 +7,7 @@ using Mapster;
 using System.Text.Json;
 
 namespace Conteudo.API.Configuration;
+
 public static class ApiConfiguration
 {
     public static WebApplicationBuilder AddApiConfiguration(this WebApplicationBuilder builder)

@@ -13,8 +13,8 @@ public partial class ConteudoService : BaseApiService, IConteudoService
 {
     private readonly ApiSettings _apiSettings;
 
-    public ConteudoService( IOptions<ApiSettings> apiSettings, 
-                            IApiClientService apiClient, 
+    public ConteudoService(IOptions<ApiSettings> apiSettings,
+                            IApiClientService apiClient,
                             ILogger<ConteudoService> logger) : base(apiClient, logger)
     {
         _apiSettings = apiSettings.Value;
@@ -77,7 +77,6 @@ public partial class ConteudoService : BaseApiService, IConteudoService
 
     public async Task<ResponseResult<Guid>> AdicionarAulaAsync(Guid cursoId, AulaCriarRequest aula)
     {
-
         var result = await ExecuteWithErrorHandling(() => AdicionarAula(cursoId, aula),
             nameof(AdicionarAulaAsync),
             cursoId);

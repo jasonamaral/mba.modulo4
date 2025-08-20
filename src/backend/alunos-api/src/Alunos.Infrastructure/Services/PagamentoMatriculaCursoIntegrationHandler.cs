@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Alunos.Infrastructure.Services;
+
 public class PagamentoMatriculaCursoIntegrationHandler(IServiceProvider serviceProvider,
     IMessageBus bus,
     ILogger<PagamentoMatriculaCursoIntegrationHandler> logger) : BackgroundService
@@ -31,7 +32,6 @@ public class PagamentoMatriculaCursoIntegrationHandler(IServiceProvider serviceP
     {
         SetResponder();
     }
-
 
     private async Task<ResponseMessage> ProcessarPagamentoMatriculaCurso(PagamentoMatriculaCursoIntegrationEvent message)
     {

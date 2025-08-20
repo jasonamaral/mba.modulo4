@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Core.Data.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,8 +10,9 @@ namespace Conteudo.Infrastructure.Configurations;
 public class AulaConfiguration : IEntityTypeConfiguration<Aula>
 {
     public void Configure(EntityTypeBuilder<Aula> entity)
-    { 
+    {
         #region Mapping columns
+
         entity.ToTable("Aulas");
 
         entity.HasKey(a => a.Id)
@@ -59,9 +60,11 @@ public class AulaConfiguration : IEntityTypeConfiguration<Aula>
         entity.Property(a => a.UpdatedAt)
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
-        #endregion
+
+        #endregion Mapping columns
 
         #region Indexes
+
         entity.HasIndex(x => x.Nome)
             .HasDatabaseName("AlunosNomeIDX");
 
@@ -74,9 +77,11 @@ public class AulaConfiguration : IEntityTypeConfiguration<Aula>
 
         entity.HasIndex(a => a.TipoAula)
             .HasDatabaseName("AlunosTipoAulaIDX");
-        #endregion
+
+        #endregion Indexes
 
         #region Relationships
+
         // Relacionamento com Curso
         entity.HasOne(a => a.Curso)
             .WithMany(c => c.Aulas)
@@ -88,7 +93,7 @@ public class AulaConfiguration : IEntityTypeConfiguration<Aula>
             .WithOne(m => m.Aula)
             .HasForeignKey(m => m.AulaId)
             .OnDelete(DeleteBehavior.Cascade);
-        #endregion
 
+        #endregion Relationships
     }
 }

@@ -29,18 +29,18 @@ public class CacheService : ICacheService
         // Tenta usar distributed cache (Redis) primeiro, senão usa memory cache
         _distributedCache = serviceProvider.GetService<IDistributedCache>();
         _memoryCache = serviceProvider.GetService<IMemoryCache>();
-        
-        _useDistributedCache = _distributedCache != null && 
+
+        _useDistributedCache = _distributedCache != null &&
                               !string.IsNullOrEmpty(_redisSettings.ConnectionString);
 
-        _logger.LogInformation("Cache configurado: {CacheType}", 
+        _logger.LogInformation("Cache configurado: {CacheType}",
             _useDistributedCache ? "Redis (Distributed)" : "Memory");
     }
 
     public async Task<T?> GetAsync<T>(string key) where T : class
     {
         var fullKey = GetFullKey(key);
-        
+
         try
         {
             if (_useDistributedCache && _distributedCache != null)
@@ -53,7 +53,7 @@ public class CacheService : ICacheService
                         PropertyNameCaseInsensitive = true,
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                     };
-                    
+
                     return JsonSerializer.Deserialize<T>(cachedValue, options);
                 }
             }
@@ -76,7 +76,7 @@ public class CacheService : ICacheService
     {
         var fullKey = GetFullKey(key);
         var exp = expiration ?? _redisSettings.DefaultExpiration;
-        
+
         try
         {
             if (_useDistributedCache && _distributedCache != null)
@@ -86,13 +86,13 @@ public class CacheService : ICacheService
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     WriteIndented = false
                 };
-                
+
                 var serializedValue = JsonSerializer.Serialize(value, options);
                 var cacheOptions = new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = exp
                 };
-                
+
                 await _distributedCache.SetStringAsync(fullKey, serializedValue, cacheOptions);
             }
             else if (_memoryCache != null)
@@ -101,7 +101,7 @@ public class CacheService : ICacheService
                 {
                     AbsoluteExpirationRelativeToNow = exp
                 };
-                
+
                 _memoryCache.Set(fullKey, value, options);
                 _memoryKeys.TryAdd(fullKey, 0);
             }
@@ -115,7 +115,7 @@ public class CacheService : ICacheService
     public async Task RemoveAsync(string key)
     {
         var fullKey = GetFullKey(key);
-        
+
         try
         {
             if (_useDistributedCache && _distributedCache != null)
@@ -192,4 +192,4 @@ public class CacheService : ICacheService
     {
         return $"{_redisSettings.KeyPrefix}{key}";
     }
-} 
+}

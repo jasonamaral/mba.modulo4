@@ -8,7 +8,7 @@ internal class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.AddApiConfiguration();
-        
+
         // Configuração global do JSON
         builder.Services.AddJsonConfiguration();
 
@@ -41,6 +41,6 @@ internal class Program
         app.MapControllers();
         app.MapHealthChecks("/health");
 
-        app.Run();       
+        app.Run();
     }
 }

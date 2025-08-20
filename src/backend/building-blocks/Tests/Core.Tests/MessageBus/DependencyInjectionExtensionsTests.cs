@@ -1,7 +1,5 @@
-using FluentAssertions;
 using global::MessageBus;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace Core.Tests.MessageBus;
 

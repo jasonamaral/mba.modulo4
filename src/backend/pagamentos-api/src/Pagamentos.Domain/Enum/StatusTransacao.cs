@@ -1,4 +1,4 @@
-﻿namespace Pagamentos.Domain.Enum
+namespace Pagamentos.Domain.Enum
 {
     public enum StatusTransacao
     {

@@ -1,4 +1,4 @@
-﻿namespace BFF.Domain.DTOs
+namespace BFF.Domain.DTOs
 {
     public class ConteudoProgramaticoDto
     {

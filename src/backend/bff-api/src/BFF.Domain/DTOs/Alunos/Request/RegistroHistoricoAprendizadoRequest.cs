@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace BFF.Domain.DTOs.Alunos.Request;
+
 public class RegistroHistoricoAprendizadoRequest
 {
     [Required(ErrorMessage = "ID do aluno é obrigatório")]

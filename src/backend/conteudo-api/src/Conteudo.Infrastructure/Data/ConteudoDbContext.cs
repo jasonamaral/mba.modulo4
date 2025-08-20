@@ -48,13 +48,13 @@ public class ConteudoDbContext(DbContextOptions<ConteudoDbContext> options) : Db
     private void UpdateTimestamps()
     {
         var entries = ChangeTracker.Entries()
-            .Where(e => e.Entity is Entidade && 
+            .Where(e => e.Entity is Entidade &&
                        (e.State == EntityState.Added || e.State == EntityState.Modified));
 
         foreach (var entry in entries)
         {
             var entity = (Entidade)entry.Entity;
-            
+
             if (entry.State == EntityState.Modified)
             {
                 entity.AtualizarDataModificacao();
@@ -66,4 +66,4 @@ public class ConteudoDbContext(DbContextOptions<ConteudoDbContext> options) : Db
     {
         return await SaveChangesAsync() > 0;
     }
-} 
+}

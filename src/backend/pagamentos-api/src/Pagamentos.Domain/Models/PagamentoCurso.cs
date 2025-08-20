@@ -1,4 +1,4 @@
-﻿namespace Pagamentos.Domain.Models
+namespace Pagamentos.Domain.Models
 {
     public class PagamentoCurso
     {

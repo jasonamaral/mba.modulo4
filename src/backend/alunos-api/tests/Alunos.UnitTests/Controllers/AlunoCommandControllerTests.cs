@@ -41,7 +41,7 @@ public class AlunoCommandControllerTests : TestBase
         };
 
         var commandResult = new CommandResult(new FluentValidation.Results.ValidationResult(), Guid.NewGuid());
-        SetupMockMediatorHandler(commandResult);
+        ConfigurarMockMediatorHandler(commandResult);
 
         // Act
         var result = await _controller.MatricularAluno(alunoId, dto);
@@ -69,7 +69,7 @@ public class AlunoCommandControllerTests : TestBase
             Observacao = "Observação teste"
         };
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.MatricularAluno(alunoId, dto);
@@ -100,7 +100,7 @@ public class AlunoCommandControllerTests : TestBase
         _controller.ModelState.AddModelError("Nome", "Nome é obrigatório");
 
         // Configurar mocks para notificações de domínio
-        SetupMockMediatorHandlerForNotifications();
+        ConfigurarMockMediatorHandlerParaNotifications();
 
         // Popular notificações simulando mensagens de ModelState
         await Notifications.Handle(new DomainNotificacaoRaiz("ModelState", "Nome é obrigatório"), CancellationToken.None);
@@ -138,7 +138,7 @@ public class AlunoCommandControllerTests : TestBase
             .ReturnsAsync(matriculaCurso);
 
         var commandResult = new CommandResult(new FluentValidation.Results.ValidationResult(), true);
-        SetupMockMediatorHandler(commandResult);
+        ConfigurarMockMediatorHandler(commandResult);
 
         // Act
         var result = await _controller.RegistrarHistoricoAprendizado(alunoId, dto);
@@ -170,7 +170,7 @@ public class AlunoCommandControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterInformacaoMatriculaCursoAsync(matriculaId))
             .ReturnsAsync((MatriculaCursoDto?)null);
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.RegistrarHistoricoAprendizado(alunoId, dto);
@@ -206,7 +206,7 @@ public class AlunoCommandControllerTests : TestBase
             .ReturnsAsync(matriculaCurso);
 
         var commandResult = new CommandResult(new FluentValidation.Results.ValidationResult(), true);
-        SetupMockMediatorHandler(commandResult);
+        ConfigurarMockMediatorHandler(commandResult);
 
         // Act
         var result = await _controller.ConcluirCurso(alunoId, dto);
@@ -232,7 +232,7 @@ public class AlunoCommandControllerTests : TestBase
             CursoDto = null // CursoDto nulo
         };
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.ConcluirCurso(alunoId, dto);
@@ -258,7 +258,7 @@ public class AlunoCommandControllerTests : TestBase
         };
 
         var commandResult = new CommandResult(new FluentValidation.Results.ValidationResult(), Guid.NewGuid());
-        SetupMockMediatorHandler(commandResult);
+        ConfigurarMockMediatorHandler(commandResult);
 
         // Act
         var result = await _controller.SolicitarCertificado(alunoId, dto);
@@ -284,7 +284,7 @@ public class AlunoCommandControllerTests : TestBase
         };
 
         var exception = new Exception("Erro interno");
-        SetupMockMediatorHandlerWithException(exception);
+        ConfigurarMockMediatorHandlerComExcecao(exception);
 
         // Act & Assert
         var action = () => _controller.SolicitarCertificado(alunoId, dto);

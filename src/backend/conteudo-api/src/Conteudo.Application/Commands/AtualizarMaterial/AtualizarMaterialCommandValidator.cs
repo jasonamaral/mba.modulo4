@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Conteudo.Application.Commands.AtualizarMaterial
 {
@@ -8,7 +8,7 @@ namespace Conteudo.Application.Commands.AtualizarMaterial
         {
             RuleFor(c => c.Id)
                 .NotEqual(Guid.Empty).WithMessage("ID do material é obrigatório");
-            
+
             RuleFor(c => c.Nome)
                 .NotEmpty().WithMessage("Nome é obrigatório")
                 .MaximumLength(200).WithMessage("Nome deve ter no máximo 200 caracteres");

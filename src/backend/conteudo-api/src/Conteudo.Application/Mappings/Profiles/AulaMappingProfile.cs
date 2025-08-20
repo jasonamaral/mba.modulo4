@@ -1,4 +1,4 @@
-﻿using Conteudo.Application.Commands.AtualizarAula;
+using Conteudo.Application.Commands.AtualizarAula;
 using Conteudo.Application.Commands.CadastrarAula;
 using Conteudo.Application.DTOs;
 using Conteudo.Domain.Entities;

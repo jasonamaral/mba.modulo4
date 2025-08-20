@@ -9,4 +9,4 @@ public class UserInfo
     public string Nome { get; set; } = string.Empty;
 
     public List<string> Roles { get; set; } = new();
-} 
+}

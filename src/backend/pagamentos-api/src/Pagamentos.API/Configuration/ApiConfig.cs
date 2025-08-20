@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Pagamentos.API.Configuration
 {
@@ -10,9 +10,9 @@ namespace Pagamentos.API.Configuration
 
             builder.Services.AddApiVersioning(options =>
             {
-                options.DefaultApiVersion = new ApiVersion(1, 0); 
+                options.DefaultApiVersion = new ApiVersion(1, 0);
                 options.AssumeDefaultVersionWhenUnspecified = true;
-                options.ReportApiVersions = true; 
+                options.ReportApiVersions = true;
             });
 
             builder.Services.AddVersionedApiExplorer(options =>

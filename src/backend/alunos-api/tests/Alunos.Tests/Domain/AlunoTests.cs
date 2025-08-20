@@ -1,26 +1,30 @@
-﻿using Alunos.Domain.Entities;
+using Alunos.Domain.Entities;
 using FluentAssertions;
 using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.Tests.Domain;
+
 public class AlunoTests
 {
     #region Helpers
+
     private static readonly Guid _codigoUsuario = Guid.NewGuid();
     private const string _nomeValido = "Jairo Azevedo";
     private const string _emailValido = "jsouza.lp@gmail.com";
-    private const string _cpfValido = "12345678909"; 
+    private const string _cpfValido = "12345678909";
     private static readonly DateTime _dataNascimentoValida = new(1973, 06, 25);
-    private const string _generoValido = "Masculino"; 
+    private const string _generoValido = "Masculino";
     private const string _cidadeValido = "Rio de Janeiro";
     private const string _estadoValido = "RJ";
-    private const string _cepValido = "21210000"; 
+    private const string _cepValido = "21210000";
     private const string _fotoValido = "var/mnt/fotos/jairo.jpeg";
 
     private Aluno CriarAlunoValido() => new(_codigoUsuario, _nomeValido, _emailValido, _cpfValido, _dataNascimentoValida, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
-    #endregion
+
+    #endregion Helpers
 
     #region Construtores
+
     [Fact]
     public void Deve_criar_aluno_valido()
     {
@@ -37,7 +41,6 @@ public class AlunoTests
         aluno.Estado.Should().Be(_estadoValido);
         aluno.Cep.Should().Be(_cepValido);
         aluno.Foto.Should().Be(_fotoValido);
-
     }
 
     [Theory]
@@ -66,9 +69,11 @@ public class AlunoTests
         Action act = () => new Aluno(_codigoUsuario, _nomeValido, _emailValido, _cpfValido, dataFutura, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
         act.Should().Throw<DomainException>().WithMessage("*Data de nascimento não pode ser superior à data atual*");
     }
-    #endregion
+
+    #endregion Construtores
 
     #region Métodos
+
     [Fact]
     public void Deve_ativar_e_inativar_aluno()
     {
@@ -124,9 +129,11 @@ public class AlunoTests
         Action act = () => aluno.MatricularAlunoEmCurso(cursoId, "Curso de Programação Avançada", 1000, "obs");
         act.Should().Throw<DomainException>().WithMessage("*Aluno já está matriculado neste curso*");
     }
-    #endregion
+
+    #endregion Métodos
 
     #region Overrides
+
     [Fact]
     public void ToString_deve_conter_nome_e_email()
     {
@@ -136,5 +143,6 @@ public class AlunoTests
         texto.Should().Contain(_nomeValido)
               .And.Contain(_emailValido);
     }
-    #endregion
+
+    #endregion Overrides
 }

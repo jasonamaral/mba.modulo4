@@ -1,4 +1,5 @@
-﻿namespace Core.SharedDtos.Conteudo;
+namespace Core.SharedDtos.Conteudo;
+
 public class AulaDto
 {
     public Guid Id { get; set; }

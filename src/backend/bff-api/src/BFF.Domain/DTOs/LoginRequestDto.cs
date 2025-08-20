@@ -1,4 +1,5 @@
-﻿namespace BFF.Domain.DTOs;
+namespace BFF.Domain.DTOs;
+
 public class LoginRequestDto
 {
     public string Email { get; set; } = string.Empty;

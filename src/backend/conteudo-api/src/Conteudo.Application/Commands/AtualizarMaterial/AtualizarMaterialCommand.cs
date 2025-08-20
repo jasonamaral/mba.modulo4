@@ -1,4 +1,4 @@
-﻿using Core.Communication;
+using Core.Communication;
 using Core.Messages;
 using MediatR;
 

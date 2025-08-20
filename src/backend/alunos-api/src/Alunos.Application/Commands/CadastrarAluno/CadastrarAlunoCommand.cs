@@ -1,4 +1,4 @@
-﻿using Core.Communication;
+using Core.Communication;
 using Core.Messages;
 using MediatR;
 
@@ -18,17 +18,16 @@ public class CadastrarAlunoCommand : CommandRaiz, IRequest<CommandResult>
     public string Cep { get; private set; }
     public string? Foto { get; private set; }
 
-
-    public CadastrarAlunoCommand(Guid id, 
-        string nome, 
-        string email, 
-        string cpf, 
-        DateTime dataNascimento, 
-        string telefone, 
-        string genero, 
-        string cidade, 
-        string estado, 
-        string cep, 
+    public CadastrarAlunoCommand(Guid id,
+        string nome,
+        string email,
+        string cpf,
+        DateTime dataNascimento,
+        string telefone,
+        string genero,
+        string cidade,
+        string estado,
+        string cep,
         string foto)
     {
         DefinirRaizAgregacao(Id);

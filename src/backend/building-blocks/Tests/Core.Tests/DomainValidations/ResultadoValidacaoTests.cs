@@ -1,6 +1,4 @@
 using Core.DomainValidations;
-using FluentAssertions;
-using Xunit;
 
 namespace Core.Tests.DomainValidations;
 

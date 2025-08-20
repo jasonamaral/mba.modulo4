@@ -19,11 +19,12 @@ public class Curso : Entidade, IRaizAgregacao
     public string Instrutor { get; private set; }
     public int VagasMaximas { get; private set; }
     public int VagasOcupadas { get; private set; }
-    
+
     private readonly List<Aula> _aulas = [];
     public IReadOnlyCollection<Aula> Aulas => _aulas.AsReadOnly();
 
-    protected Curso() { }
+    protected Curso()
+    { }
 
     public Curso(
         string nome,
@@ -38,7 +39,7 @@ public class Curso : Entidade, IRaizAgregacao
         Guid? categoriaId = null)
     {
         ValidarDados(nome, valor, conteudoProgramatico, duracaoHoras, nivel, instrutor, vagasMaximas);
-        
+
         Nome = nome;
         Valor = valor;
         ConteudoProgramatico = conteudoProgramatico;
@@ -53,30 +54,30 @@ public class Curso : Entidade, IRaizAgregacao
         Ativo = true;
     }
 
-    private static void ValidarDados(string nome, decimal valor, ConteudoProgramatico conteudoProgramatico, 
+    private static void ValidarDados(string nome, decimal valor, ConteudoProgramatico conteudoProgramatico,
         int duracaoHoras, string nivel, string instrutor, int vagasMaximas)
     {
         if (string.IsNullOrWhiteSpace(nome))
             throw new DomainException("Nome do curso é obrigatório");
-            
+
         if (nome.Length > 200)
             throw new DomainException("Nome do curso não pode ter mais de 200 caracteres");
 
         if (valor < 0)
             throw new DomainException("Valor do curso não pode ser negativo");
-            
+
         if (conteudoProgramatico == null)
             throw new DomainException("Conteúdo programático é obrigatório");
 
         if (duracaoHoras <= 0)
             throw new DomainException("Duração do curso deve ser maior que zero");
-            
+
         if (string.IsNullOrWhiteSpace(nivel))
             throw new DomainException("Nível do curso é obrigatório");
-            
+
         if (string.IsNullOrWhiteSpace(instrutor))
             throw new DomainException("Instrutor é obrigatório");
-            
+
         if (vagasMaximas <= 0)
             throw new DomainException("Número de vagas deve ser maior que zero");
     }
@@ -94,7 +95,7 @@ public class Curso : Entidade, IRaizAgregacao
         Guid? categoriaId = null)
     {
         ValidarDados(nome, valor, conteudoProgramatico, duracaoHoras, nivel, instrutor, vagasMaximas);
-        
+
         Nome = nome;
         Valor = valor;
         ConteudoProgramatico = conteudoProgramatico;
@@ -105,7 +106,7 @@ public class Curso : Entidade, IRaizAgregacao
         ImagemUrl = imagemUrl;
         ValidoAte = validoAte;
         CategoriaId = categoriaId;
-        
+
         AtualizarDataModificacao();
     }
 
@@ -125,10 +126,10 @@ public class Curso : Entidade, IRaizAgregacao
     {
         if (aula == null)
             throw new DomainException("Aula não pode ser nula");
-            
+
         if (_aulas.Any(a => a.Numero == aula.Numero))
             throw new DomainException($"Já existe uma aula com o número {aula.Numero}");
-            
+
         _aulas.Add(aula);
         AtualizarDataModificacao();
     }
@@ -147,7 +148,7 @@ public class Curso : Entidade, IRaizAgregacao
     {
         if (VagasOcupadas >= VagasMaximas)
             throw new DomainException("Não há vagas disponíveis para este curso");
-            
+
         VagasOcupadas++;
         AtualizarDataModificacao();
     }
@@ -165,4 +166,4 @@ public class Curso : Entidade, IRaizAgregacao
     public int VagasDisponiveis => VagasMaximas - VagasOcupadas;
     public bool EstaExpirado => ValidoAte.HasValue && ValidoAte.Value < DateTime.UtcNow;
     public bool PodeSerMatriculado => Ativo && !EstaExpirado && TemVagasDisponiveis;
-} 
+}

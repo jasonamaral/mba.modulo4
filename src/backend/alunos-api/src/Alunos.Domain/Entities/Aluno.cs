@@ -8,6 +8,7 @@ namespace Alunos.Domain.Entities;
 public class Aluno : Entidade, IRaizAgregacao
 {
     #region Atributos
+
     public Guid CodigoUsuarioAutenticacao { get; }
     public string Nome { get; private set; }
     public string Email { get; private set; }
@@ -23,11 +24,14 @@ public class Aluno : Entidade, IRaizAgregacao
 
     private readonly List<MatriculaCurso> _matriculasCursos = [];
     public IReadOnlyCollection<MatriculaCurso> MatriculasCursos => _matriculasCursos.AsReadOnly();
-    #endregion
+
+    #endregion Atributos
 
     #region CTOR
+
     // EF Compatibility
-    protected Aluno() { }
+    protected Aluno()
+    { }
 
     public Aluno(Guid codigoUsuarioAutenticacao,
         string nome,
@@ -53,11 +57,15 @@ public class Aluno : Entidade, IRaizAgregacao
 
         ValidarIntegridadeAluno();
     }
-    #endregion
+
+    #endregion CTOR
 
     #region Métodos
+
     #region Manipuladores de Aluno
+
     public void AtivarAluno() => Ativo = true;
+
     public void InativarAluno() => Ativo = false;
 
     internal void AtualizarNomeAluno(string nome)
@@ -83,9 +91,11 @@ public class Aluno : Entidade, IRaizAgregacao
         ValidarIntegridadeAluno(novaDataNascimento: dataNascimento);
         DataNascimento = dataNascimento;
     }
-    #endregion
+
+    #endregion Manipuladores de Aluno
 
     #region Manipuladores de MatriculaCurso
+
     public int ObterQuantidadeAulasPendenteMatriculaCurso(Guid cursoId)
     {
         return _matriculasCursos.Count(m => m.CursoId == cursoId && m.PodeConcluirCurso() == false);
@@ -145,9 +155,11 @@ public class Aluno : Entidade, IRaizAgregacao
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.AtualizarObservacoes(observacao);
     }
-    #endregion
+
+    #endregion Manipuladores de MatriculaCurso
 
     #region Manipuladores de HistoricoAprendizado
+
     public void RegistrarHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
@@ -167,9 +179,11 @@ public class Aluno : Entidade, IRaizAgregacao
         var matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         return matriculaCurso.ObterQuantidadeAulasRegistradas();
     }
-    #endregion
+
+    #endregion Manipuladores de HistoricoAprendizado
 
     #region Manipuladores de Certificado
+
     public void RequisitarCertificadoConclusao(Guid matriculaCursoId, decimal notaFinal, string pathCertificado, string nomeInstrutor)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
@@ -199,7 +213,8 @@ public class Aluno : Entidade, IRaizAgregacao
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.AtualizarNomeInstrutor(nomeInstrutor);
     }
-    #endregion
+
+    #endregion Manipuladores de Certificado
 
     private void ValidarIntegridadeAluno(string novoNome = null,
         string novoEmail = null,
@@ -244,7 +259,8 @@ public class Aluno : Entidade, IRaizAgregacao
 
         validacao.DispararExcecaoDominioSeInvalido();
     }
-    #endregion
+
+    #endregion Métodos
 
     public override string ToString() => $"{Nome} (Email: {Email})";
 }

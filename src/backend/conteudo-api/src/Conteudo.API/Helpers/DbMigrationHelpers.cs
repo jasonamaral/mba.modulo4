@@ -2,9 +2,9 @@ using Conteudo.Domain.Entities;
 using Conteudo.Domain.ValueObjects;
 using Conteudo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace Conteudo.API.Helpers;
+
 public static class DbMigrationHelpers
 {
     public static void UseDbMigrationHelper(this WebApplication app)
@@ -37,6 +37,7 @@ public static class DbMigrationHelpers
         if (!context.Categorias.Any())
         {
             #region Seed Categorias
+
             var categoriaProgramacao = new Categoria(
                 nome: "Programação",
                 descricao: "Cursos voltados para programação e desenvolvimento de software",
@@ -55,7 +56,8 @@ public static class DbMigrationHelpers
 
             context.Categorias.AddRange(categoriaProgramacao, categoriaDevOps);
             await context.SaveChangesAsync();
-            #endregion
+
+            #endregion Seed Categorias
 
             #region Seed Cursos
 
@@ -254,7 +256,8 @@ public static class DbMigrationHelpers
 
             context.Cursos.AddRange(cursos);
             await context.SaveChangesAsync();
-            #endregion
+
+            #endregion Seed Cursos
 
             #region Seed Aulas e Materiais
 
@@ -307,7 +310,8 @@ public static class DbMigrationHelpers
                     context.Materiais.Add(material);
                 }
                 await context.SaveChangesAsync();
-                #endregion
+
+                #endregion Seed Aulas e Materiais
             }
         }
     }

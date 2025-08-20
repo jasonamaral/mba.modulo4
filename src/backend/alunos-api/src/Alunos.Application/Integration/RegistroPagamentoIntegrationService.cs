@@ -6,6 +6,7 @@ using Core.Messages.Integration;
 using Microsoft.Extensions.Logging;
 
 namespace Alunos.Application.Integration;
+
 public class RegistroPagamentoIntegrationService(IMediatorHandler mediatorHandler,
     ILogger<RegistroPagamentoIntegrationService> logger) : IRegistroPagamentoIntegrationService
 {
@@ -26,9 +27,9 @@ public class RegistroPagamentoIntegrationService(IMediatorHandler mediatorHandle
             }
             else
             {
-                _logger.LogWarning("Falha na validação do comando de registro de pagamento. Id Aluno: {AlunoId} Id Curso: {CursoId}, Erros: {Erros}", 
-                    message.AlunoId, 
-                    message.CursoId, 
+                _logger.LogWarning("Falha na validação do comando de registro de pagamento. Id Aluno: {AlunoId} Id Curso: {CursoId}, Erros: {Erros}",
+                    message.AlunoId,
+                    message.CursoId,
                     string.Join(", ", resultado.Errors.Select(e => e.ErrorMessage)));
                 return new ResponseMessage(resultado);
             }

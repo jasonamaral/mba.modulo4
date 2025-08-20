@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
@@ -6,8 +6,9 @@ using Core.Messages;
 using MediatR;
 
 namespace Conteudo.Application.Commands.CadastrarCategoria;
+
 public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepository
-                                            , IMediatorHandler mediatorHandler) 
+                                            , IMediatorHandler mediatorHandler)
     : IRequestHandler<CadastrarCategoriaCommand, CommandResult>
 {
     private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
@@ -40,7 +41,7 @@ public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
         {
             foreach (var erro in request.Erros)
             {
-               await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), erro));
+                await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), erro));
             }
             return false;
         }

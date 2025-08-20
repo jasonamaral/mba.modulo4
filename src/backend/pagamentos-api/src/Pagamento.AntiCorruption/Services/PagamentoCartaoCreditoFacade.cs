@@ -1,4 +1,4 @@
-﻿using Pagamento.AntiCorruption.Interfaces;
+using Pagamento.AntiCorruption.Interfaces;
 using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Enum;
 using Pagamentos.Domain.Interfaces;

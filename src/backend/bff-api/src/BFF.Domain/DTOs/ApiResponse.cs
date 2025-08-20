@@ -25,4 +25,4 @@ public class ApiResponse<T>
     /// Conteúdo do erro (quando IsSuccess = false)
     /// </summary>
     public string? ErrorContent { get; set; }
-} 
+}

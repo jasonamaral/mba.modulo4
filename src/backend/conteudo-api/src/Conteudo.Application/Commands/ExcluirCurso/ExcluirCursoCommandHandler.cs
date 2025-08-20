@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
@@ -6,8 +6,9 @@ using Core.Messages;
 using MediatR;
 
 namespace Conteudo.Application.Commands.ExcluirCurso;
+
 public class ExcluirCursoCommandHandler(ICursoRepository cursoRepository
-                                      , IMediatorHandler mediator) 
+                                      , IMediatorHandler mediator)
     : IRequestHandler<ExcluirCursoCommand, CommandResult>
 {
     public async Task<CommandResult> Handle(ExcluirCursoCommand request, CancellationToken cancellationToken)
@@ -26,6 +27,7 @@ public class ExcluirCursoCommandHandler(ICursoRepository cursoRepository
         request.Resultado.Data = true;
         return request.Resultado;
     }
+
     private async Task<bool> ValidarRequisicao(ExcluirCursoCommand request, Curso curso)
     {
         request.DefinirValidacao(new ExcluirCursoCommandValidator().Validate(request));

@@ -1,4 +1,4 @@
-﻿namespace Conteudo.Application.DTOs
+namespace Conteudo.Application.DTOs
 {
     public class ConteudoProgramaticoDto
     {

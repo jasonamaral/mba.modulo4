@@ -1,6 +1,7 @@
-﻿using Core.Messages;
+using Core.Messages;
 
 namespace Conteudo.Application.Commands.CadastrarCategoria;
+
 public class CadastrarCategoriaCommand : CommandRaiz
 {
     public string Nome { get; set; } = string.Empty;
