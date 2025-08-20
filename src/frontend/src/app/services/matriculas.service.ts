@@ -2,22 +2,16 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
-import { MatriculaModel } from '../models/matricula.model';
-
-// tipo movido para src/app/models/dtos
+import { MatriculaCreateModel, MatriculaModel } from '../models/matricula.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatriculasService extends BaseService {
   constructor(private http: HttpClient) { super(); }
 
-  criarMatricula(cursoId: string, observacao: string = ''): Observable<{ matriculaId: string }> {
+  criarMatricula(data: MatriculaCreateModel): Observable<string> {
     const alunoId = this.LocalStorage.getUser()?.usuarioToken?.id;
     return this.http
-      .post(
-        this.UrlServiceV1 + `Alunos/${alunoId}/matricular-aluno`,
-        { alunoId, cursoId, observacao },
-        this.getAuthHeaderJson()
-      )
+      .post(this.UrlServiceV1 + `Alunos/${alunoId}/matricular-aluno`, data, this.getAuthHeaderJson())
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 

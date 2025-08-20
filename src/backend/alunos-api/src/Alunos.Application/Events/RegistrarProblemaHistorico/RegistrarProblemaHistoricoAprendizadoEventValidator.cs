@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Alunos.Application.Events.RegistrarProblemaHistorico;
+
 public class RegistrarProblemaHistoricoAprendizadoEventValidator : AbstractValidator<RegistrarProblemaHistoricoAprendizadoEvent>
 {
     public RegistrarProblemaHistoricoAprendizadoEventValidator()

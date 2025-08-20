@@ -7,6 +7,8 @@ public interface IAuthDbContext
 {
     DbSet<ApplicationUser> Users { get; set; }
     DbSet<RefreshToken> RefreshTokens { get; set; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
     DbSet<TEntity> Set<TEntity>() where TEntity : class;
-} 
+}

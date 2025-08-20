@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Conteudo.Application.Commands.AtualizarAula
 {
@@ -8,10 +8,10 @@ namespace Conteudo.Application.Commands.AtualizarAula
         {
             RuleFor(c => c.Id)
                 .NotEqual(Guid.Empty).WithMessage("ID da aula é obrigatório");
-            
+
             RuleFor(c => c.CursoId)
                 .NotEqual(Guid.Empty).WithMessage("ID do curso é obrigatório");
-            
+
             RuleFor(c => c.Nome)
                 .NotEmpty().WithMessage("Nome é obrigatório")
                 .MaximumLength(200).WithMessage("Nome deve ter no máximo 200 caracteres");

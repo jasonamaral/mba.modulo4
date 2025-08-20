@@ -4,6 +4,7 @@ using Core.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alunos.Infrastructure.Data;
+
 public class AlunoDbContext(DbContextOptions<AlunoDbContext> options) : DbContext(options), IUnitOfWork
 {
     public DbSet<Aluno> Alunos { get; set; }
@@ -22,7 +23,7 @@ public class AlunoDbContext(DbContextOptions<AlunoDbContext> options) : DbContex
         {
             if (property.GetMaxLength() == null)
             {
-                property.SetMaxLength(0); 
+                property.SetMaxLength(0);
             }
         }
 

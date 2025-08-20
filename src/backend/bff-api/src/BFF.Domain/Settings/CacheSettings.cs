@@ -6,4 +6,4 @@ public class CacheSettings
     public TimeSpan UserProfileExpiration { get; set; } = TimeSpan.FromMinutes(60);
     public TimeSpan CursoDetailsExpiration { get; set; } = TimeSpan.FromMinutes(15);
     public TimeSpan RelatoriosExpiration { get; set; } = TimeSpan.FromMinutes(5);
-} 
+}

@@ -1,5 +1,4 @@
-﻿using Core.Messages;
-
+using Core.Messages;
 
 namespace Conteudo.Application.Commands.PublicarAula
 {

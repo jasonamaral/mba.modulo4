@@ -1,5 +1,3 @@
-﻿using Core.Messages;
-
 namespace Pagamentos.API.Configuration
 {
     public static class MediatRConfig
@@ -9,7 +7,6 @@ namespace Pagamentos.API.Configuration
             builder.Services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies())
             );
-
 
             //builder.Services.AddMediatR(cfg =>
             //                cfg.RegisterServicesFromAssemblies(

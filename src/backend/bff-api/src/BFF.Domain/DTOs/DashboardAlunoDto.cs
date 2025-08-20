@@ -7,6 +7,7 @@ public class DashboardAlunoDto
 {
     [JsonIgnore]
     public AlunoDto Aluno { get; set; } = new();
+
     public List<MatriculaCursoDto> Matriculas { get; set; } = new();
     public List<CertificadoDto> Certificados { get; set; } = new();
     public ProgressoGeralDto ProgressoGeral { get; set; } = new();

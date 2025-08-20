@@ -1,10 +1,9 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using MediatR;
-
 
 namespace Conteudo.Application.Commands.AtualizarAula
 {
@@ -26,7 +25,6 @@ namespace Conteudo.Application.Commands.AtualizarAula
 
         public async Task<CommandResult> Handle(AtualizarAulaCommand request, CancellationToken cancellationToken)
         {
-
             _raizAgregacao = request.RaizAgregacao;
             var aulaExistente = await _aulaRepository.ObterPorIdAsync(request.Id, false);
 
@@ -51,7 +49,6 @@ namespace Conteudo.Application.Commands.AtualizarAula
             }
 
             return request.Resultado;
-
         }
 
         private async Task<bool> ValidarRequisicao(AtualizarAulaCommand request, Aula aula)
@@ -73,7 +70,7 @@ namespace Conteudo.Application.Commands.AtualizarAula
                     new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), "Aula não encontrada"));
                 return false;
             }
-            
+
             var curso = await _cursoRepository.ObterPorIdAsync(request.CursoId);
             if (curso == null)
             {

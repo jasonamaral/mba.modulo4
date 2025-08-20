@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Alunos.Application.Commands.RegistrarHistoricoAprendizado;
+
 public class RegistrarHistoricoAprendizadoCommandValidator : AbstractValidator<RegistrarHistoricoAprendizadoCommand>
 {
     public RegistrarHistoricoAprendizadoCommandValidator()

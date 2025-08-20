@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Utils;
+
 public static class DbContextExtensions
 {
     public static void AtualizarEstadoValueObject<T>(this DbContext context, T antigo, T novo)

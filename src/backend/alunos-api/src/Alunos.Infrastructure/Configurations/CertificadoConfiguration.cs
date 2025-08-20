@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
 using Alunos.Domain.Entities;
 using Core.Data.Constants;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Alunos.Infrastructure.Configurations;
 
@@ -12,6 +12,7 @@ public class CertificadoConfiguration : IEntityTypeConfiguration<Certificado>
     public void Configure(EntityTypeBuilder<Certificado> builder)
     {
         #region Mapping columns
+
         builder.ToTable("Certificados");
 
         builder.HasKey(x => x.Id)
@@ -72,18 +73,23 @@ public class CertificadoConfiguration : IEntityTypeConfiguration<Certificado>
         builder.Property(x => x.UpdatedAt)
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
+
         #endregion Mapping columns
 
         #region Indexes
+
         builder.HasIndex(x => x.MatriculaCursoId).HasDatabaseName("CertificadosMatriculaCursoIdIDX");
+
         #endregion Indexes
 
         #region Relationships
+
         builder.HasOne(x => x.MatriculaCurso)
            .WithOne(x => x.Certificado)
            .HasForeignKey<Certificado>(x => x.MatriculaCursoId)
            .HasConstraintName("CertificadoMatriculaCursoFK")
            .OnDelete(DeleteBehavior.Cascade);
+
         #endregion Relationships
     }
 }

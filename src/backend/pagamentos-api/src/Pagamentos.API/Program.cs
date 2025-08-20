@@ -13,7 +13,6 @@ builder
     .AddMapsterConfiguration()
     .AddMediatrConfig()
     .AddDependencyInjectionConfig();
-    
 
 var app = builder.Build();
 
@@ -43,9 +42,4 @@ app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", DateTime = Date
 
 app.UseDbMigrationHelper();
 
-
 app.Run();
-
-
-
-

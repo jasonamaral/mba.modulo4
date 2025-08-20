@@ -1,5 +1,4 @@
 using Conteudo.Domain.Entities;
-using FluentAssertions;
 using Plataforma.Educacao.Core.Exceptions;
 
 namespace Conteudo.UnitTests.Domain.Entities;

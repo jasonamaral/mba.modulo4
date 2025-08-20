@@ -1,6 +1,4 @@
 using Auth.Application.DTOs;
-using FluentAssertions;
-using Xunit;
 
 namespace Auth.UnitTests.Application;
 

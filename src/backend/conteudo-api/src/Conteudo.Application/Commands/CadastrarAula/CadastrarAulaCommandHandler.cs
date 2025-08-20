@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
@@ -15,7 +15,7 @@ namespace Conteudo.Application.Commands.CadastrarAula
         private readonly IMediatorHandler _mediatorHandler;
         private Guid _raizAgregacao;
 
-        public CadastrarAulaCommandHandler( IAulaRepository aulaRepository,
+        public CadastrarAulaCommandHandler(IAulaRepository aulaRepository,
                                             ICursoRepository cursoRepository,
                                             IMediatorHandler mediatorHandler)
         {

@@ -1,7 +1,6 @@
-﻿using Core.Communication;
+using Core.Communication;
 using Core.Messages;
 using MediatR;
-
 
 namespace Conteudo.Application.Commands.CadastrarAula
 {

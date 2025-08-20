@@ -1,4 +1,4 @@
-﻿namespace Pagamentos.Application.Interfaces
+namespace Pagamentos.Application.Interfaces
 {
     public interface IPagamentoComandoAppService
     {

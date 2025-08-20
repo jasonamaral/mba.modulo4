@@ -1,11 +1,13 @@
-﻿using Alunos.Domain.Entities;
+using Alunos.Domain.Entities;
 using FluentAssertions;
 using Plataforma.Educacao.Core.Exceptions;
 
 namespace Alunos.Tests.Domain;
+
 public class CertificadoTests
 {
     #region Helpers
+
     private static readonly Guid _matriculaIdValido = Guid.Parse("0044bf68-a9ee-462f-9e43-d12f8ffef93e");
     private static readonly string _nomeCursoValido = "Curso de Testes";
     private static readonly short _cargaHorariaValida = 40;
@@ -14,9 +16,11 @@ public class CertificadoTests
     private static readonly string _instrutorValido = "Eduardo Pires";
 
     private Certificado CriarCertificadoValido() => new(_matriculaIdValido, _nomeCursoValido, DateTime.Now, null, _cargaHorariaValida, _notaFinalValida, _pathValido, _instrutorValido);
-    #endregion
+
+    #endregion Helpers
 
     #region Construtores
+
     [Fact]
     public void Deve_criar_certificado_valido()
     {
@@ -61,9 +65,11 @@ public class CertificadoTests
         Action act = () => new Certificado(_matriculaIdValido, "", DateTime.Now, null, _cargaHorariaValida, _notaFinalValida, _pathValido, _instrutorValido);
         act.Should().Throw<DomainException>().WithMessage("*Nome do curso não pode ser nulo ou vazio*");
     }
-    #endregion
+
+    #endregion Construtores
 
     #region Atualizacoes
+
     [Fact]
     public void Deve_atualizar_carga_horaria()
     {
@@ -88,9 +94,11 @@ public class CertificadoTests
         Action act = () => certificado.AtualizarNotaFinal(15);
         act.Should().Throw<DomainException>().WithMessage("*Nota final deve estar entre 0 e 10*");
     }
-    #endregion
+
+    #endregion Atualizacoes
 
     #region Overrides
+
     [Fact]
     public void ToString_deve_retornar_formatado()
     {
@@ -102,5 +110,6 @@ public class CertificadoTests
               .And.Contain(certificado.CargaHoraria.ToString())
               .And.Contain(certificado.NotaFinal.ToString());
     }
-    #endregion
+
+    #endregion Overrides
 }

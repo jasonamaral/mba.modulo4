@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
@@ -14,7 +14,7 @@ namespace Conteudo.Application.Commands.AtualizarMaterial
         private readonly IMediatorHandler _mediatorHandler;
         private Guid _raizAgregacao;
 
-        public AtualizarMaterialCommandHandler( IMaterialRepository materialRepository,
+        public AtualizarMaterialCommandHandler(IMaterialRepository materialRepository,
                                                 IAulaRepository aulaRepository,
                                                 IMediatorHandler mediatorHandler)
         {
@@ -25,7 +25,6 @@ namespace Conteudo.Application.Commands.AtualizarMaterial
 
         public async Task<CommandResult> Handle(AtualizarMaterialCommand request, CancellationToken cancellationToken)
         {
-
             _raizAgregacao = request.RaizAgregacao;
             var materialExistente = await _materialRepository.ObterPorIdAsync(request.Id);
 
@@ -50,7 +49,6 @@ namespace Conteudo.Application.Commands.AtualizarMaterial
             }
 
             return request.Resultado;
-            
         }
 
         private async Task<bool> ValidarRequisicao(AtualizarMaterialCommand request, Material material)
@@ -83,5 +81,4 @@ namespace Conteudo.Application.Commands.AtualizarMaterial
             return true;
         }
     }
-
 }

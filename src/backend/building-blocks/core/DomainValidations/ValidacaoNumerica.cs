@@ -1,4 +1,4 @@
-﻿namespace Core.DomainValidations;
+namespace Core.DomainValidations;
 
 public static class ValidacaoNumerica
 {
@@ -39,6 +39,7 @@ public static class ValidacaoNumerica
     #endregion Validação INT
 
     #region Validação DECIMAL
+
     public static void DeveEstarEntre<T>(decimal valor, decimal tamanhoMinimo, decimal tamanhoMaximo, string mensagem, ResultadoValidacao<T> resultado) where T : class
     {
         if (valor < tamanhoMinimo || valor > tamanhoMaximo)

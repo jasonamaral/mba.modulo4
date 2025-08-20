@@ -1,4 +1,4 @@
-﻿namespace Core.Messages.Integration;
+namespace Core.Messages.Integration;
 
 public class AlunoRegistradoIntegrationEvent : IntegrationEvent
 {
@@ -28,8 +28,8 @@ public class AlunoRegistradoIntegrationEvent : IntegrationEvent
         string estado,
         string cep,
         string? foto)
-        //bool ehAdministrador,
-        //DateTime dataCadastro)
+    //bool ehAdministrador,
+    //DateTime dataCadastro)
     {
         Id = id;
         Nome = nome;

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
 using Alunos.Domain.Entities;
 using Core.Data.Constants;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Alunos.Infrastructure.Configurations;
 
@@ -12,6 +12,7 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
     public void Configure(EntityTypeBuilder<MatriculaCurso> builder)
     {
         #region Mapping columns
+
         builder.ToTable("MatriculasCursos");
 
         builder.HasKey(x => x.Id)
@@ -70,7 +71,7 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
         builder.OwnsMany(x => x.HistoricoAprendizado, ha =>
         {
             ha.ToTable("HistoricosAprendizado");
-            ha.WithOwner().HasForeignKey(h => h.MatriculaCursoId); 
+            ha.WithOwner().HasForeignKey(h => h.MatriculaCursoId);
             ha.HasKey(x => x.Id).HasName("HistoricoAprendizadoPK");
 
             ha.Property(x => x.Id).HasColumnName("HistoricoAprendizadoId").HasColumnType(DatabaseTypeConstant.UniqueIdentifier).IsRequired();
@@ -93,14 +94,18 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
         builder.Property(x => x.UpdatedAt)
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
+
         #endregion Mapping columns
 
         #region Indexes
+
         builder.HasIndex(x => x.AlunoId).HasDatabaseName("MatriculasCursosAlunoIdIDX");
         builder.HasIndex(x => x.CursoId).HasDatabaseName("MatriculasCursosCursoIdIDX");
+
         #endregion Indexes
 
         #region Relationships
+
         builder.HasOne(x => x.Certificado)
            .WithOne(x => x.MatriculaCurso)
            .HasForeignKey<Certificado>(x => x.MatriculaCursoId)
@@ -112,6 +117,7 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
            .HasForeignKey(x => x.AlunoId)
            .HasConstraintName("MatriculasCursosAlunosFK")
            .OnDelete(DeleteBehavior.Cascade);
+
         #endregion Relationships
     }
 }

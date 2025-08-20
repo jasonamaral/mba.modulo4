@@ -1,7 +1,5 @@
 using Core.Utils;
-using FluentAssertions;
 using System.ComponentModel;
-using Xunit;
 
 namespace Core.Tests.Utils;
 
@@ -11,10 +9,13 @@ public class EnumeratorExtensionTests : TestBase
     {
         [Description("Ativo")]
         Ativo,
+
         [Description("Inativo")]
         Inativo,
+
         [Description("Pendente")]
         Pendente,
+
         SemDescricao
     }
 
@@ -22,6 +23,7 @@ public class EnumeratorExtensionTests : TestBase
     {
         [Description("Valor A")]
         ValorA,
+
         [Description("Valor B")]
         ValorB
     }
@@ -39,7 +41,7 @@ public class EnumeratorExtensionTests : TestBase
         var status = StatusTeste.Ativo;
 
         // Act
-        var result = status.GetDescription();
+        var result = status.ObterDescricao();
 
         // Assert
         result.Should().Be("Ativo");
@@ -53,8 +55,8 @@ public class EnumeratorExtensionTests : TestBase
         var status2 = StatusTeste.Pendente;
 
         // Act
-        var result1 = status1.GetDescription();
-        var result2 = status2.GetDescription();
+        var result1 = status1.ObterDescricao();
+        var result2 = status2.ObterDescricao();
 
         // Assert
         result1.Should().Be("Inativo");
@@ -68,7 +70,7 @@ public class EnumeratorExtensionTests : TestBase
         var status = StatusTeste.SemDescricao;
 
         // Act
-        var result = status.GetDescription();
+        var result = status.ObterDescricao();
 
         // Assert
         result.Should().Be("SemDescricao");
@@ -81,7 +83,7 @@ public class EnumeratorExtensionTests : TestBase
         StatusTeste? status = null;
 
         // Act
-        var result = status.GetDescription();
+        var result = status.ObterDescricao();
 
         // Assert
         result.Should().Be("Não informado");
@@ -94,7 +96,7 @@ public class EnumeratorExtensionTests : TestBase
         var status = StatusTeste.SemDescricao;
 
         // Act
-        var result = status.GetDescription();
+        var result = status.ObterDescricao();
 
         // Assert
         result.Should().Be("SemDescricao");
@@ -108,8 +110,8 @@ public class EnumeratorExtensionTests : TestBase
         var valor2 = OutroEnum.ValorB;
 
         // Act
-        var result1 = valor1.GetDescription();
-        var result2 = valor2.GetDescription();
+        var result1 = valor1.ObterDescricao();
+        var result2 = valor2.ObterDescricao();
 
         // Assert
         result1.Should().Be("Valor A");
@@ -123,7 +125,7 @@ public class EnumeratorExtensionTests : TestBase
         var valor = EnumSemDescricao.Valor1;
 
         // Act
-        var result = valor.GetDescription();
+        var result = valor.ObterDescricao();
 
         // Assert
         result.Should().Be("Valor1");

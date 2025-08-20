@@ -1,10 +1,11 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Core.Utils;
+
 public static class EnumeratorExtension
 {
-    public static string GetDescription(this Enum value)
+    public static string ObterDescricao(this Enum value)
     {
         if (value is null) return "Não informado";
 

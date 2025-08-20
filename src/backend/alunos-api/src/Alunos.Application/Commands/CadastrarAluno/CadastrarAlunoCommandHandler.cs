@@ -1,12 +1,15 @@
 using MediatR;
 using Core.Communication;
-using Alunos.Domain.Interfaces;
-using Core.Mediator;
 using Alunos.Domain.Entities;
+using Alunos.Domain.Interfaces;
+using Core.Communication;
+using Core.Mediator;
 using Core.Messages;
 using FluentValidation.Results;
+using MediatR;
 
 namespace Alunos.Application.Commands.CadastrarAluno;
+
 public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMediatorHandler mediatorHandler) : IRequestHandler<CadastrarAlunoCommand, CommandResult>
 {
     private readonly IAlunoRepository _alunoRepository = alunoRepository;
@@ -73,5 +76,4 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
 
         return true;
     }
-
 }

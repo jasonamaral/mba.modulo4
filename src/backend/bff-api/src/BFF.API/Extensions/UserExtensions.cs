@@ -33,4 +33,4 @@ public static class UserExtensions
     {
         return user.IsInRole(role);
     }
-} 
+}

@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogTitle, Ma
 import { MaterialModule } from 'src/app/material.module';
 import { ToastrService } from 'ngx-toastr';
 import { CursosService } from 'src/app/services/cursos.service';
-import { AulaCreateModel } from 'src/app/models/aula.model';
+import { AulaCreateModel } from 'src/app/pages/conteudo/models/aula.model';
 
 interface DialogData {
   cursoId: string;

@@ -1,7 +1,5 @@
 using Core.Messages.Integration;
-using FluentAssertions;
 using global::MessageBus;
-using Xunit;
 
 namespace Core.Tests.MessageBus;
 

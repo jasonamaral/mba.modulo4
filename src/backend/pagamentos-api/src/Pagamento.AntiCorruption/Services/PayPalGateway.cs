@@ -1,4 +1,4 @@
-﻿using Pagamento.AntiCorruption.Interfaces;
+using Pagamento.AntiCorruption.Interfaces;
 
 namespace Pagamento.AntiCorruption.Services
 {

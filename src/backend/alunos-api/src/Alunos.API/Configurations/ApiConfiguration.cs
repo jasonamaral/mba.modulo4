@@ -1,4 +1,4 @@
-﻿using Alunos.API.Configurations;
+using Alunos.API.Configurations;
 using Alunos.API.Filters;
 using Alunos.Application.Commands.AtualizarPagamento;
 using Core.Identidade;
@@ -6,6 +6,7 @@ using Mapster;
 using System.Text.Json;
 
 namespace Alunos.API.Configurations;
+
 public static class ApiConfiguration
 {
     public static WebApplicationBuilder AddApiConfiguration(this WebApplicationBuilder builder)
@@ -47,7 +48,7 @@ public static class ApiConfiguration
             options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         });
-            
+
         return builder;
     }
 
