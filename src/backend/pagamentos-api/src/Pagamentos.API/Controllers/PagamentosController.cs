@@ -20,8 +20,6 @@ namespace Pagamentos.API.Controllers
     [Route("api/v{version:apiVersion}/pagamentos")]
     [Authorize]
     public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService,
-                                      IPagamentoComandoAppService pagamentoComandoAppService,
-                                      IConteudoService conteudoService,
                                       IMediatorHandler mediator,
                                       INotificador notificador,
                                       INotificationHandler<DomainNotificacaoRaiz> notifications,
@@ -30,8 +28,6 @@ namespace Pagamentos.API.Controllers
         private readonly IMessageBus _bus = bus;
         private readonly IMediatorHandler _mediator = mediator;
         private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService = pagamentoConsultaAppService;
-        private readonly IPagamentoComandoAppService _pagamentoComandoAppService = pagamentoComandoAppService;
-        private readonly IConteudoService _conteudoService;
 
         [HttpPost("pagamento")]
         [SwaggerOperation(Summary = "Executa pagamento", Description = "Executa o pagamento do curso.")]
