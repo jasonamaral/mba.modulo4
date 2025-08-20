@@ -1,4 +1,4 @@
-﻿using Mapster;
+using Mapster;
 using Pagamentos.Application.ViewModels;
 using Pagamentos.Domain.Entities;
 
@@ -17,14 +17,14 @@ namespace Pagamentos.Application.Mappings
         {
             config.NewConfig<Pagamento, PagamentoViewModel>()
                   .Map(d => d.Transacao, s => s.Transacao)
-                  .TwoWays(); 
+                  .TwoWays();
         }
 
         private static void ConfigureTransacaoMappings(TypeAdapterConfig config)
         {
             config.NewConfig<Transacao, TransacaoViewModel>()
                   .TwoWays()
-                  .PreserveReference(true); 
+                  .PreserveReference(true);
         }
 
         private static void ConfigureCollections(TypeAdapterConfig config)

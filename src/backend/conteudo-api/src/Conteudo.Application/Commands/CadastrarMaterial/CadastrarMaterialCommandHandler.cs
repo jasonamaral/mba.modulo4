@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
@@ -8,14 +8,14 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.CadastrarMaterial
 {
-    public class CadastrarMaterialCommandHandler : IRequestHandler<CadastrarMaterialCommand, CommandResult> 
+    public class CadastrarMaterialCommandHandler : IRequestHandler<CadastrarMaterialCommand, CommandResult>
     {
         private readonly IMaterialRepository _materialRepository;
         private readonly IAulaRepository _aulaRepository;
         private readonly IMediatorHandler _mediatorHandler;
         private Guid _raizAgregacao;
 
-        public CadastrarMaterialCommandHandler( IMaterialRepository materialRepository,
+        public CadastrarMaterialCommandHandler(IMaterialRepository materialRepository,
                                                 IAulaRepository aulaRepository,
                                                 IMediatorHandler mediatorHandler)
         {
@@ -23,6 +23,7 @@ namespace Conteudo.Application.Commands.CadastrarMaterial
             _aulaRepository = aulaRepository;
             _mediatorHandler = mediatorHandler;
         }
+
         public async Task<CommandResult> Handle(CadastrarMaterialCommand request, CancellationToken cancellationToken)
         {
             try

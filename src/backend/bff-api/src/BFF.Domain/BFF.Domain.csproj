@@ -11,4 +11,8 @@
     <Folder Include="DTOs\Pagamentos\Request\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
+  </ItemGroup>
+
 </Project>

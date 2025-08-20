@@ -4,7 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'src/app/material.module';
 import { MessageService } from 'src/app/services/message.service ';
 import { NotificationMessage } from 'src/app/models/notificationMessage.model';
-import { ConteudoAddComponent } from '../conteudo/conteudo-add.component';
+import { ConteudoAddComponent } from '../conteudo/cursos/add/conteudo-add.component';
 
 
 @Component({

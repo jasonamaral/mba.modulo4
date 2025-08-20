@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
-import { CursoCreateModel, CursoModel } from '../models/curso.model';
-import { AulaCreateModel, AulaEditModel } from '../models/aula.model';
+import { AulaCreateModel, AulaEditModel } from '../pages/conteudo/models/aula.model';
+import { CursoCreateModel, CursoModel } from '../pages/conteudo/models/curso.model';
 
 @Injectable({ providedIn: 'root' })
 export class CursosService extends BaseService {

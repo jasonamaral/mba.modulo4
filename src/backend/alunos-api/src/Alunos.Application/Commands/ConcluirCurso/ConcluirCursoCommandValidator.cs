@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Alunos.Application.Commands.ConcluirCurso;
+
 public class ConcluirCursoCommandValidator : AbstractValidator<ConcluirCursoCommand>
 {
     public ConcluirCursoCommandValidator()

@@ -11,11 +11,12 @@ public class Categoria : Entidade, IRaizAgregacao
     public string IconeUrl { get; private set; }
     public bool IsAtiva { get; private set; }
     public int Ordem { get; private set; }
-    
+
     private readonly List<Curso> _cursos = [];
     public IReadOnlyCollection<Curso> Cursos => _cursos.AsReadOnly();
 
-    protected Categoria() { }
+    protected Categoria()
+    { }
 
     public Categoria(
         string nome,
@@ -25,7 +26,7 @@ public class Categoria : Entidade, IRaizAgregacao
         int ordem = 0)
     {
         ValidarDados(nome, descricao, cor);
-        
+
         Nome = nome;
         Descricao = descricao;
         Cor = cor;
@@ -38,13 +39,13 @@ public class Categoria : Entidade, IRaizAgregacao
     {
         if (string.IsNullOrWhiteSpace(nome))
             throw new DomainException("Nome da categoria é obrigatório");
-            
+
         if (nome.Length > 100)
             throw new DomainException("Nome da categoria não pode ter mais de 100 caracteres");
-            
+
         if (string.IsNullOrWhiteSpace(descricao))
             throw new DomainException("Descrição da categoria é obrigatória");
-            
+
         if (string.IsNullOrWhiteSpace(cor))
             throw new DomainException("Cor da categoria é obrigatória");
     }
@@ -57,13 +58,13 @@ public class Categoria : Entidade, IRaizAgregacao
         int ordem = 0)
     {
         ValidarDados(nome, descricao, cor);
-        
+
         Nome = nome;
         Descricao = descricao;
         Cor = cor;
         IconeUrl = iconeUrl;
         Ordem = ordem;
-        
+
         AtualizarDataModificacao();
     }
 
@@ -77,7 +78,7 @@ public class Categoria : Entidade, IRaizAgregacao
     {
         if (_cursos.Any(c => c.Ativo))
             throw new DomainException("Não é possível desativar categoria com cursos ativos");
-            
+
         IsAtiva = false;
         AtualizarDataModificacao();
     }
@@ -86,11 +87,11 @@ public class Categoria : Entidade, IRaizAgregacao
     {
         if (novaOrdem < 0)
             throw new DomainException("Ordem não pode ser negativa");
-            
+
         Ordem = novaOrdem;
         AtualizarDataModificacao();
     }
 
     public int TotalCursos => _cursos.Count;
     public int CursosAtivos => _cursos.Count(c => c.Ativo);
-} 
+}

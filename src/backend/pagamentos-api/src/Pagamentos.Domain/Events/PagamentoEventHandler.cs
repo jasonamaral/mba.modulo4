@@ -1,4 +1,4 @@
-﻿using Core.Messages.Integration;
+using Core.Messages.Integration;
 using MediatR;
 using Pagamentos.Domain.Interfaces;
 using Pagamentos.Domain.Models;

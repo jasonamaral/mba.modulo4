@@ -4,11 +4,10 @@ namespace BFF.API.Models.Request;
 
 public class LoginRequest
 {
-
-    [Required(ErrorMessage = "Email È obrigatÛrio")]
-    [EmailAddress(ErrorMessage = "Email inv·lido")]
+    [Required(ErrorMessage = "Email √© obrigat√≥rio")]
+    [EmailAddress(ErrorMessage = "Email inv√°lido")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Senha È obrigatÛria")]
+    [Required(ErrorMessage = "Senha √© obrigat√≥ria")]
     public string Senha { get; set; } = string.Empty;
 }

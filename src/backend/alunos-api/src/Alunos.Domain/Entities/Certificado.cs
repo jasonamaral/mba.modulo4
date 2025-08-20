@@ -8,6 +8,7 @@ namespace Alunos.Domain.Entities;
 public class Certificado : Entidade
 {
     #region Atributos
+
     public Guid MatriculaCursoId { get; }
     public string NomeCurso { get; }
     public DateTime DataSolicitacao { get; }
@@ -19,10 +20,13 @@ public class Certificado : Entidade
 
     [JsonIgnore]
     public MatriculaCurso MatriculaCurso { get; private set; }
-    #endregion
+
+    #endregion Atributos
 
     #region CTOR
-    protected Certificado() { }
+
+    protected Certificado()
+    { }
 
     public Certificado(Guid matriculaId,
         string nomeCurso,
@@ -44,9 +48,11 @@ public class Certificado : Entidade
 
         ValidarIntegridadeCertificado();
     }
-    #endregion
+
+    #endregion CTOR
 
     #region Metodos
+
     internal void AtualizarDataEmissao(DateTime dataEmissao)
     {
         ValidarIntegridadeCertificado(novaDataEmissao: dataEmissao);
@@ -123,7 +129,8 @@ public class Certificado : Entidade
 
         validacao.DispararExcecaoDominioSeInvalido();
     }
-    #endregion
+
+    #endregion Metodos
 
     public override string ToString() => $"Certificado do curso {NomeCurso} (matrícula {MatriculaCursoId}) com total de {CargaHoraria} horas e nota final {NotaFinal} solicitado em {DataSolicitacao:dd/MM/yyyy}";
 }

@@ -1,5 +1,4 @@
 using Conteudo.Domain.ValueObjects;
-using FluentAssertions;
 
 namespace Conteudo.UnitTests.Domain.ValueObjects;
 

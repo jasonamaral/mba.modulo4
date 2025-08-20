@@ -1,4 +1,4 @@
-﻿namespace BFF.Domain.DTOs.Pagamentos.Response
+namespace BFF.Domain.DTOs.Pagamentos.Response
 {
     public class PagamentoDto
     {
@@ -15,6 +15,5 @@
         public string CvvCartao { get; set; } = string.Empty;
 
         public TransacaoDto Transacao { get; set; } = new TransacaoDto();
-
     }
 }

@@ -1,8 +1,9 @@
-﻿using Core.Mediator;
+using Core.Mediator;
 using Core.Messages;
 using MediatR;
 
 namespace Alunos.Application.Events.RegistrarProblemaHistorico;
+
 public class RegistrarProblemaHistoricoAprendizadoEventHandler(IMediatorHandler mediatorHandler) : INotificationHandler<RegistrarProblemaHistoricoAprendizadoEvent>
 {
     private readonly IMediatorHandler _mediatorHandler = mediatorHandler;

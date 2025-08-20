@@ -1,4 +1,4 @@
-﻿namespace BFF.Domain.DTOs.Pagamentos.Response
+namespace BFF.Domain.DTOs.Pagamentos.Response
 {
     public class TransacaoDto
     {

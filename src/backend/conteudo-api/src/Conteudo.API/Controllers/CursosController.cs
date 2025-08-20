@@ -1,20 +1,20 @@
 using Conteudo.Application.Commands.AtualizarCurso;
 using Conteudo.Application.Commands.CadastrarCurso;
+using Conteudo.Application.Commands.ExcluirCurso;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
 using Core.Communication;
 using Core.Communication.Filters;
 using Core.Mediator;
 using Core.Messages;
+using Core.Notification;
 using Core.Services.Controllers;
 using Core.SharedDtos.Conteudo;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using Mapster;
-using Core.Notification;
-using Conteudo.Application.Commands.ExcluirCurso;
 
 namespace Conteudo.API.Controllers;
 

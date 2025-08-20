@@ -1,9 +1,9 @@
-﻿using Alunos.Domain.Entities;
+using Alunos.Domain.Entities;
 using Alunos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Polly;
 
 namespace Alunos.API.Helpers;
+
 public static class DbMigrationHelpers
 {
     public static void UseDbMigrationHelper(this WebApplication app)
@@ -30,7 +30,7 @@ public static class DbMigrationHelpers
     }
 
     private static async Task EnsureSeedData(AlunoDbContext context)
-    {   
+    {
         await context.Database.MigrateAsync();
 
         if (!context.Alunos.Any())
@@ -52,7 +52,7 @@ public static class DbMigrationHelpers
         // Trato o curso 1 como finalizado
         Guid cursoIdUm = Guid.Parse("f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c");
         aluno.MatricularAlunoEmCurso(cursoIdUm, "C# Avançado", 499.90m, $"Observação Aluno {nome} - Curso 1-C# Avançado");
-        
+
         MatriculaCurso matriculaUm = aluno.MatriculasCursos.ToArray()[0];
         aluno.AtualizarPagamentoMatricula(matriculaUm.Id);
         aluno.RegistrarHistoricoAprendizado(matriculaUm.Id, Guid.Parse("9be503ca-83fb-41cb-98e4-8f0ae98692a0"), $"Conteúdo da aula 1 do curso {matriculaUm.NomeCurso}", 20, DateTime.UtcNow);

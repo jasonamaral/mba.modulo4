@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Core.Data.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,6 +12,7 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
     public void Configure(EntityTypeBuilder<Categoria> entity)
     {
         #region Maping columns
+
         entity.ToTable("Categoria");
 
         entity.HasKey(a => a.Id)
@@ -52,9 +53,11 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
         entity.Property(a => a.UpdatedAt)
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
-        #endregion
+
+        #endregion Maping columns
 
         #region Indexes
+
         // Índices
         entity.HasIndex(c => c.Nome)
             .HasDatabaseName("CategoriaNomeIDX")
@@ -65,14 +68,17 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
 
         entity.HasIndex(c => c.Ordem)
             .HasDatabaseName("CategoriaOrdemIDX");
-        #endregion
+
+        #endregion Indexes
 
         #region Relationships
+
         // Relacionamento com Cursos
         entity.HasMany(c => c.Cursos)
             .WithOne(curso => curso.Categoria)
             .HasForeignKey(curso => curso.CategoriaId)
             .OnDelete(DeleteBehavior.SetNull);
-        #endregion
+
+        #endregion Relationships
     }
 }

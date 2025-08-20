@@ -5,6 +5,7 @@ using Core.Messages;
 using MediatR;
 
 namespace Alunos.Application.Commands.AtualizarPagamento;
+
 public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<AtualizarPagamentoMatriculaCommand, CommandResult>
 {

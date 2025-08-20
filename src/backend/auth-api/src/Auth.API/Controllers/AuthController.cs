@@ -7,11 +7,11 @@ using Core.Messages;
 using Core.Messages.Integration;
 using Core.Notification;
 using Core.Services.Controllers;
+using FluentValidation.Results;
 using MediatR;
 using MessageBus;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using FluentValidation.Results;
 
 namespace Auth.API.Controllers;
 
@@ -27,7 +27,7 @@ public class AuthController(IMediatorHandler mediator
 {
     private readonly AuthService _authService = authService;
     private readonly IMessageBus _bus = bus;
-    private readonly new INotificador _notificador = notificador;
+    private new readonly INotificador _notificador = notificador;
 
     /// <summary>
     /// Registra um novo usuário no sistema
@@ -139,32 +139,32 @@ public class AuthController(IMediatorHandler mediator
     {
         var usuario = await _authService.UserManager.FindByEmailAsync(registroRequest.Email);
 
-            var usuarioRegistrado = new AlunoRegistradoIntegrationEvent(
-                 Guid.Parse(usuario!.Id),
-                 registroRequest.Nome,
-                 registroRequest.Email,
-                 registroRequest.CPF,
-                 registroRequest.DataNascimento,
-                 registroRequest.Telefone,
-                 registroRequest.Genero,
-                 registroRequest.Cidade,
-                 registroRequest.Estado,
-                 registroRequest.CEP,
-                 registroRequest.Foto
-                 //registroRequest.EhAdministrador,
-                 //DateTime.Now
-             );
+        var usuarioRegistrado = new AlunoRegistradoIntegrationEvent(
+             Guid.Parse(usuario!.Id),
+             registroRequest.Nome,
+             registroRequest.Email,
+             registroRequest.CPF,
+             registroRequest.DataNascimento,
+             registroRequest.Telefone,
+             registroRequest.Genero,
+             registroRequest.Cidade,
+             registroRequest.Estado,
+             registroRequest.CEP,
+             registroRequest.Foto
+         //registroRequest.EhAdministrador,
+         //DateTime.Now
+         );
 
-            try
-            {
-                return await _bus.RequestAsync<AlunoRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
-            }
-            catch (Exception ex)
-            {
-                // Converte falhas de infraestrutura em ValidationResult inválido para ser retornado ao cliente
-                var validationResult = new ValidationResult();
-                validationResult.Errors.Add(new ValidationFailure("RegistroAluno", $"Falha ao registrar aluno no serviço de Alunos: {ex.Message}"));
-                return new ResponseMessage(validationResult);
-            }
+        try
+        {
+            return await _bus.RequestAsync<AlunoRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
+        }
+        catch (Exception ex)
+        {
+            // Converte falhas de infraestrutura em ValidationResult inválido para ser retornado ao cliente
+            var validationResult = new ValidationResult();
+            validationResult.Errors.Add(new ValidationFailure("RegistroAluno", $"Falha ao registrar aluno no serviço de Alunos: {ex.Message}"));
+            return new ResponseMessage(validationResult);
+        }
     }
 }

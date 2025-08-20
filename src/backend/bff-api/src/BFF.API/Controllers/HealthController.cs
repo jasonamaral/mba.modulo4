@@ -30,7 +30,7 @@ public class HealthController : BffController
     /// </summary>
     /// <returns>Status de saúde da API</returns>
     [HttpGet]
-    public IActionResult Get()
+    public IActionResult Obter()
     {
         var healthData = new HealthCheckResponse
         {
@@ -52,7 +52,7 @@ public class HealthController : BffController
     /// </summary>
     /// <returns>Status detalhado da API</returns>
     [HttpGet("status")]
-    public IActionResult GetStatus()
+    public IActionResult ObterStatus()
     {
         var statusData = new ApiStatusResponse
         {

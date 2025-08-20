@@ -28,4 +28,4 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext,
             entity.Property(e => e.Ativo).IsRequired();
         });
     }
-} 
+}

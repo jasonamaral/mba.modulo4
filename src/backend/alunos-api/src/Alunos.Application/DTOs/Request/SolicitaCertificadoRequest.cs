@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Alunos.Application.DTOs.Request;
+
 public class SolicitaCertificadoRequest
 {
     [Required(ErrorMessage = "ID do aluno é obrigatório")]

@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
@@ -18,6 +18,7 @@ namespace Conteudo.Application.Commands.ExcluirAula
             _aulaRepository = aulaRepository;
             _mediatorHandler = mediatorHandler;
         }
+
         public async Task<CommandResult> Handle(ExcluirAulaCommand request, CancellationToken cancellationToken)
         {
             var aula = await _aulaRepository.ObterPorIdAsync(request.Id);

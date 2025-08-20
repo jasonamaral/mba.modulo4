@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Alunos.Application.Commands.SolicitarCertificado;
+
 public class SolicitarCertificadoCommandValidator : AbstractValidator<SolicitarCertificadoCommand>
 {
     public SolicitarCertificadoCommandValidator()

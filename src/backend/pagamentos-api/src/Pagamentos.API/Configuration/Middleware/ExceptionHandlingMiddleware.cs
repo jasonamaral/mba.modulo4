@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
 
 namespace Pagamentos.API.Configuration.Middleware
@@ -32,7 +32,7 @@ namespace Pagamentos.API.Configuration.Middleware
                     context.Response.StatusCode,
                     Message = "Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde.",
 
-                    //Detailed = ex.Message 
+                    //Detailed = ex.Message
                 };
 
                 var json = JsonSerializer.Serialize(errorResponse);

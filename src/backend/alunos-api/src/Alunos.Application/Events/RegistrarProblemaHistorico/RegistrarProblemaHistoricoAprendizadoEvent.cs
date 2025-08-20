@@ -1,6 +1,7 @@
-﻿using Core.Messages;
+using Core.Messages;
 
 namespace Alunos.Application.Events.RegistrarProblemaHistorico;
+
 public class RegistrarProblemaHistoricoAprendizadoEvent : EventRaiz
 {
     public Guid AlunoId { get; init; }

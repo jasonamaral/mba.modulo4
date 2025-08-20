@@ -10,8 +10,8 @@ public static class SwaggerExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo 
-            { 
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
                 Title = "BFF API",
                 Version = "v1",
                 Description = "Backend for Frontend API - Orquestração dos Microsserviços da Plataforma Educacional",
@@ -30,13 +30,14 @@ public static class SwaggerExtensions
                 c.IncludeXmlComments(xmlPath);
             }
 
+            // Configuração para Swashbuckle 9.0.3 - padrão correto: "Bearer {token}"
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
                 BearerFormat = "JWT"
             });
 
@@ -76,4 +77,4 @@ public static class SwaggerExtensions
 
         return app;
     }
-} 
+}

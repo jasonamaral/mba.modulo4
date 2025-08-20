@@ -60,7 +60,7 @@ public class AlunoQueryControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterAlunoPorIdAsync(alunoId))
             .ReturnsAsync((AlunoDto?)null);
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.ObterAlunoPorId(alunoId);
@@ -127,7 +127,7 @@ public class AlunoQueryControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId))
             .ReturnsAsync((EvolucaoAlunoDto?)null);
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId);
@@ -191,7 +191,7 @@ public class AlunoQueryControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterMatriculasPorAlunoIdAsync(alunoId))
             .ReturnsAsync(new List<MatriculaCursoDto>());
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.ObterMatriculasPorAlunoId(alunoId);
@@ -212,7 +212,7 @@ public class AlunoQueryControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterMatriculasPorAlunoIdAsync(alunoId))
             .ThrowsAsync(new Exception("Erro de teste"));
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.ObterMatriculasPorAlunoId(alunoId);
@@ -266,7 +266,7 @@ public class AlunoQueryControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterCertificadoPorMatriculaIdAsync(matriculaId))
             .ReturnsAsync((CertificadoDto?)null);
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.ObterCertificadoPorMatriculaId(matriculaId);
@@ -330,7 +330,7 @@ public class AlunoQueryControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterAulasPorMatriculaIdAsync(matriculaId))
             .ReturnsAsync(new List<AulaCursoDto>());
 
-        SetupMockNotificador();
+        ConfigurarMockNotificador();
 
         // Act
         var result = await _controller.ObterAulasPorMatriculaId(matriculaId);

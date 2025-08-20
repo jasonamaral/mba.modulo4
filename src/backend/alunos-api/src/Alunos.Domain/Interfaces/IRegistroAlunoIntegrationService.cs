@@ -15,4 +15,4 @@ public interface IRegistroAlunoIntegrationService
     /// <param name="message">Evento de integração com dados do usuário registrado</param>
     /// <returns>Resposta indicando sucesso ou falha da operação</returns>
     Task<ResponseMessage> ProcessarAlunoRegistradoAsync(AlunoRegistradoIntegrationEvent message);
-} 
+}

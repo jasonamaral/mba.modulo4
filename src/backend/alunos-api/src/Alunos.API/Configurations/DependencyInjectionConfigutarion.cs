@@ -1,4 +1,4 @@
-﻿using Alunos.Application.Commands.AtualizarPagamento;
+using Alunos.Application.Commands.AtualizarPagamento;
 using Alunos.Application.Commands.CadastrarAluno;
 using Alunos.Application.Commands.ConcluirCurso;
 using Alunos.Application.Commands.MatricularAluno;
@@ -17,6 +17,7 @@ using Core.Utils;
 using MediatR;
 
 namespace Alunos.API.Configurations;
+
 public static class DependencyInjectionConfigutarion
 {
     public static void RegisterServices(this IServiceCollection services)

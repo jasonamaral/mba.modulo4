@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
@@ -18,6 +18,7 @@ namespace Conteudo.Application.Commands.ExcluirMaterial
             _materialRepository = materialRepository;
             _mediatorHandler = mediatorHandler;
         }
+
         public async Task<CommandResult> Handle(ExcluirMaterialCommand request, CancellationToken cancellationToken)
         {
             var material = await _materialRepository.ObterPorIdAsync(request.Id);

@@ -85,7 +85,7 @@ public abstract class BaseApiService
         return new ResponseResult<T>
         {
             Status = statusResult,
-            Errors = new ResponseErrorMessages { Mensagens = ["Erro desconhecido na API" ] }
+            Errors = new ResponseErrorMessages { Mensagens = ["Erro desconhecido na API"] }
         };
     }
 

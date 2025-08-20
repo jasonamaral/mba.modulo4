@@ -20,7 +20,7 @@ export const PagesRoutes: Routes = [
       },
       {
         path: 'cursos',
-        loadComponent: () => import('./conteudo/cursos-list.component').then(m => m.CursosListComponent)
+        loadComponent: () => import('./conteudo/cursos/list/cursos-list.component').then(m => m.CursosListComponent)
       }
     ],
   },

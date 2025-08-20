@@ -22,6 +22,7 @@ public class CursoDto
 
     // Conteúdo Programático
     public string Resumo { get; set; } = string.Empty;
+
     public string Descricao { get; set; } = string.Empty;
     public string Objetivos { get; set; } = string.Empty;
     public string PreRequisitos { get; set; } = string.Empty;
@@ -32,4 +33,4 @@ public class CursoDto
     public string Bibliografia { get; set; } = string.Empty;
 
     public List<AulaDto> Aulas { get; set; } = [];
-} 
+}

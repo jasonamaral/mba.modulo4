@@ -1,4 +1,4 @@
-﻿using Alunos.Application.Commands.ConcluirCurso;
+using Alunos.Application.Commands.ConcluirCurso;
 using Alunos.Application.Commands.MatricularAluno;
 using Alunos.Application.Commands.RegistrarHistoricoAprendizado;
 using Alunos.Application.Commands.SolicitarCertificado;

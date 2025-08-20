@@ -1,10 +1,5 @@
-using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
-using FluentAssertions;
-using FluentValidation.Results;
-using MediatR;
-using Xunit;
 
 namespace Core.Tests.Mediator;
 

@@ -1,10 +1,11 @@
-﻿using Alunos.Domain.Interfaces;
+using Alunos.Domain.Interfaces;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using MediatR;
 
 namespace Alunos.Application.Commands.MatricularAluno;
+
 public class MatricularAlunoCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<MatricularAlunoCommand, CommandResult>
 {
@@ -23,9 +24,9 @@ public class MatricularAlunoCommandHandler(IAlunoRepository alunoRepository,
         aluno.MatricularAlunoEmCurso(request.CursoId, request.NomeCurso, request.ValorCurso, request.Observacao);
         var matricula = aluno.ObterMatriculaPorCursoId(request.CursoId);
         await AlunoRepository.AdicionarMatriculaCursoAsync(matricula);
-        if (await _alunoRepository.UnitOfWork.Commit()) 
-        { 
-            request.Resultado.Data = matricula.Id; 
+        if (await _alunoRepository.UnitOfWork.Commit())
+        {
+            request.Resultado.Data = matricula.Id;
         }
 
         return request.Resultado;

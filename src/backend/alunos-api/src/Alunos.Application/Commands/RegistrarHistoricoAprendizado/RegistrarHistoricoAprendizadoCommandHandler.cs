@@ -1,14 +1,15 @@
-﻿using MediatR;
-using Alunos.Domain.Interfaces;
-using Core.Mediator;
-using Core.Communication;
-using Alunos.Domain.Entities;
-using Alunos.Domain.ValueObjects;
-using Core.Messages;
 using Alunos.Application.Events.RegistrarProblemaHistorico;
+using Alunos.Domain.Entities;
+using Alunos.Domain.Interfaces;
+using Alunos.Domain.ValueObjects;
+using Core.Communication;
+using Core.Mediator;
+using Core.Messages;
+using MediatR;
 
 namespace Alunos.Application.Commands.RegistrarHistoricoAprendizado;
-public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoRepository, 
+
+public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<RegistrarHistoricoAprendizadoCommand, CommandResult>
 {
     private readonly IAlunoRepository _alunoRepository = alunoRepository;

@@ -1,4 +1,4 @@
-﻿using Conteudo.Application.Commands.AtualizarMaterial;
+using Conteudo.Application.Commands.AtualizarMaterial;
 using Conteudo.Application.Commands.CadastrarMaterial;
 using Conteudo.Application.Commands.ExcluirMaterial;
 using Conteudo.Application.DTOs;

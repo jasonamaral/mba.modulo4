@@ -1,6 +1,4 @@
-using FluentAssertions;
 using Plataforma.Educacao.Core.Exceptions;
-using Xunit;
 
 namespace Core.Tests.Exceptions;
 

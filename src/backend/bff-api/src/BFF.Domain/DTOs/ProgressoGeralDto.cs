@@ -7,4 +7,4 @@ public class ProgressoGeralDto
     public int CertificadosEmitidos { get; set; }
     public decimal PercentualConcluidoGeral { get; set; }
     public int HorasEstudadas { get; set; }
-} 
+}

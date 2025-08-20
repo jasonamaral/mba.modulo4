@@ -7,4 +7,4 @@ public class AtualizarPerfilAluno
     public string Cidade { get; set; } = string.Empty;
     public string Estado { get; set; } = string.Empty;
     public string CEP { get; set; } = string.Empty;
-} 
+}
