@@ -7,7 +7,7 @@ namespace Alunos.Application.Commands.AtualizarPagamento
         public AtualizarPagamentoMatriculaCommandValidator()
         {
             RuleFor(c => c.AlunoId).NotEqual(Guid.Empty).WithMessage("Id do aluno é inválido");
-            RuleFor(c => c.CursoId).NotEqual(Guid.Empty).WithMessage("Id do curso é inválido");
+            RuleFor(c => c.MatriculaCursoId).NotEqual(Guid.Empty).WithMessage("Id do curso é inválido");
         }
     }
 }

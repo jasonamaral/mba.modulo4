@@ -8,11 +8,13 @@ builder
     .AddApiConfig()
     .AddCorsConfig()
     .AddSwaggerConfig()
+    .AddMessageBusConfiguration(builder.Configuration)
     .AddDbContextConfig()
     .AddJwtConfiguration()
     .AddMapsterConfiguration()
     .AddMediatrConfig()
     .AddDependencyInjectionConfig();
+
 
 var app = builder.Build();
 

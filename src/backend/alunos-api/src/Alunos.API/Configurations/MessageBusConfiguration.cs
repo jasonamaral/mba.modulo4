@@ -10,5 +10,8 @@ public static class MessageBusConfiguration
     {
         services.AddMessageBus(configuration?.GetMessageQueueConnection("MessageBus")!)
             .AddHostedService<RegistroAlunoIntegrationHandler>();
+
+        services.AddMessageBus(configuration?.GetMessageQueueConnection("MessageBus")!)
+            .AddHostedService<PagamentoMatriculaCursoIntegrationHandler>();
     }
 }

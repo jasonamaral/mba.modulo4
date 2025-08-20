@@ -1,3 +1,4 @@
+using BFF.API.Services.Conteudos;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -5,6 +6,7 @@ using Core.Messages.Integration;
 using Core.Notification;
 using Core.Services.Controllers;
 using MediatR;
+using MessageBus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pagamentos.Application.Interfaces;
@@ -18,14 +20,14 @@ namespace Pagamentos.API.Controllers
     [Route("api/v{version:apiVersion}/pagamentos")]
     [Authorize]
     public class PagamentosController(IPagamentoConsultaAppService pagamentoConsultaAppService,
-                                      IPagamentoComandoAppService pagamentoComandoAppService,
                                       IMediatorHandler mediator,
                                       INotificador notificador,
-                                      INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
+                                      INotificationHandler<DomainNotificacaoRaiz> notifications,
+                                      IMessageBus bus ) : MainController(mediator, notifications, notificador)
     {
+        private readonly IMessageBus _bus = bus;
         private readonly IMediatorHandler _mediator = mediator;
         private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService = pagamentoConsultaAppService;
-        private readonly IPagamentoComandoAppService _pagamentoComandoAppService = pagamentoComandoAppService;
 
         [HttpPost("pagamento")]
         [SwaggerOperation(Summary = "Executa pagamento", Description = "Executa o pagamento do curso.")]
@@ -38,15 +40,32 @@ namespace Pagamentos.API.Controllers
                 return RespostaPadraoApi<CommandResult>(ModelState);
             }
 
-            var evento = new PagamentoCursoEvent(pagamento.MatriculaId,
-                                                    pagamento.AlunoId,
-                                                    pagamento.Total,
-                                                    pagamento.NomeCartao,
-                                                    pagamento.NumeroCartao,
-                                                    pagamento.ExpiracaoCartao,
-                                                    pagamento.CvvCartao);
 
-            await _mediator.PublicarEvento(evento);
+            var eventoPagamento = new PagamentoCursoEvent(pagamento.MatriculaId,
+                                                          pagamento.AlunoId,
+                                                          pagamento.Total,
+                                                          pagamento.NomeCartao,
+                                                          pagamento.NumeroCartao,
+                                                          pagamento.ExpiracaoCartao,
+                                                          pagamento.CvvCartao);
+
+
+            await _mediator.PublicarEvento(eventoPagamento);
+
+
+            if (OperacaoValida())
+            {
+                try
+                {
+                    PagamentoMatriculaCursoIntegrationEvent pagamentoMatriculaCursoIntegrationEvent = new PagamentoMatriculaCursoIntegrationEvent(pagamento.AlunoId, pagamento.MatriculaId);
+                    await _bus.RequestAsync<PagamentoMatriculaCursoIntegrationEvent, ResponseMessage>(pagamentoMatriculaCursoIntegrationEvent);
+                }
+                catch (Exception ex)
+                {
+                    _notificador.AdicionarErro(ex.Message);
+                    return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+                }
+            }
 
             return RespostaPadraoApi(HttpStatusCode.OK, "");
         }
@@ -81,4 +100,5 @@ namespace Pagamentos.API.Controllers
             return RespostaPadraoApi(HttpStatusCode.NotFound, message);
         }
     }
+
 }

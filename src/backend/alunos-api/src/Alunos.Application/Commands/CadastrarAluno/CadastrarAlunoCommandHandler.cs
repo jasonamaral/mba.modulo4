@@ -1,5 +1,3 @@
-using MediatR;
-using Core.Communication;
 using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
 using Core.Communication;

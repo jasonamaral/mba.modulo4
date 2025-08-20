@@ -31,6 +31,7 @@ namespace BFF.API.Services.Pagamentos
             _apiClient.SetBaseAddress(_apiSettings.PagamentosApiUrl);
 
             ApiResponse<ResponseResult<object>> apiResponse;
+
             try
             {
                 apiResponse = await _apiClient.PostAsyncWithDetails<PagamentoCursoInputModel, ResponseResult<object>>("/api/v1/pagamentos/pagamento", pagamentoCursoInputModel);
