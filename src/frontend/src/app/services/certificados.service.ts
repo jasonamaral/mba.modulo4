@@ -4,8 +4,6 @@ import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
 import { CertificadoModel } from '../models/certificado.model';
 
-// tipo movido para src/app/models/dtos
-
 @Injectable({ providedIn: 'root' })
 export class CertificadosService extends BaseService {
   constructor(private http: HttpClient) { super(); }

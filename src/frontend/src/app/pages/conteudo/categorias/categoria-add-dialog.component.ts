@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'src/app/material.module';
-import { CategoryModel } from 'src/app/models/conteudo.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
 import { ToastrService } from 'ngx-toastr';
 

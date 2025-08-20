@@ -1,19 +1,20 @@
-import { FilterCurso, PagedResult } from './../../models/paged-result.model';
+import { FilterCurso, PagedResult } from '../../../../models/paged-result.model';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { CursosService } from '../../services/cursos.service';
+import { CursosService } from '../../../../services/cursos.service';
 import { CursoModel } from '../../models/curso.model';
-import { MatriculasService } from '../../services/matriculas.service';
 import { MessageService } from 'src/app/services/message.service ';
 import { ToastrService } from 'ngx-toastr';
 import { BreakpointObserver, LayoutModule } from '@angular/cdk/layout';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ConteudoAddComponent } from './conteudo-add.component';
+import { ConteudoAddComponent } from '../add/conteudo-add.component';
 import { LocalStorageUtils } from 'src/app/utils/localstorage';
-import { ConteudoUpdateComponent } from './conteudo-update.component';
-import { AulasListDialogComponent } from './aulas-list-dialog.component';
+import { CursoEditComponent } from '../edit/curso-edit.component';
+import { AulasListDialogComponent } from '../../aulas/list/aulas-list-dialog.component';
 import { MaterialModule } from "src/app/material.module";
+import { MatriculaAddComponent } from '../../../user/matriculas/add/matricula-add.component';
+import { MatriculasService } from '../../../../services/matriculas.service';
 
 @Component({
   standalone: true,
@@ -39,23 +40,30 @@ export class CursosListComponent {
     ativos: true
   };
   loading = false;
+  userId = new LocalStorageUtils().getUser()?.usuarioToken?.id;
+  matriculasAluno: any[] = [];
 
   constructor(
     private cursosService: CursosService,
-    private matriculas: MatriculasService,
     private messageService: MessageService,
     private toastr: ToastrService,
     private breakpointObserver: BreakpointObserver,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private matriculas: MatriculasService,
   ) { }
+  
   ngOnInit() {
-    // Botão de adicionar só visível para admin via template condicional
     this.isUserAdmin = new LocalStorageUtils().isUserAdmin();
     // Responsividade: 2 colunas em telas médias/maiores, 1 coluna em telas menores
     this.breakpointObserver
       .observe(['(max-width: 992px)'])
       .subscribe(state => this.gridCols = state.matches ? 1 : 2);
     this.loadCursos();
+    this.loadMatriculas();
+  }
+
+  hasMatricula(cursoId: string): boolean {
+    return !!this.matriculasAluno.find(m => m.cursoId === cursoId && m.alunoId === this.userId);
   }
 
   private loadCursos(): void {
@@ -79,6 +87,19 @@ export class CursosListComponent {
     });
   }
 
+  private loadMatriculas(): void {
+    this.matriculas.listarMatriculas(this.userId).subscribe({
+      next: (matriculas) => {
+        this.matriculasAluno = matriculas;
+        console.log('Matrículas do aluno:', this.matriculasAluno);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar matrículas do aluno:', err);
+        this.matriculasAluno = [];
+      }
+    });
+  }
+
   openAddDialog(): void {
     const ref = this.dialog.open(ConteudoAddComponent, {
       width: '1100px',
@@ -96,7 +117,7 @@ export class CursosListComponent {
   }
 
   openEditDialog(curso: CursoModel): void {
-    const ref = this.dialog.open(ConteudoUpdateComponent, {
+    const ref = this.dialog.open(CursoEditComponent, {
       width: '1000px',
       maxWidth: '100vw',
       panelClass: ['dialog-fullwidth'],
@@ -116,17 +137,21 @@ export class CursosListComponent {
     this.dialog.open(AulasListDialogComponent, {
       width: '800px',
       maxWidth: '95vw',
-      data: { curso },
+      data: { curso, hasMatricula: this.hasMatricula(curso.id) },
     });
   }
 
   matricular(c: CursoModel) {
-    this.matriculas.criarMatricula(c.id).subscribe({
-      next: () => this.toastr.success('Matrícula realizada com sucesso.'),
-      error: (fail) => {
-        const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
-        if (Array.isArray(errors) && errors.length > 0) this.toastr.error(errors.join('\n'));
-        else this.toastr.error('Não foi possível realizar a matrícula.');
+    const ref = this.dialog.open(MatriculaAddComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      data: { curso: c, alunoId: this.userId }
+    });
+    
+    ref.afterClosed().subscribe(result => {
+      if (result?.inserted) {
+        this.loadMatriculas();
+        this.loadCursos();
       }
     });
   }

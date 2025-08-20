@@ -60,7 +60,7 @@
             <mat-card-actions class="course-actions">
               <button mat-button color="primary" (click)="openAulasDialog(c)">Ver aulas</button>
               <button mat-flat-button color="accent" (click)="matricular(c)" [disabled]="c.podeSerMatriculado === false" *ngIf="!isUserAdmin">
-                Matricular-se
+                {{ hasMatricula(c.id) ? 'Já matriculado' : 'Matricular-se' }}
               </button>
               <button mat-flat-button color="accent" (click)="openEditDialog(c)" *ngIf="isUserAdmin">
                 Editar
