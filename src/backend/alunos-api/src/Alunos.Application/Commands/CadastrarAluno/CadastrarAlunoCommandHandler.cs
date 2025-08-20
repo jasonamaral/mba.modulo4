@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Core.Communication;
 using Alunos.Domain.Interfaces;
 using Core.Mediator;
@@ -31,6 +31,7 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
                 request.Cep,
                 request.Foto);
 
+            aluno.DefinirId(request.Id);
             aluno.AtivarAluno();
             await _alunoRepository.AdicionarAsync(aluno);
             if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = aluno.Id; }
