@@ -1,0 +1,63 @@
+<h3 mat-dialog-title>
+  Realize sua matrícula e informe os dados do cartão:
+</h3>
+<hr style="width:95%" />
+<mat-dialog-content class="dialog-body">
+  <mat-form-field appearance="outline" floatLabel="always" class="col-8">
+    <mat-label>Curso</mat-label>
+    <input matInput [value]="data.curso.nome || 'Curso sem nome'" readonly>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" floatLabel="always" class="col-8">
+    <mat-label>Valor</mat-label>
+    <input matInput formControlName="total" [value]="data.curso.valor | currency:'BRL'" readonly>
+    <mat-error *ngIf="form.get('total')?.hasError('required')">
+      Valor total é obrigatório.
+    </mat-error>
+  </mat-form-field>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="form-grid" autocomplete="off" novalidate>
+    <mat-form-field appearance="outline" floatLabel="always" class="col-12">
+      <mat-label>Número Cartão</mat-label>
+      <mat-icon matPrefix>credit_card</mat-icon>
+      <input matInput formControlName="numeroCartao" required>
+      <mat-error *ngIf="form.get('numeroCartao')?.hasError('required')">
+        Número Cartão é obrigatório.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" floatLabel="always" class="col-12">
+      <mat-label>Nome Titular Cartão</mat-label>
+      <mat-icon matPrefix>person</mat-icon>
+      <input matInput formControlName="nomeCartao" required>
+      <mat-error *ngIf="form.get('nomeCartao')?.hasError('required')">
+        Nome Titular Cartão é obrigatório.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" floatLabel="always" class="col-6">
+      <mat-label>CVV</mat-label>
+      <mat-icon matPrefix>lock</mat-icon>
+      <input matInput formControlName="cvvCartao" required>
+      <mat-error *ngIf="form.get('cvvCartao')?.hasError('required')">
+        CVV é obrigatório.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" floatLabel="always" class="col-6">
+      <mat-label>Data de Validade</mat-label>
+      <mat-icon matPrefix>event</mat-icon>
+      <input matInput formControlName="expiracaoCartao" required>
+      <mat-error *ngIf="form.get('expiracaoCartao')?.hasError('required')">
+        Data de Validade é obrigatória.
+      </mat-error>
+    </mat-form-field>
+    <mat-dialog-actions align="end" class="col-12">
+      <button mat-stroked-button color="warn" (click)="cancel()" [disabled]="saving" type="button">Cancelar</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="saving || form.invalid">
+        <mat-icon class="rotating" *ngIf="saving">loop</mat-icon>
+        Matricular
+      </button>
+    </mat-dialog-actions>
+  </form>
+</mat-dialog-content>

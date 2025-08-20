@@ -1,4 +1,4 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
 using Core.Communication;
@@ -192,6 +192,8 @@ public class ConteudosController : BffController
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
+
+        await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
         return Ok(response);
     }
 

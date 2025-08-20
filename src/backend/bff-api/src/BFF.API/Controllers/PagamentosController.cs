@@ -1,4 +1,4 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
 using BFF.API.Services.Pagamentos;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs.Pagamentos.Response;
@@ -52,6 +52,7 @@ namespace BFF.API.Controllers
 
                 if (resultado?.Status == (int)HttpStatusCode.OK)
                 {
+                    await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
                     return Ok(resultado);
                 }
 
