@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Conteudo.Application.Commands.CadastrarCurso;
+
 public class CadastrarCursoCommandValidator : AbstractValidator<CadastrarCursoCommand>
 {
     public CadastrarCursoCommandValidator()

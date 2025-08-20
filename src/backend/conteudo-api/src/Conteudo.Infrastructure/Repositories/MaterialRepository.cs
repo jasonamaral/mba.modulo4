@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Conteudo.Infrastructure.Data;
 using Core.Data;

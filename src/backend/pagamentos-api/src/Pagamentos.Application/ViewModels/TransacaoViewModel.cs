@@ -1,4 +1,4 @@
-﻿namespace Pagamentos.Application.ViewModels
+namespace Pagamentos.Application.ViewModels
 {
     public class TransacaoViewModel
     {

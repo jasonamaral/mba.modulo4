@@ -1,8 +1,5 @@
 using Core.Communication;
-using FluentAssertions;
-using FluentValidation;
 using FluentValidation.Results;
-using Xunit;
 
 namespace Core.Tests.Communication;
 
@@ -132,6 +129,4 @@ public class CommandResultTests : TestBase
         // Act & Assert
         commandResult.IsValid.Should().BeTrue();
     }
-
-
 }

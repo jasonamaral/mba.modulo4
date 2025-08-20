@@ -1,4 +1,4 @@
-﻿using Core.Messages;
+using Core.Messages;
 using Core.Messages.Integration;
 using EasyNetQ;
 using Polly;
@@ -9,8 +9,10 @@ namespace MessageBus;
 public class MessageBus : IMessageBus
 {
     private IBus? _bus;
+
     // Removido campo não utilizado
     private readonly string _connectionString;
+
     private readonly int _requestTimeoutSeconds;
 
     public MessageBus(string connectionString)

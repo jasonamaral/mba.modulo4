@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
@@ -6,11 +6,13 @@ using Core.Messages;
 using MediatR;
 
 namespace Conteudo.Application.Commands.AtualizarCategoria;
+
 public class AtualizarCategoriaCommandHandler(ICategoriaRepository categoriaRepository
-                                            , IMediatorHandler mediator) 
+                                            , IMediatorHandler mediator)
     : IRequestHandler<AtualizarCategoriaCommand, CommandResult>
 {
     private Guid _raizAgregacao;
+
     public async Task<CommandResult> Handle(AtualizarCategoriaCommand request, CancellationToken cancellationToken)
     {
         _raizAgregacao = request.Id;
@@ -18,7 +20,7 @@ public class AtualizarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
 
         if (!await ValidarRequisicao(request, categoriaExistente))
             return request.Resultado;
-        
+
         categoriaExistente.AtualizarInformacoes(
             nome: request.Nome,
             descricao: request.Descricao,
@@ -50,10 +52,10 @@ public class AtualizarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
             await mediator.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(AtualizarCategoriaCommand), "Categoria não encontrada."));
             return false;
         }
-            
+
         if (await categoriaRepository.ExistePorNome(request.Nome))
         {
-            await mediator.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao,nameof(AtualizarCategoriaCommand), "Já existe uma categoria com este nome."));
+            await mediator.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(AtualizarCategoriaCommand), "Já existe uma categoria com este nome."));
             return false;
         }
         return true;

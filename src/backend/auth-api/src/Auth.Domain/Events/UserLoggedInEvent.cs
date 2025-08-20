@@ -16,6 +16,4 @@ public class UserLoggedInEvent
     public string Nome { get; set; } = string.Empty;
     public DateTime DataLogin { get; set; }
     public string IpAddress { get; set; } = string.Empty;
-
-
 }

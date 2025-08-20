@@ -1,4 +1,4 @@
-﻿using Conteudo.Domain.Entities;
+using Conteudo.Domain.Entities;
 using Core.Data.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,6 +12,7 @@ public class CursoConfiguration : IEntityTypeConfiguration<Curso>
     public void Configure(EntityTypeBuilder<Curso> entity)
     {
         #region Mapping columns
+
         entity.ToTable("Cursos");
 
         entity.HasKey(a => a.Id)
@@ -111,9 +112,11 @@ public class CursoConfiguration : IEntityTypeConfiguration<Curso>
                 .HasColumnName("ConteudoProgramatico_Bibliografia")
                 .HasMaxLength(1024);
         });
-        #endregion
+
+        #endregion Mapping columns
 
         #region Indexes
+
         // Índices
         entity.HasIndex(c => c.Nome)
             .HasDatabaseName("CursoNomeIDX")
@@ -128,9 +131,11 @@ public class CursoConfiguration : IEntityTypeConfiguration<Curso>
 
         entity.HasIndex(c => c.CategoriaId)
             .HasDatabaseName("CursoCategoriaIdIDX");
-        #endregion
+
+        #endregion Indexes
 
         #region Indexes
+
         // Relacionamento com Categoria
         entity.HasOne(c => c.Categoria)
             .WithMany(cat => cat.Cursos)
@@ -142,6 +147,7 @@ public class CursoConfiguration : IEntityTypeConfiguration<Curso>
             .WithOne(a => a.Curso)
             .HasForeignKey(a => a.CursoId)
             .OnDelete(DeleteBehavior.Cascade);
-        #endregion
+
+        #endregion Indexes
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace Core.SharedDtos.Conteudo;
+namespace Core.SharedDtos.Conteudo;
+
 public class MaterialDto
 {
     public Guid Id { get; set; }

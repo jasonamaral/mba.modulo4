@@ -12,7 +12,8 @@ public class ConteudoProgramatico
     public string Avaliacao { get; private set; }
     public string Bibliografia { get; private set; }
 
-    protected ConteudoProgramatico() { }
+    protected ConteudoProgramatico()
+    { }
 
     public ConteudoProgramatico(
         string resumo,
@@ -26,7 +27,7 @@ public class ConteudoProgramatico
         string bibliografia)
     {
         ValidarDados(resumo, descricao, objetivos);
-        
+
         Resumo = resumo;
         Descricao = descricao;
         Objetivos = objetivos;
@@ -42,10 +43,10 @@ public class ConteudoProgramatico
     {
         if (string.IsNullOrWhiteSpace(resumo))
             throw new ArgumentException("Resumo é obrigatório", nameof(resumo));
-            
+
         if (string.IsNullOrWhiteSpace(descricao))
             throw new ArgumentException("Descrição é obrigatória", nameof(descricao));
-            
+
         if (string.IsNullOrWhiteSpace(objetivos))
             throw new ArgumentException("Objetivos são obrigatórios", nameof(objetivos));
     }
@@ -96,4 +97,4 @@ public class ConteudoProgramatico
         var hash2 = Bibliografia.GetHashCode();
         return HashCode.Combine(hash1, hash2);
     }
-} 
+}

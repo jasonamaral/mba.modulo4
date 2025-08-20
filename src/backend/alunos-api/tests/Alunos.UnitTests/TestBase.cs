@@ -32,7 +32,7 @@ public abstract class TestBase
             .Returns(false);
     }
 
-    protected MainController CreateMainController()
+    protected MainController CriarMainController()
     {
         return new TestMainController(
             MockMediatorHandler.Object,
@@ -40,35 +40,35 @@ public abstract class TestBase
             MockNotificador.Object);
     }
 
-    protected void SetupMockMediatorHandler(CommandResult result)
+    protected void ConfigurarMockMediatorHandler(CommandResult result)
     {
         MockMediatorHandler
             .Setup(x => x.ExecutarComando(It.IsAny<CommandRaiz>()))
             .Returns(Task.FromResult(result));
     }
 
-    protected void SetupMockMediatorHandlerWithException(Exception exception)
+    protected void ConfigurarMockMediatorHandlerComExcecao(Exception exception)
     {
         MockMediatorHandler
             .Setup(x => x.ExecutarComando(It.IsAny<CommandRaiz>()))
             .ThrowsAsync(exception);
     }
 
-    protected void SetupMockAlunoQueryService(AlunoDto result)
+    protected void ConfigurarMockAlunoQueryService(AlunoDto result)
     {
         MockAlunoQueryService
             .Setup(x => x.ObterAlunoPorIdAsync(It.IsAny<Guid>()))
             .Returns(Task.FromResult(result));
     }
 
-    protected void SetupMockAlunoQueryServiceWithException(Exception exception)
+    protected void ConfigurarMockAlunoQueryServiceComExcecao(Exception exception)
     {
         MockAlunoQueryService
             .Setup(x => x.ObterAlunoPorIdAsync(It.IsAny<Guid>()))
             .ThrowsAsync(exception);
     }
 
-    protected void SetupMockNotificador()
+    protected void ConfigurarMockNotificador()
     {
         MockNotificador
             .Setup(x => x.AdicionarErro(It.IsAny<string>()));
@@ -82,12 +82,12 @@ public abstract class TestBase
             .Returns(new List<string> { "Erro de teste" });
     }
 
-    protected void SetupMockNotifications()
+    protected void ConfigurarMockNotifications()
     {
         Notifications.Limpar();
     }
 
-    protected void SetupMockMediatorHandlerForNotifications()
+    protected void ConfigurarMockMediatorHandlerParaNotifications()
     {
         MockMediatorHandler
             .Setup(x => x.PublicarNotificacaoDominio(It.IsAny<DomainNotificacaoRaiz>()))

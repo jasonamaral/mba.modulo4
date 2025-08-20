@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Alunos.Infrastructure.Services;
+
 public class RegistroAlunoIntegrationHandler : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
@@ -14,7 +15,7 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
     private readonly ILogger<RegistroAlunoIntegrationHandler> _logger;
 
     public RegistroAlunoIntegrationHandler(
-        IServiceProvider serviceProvider, 
+        IServiceProvider serviceProvider,
         IMessageBus bus,
         ILogger<RegistroAlunoIntegrationHandler> logger)
     {
@@ -31,7 +32,7 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
         {
             try
             {
-                SetResponder();
+                DefinirResponder();
                 _logger.LogInformation("Responder de RegistroUsuario configurado com sucesso");
                 break;
             }
@@ -44,7 +45,7 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
         }
     }
 
-    private void SetResponder()
+    private void DefinirResponder()
     {
         _bus.RespondAsync<AlunoRegistradoIntegrationEvent, ResponseMessage>(async request => await ProcessarUsuarioRegistrado(request));
         _bus.AdvancedBus.Connected += OnConnect;
@@ -52,9 +53,8 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
 
     private void OnConnect(object? s, EventArgs e)
     {
-        SetResponder();
+        DefinirResponder();
     }
-
 
     private async Task<ResponseMessage> ProcessarUsuarioRegistrado(AlunoRegistradoIntegrationEvent message)
     {

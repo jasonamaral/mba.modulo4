@@ -1,7 +1,5 @@
 using Core.Utils;
-using FluentAssertions;
 using Microsoft.Extensions.Configuration;
-using Xunit;
 
 namespace Core.Tests.Utils;
 

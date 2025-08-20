@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Alunos.Application.Commands.MatricularAluno;
+
 public class MatricularAlunoCommandValidator : AbstractValidator<MatricularAlunoCommand>
 {
     public MatricularAlunoCommandValidator()

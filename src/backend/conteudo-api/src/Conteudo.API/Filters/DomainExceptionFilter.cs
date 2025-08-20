@@ -1,11 +1,11 @@
-﻿using Core.Communication;
+using Core.Communication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Plataforma.Educacao.Core.Exceptions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Conteudo.API.Filters;
+
 public class DomainExceptionFilter(IActionResultExecutor<ObjectResult> executor, ILogger<ExceptionFilter> logger) : IExceptionFilter
 {
     private readonly IActionResultExecutor<ObjectResult> _executor = executor;

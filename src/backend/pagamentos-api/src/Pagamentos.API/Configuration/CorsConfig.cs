@@ -1,4 +1,4 @@
-﻿namespace Pagamentos.API.Configuration
+namespace Pagamentos.API.Configuration
 {
     public static class CorsConfig
     {

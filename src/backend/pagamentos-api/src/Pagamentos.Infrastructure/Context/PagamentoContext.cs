@@ -1,4 +1,4 @@
-﻿using Core.Data;
+using Core.Data;
 using Core.Mediator;
 using Core.Messages;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +19,6 @@ namespace Pagamentos.Infrastructure.Context
 
         public DbSet<Pagamento> Pagamentos { get; set; }
         public DbSet<Transacao> Transacoes { get; set; }
-
 
         public async Task<bool> Commit()
         {

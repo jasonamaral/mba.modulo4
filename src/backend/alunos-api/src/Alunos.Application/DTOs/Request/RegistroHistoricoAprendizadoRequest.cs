@@ -1,4 +1,5 @@
-﻿namespace Alunos.Application.DTOs.Request;
+namespace Alunos.Application.DTOs.Request;
+
 public class RegistroHistoricoAprendizadoRequest
 {
     public Guid AlunoId { get; set; }

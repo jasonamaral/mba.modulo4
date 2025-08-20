@@ -1,11 +1,12 @@
-﻿using MediatR;
-using Core.Mediator;
+using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
 using Core.Communication;
+using Core.Mediator;
 using Core.Messages;
-using Alunos.Domain.Entities;
+using MediatR;
 
 namespace Alunos.Application.Commands.SolicitarCertificado;
+
 public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<SolicitarCertificadoCommand, CommandResult>
 {
@@ -19,7 +20,7 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
         if (!ValidarRequisicao(request)) { return request.Resultado; }
         if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
         if (!ObterMatriculaCurso(request.MatriculaCursoId, out MatriculaCurso matriculaCurso)) { return request.Resultado; }
-        
+
         decimal notaFinal = matriculaCurso.CalcularMediaFinalCurso();
         string pathCertificado = $"Certificado_{request.AlunoId}_{request.MatriculaCursoId}.pdf";
         string nomeInstrutor = "Curso Online";
@@ -32,7 +33,7 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
         {
             // TODO :: Devo enviar algo para mensageria para realizar a impressão/emissão do certificado?
 
-            request.Resultado.Data = certificado.Id; 
+            request.Resultado.Data = certificado.Id;
         }
 
         return request.Resultado;

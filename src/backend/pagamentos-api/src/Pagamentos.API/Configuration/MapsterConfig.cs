@@ -1,4 +1,4 @@
-﻿using Mapster;
+using Mapster;
 
 namespace Pagamentos.API.Configuration
 {

@@ -1,9 +1,9 @@
-using Core.Notification;
-using Core.Services.Controllers;
 using Core.Mediator;
 using Core.Messages;
-using Microsoft.AspNetCore.Mvc;
+using Core.Notification;
+using Core.Services.Controllers;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BFF.API.Controllers;
 
@@ -15,7 +15,6 @@ public abstract class BffController : MainController
 {
     protected BffController(IMediatorHandler mediator, INotificationHandler<DomainNotificacaoRaiz> notifications, INotificador notificador) : base(mediator, notifications, notificador)
     { }
-
 
     protected async Task<ActionResult> ProcessarRespostaApi(HttpResponseMessage response, string? successMessage = null)
     {

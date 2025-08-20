@@ -1,6 +1,5 @@
 using Conteudo.Domain.Entities;
 using Conteudo.Domain.ValueObjects;
-using FluentAssertions;
 using Plataforma.Educacao.Core.Exceptions;
 
 namespace Conteudo.UnitTests.Domain.Entities;

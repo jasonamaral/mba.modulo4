@@ -1,7 +1,4 @@
 using Bogus;
-using FluentAssertions;
-using Moq;
-using Xunit;
 
 namespace Auth.UnitTests;
 

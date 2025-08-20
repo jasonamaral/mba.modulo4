@@ -1,4 +1,4 @@
-﻿namespace Pagamento.AntiCorruption.Interfaces
+namespace Pagamento.AntiCorruption.Interfaces
 {
     public interface IConfigurationManager
     {

@@ -1,7 +1,8 @@
-﻿using Core.Messages;
+using Core.Messages;
 using Core.SharedDtos.Conteudo;
 
 namespace Alunos.Application.Commands.ConcluirCurso;
+
 public class ConcluirCursoCommand : CommandRaiz
 {
     public Guid AlunoId { get; init; }

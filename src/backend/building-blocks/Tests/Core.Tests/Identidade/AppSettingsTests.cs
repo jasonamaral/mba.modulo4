@@ -1,6 +1,4 @@
 using Core.Identidade;
-using FluentAssertions;
-using Xunit;
 
 namespace Core.Tests.Identidade;
 

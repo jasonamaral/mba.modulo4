@@ -1,14 +1,11 @@
 using BFF.API.Controllers;
-using BFF.API.Models.Response;
 using Core.Mediator;
-using Core.Notification;
 using Core.Messages;
+using Core.Notification;
 using FluentAssertions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Moq;
-using MediatR;
-using Xunit;
 
 namespace BFF.IntegrationTests.Controllers;
 
@@ -62,8 +59,8 @@ public class HealthControllerIntegrationTests
 
         // Assert
         publicMethods.Should().NotBeEmpty();
-        publicMethods.Should().Contain(m => m.Name == "Get");
-        publicMethods.Should().Contain(m => m.Name == "GetStatus");
+        publicMethods.Should().Contain(m => m.Name == "Obter");
+        publicMethods.Should().Contain(m => m.Name == "ObterStatus");
     }
 
     [Fact]

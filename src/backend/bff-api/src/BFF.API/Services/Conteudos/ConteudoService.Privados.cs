@@ -1,10 +1,11 @@
-﻿using BFF.API.Models.Request;
+using BFF.API.Models.Request;
 using BFF.Domain.DTOs;
 using Core.Communication;
 using Core.Communication.Filters;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace BFF.API.Services.Conteudos;
+
 public partial class ConteudoService
 {
     public async Task<ResponseResult<CursoDto>> ObterCursoPorId(Guid cursoId, bool includeAulas = false)
@@ -35,6 +36,7 @@ public partial class ConteudoService
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
         else { return CaptureRequestError<PagedResult<CursoDto>>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
+
     public async Task<ResponseResult<ConteudoProgramaticoDto>> ObterConteudoProgramaticoPorCursoId(Guid cursoId, bool includeAulas = false)
     {
         var url = $"api/cursos/{cursoId}/conteudo-programatico";
@@ -63,9 +65,9 @@ public partial class ConteudoService
     {
         var url = $"api/cursos/{cursoId}";
         var apiResponse = await _apiClient.DeleteAsync(url);
-        if (apiResponse) 
-        { 
-            return new ResponseResult<bool?> { Status = 200, Data = true }; 
+        if (apiResponse)
+        {
+            return new ResponseResult<bool?> { Status = 200, Data = true };
         }
         else
         {
@@ -81,7 +83,7 @@ public partial class ConteudoService
     {
         var url = $"api/cursos/{cursoId}/aulas";
         var apiResponse = await _apiClient.PostAsyncWithDetails<AulaCriarRequest, ResponseResult<Guid>>(url, aula);
-        
+
         return apiResponse.IsSuccess
             ? apiResponse.Data
             : CaptureRequestError<Guid>(apiResponse.ErrorContent, apiResponse.StatusCode);
@@ -94,7 +96,7 @@ public partial class ConteudoService
 
         var url = $"api/cursos/{cursoId}/aulas/{aulaId}";
         var apiResponse = await _apiClient.PutAsyncWithDetails<AulaAtualizarRequest, ResponseResult<AulaDto>>(url, aula);
-        
+
         return apiResponse.IsSuccess
             ? apiResponse.Data
             : CaptureRequestError<AulaDto>(apiResponse.ErrorContent, apiResponse.StatusCode);

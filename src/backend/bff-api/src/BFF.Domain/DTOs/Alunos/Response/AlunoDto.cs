@@ -1,4 +1,5 @@
 namespace BFF.Domain.DTOs.Alunos.Response;
+
 public class AlunoDto
 {
     public Guid Id { get; set; }

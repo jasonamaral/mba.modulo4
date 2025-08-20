@@ -1,4 +1,4 @@
-﻿using Core.DomainObjects;
+using Core.DomainObjects;
 using Pagamentos.Domain.Enum;
 
 namespace Pagamentos.Domain.Entities

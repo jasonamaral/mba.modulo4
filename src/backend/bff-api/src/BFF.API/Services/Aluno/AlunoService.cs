@@ -8,6 +8,7 @@ using Core.Communication;
 using Microsoft.Extensions.Options;
 
 namespace BFF.API.Services.Aluno;
+
 public partial class AlunoService : BaseApiService, IAlunoService
 {
     private readonly ApiSettings _apiSettings;
@@ -25,6 +26,7 @@ public partial class AlunoService : BaseApiService, IAlunoService
     }
 
     #region Gets
+
     public async Task<ResponseResult<AlunoDto>> ObterAlunoPorIdAsync(Guid alunoId)
     {
         var result = await ExecuteWithErrorHandling(() => ObterAlunoPorId(alunoId),
@@ -96,9 +98,11 @@ public partial class AlunoService : BaseApiService, IAlunoService
 
         return aulaCursoDto ?? ReturnUnknowError<ICollection<AulaCursoDto>>();
     }
-    #endregion
+
+    #endregion Gets
 
     #region Posts and Puts
+
     public async Task<ResponseResult<Guid?>> MatricularAlunoAsync(MatriculaCursoRequest dto)
     {
         var cursoDto = await _conteudoService.ObterCursoPorIdAsync(dto.CursoId, includeAulas: false);
@@ -126,7 +130,6 @@ public partial class AlunoService : BaseApiService, IAlunoService
 
     public async Task<ResponseResult<bool?>> RegistrarHistoricoAprendizadoAsync(RegistroHistoricoAprendizadoRequest dto)
     {
-
         var matriculaCurso = await ObterMatriculasPorAlunoIdAsync(dto.AlunoId);
         if (matriculaCurso == null || matriculaCurso.Data == null || !matriculaCurso.Data.Any(x => x.Id == dto.MatriculaCursoId))
         {
@@ -199,5 +202,6 @@ public partial class AlunoService : BaseApiService, IAlunoService
 
         return result ?? ReturnUnknowError<Guid?>();
     }
-    #endregion
+
+    #endregion Posts and Puts
 }

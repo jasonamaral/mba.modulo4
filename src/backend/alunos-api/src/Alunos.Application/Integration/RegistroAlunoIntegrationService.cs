@@ -6,6 +6,7 @@ using Core.Messages.Integration;
 using Microsoft.Extensions.Logging;
 
 namespace Alunos.Application.Integration;
+
 public class RegistroAlunoIntegrationService(IMediatorHandler mediatorHandler,
     ILogger<RegistroAlunoIntegrationService> logger) : IRegistroAlunoIntegrationService
 {

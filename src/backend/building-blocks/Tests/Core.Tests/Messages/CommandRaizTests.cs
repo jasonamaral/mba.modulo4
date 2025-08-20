@@ -1,8 +1,5 @@
 using Core.Messages;
-using FluentAssertions;
-using FluentValidation;
 using FluentValidation.Results;
-using Xunit;
 
 namespace Core.Tests.Messages;
 

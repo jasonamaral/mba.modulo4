@@ -9,4 +9,4 @@ public class VendaRecenteDto
     public DateTime DataVenda { get; set; }
     public string Status { get; set; } = string.Empty;
     public string FormaPagamento { get; set; } = string.Empty;
-} 
+}

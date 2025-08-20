@@ -9,4 +9,4 @@ public class RefreshTokenRequest
     /// Token de refresh
     /// </summary>
     public string RefreshToken { get; set; } = string.Empty;
-} 
+}

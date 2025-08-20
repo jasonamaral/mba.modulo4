@@ -1,9 +1,10 @@
-﻿using Core.Communication;
+using Core.Communication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Conteudo.API.Filters;
+
 public class ExceptionFilter(IActionResultExecutor<ObjectResult> executor, ILogger<ExceptionFilter> logger) : IExceptionFilter
 {
     private readonly IActionResultExecutor<ObjectResult> _executor = executor;

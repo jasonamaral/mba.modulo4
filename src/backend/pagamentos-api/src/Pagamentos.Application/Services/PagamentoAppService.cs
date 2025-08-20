@@ -1,4 +1,4 @@
-﻿using Mapster;
+using Mapster;
 using Pagamentos.Application.Interfaces;
 using Pagamentos.Application.ViewModels;
 using Pagamentos.Domain.Interfaces;
@@ -7,7 +7,6 @@ namespace Pagamentos.Application.Services
 {
     public class PagamentoAppService : IPagamentoConsultaAppService, IPagamentoComandoAppService
     {
-
         private readonly IPagamentoRepository _pagamentoRepository;
 
         public PagamentoAppService(IPagamentoRepository pagamentoRepository)

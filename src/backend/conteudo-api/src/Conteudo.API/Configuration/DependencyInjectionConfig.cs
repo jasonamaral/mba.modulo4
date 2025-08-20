@@ -1,4 +1,4 @@
-﻿using Conteudo.Application.Commands.AtualizarAula;
+using Conteudo.Application.Commands.AtualizarAula;
 using Conteudo.Application.Commands.AtualizarCategoria;
 using Conteudo.Application.Commands.AtualizarCurso;
 using Conteudo.Application.Commands.AtualizarMaterial;
@@ -45,7 +45,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<IRequestHandler<ExcluirCursoCommand, CommandResult>, ExcluirCursoCommandHandler>();
         services.AddScoped<IRequestHandler<ExcluirAulaCommand, CommandResult>, ExcluirAulaCommandHandler>();
         services.AddScoped<IRequestHandler<ExcluirMaterialCommand, CommandResult>, ExcluirMaterialCommandHandler>();
-                
+
         // Services
         services.AddScoped<IAulaAppService, AulaAppService>();
         services.AddScoped<ICursoQuery, CursoQueryService>();
