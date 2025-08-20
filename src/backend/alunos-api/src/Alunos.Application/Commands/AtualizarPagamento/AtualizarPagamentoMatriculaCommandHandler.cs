@@ -1,4 +1,4 @@
-﻿using Alunos.Domain.Interfaces;
+using Alunos.Domain.Interfaces;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -18,8 +18,7 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
         if (!ValidarRequisicao(request)) { return request.Resultado; }
         if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
 
-        var matricula = aluno.ObterMatriculaPorCursoId(request.CursoId);
-        aluno.AtualizarPagamentoMatricula(matricula.Id);
+        aluno.AtualizarPagamentoMatricula(request.MatriculaCursoId);
 
         await _alunoRepository.AtualizarAsync(aluno);
         if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }

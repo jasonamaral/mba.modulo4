@@ -1,16 +1,16 @@
-﻿using Core.Messages;
+using Core.Messages;
 
 namespace Alunos.Application.Commands.AtualizarPagamento;
 public class AtualizarPagamentoMatriculaCommand : CommandRaiz
 {
     public Guid AlunoId { get; init; }
-    public Guid CursoId { get; init; }
+    public Guid MatriculaCursoId { get; init; }
 
-    public AtualizarPagamentoMatriculaCommand(Guid alunoId, Guid cursoId) 
+    public AtualizarPagamentoMatriculaCommand(Guid alunoId, Guid matriculaCursoId) 
     {
         DefinirRaizAgregacao(alunoId);
 
         AlunoId = alunoId;
-        CursoId = cursoId;
+        MatriculaCursoId = matriculaCursoId;
     }
 }

@@ -4,6 +4,7 @@ using Core.Messages;
 using Core.Messages.Integration;
 using Core.Notification;
 using Core.Services.Controllers;
+using EasyNetQ;
 using MediatR;
 using MessageBus;
 using Microsoft.AspNetCore.Authorization;
@@ -60,14 +61,18 @@ namespace Pagamentos.API.Controllers
 
             try
             {
-                var xxx =  await _bus.RequestAsync<PagamentoCursoEvent, ResponseMessage>(eventoPagamento);
+                if (OperacaoValida())
+                {
+                    PagamentoMatriculaCursoIntegrationEvent xx = new PagamentoMatriculaCursoIntegrationEvent(pagamento.AlunoId, pagamento.MatriculaId);
+
+
+                    var xxx = await _bus.RequestAsync<PagamentoMatriculaCursoIntegrationEvent, ResponseMessage>(xx);
+                }
             }
             catch (Exception ex)
             {
-                // Converte falhas de infraestrutura em ValidationResult inválido para ser retornado ao cliente
-                //var validationResult = new ValidationResult();
-                //validationResult.Errors.Add(new ValidationFailure("RegistroAluno", $"Falha ao registrar aluno no serviço de Alunos: {ex.Message}"));
-               // return new ResponseMessage(validationResult);
+                _notificador.AdicionarErro(ex.Message);
+                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
             }
 
             return RespostaPadraoApi(HttpStatusCode.OK, "");

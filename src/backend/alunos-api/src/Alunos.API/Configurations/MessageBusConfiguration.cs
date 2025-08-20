@@ -1,4 +1,4 @@
-﻿using Alunos.Infrastructure.Services;
+using Alunos.Infrastructure.Services;
 using Core.Utils;
 using MessageBus;
 
@@ -9,5 +9,8 @@ public static class MessageBusConfiguration
     {
         services.AddMessageBus(configuration?.GetMessageQueueConnection("MessageBus")!)
             .AddHostedService<RegistroAlunoIntegrationHandler>();
+
+        services.AddMessageBus(configuration?.GetMessageQueueConnection("MessageBus")!)
+            .AddHostedService<PagamentoMatriculaCursoIntegrationHandler>();
     }
 }
