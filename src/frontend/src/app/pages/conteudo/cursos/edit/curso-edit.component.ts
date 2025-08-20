@@ -6,23 +6,23 @@ import { CommonModule } from '@angular/common';
 import { FormBaseComponent } from 'src/app/components/base-components/form-base.component';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormControlName, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CategoryModel } from 'src/app/models/conteudo.model';
-import { CursoModel } from 'src/app/models/curso.model';
+import { CategoryModel } from 'src/app/pages/conteudo/models/categoria.model';
+import { CursoModel } from '../../models/curso.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
-import { CursoCreateModel } from 'src/app/models/curso.model';
+import { CursoCreateModel } from '../../models/curso.model';
 import { CursosService } from 'src/app/services/cursos.service';
-import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
+import { CategoriaAddDialogComponent } from '../../categorias/categoria-add-dialog.component';
 import { NgxCurrencyDirective } from "ngx-currency";
 
 @Component({
-  selector: 'app-conteudo-update',
+  selector: 'app-curso-edit',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, NgxCurrencyDirective],
-  templateUrl: './conteudo-update.component.html',
-  styleUrl: './conteudo-add.component.scss'
+  templateUrl: './curso-edit.component.html',
+  styleUrls: ['./curso-edit.component.scss']
 })
 
-export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit, OnDestroy {
+export class CursoEditComponent extends FormBaseComponent implements OnInit, OnDestroy {
   @ViewChildren(FormControlName, { read: ElementRef }) formInputElements!: ElementRef[];
 
   form: FormGroup = new FormGroup({});
@@ -36,7 +36,7 @@ export class ConteudoUpdateComponent extends FormBaseComponent implements OnInit
     private categoriasService: ConteudoService,
     private cursosService: CursosService,
     private toastr: ToastrService,
-    private dialogRef: MatDialogRef<ConteudoUpdateComponent>,
+    private dialogRef: MatDialogRef<CursoEditComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CursoModel | null) {
 
     super();

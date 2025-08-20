@@ -2,17 +2,18 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'src/app/material.module';
-import { AulaModel } from 'src/app/models/aula.model';
-import { CursoModel } from 'src/app/models/curso.model';
+import { AulaModel } from 'src/app/pages/conteudo/models/aula.model';
+import { CursoModel } from '../../models/curso.model';
 import { LocalStorageUtils } from 'src/app/utils/localstorage';
 import { MatDialog } from '@angular/material/dialog';
-import { AulaEditDialogComponent } from './aula-edit-dialog.component';
-import { CursosService } from '../../services/cursos.service';
+import { AulaEditDialogComponent } from '../edit/aula-edit-dialog.component';
 import { ToastrService } from 'ngx-toastr';
-import { AulaAddDialogComponent } from './aula-add-dialog.component';
+import { AulaAddDialogComponent } from '../add/aula-add-dialog.component';
+import { CursosService } from '../../../../services/cursos.service';
 
 interface DialogData {
   curso: CursoModel;
+  hasMatricula?: boolean;
 }
 
 @Component({
@@ -34,7 +35,7 @@ interface DialogData {
           </div>
           <div class="descricao" *ngIf="a.descricao">{{ a.descricao }}</div>
           <div class="meta">
-            <span *ngIf="a.videoUrl">
+            <span *ngIf="a.videoUrl && data.hasMatricula">
               <span class="iconify" data-icon="mdi:play-circle-outline" data-width="18" data-height="18"></span>
               <a [href]="a.videoUrl" target="_blank" rel="noopener">Assistir vídeo</a>
             </span>

@@ -192,6 +192,8 @@ public class ConteudosController : BffController
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
+
+        await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
         return Ok(response);
     }
 

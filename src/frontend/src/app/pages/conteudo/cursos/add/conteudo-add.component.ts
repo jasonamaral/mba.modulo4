@@ -7,12 +7,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormBaseComponent } from 'src/app/components/base-components/form-base.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormControlName, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CategoryModel } from 'src/app/models/conteudo.model';
+import { CategoryModel } from 'src/app/pages/conteudo/models/categoria.model';
 import { ConteudoService } from 'src/app/services/conteudo.service';
-import { CursoCreateModel } from 'src/app/models/curso.model';
+import { CursoCreateModel } from '../../models/curso.model';
 import { CursosService } from 'src/app/services/cursos.service';
-import { CategoriaAddDialogComponent } from './categoria-add-dialog.component';
-import { AulaAddDialogComponent } from './aula-add-dialog.component';
+import { CategoriaAddDialogComponent } from '../../categorias/categoria-add-dialog.component';
+import { AulaAddDialogComponent } from '../../aulas/add/aula-add-dialog.component';
 import { NgxCurrencyDirective } from "ngx-currency";
 
 @Component({

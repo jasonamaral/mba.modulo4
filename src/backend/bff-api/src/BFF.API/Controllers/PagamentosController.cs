@@ -55,6 +55,7 @@ namespace BFF.API.Controllers
 
                 if (resultado?.Status == (int)HttpStatusCode.OK)
                 {
+                    await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
                     return Ok(resultado);
                 }
 
