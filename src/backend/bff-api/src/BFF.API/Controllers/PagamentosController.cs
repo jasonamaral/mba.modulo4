@@ -1,4 +1,5 @@
 using BFF.API.Models.Request;
+using BFF.API.Services.Conteudos;
 using BFF.API.Services.Pagamentos;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs.Pagamentos.Response;
@@ -22,7 +23,8 @@ namespace BFF.API.Controllers
     public class PagamentosController : BffController
     {
         private readonly IPagamentoService _pagamentoService;
-        private readonly ICacheService _cacheService;
+        private readonly IConteudoService _conteudoService;
+
         private readonly ILogger<PagamentosController> _logger;
 
         public PagamentosController(IMediatorHandler mediator,
@@ -30,11 +32,11 @@ namespace BFF.API.Controllers
                                     INotificador notificador,
                                     ILogger<PagamentosController> logger,
                                     IPagamentoService pagamentoService,
-                                    ICacheService cacheService) : base(mediator, notifications, notificador)
+                                    IConteudoService conteudoService) : base(mediator, notifications, notificador)
         {
+            _conteudoService = conteudoService;
             _pagamentoService = pagamentoService;
             _logger = logger;
-            _cacheService = cacheService;
         }
 
         [Authorize(Roles = "Usuario, Administrador")]
@@ -44,18 +46,29 @@ namespace BFF.API.Controllers
         [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
         {
+            if (!ModelState.IsValid)
+                return RespostaPadraoApi<CommandResult>(ModelState);
+
             try
             {
-                if (!ModelState.IsValid)
+                var cursoResp = await _conteudoService.ObterCursoPorIdAsync(pagamento.CursoId, false);
+
+                if (cursoResp?.Status == (int)HttpStatusCode.OK)
                 {
-                    return RespostaPadraoApi<CommandResult>(ModelState);
+                    var valorCurso = cursoResp.Data?.Valor ?? 0m;
+
+                    if (valorCurso != pagamento.Total)
+                        return RespostaPadraoApi(HttpStatusCode.BadRequest, "Valor do Pagamento diverge do Valor do Curso");
+                }
+                else
+                {
+                    return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado.");
                 }
 
                 var resultado = await _pagamentoService.ExecutarPagamento(pagamento);
 
                 if (resultado?.Status == (int)HttpStatusCode.OK)
                 {
-                    await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
                     return Ok(resultado);
                 }
 
@@ -64,7 +77,7 @@ namespace BFF.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao processar pagamento via BFF");
-                return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
+                return ProcessarErro(HttpStatusCode.InternalServerError, "Erro interno do servidor");
             }
         }
 
