@@ -1,4 +1,5 @@
 using Alunos.Application.DTOs.Response;
+using Alunos.API.Extensions;
 using Core.Communication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,19 +54,20 @@ public partial class AlunoController
     }
 
     /// <summary>
-    /// Obtem as informações de matrículas pelo aluno
+    /// Obtem as informações de matrículas do aluno logado
     /// </summary>
-    /// <param name="alunoId">ID do aluno</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
-    [HttpGet("{alunoId}/todas-matriculas")]
+    [HttpGet("todas-matriculas")]
     [ProducesResponseType(typeof(ResponseResult<ICollection<MatriculaCursoDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ObterMatriculasPorAlunoId(Guid alunoId)
+    public async Task<IActionResult> ObterMatriculasPorAlunoId()
     {
         try
         {
+            var alunoId = User.GetUserId();
+            
             var matriculas = await _alunoQueryService.ObterMatriculasPorAlunoIdAsync(alunoId);
             if (matriculas == null || !matriculas.Any())
             {
@@ -123,5 +125,34 @@ public partial class AlunoController
         }
 
         return RespostaPadraoApi(data: aulas);
+    }
+
+    /// <summary>
+    /// Obtem os certificados de um aluno
+    /// </summary>
+    /// <param name="alunoId">ID do aluno</param>
+    /// <returns></returns>
+    [Authorize(Roles = "Usuario")]
+    [HttpGet("{alunoId}/certificados")]
+    [ProducesResponseType(typeof(ResponseResult<ICollection<CertificadosDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ObterCertificadosPorAlunoId(Guid alunoId)
+    {
+        try
+        {
+            var certificados = await _alunoQueryService.ObterCertificadosPorAlunoIdAsync(alunoId);
+            if (certificados == null || !certificados.Any())
+            {
+                _notificador.AdicionarErro("Nenhum certificado encontrado para o aluno.");
+                return RespostaPadraoApi<string>();
+            }
+
+            return RespostaPadraoApi(data: certificados);
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
     }
 }

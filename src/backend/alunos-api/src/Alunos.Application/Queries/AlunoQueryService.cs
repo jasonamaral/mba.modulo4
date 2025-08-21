@@ -77,7 +77,6 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
                 DataMatricula = m.DataMatricula,
                 DataConclusao = m.DataConclusao,
                 EstadoMatricula = m.EstadoMatricula.ObterDescricao(),
-                //QuantidadeAulasNoCurso = cursos.FirstOrDefault(c => c.Id == m.CursoId)?.QuantidadeAulas ?? -1,
                 QuantidadeAulasRealizadas = m.QuantidadeAulasFinalizadas(),
                 QuantidadeAulasEmAndamento = m.QuantidadeAulasEmAndamento(),
                 Certificado = m.Certificado != null ? new CertificadoDto
@@ -197,5 +196,30 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
         }
 
         return retorno.OrderBy(x => x.OrdemAula).ToList();
+    }
+
+    public async Task<IEnumerable<CertificadosDto>> ObterCertificadosPorAlunoIdAsync(Guid alunoId)
+    {
+        var aluno = await _alunoRepository.ObterPorIdAsync(alunoId);
+        if (aluno == null || aluno.MatriculasCursos == null) return [];
+
+        var certificados = new List<CertificadosDto>();
+        
+        foreach (var matricula in aluno.MatriculasCursos)
+        {
+            if (matricula.Certificado != null && !string.IsNullOrEmpty(matricula.Certificado.PathCertificado))
+            {
+                certificados.Add(new CertificadosDto
+                {
+                    Id = matricula.Certificado.Id,
+                    NomeCurso = matricula.Certificado.NomeCurso,
+                    Codigo = matricula.Certificado.Id.ToString("N").Substring(0, 8).ToUpper(),
+                    DataEmissao = matricula.Certificado.DataEmissao ?? matricula.Certificado.DataSolicitacao,
+                    Url = matricula.Certificado.PathCertificado
+                });
+            }
+        }
+
+        return [.. certificados.OrderByDescending(x => x.DataEmissao)];
     }
 }

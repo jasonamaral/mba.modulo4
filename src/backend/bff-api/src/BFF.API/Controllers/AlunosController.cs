@@ -1,4 +1,5 @@
 using BFF.API.Services.Aluno;
+using BFF.API.Extensions;
 using BFF.Domain.DTOs.Alunos.Request;
 using BFF.Domain.DTOs.Alunos.Response;
 using Core.Communication;
@@ -82,20 +83,20 @@ public class AlunosController(IAlunoService aulaService,
     }
 
     /// <summary>
-    /// Obtem uma lista das matrículas de um determinado aluno
+    /// Obtem uma lista das matrículas do aluno logado
     /// </summary>
-    /// <param name="alunoId">ID do Aluno</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
-    [HttpGet("{alunoId}/todas-matriculas")]
+    [HttpGet("todas-matriculas")]
     [ProducesResponseType(typeof(ResponseResult<ICollection<MatriculaCursoDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ObterMatriculasPorAlunoIdAsync(Guid alunoId)
+    public async Task<IActionResult> ObterMatriculasPorAlunoIdAsync()
     {
+        var alunoId = User.GetUserId();
         if (alunoId == Guid.Empty)
         {
-            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválido.");
+            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Usuário não autenticado.");
         }
 
         var resultado = await _aulaService.ObterMatriculasPorAlunoIdAsync(alunoId);
@@ -257,6 +258,33 @@ public class AlunosController(IAlunoService aulaService,
         if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
 
         var resultado = await _aulaService.SolicitarCertificadoAsync(dto);
+
+        if (resultado?.Status == (int)HttpStatusCode.OK)
+        {
+            return Ok(resultado);
+        }
+
+        return BadRequest(resultado);
+    }
+
+    /// <summary>
+    /// Obtem os certificados do aluno logado
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = "Usuario")]
+    [HttpGet("certificados")]
+    [ProducesResponseType(typeof(ResponseResult<ICollection<CertificadosDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ObterCertificadosAsync()
+    {
+        var alunoId = User.GetUserId();
+        if (alunoId == Guid.Empty)
+        {
+            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Usuário não autenticado.");
+        }
+
+        var resultado = await _aulaService.ObterCertificadosPorAlunoIdAsync(alunoId);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {

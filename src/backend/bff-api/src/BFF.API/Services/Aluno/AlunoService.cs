@@ -203,5 +203,14 @@ public partial class AlunoService : BaseApiService, IAlunoService
         return result ?? ReturnUnknowError<Guid?>();
     }
 
+    public async Task<ResponseResult<ICollection<CertificadosDto>>> ObterCertificadosPorAlunoIdAsync(Guid alunoId)
+    {
+        var result = await ExecuteWithErrorHandling(() => ObterCertificados(alunoId),
+            nameof(ObterCertificadosPorAlunoIdAsync),
+            alunoId);
+
+        return result ?? ReturnUnknowError<ICollection<CertificadosDto>>();
+    }
+
     #endregion Posts and Puts
 }

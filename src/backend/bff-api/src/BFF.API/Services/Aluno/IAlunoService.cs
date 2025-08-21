@@ -23,4 +23,6 @@ public interface IAlunoService
     Task<ResponseResult<bool?>> ConcluirCursoAsync(ConcluirCursoRequest dto);
 
     Task<ResponseResult<Guid?>> SolicitarCertificadoAsync(SolicitaCertificadoRequest dto);
+
+    Task<ResponseResult<ICollection<CertificadosDto>>> ObterCertificadosPorAlunoIdAsync(Guid alunoId);
 }
