@@ -7,26 +7,42 @@
 <table mat-table [dataSource]="matriculas" class="mat-elevation-z1 w-100" *ngIf="matriculas?.length; else vazio">
   <ng-container matColumnDef="curso">
     <th mat-header-cell *matHeaderCellDef>Curso</th>
-    <td mat-cell *matCellDef="let m">{{m.cursoNome}}</td>
+    <td mat-cell *matCellDef="let m">{{m.nomeCurso}}</td>
   </ng-container>
 
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef>Status</th>
-    <td mat-cell *matCellDef="let m">{{m.status}}</td>
+    <td mat-cell *matCellDef="let m">{{m.estadoMatricula}}</td>
   </ng-container>
 
   <ng-container matColumnDef="progresso">
     <th mat-header-cell *matHeaderCellDef>Progresso</th>
     <td mat-cell *matCellDef="let m">
-      <mat-progress-bar mode="determinate" [value]="m.percentualConclusao"></mat-progress-bar>
-      <small>{{m.percentualConclusao}}%</small>
+      <div *ngIf="m.estadoMatricula === 'Curso concluído'; else progressoBar">
+        <span class="concluido-badge">100% Concluído</span>
+      </div>
+      <ng-template #progressoBar>
+        <span class="em-andamento">Em andamento</span>
+      </ng-template>
     </td>
   </ng-container>
 
   <ng-container matColumnDef="acoes">
     <th mat-header-cell *matHeaderCellDef>Ações</th>
     <td mat-cell *matCellDef="let m">
-      <button mat-stroked-button color="primary" (click)="finalizar(m)" [disabled]="m.percentualConclusao < 100">Emitir Certificado</button>
+      <button *ngIf="m.estadoMatricula === 'Curso concluído' && !m.certificado" 
+              mat-stroked-button color="primary" 
+              (click)="solicitarCertificado(m)">
+        Emitir Certificado
+      </button>
+      <span *ngIf="m.estadoMatricula === 'Curso concluído' && m.certificado" 
+            class="certificado-emitido">
+        ✓ Certificado Emitido
+      </span>
+      <span *ngIf="m.estadoMatricula !== 'Curso concluído'" 
+            class="curso-pendente">
+        Curso em andamento
+      </span>
     </td>
   </ng-container>
 

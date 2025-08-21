@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, catchError, map } from 'rxjs';
 import { BaseService } from './BaseService';
 import { MatriculaCreateModel, MatriculaModel } from '../models/matricula.model';
+import { SolicitarCertificadoRequest } from '../models/certificado.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatriculasService extends BaseService {
@@ -24,6 +25,13 @@ export class MatriculasService extends BaseService {
   finalizarCurso(cursoId: string) {
     return this.http
       .post(this.UrlServiceV1 + `alunos/cursos/${cursoId}/finalizar`, {}, this.getAuthHeaderJson())
+      .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
+  }
+
+  solicitarCertificado(request: SolicitarCertificadoRequest): Observable<string> {
+    const alunoId = this.LocalStorage.getUser()?.usuarioToken?.id;
+    return this.http
+      .post(this.UrlServiceV1 + `alunos/${alunoId}/solicitar-certificado`, request, this.getAuthHeaderJson())
       .pipe(map(r => this.extractData(r)), catchError(e => this.serviceError(e)));
   }
 

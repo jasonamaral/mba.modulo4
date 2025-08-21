@@ -6,4 +6,9 @@ export interface CertificadoModel {
   url: string;
 }
 
+export interface SolicitarCertificadoRequest {
+  alunoId: string;
+  matriculaCursoId: string;
+}
+
 
