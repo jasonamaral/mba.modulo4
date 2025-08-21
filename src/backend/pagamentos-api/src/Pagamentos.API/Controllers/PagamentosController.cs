@@ -29,6 +29,15 @@ namespace Pagamentos.API.Controllers
         private readonly IMediatorHandler _mediator = mediator;
         private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService = pagamentoConsultaAppService;
 
+        /// <summary>
+        /// Executa o pagamento de um curso.
+        /// </summary>
+        /// <param name="pagamento">Dados do pagamento a ser processado</param>
+        /// <returns>
+        /// Resultado da operação de pagamento.
+        /// </returns>
+        /// <response code="200">Pagamento processado com sucesso</response>
+        /// <response code="400">Erro de validação ou falha ao executar pagamento</response>
         [HttpPost("pagamento")]
         [SwaggerOperation(Summary = "Executa pagamento", Description = "Executa o pagamento do curso.")]
         [ProducesResponseType(typeof(PagamentoCursoInputModel), StatusCodes.Status200OK)]
@@ -70,6 +79,13 @@ namespace Pagamentos.API.Controllers
             return RespostaPadraoApi(HttpStatusCode.OK, "");
         }
 
+        /// <summary>
+        /// Obtém todos os pagamentos cadastrados.
+        /// </summary>
+        /// <returns>
+        /// Lista de pagamentos disponíveis no sistema.
+        /// </returns>
+        /// <response code="200">Lista retornada com sucesso</response>
         [Authorize(Roles = "Administrador")]
         [HttpGet("obter_todos")]
         [SwaggerOperation(Summary = "Obtém todos os pagamentos", Description = "Retorna uma lista com todos os pagamentos.")]
@@ -80,6 +96,15 @@ namespace Pagamentos.API.Controllers
             return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
         }
 
+        /// <summary>
+        /// Obtém um pagamento específico pelo seu identificador único.
+        /// </summary>
+        /// <param name="id">ID do pagamento (Guid)</param>
+        /// <returns>
+        /// Dados do pagamento solicitado.
+        /// </returns>
+        /// <response code="200">Pagamento encontrado</response>
+        /// <response code="404">Pagamento não encontrado</response>
         [Authorize(Roles = "Administrador")]
         [HttpGet("obter/{id:guid}")]
         [SwaggerOperation(Summary = "Obtém pagamento por ID", Description = "Retorna os dados de um pagamento específico.")]
