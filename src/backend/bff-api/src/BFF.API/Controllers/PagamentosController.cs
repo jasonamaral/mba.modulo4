@@ -39,6 +39,17 @@ namespace BFF.API.Controllers
             _logger = logger;
         }
 
+
+        /// <summary>
+        /// Registra um novo pagamento de curso.
+        /// </summary>
+        /// <param name="pagamento">Dados do pagamento a ser processado</param>
+        /// <returns>
+        /// Retorna o resultado do processamento do pagamento.
+        /// </returns>
+        /// <response code="200">Pagamento processado com sucesso</response>
+        /// <response code="400">Erro de validação ou valor divergente do curso</response>
+        /// <response code="500">Erro interno ao processar o pagamento</response>
         [Authorize(Roles = "Usuario, Administrador")]
         [HttpPost("registrar-pagamento")]
         [ProducesResponseType(typeof(ResponseResult<bool>), StatusCodes.Status200OK)]
@@ -81,6 +92,15 @@ namespace BFF.API.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Obtém todos os pagamentos cadastrados.
+        /// </summary>
+        /// <returns>
+        /// Lista de pagamentos disponíveis no sistema.
+        /// </returns>
+        /// <response code="200">Lista retornada com sucesso</response>
+        /// <response code="500">Erro interno ao obter os pagamentos</response>
         [Authorize(Roles = "Usuario, Administrador")]
         [HttpGet("obter_todos")]
         [ProducesResponseType(typeof(ResponseResult<IEnumerable<PagamentoDto>>), StatusCodes.Status200OK)]
@@ -99,6 +119,17 @@ namespace BFF.API.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Obtém um pagamento específico pelo seu identificador único.
+        /// </summary>
+        /// <param name="id">ID do pagamento (Guid)</param>
+        /// <returns>
+        /// Dados do pagamento solicitado.
+        /// </returns>
+        /// <response code="200">Pagamento encontrado</response>
+        /// <response code="404">Pagamento não encontrado</response>
+        /// <response code="500">Erro interno ao obter o pagamento</response>
         [Authorize(Roles = "Administrador")]
         [HttpGet("obter/{id:guid}")]
         [ProducesResponseType(typeof(ResponseResult<PagamentoDto>), StatusCodes.Status200OK)]
