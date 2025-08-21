@@ -15,4 +15,6 @@ public interface IAlunoQueryService
     Task<CertificadoDto> ObterCertificadoPorMatriculaIdAsync(Guid matriculaCursoId);
 
     Task<IEnumerable<AulaCursoDto>> ObterAulasPorMatriculaIdAsync(Guid matriculaCursoId);
+
+    Task<IEnumerable<CertificadosDto>> ObterCertificadosPorAlunoIdAsync(Guid alunoId);
 }

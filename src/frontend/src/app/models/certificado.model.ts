@@ -1,10 +1,8 @@
 export interface CertificadoModel {
   id: string;
-  alunoId: string;
-  cursoId: string;
-  cursoNome: string;
+  nomeCurso: string;
+  codigo: string;
   dataEmissao: string;
-  codigoVerificacao: string;
   url: string;
 }
 

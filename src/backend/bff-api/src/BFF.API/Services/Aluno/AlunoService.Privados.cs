@@ -73,4 +73,12 @@ public partial class AlunoService
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
         else { return CaptureRequestError<Guid?>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
+
+    private async Task<ResponseResult<ICollection<CertificadosDto>>> ObterCertificados(Guid alunoId)
+    {
+        var url = $"api/aluno/{alunoId}/certificados";
+        var apiResponse = await _apiClient.GetWithDetailsAsync<ResponseResult<ICollection<CertificadosDto>>>(url);
+        if (apiResponse.IsSuccess) { return apiResponse.Data; }
+        else { return CaptureRequestError<ICollection<CertificadosDto>>(apiResponse.ErrorContent, apiResponse.StatusCode); }
+    }
 }

@@ -124,4 +124,33 @@ public partial class AlunoController
 
         return RespostaPadraoApi(data: aulas);
     }
+
+    /// <summary>
+    /// Obtem os certificados de um aluno
+    /// </summary>
+    /// <param name="alunoId">ID do aluno</param>
+    /// <returns></returns>
+    [Authorize(Roles = "Usuario")]
+    [HttpGet("{alunoId}/certificados")]
+    [ProducesResponseType(typeof(ResponseResult<ICollection<CertificadosDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ObterCertificadosPorAlunoId(Guid alunoId)
+    {
+        try
+        {
+            var certificados = await _alunoQueryService.ObterCertificadosPorAlunoIdAsync(alunoId);
+            if (certificados == null || !certificados.Any())
+            {
+                _notificador.AdicionarErro("Nenhum certificado encontrado para o aluno.");
+                return RespostaPadraoApi<string>();
+            }
+
+            return RespostaPadraoApi(data: certificados);
+        }
+        catch (Exception ex)
+        {
+            return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
+        }
+    }
 }
