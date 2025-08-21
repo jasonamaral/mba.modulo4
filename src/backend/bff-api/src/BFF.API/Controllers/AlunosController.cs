@@ -83,20 +83,20 @@ public class AlunosController(IAlunoService aulaService,
     }
 
     /// <summary>
-    /// Obtem uma lista das matrículas de um determinado aluno
+    /// Obtem uma lista das matrículas do aluno logado
     /// </summary>
-    /// <param name="alunoId">ID do Aluno</param>
     /// <returns></returns>
     [Authorize(Roles = "Usuario")]
-    [HttpGet("{alunoId}/todas-matriculas")]
+    [HttpGet("todas-matriculas")]
     [ProducesResponseType(typeof(ResponseResult<ICollection<MatriculaCursoDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ObterMatriculasPorAlunoIdAsync(Guid alunoId)
+    public async Task<IActionResult> ObterMatriculasPorAlunoIdAsync()
     {
+        var alunoId = User.GetUserId();
         if (alunoId == Guid.Empty)
         {
-            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválido.");
+            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Usuário não autenticado.");
         }
 
         var resultado = await _aulaService.ObterMatriculasPorAlunoIdAsync(alunoId);

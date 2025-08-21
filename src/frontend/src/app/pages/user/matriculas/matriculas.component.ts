@@ -22,8 +22,7 @@ export class MatriculasComponent {
   ngOnInit() { this.load(); }
 
   load() {
-    const alunoId = this.service.LocalStorage.getUser()?.usuarioToken?.id;
-    this.service.listarMatriculas(alunoId).subscribe({
+    this.service.listarMatriculas().subscribe({
       next: d => this.matriculas = d,
       error: (fail) => {
         const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];

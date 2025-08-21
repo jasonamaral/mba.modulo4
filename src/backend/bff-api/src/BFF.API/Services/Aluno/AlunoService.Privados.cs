@@ -24,7 +24,7 @@ public partial class AlunoService
 
     public async Task<ResponseResult<ICollection<MatriculaCursoDto>>> ObterMatriculasPorAlunoId(Guid alunoId)
     {
-        var url = $"api/aluno/{alunoId}/todas-matriculas";
+        var url = "api/aluno/todas-matriculas";
         var apiResponse = await _apiClient.GetWithDetailsAsync<ResponseResult<ICollection<MatriculaCursoDto>>>(url);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
         else { return CaptureRequestError<ICollection<MatriculaCursoDto>>(apiResponse.ErrorContent, apiResponse.StatusCode); }
