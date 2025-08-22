@@ -5,6 +5,7 @@ using Conteudo.Application.Commands.ExcluirAula;
 using Conteudo.Application.Commands.PublicarAula;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
+using Conteudo.Domain.Entities;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -22,10 +23,10 @@ namespace Conteudo.API.Controllers
     /// <summary>
     /// Controller para gerenciar aulas
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("api/cursos/{cursoId}/[controller]")]
     [Authorize]
     [Produces("application/json")]
-    public class AulaController(IMediatorHandler mediator,
+    public class AulasController(IMediatorHandler mediator,
                                 IAulaAppService aulaAppService,
                                 INotificationHandler<DomainNotificacaoRaiz> notifications,
                                 INotificador notificador) : MainController(mediator, notifications, notificador)
@@ -36,17 +37,18 @@ namespace Conteudo.API.Controllers
         /// <summary>
         /// Obtém uma aula por ID
         /// </summary>
+        /// <param name="cursoId">ID do curso</param>
         /// <param name="id">ID da aula</param>
         /// <param name="includeMateriais">Se deve incluir materiais na resposta</param>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ResponseResult<AulaDto>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 404)]
         [Authorize(Roles = "Usuario, Administrador")]
-        public async Task<IActionResult> ObterPorId(Guid id, [FromQuery] bool includeMateriais = false)
+        public async Task<IActionResult> ObterPorId(Guid cursoId, Guid id, [FromQuery] bool includeMateriais = false)
         {
             try
             {
-                var aula = await _aulaAppService.ObterPorIdAsync(id, includeMateriais);
+                var aula = await _aulaAppService.ObterPorIdAsync(cursoId, id, includeMateriais);
 
                 if (aula == null)
                 {
@@ -65,41 +67,17 @@ namespace Conteudo.API.Controllers
         /// <summary>
         /// Obtém todas as aulas
         /// </summary>
+        /// <param name="cursoId">ID do curso</param>
         /// <param name="includeMateriais">Se deve incluir materiais na resposta</param>
         [HttpGet]
         [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Usuario, Administrador")]
-        public async Task<IActionResult> ObterTodos([FromQuery] bool includeMateriais = false)
+        public async Task<IActionResult> ObterTodos(Guid cursoId, [FromQuery] bool includeMateriais = false)
         {
             try
             {
-                var aulas = await _aulaAppService.ObterTodosAsync(includeMateriais);
-                return RespostaPadraoApi(data: aulas);
-            }
-            catch (Exception ex)
-            {
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Obtém aulas por curso
-        /// </summary>
-        /// <param name="cursoId">ID do curso</param>
-        /// <param name="includeMateriais">Se deve incluir materiais na resposta</param>
-        [HttpGet("curso/{cursoId}")]
-        [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
-        [Authorize(Roles = "Usuario, Administrador")]
-        public async Task<IActionResult> ObterPorCursoId(Guid cursoId, [FromQuery] bool includeMateriais = false)
-        {
-            try
-            {
-                if (cursoId == Guid.Empty)
-                    return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do curso inválido");
-
-                var aulas = await _aulaAppService.ObterPorCursoIdAsync(cursoId, includeMateriais);
+                var aulas = await _aulaAppService.ObterTodosAsync(cursoId, includeMateriais);
                 return RespostaPadraoApi(data: aulas);
             }
             catch (Exception ex)
@@ -130,44 +108,26 @@ namespace Conteudo.API.Controllers
         }
 
         /// <summary>
-        /// Obtém aulas publicadas por curso
-        /// </summary>
-        /// <param name="cursoId">ID do curso</param>
-        /// <param name="includeMateriais">Se deve incluir materiais na resposta</param>
-        [HttpGet("curso/{cursoId}/publicadas")]
-        [ProducesResponseType(typeof(ResponseResult<IEnumerable<AulaDto>>), 200)]
-        [ProducesResponseType(typeof(ResponseResult<string>), 400)]
-        [Authorize(Roles = "Usuario, Administrador")]
-        public async Task<IActionResult> ObterPublicadasPorCursoId(Guid cursoId, [FromQuery] bool includeMateriais = false)
-        {
-            try
-            {
-                if (cursoId == Guid.Empty)
-                    return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do curso inválido");
-
-                var aulas = await _aulaAppService.ObterPublicadasPorCursoIdAsync(cursoId, includeMateriais);
-                return RespostaPadraoApi(data: aulas);
-            }
-            catch (Exception ex)
-            {
-                return RespostaPadraoApi(HttpStatusCode.BadRequest, ex.Message);
-            }
-        }
-
-        /// <summary>
         /// Cadastra uma nova aula
         /// </summary>
+        /// <param name="cursoId">ID do curso ao qual a aula pertence</param>
         /// <param name="dto">Dados da aula</param>
-        [HttpPost]
+        [HttpPost()]
         [ProducesResponseType(typeof(ResponseResult<Guid?>), 201)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Cadastrar([FromBody] CadastroAulaDto dto)
+        public async Task<IActionResult> Cadastrar([FromRoute] Guid cursoId, [FromBody] CadastroAulaDto dto)
         {
             try
             {
+                if (cursoId != dto.CursoId)
+                {
+                    _notificador.AdicionarErro("ID do curso informado não confere.");
+                    return RespostaPadraoApi<string>();
+                }
+
                 var command = dto.Adapt<CadastrarAulaCommand>();
-                return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<Guid>(await _mediator.ExecutarComando(command), HttpStatusCode.Created);
             }
             catch (Exception ex)
             {
@@ -178,18 +138,27 @@ namespace Conteudo.API.Controllers
         /// <summary>
         /// Atualiza uma aula existente
         /// </summary>
+        /// <param name="cursoId">ID do curso ao qual a aula pertence</param>
         /// <param name="id">ID da aula</param>
         /// <param name="dto">Dados atualizados da aula</param>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Atualizar(Guid id, [FromBody] AtualizarAulaDto dto)
+        public async Task<IActionResult> Atualizar([FromRoute]Guid cursoId, Guid id, [FromBody] AtualizarAulaDto dto)
         {
             try
             {
+                if (cursoId != dto.CursoId)
+                {
+                    _notificador.AdicionarErro("ID do curso informado não confere.");
+                    return RespostaPadraoApi<string>();
+                }
                 if (id != dto.Id)
-                    return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da aula não confere");
+                {
+                    _notificador.AdicionarErro("ID da aula não confere.");
+                    return RespostaPadraoApi<string>();
+                }
 
                 var command = dto.Adapt<AtualizarAulaCommand>();
                 return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
@@ -203,16 +172,17 @@ namespace Conteudo.API.Controllers
         /// <summary>
         /// Exclui uma aula
         /// </summary>
+        /// <param name="cursoId">ID do curso ao qual a aula pertence</param>
         /// <param name="id">ID da aula</param>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(ResponseResult<bool>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Excluir(Guid id)
+        public async Task<IActionResult> Excluir(Guid cursoId, Guid id)
         {
             try
             {
-                var command = new ExcluirAulaCommand(id);
+                var command = new ExcluirAulaCommand(cursoId, id);
                 return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
@@ -224,16 +194,17 @@ namespace Conteudo.API.Controllers
         /// <summary>
         /// Publica uma aula
         /// </summary>
+        /// <param name="cursoId">ID do curso ao qual a aula pertence</param>
         /// <param name="id">ID da aula</param>
         [HttpPost("{id}/publicar")]
         [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Publicar(Guid id)
+        public async Task<IActionResult> Publicar(Guid cursoId, Guid id)
         {
             try
             {
-                var command = new PublicarAulaCommand(id);
+                var command = new PublicarAulaCommand(cursoId, id);
                 return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)
@@ -245,16 +216,17 @@ namespace Conteudo.API.Controllers
         /// <summary>
         /// Despublica uma aula
         /// </summary>
+        /// <param name="cursoId">ID do curso ao qual a aula pertence</param>
         /// <param name="id">ID da aula</param>
         [HttpPost("{id}/despublicar")]
         [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Despublicar(Guid id)
+        public async Task<IActionResult> Despublicar(Guid cursoId, Guid id)
         {
             try
             {
-                var command = new DespublicarAulaCommand(id);
+                var command = new DespublicarAulaCommand(cursoId, id);
                 return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
             }
             catch (Exception ex)

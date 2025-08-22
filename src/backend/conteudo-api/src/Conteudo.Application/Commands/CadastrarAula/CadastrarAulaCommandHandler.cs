@@ -26,37 +26,27 @@ namespace Conteudo.Application.Commands.CadastrarAula
 
         public async Task<CommandResult> Handle(CadastrarAulaCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                _raizAgregacao = request.RaizAgregacao;
-                if (!await ValidarRequisicao(request))
-                    return request.Resultado;
-
-                var aula = new Aula(
-                    request.CursoId,
-                    request.Nome,
-                    request.Descricao,
-                    request.Numero,
-                    request.DuracaoMinutos,
-                    request.VideoUrl,
-                    request.TipoAula,
-                    request.IsObrigatoria,
-                    request.Observacoes);
-
-                await _aulaRepository.CadastrarAulaAsync(aula);
-
-                if (await _aulaRepository.UnitOfWork.Commit())
-                {
-                    request.Resultado.Data = aula.Id;
-                }
-
+            _raizAgregacao = request.RaizAgregacao;
+            if (!await ValidarRequisicao(request))
                 return request.Resultado;
-            }
-            catch (Exception ex)
-            {
-                request.Validacao.Errors.Add(new ValidationFailure("Exception", $"Erro ao cadastrar aula: {ex.Message}"));
-                return request.Resultado;
-            }
+
+            var aula = new Aula(
+                request.CursoId,
+                request.Nome,
+                request.Descricao,
+                request.Numero,
+                request.DuracaoMinutos,
+                request.VideoUrl,
+                request.TipoAula,
+                request.IsObrigatoria,
+                request.Observacoes);
+
+            await _aulaRepository.CadastrarAulaAsync(aula);
+
+            if (await _aulaRepository.UnitOfWork.Commit())
+                request.Resultado.Data = aula.Id;
+
+            return request.Resultado;
         }
 
         private async Task<bool> ValidarRequisicao(CadastrarAulaCommand request)

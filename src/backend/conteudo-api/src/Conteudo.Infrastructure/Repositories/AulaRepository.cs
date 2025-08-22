@@ -11,7 +11,7 @@ namespace Conteudo.Infrastructure.Repositories
         private readonly DbSet<Aula> _aula = dbContext.Set<Aula>();
         public IUnitOfWork UnitOfWork => dbContext;
 
-        public async Task<IEnumerable<Aula>> ObterTodosAsync(bool includeMateriais = false)
+        public async Task<IEnumerable<Aula>> ObterTodosAsync(Guid cursoId, bool includeMateriais = false)
         {
             var query = _aula.AsQueryable();
 
@@ -19,11 +19,12 @@ namespace Conteudo.Infrastructure.Repositories
                 query = query.Include(a => a.Materiais);
 
             return await query
+                .Where(a => a.CursoId == cursoId)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-        public async Task<Aula?> ObterPorIdAsync(Guid id, bool includeMateriais = false)
+        public async Task<Aula?> ObterPorIdAsync(Guid cursoId, Guid id, bool includeMateriais = false)
         {
             var query = _aula.AsQueryable();
 
@@ -31,7 +32,7 @@ namespace Conteudo.Infrastructure.Repositories
                 query = query.Include(a => a.Materiais);
 
             return await query
-                .FirstOrDefaultAsync(a => a.Id == id);
+                .FirstOrDefaultAsync(a => a.Id == id && a.CursoId == cursoId);
         }
 
         public async Task<IEnumerable<Aula>> ObterPorCursoIdAsync(Guid cursoId, bool includeMateriais = false)
@@ -102,9 +103,9 @@ namespace Conteudo.Infrastructure.Repositories
             return aula;
         }
 
-        public async Task PublicarAulaAsync(Guid id)
+        public async Task PublicarAulaAsync(Guid cursoId, Guid id)
         {
-            var aula = await ObterPorIdAsync(id);
+            var aula = await ObterPorIdAsync(cursoId, id);
             if (aula != null)
             {
                 aula.Publicar();
@@ -113,9 +114,9 @@ namespace Conteudo.Infrastructure.Repositories
             }
         }
 
-        public async Task DespublicarAulaAsync(Guid id)
+        public async Task DespublicarAulaAsync(Guid cursoId, Guid id)
         {
-            var aula = await ObterPorIdAsync(id);
+            var aula = await ObterPorIdAsync(cursoId, id);
             if (aula != null)
             {
                 aula.Despublicar();
@@ -124,9 +125,9 @@ namespace Conteudo.Infrastructure.Repositories
             }
         }
 
-        public async Task ExcluirAulaAsync(Guid id)
+        public async Task ExcluirAulaAsync(Guid cursoId, Guid id)
         {
-            var aula = await ObterPorIdAsync(id);
+            var aula = await ObterPorIdAsync(cursoId, id);
             if (aula != null)
             {
                 _aula.Remove(aula);

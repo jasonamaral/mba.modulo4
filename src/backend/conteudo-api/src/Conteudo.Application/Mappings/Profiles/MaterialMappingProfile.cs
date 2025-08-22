@@ -13,6 +13,7 @@ namespace Conteudo.Application.Mappings.Profiles
         {
             config.NewConfig<CadastroMaterialDto, CadastrarMaterialCommand>()
                 .ConstructUsing(x => new CadastrarMaterialCommand(
+                    x.CursoId,
                     x.AulaId,
                     x.Nome,
                     x.Descricao,
@@ -25,6 +26,7 @@ namespace Conteudo.Application.Mappings.Profiles
 
             config.NewConfig<AtualizarMaterialDto, AtualizarMaterialCommand>()
                 .ConstructUsing(x => new AtualizarMaterialCommand(
+                    x.CursoId,
                     x.Id,
                     x.Nome,
                     x.Descricao,

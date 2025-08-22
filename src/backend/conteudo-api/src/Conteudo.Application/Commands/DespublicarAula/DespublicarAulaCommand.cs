@@ -6,10 +6,12 @@ namespace Conteudo.Application.Commands.DespublicarAula
 {
     public class DespublicarAulaCommand : CommandRaiz, IRequest<CommandResult>
     {
+        public Guid CursoId { get; private set; }
         public Guid Id { get; private set; }
 
-        public DespublicarAulaCommand(Guid id)
+        public DespublicarAulaCommand(Guid cursoId, Guid id)
         {
+            CursoId = cursoId;
             Id = id;
             DefinirRaizAgregacao(Id);
         }

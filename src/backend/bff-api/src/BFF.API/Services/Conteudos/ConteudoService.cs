@@ -75,23 +75,23 @@ public partial class ConteudoService : BaseApiService, IConteudoService
         return result ?? ReturnUnknowError<bool?>();
     }
 
-    public async Task<ResponseResult<Guid>> AdicionarAulaAsync(Guid cursoId, AulaCriarRequest aula)
+    public async Task<ResponseResult<Guid?>> AdicionarAulaAsync(Guid cursoId, AulaCriarRequest aula)
     {
         var result = await ExecuteWithErrorHandling(() => AdicionarAula(cursoId, aula),
             nameof(AdicionarAulaAsync),
             cursoId);
 
-        return result ?? ReturnUnknowError<Guid>();
+        return result ?? ReturnUnknowError<Guid?>();
     }
 
-    public async Task<ResponseResult<AulaDto>> AtualizarAulaAsync(Guid cursoId, AulaAtualizarRequest aula)
+    public async Task<ResponseResult<bool>> AtualizarAulaAsync(Guid cursoId, AulaAtualizarRequest aula)
     {
         var result = await ExecuteWithErrorHandling(
             () => AtualizarAula(cursoId, aula.Id, aula),
             nameof(AtualizarAulaAsync),
             aula.Id);
 
-        return result ?? ReturnUnknowError<AulaDto>();
+        return result ?? ReturnUnknowError<bool>();
     }
 
     public async Task<ResponseResult<bool>> ExcluirAulaAsync(Guid cursoId, Guid aulaId)

@@ -23,9 +23,9 @@ public interface IConteudoService
 
     Task<ResponseResult<bool?>> ExcluirCursoAsync(Guid cursoId);
 
-    Task<ResponseResult<Guid>> AdicionarAulaAsync(Guid cursoId, AulaCriarRequest aula);
+    Task<ResponseResult<Guid?>> AdicionarAulaAsync(Guid cursoId, AulaCriarRequest aula);
 
-    Task<ResponseResult<AulaDto>> AtualizarAulaAsync(Guid cursoId, AulaAtualizarRequest aula);
+    Task<ResponseResult<bool>> AtualizarAulaAsync(Guid cursoId, AulaAtualizarRequest aula);
 
     Task<ResponseResult<bool>> ExcluirAulaAsync(Guid cursoId, Guid aulaId);
 }

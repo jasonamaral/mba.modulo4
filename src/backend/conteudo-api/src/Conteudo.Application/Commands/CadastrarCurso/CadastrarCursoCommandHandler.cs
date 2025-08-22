@@ -41,7 +41,7 @@ public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
                               request.CategoriaId);
 
         await _cursoRepository.Adicionar(curso);
-        if (await categoriaRepository.UnitOfWork.Commit())
+        if (await _cursoRepository.UnitOfWork.Commit())
             request.Resultado.Data = curso.Id;
         else
             request.Resultado.Data = Guid.Empty;

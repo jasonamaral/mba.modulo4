@@ -79,27 +79,27 @@ public partial class ConteudoService
         }
     }
 
-    public async Task<ResponseResult<Guid>> AdicionarAula(Guid cursoId, AulaCriarRequest aula)
+    public async Task<ResponseResult<Guid?>> AdicionarAula(Guid cursoId, AulaCriarRequest aula)
     {
         var url = $"api/cursos/{cursoId}/aulas";
-        var apiResponse = await _apiClient.PostAsyncWithDetails<AulaCriarRequest, ResponseResult<Guid>>(url, aula);
+        var apiResponse = await _apiClient.PostAsyncWithDetails<AulaCriarRequest, ResponseResult<Guid?>>(url, aula);
 
         return apiResponse.IsSuccess
             ? apiResponse.Data
-            : CaptureRequestError<Guid>(apiResponse.ErrorContent, apiResponse.StatusCode);
+            : CaptureRequestError<Guid?>(apiResponse.ErrorContent, apiResponse.StatusCode);
     }
 
-    public async Task<ResponseResult<AulaDto>> AtualizarAula(Guid cursoId, Guid aulaId, AulaAtualizarRequest aula)
+    public async Task<ResponseResult<bool>> AtualizarAula(Guid cursoId, Guid aulaId, AulaAtualizarRequest aula)
     {
         if (aulaId != aula.Id)
-            return new ResponseResult<AulaDto> { Status = 400, Errors = new() { Mensagens = new List<string> { "ID da aula não confere" } } };
+            return new ResponseResult<bool> { Status = 400, Errors = new() { Mensagens = new List<string> { "ID da aula não confere" } } };
 
         var url = $"api/cursos/{cursoId}/aulas/{aulaId}";
-        var apiResponse = await _apiClient.PutAsyncWithDetails<AulaAtualizarRequest, ResponseResult<AulaDto>>(url, aula);
+        var apiResponse = await _apiClient.PutAsyncWithDetails<AulaAtualizarRequest, ResponseResult<bool>>(url, aula);
 
         return apiResponse.IsSuccess
             ? apiResponse.Data
-            : CaptureRequestError<AulaDto>(apiResponse.ErrorContent, apiResponse.StatusCode);
+            : CaptureRequestError<bool>(apiResponse.ErrorContent, apiResponse.StatusCode);
     }
 
     public async Task<ResponseResult<bool>> ExcluirAula(Guid cursoId, Guid aulaId)
