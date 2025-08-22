@@ -25,7 +25,7 @@ namespace Pagamentos.IntegrationTests.API
         public async Task Pagamento_ComDadosValidos_DeveSerProcessado()
         {
             // Arrange
-            var pagamentoRequest = new PagamentoCursoInputModel
+            var pagamentoRequest = new PagamentoCursoViewModel
             {
                 MatriculaId = Guid.NewGuid(),
                 AlunoId = Guid.NewGuid(),
@@ -182,7 +182,7 @@ namespace Pagamentos.IntegrationTests.API
         public async Task Pagamento_ComMediatorFalhando_DevePropagarExcecao()
         {
             // Arrange
-            var pagamentoRequest = new PagamentoCursoInputModel
+            var pagamentoRequest = new PagamentoCursoViewModel
             {
                 MatriculaId = Guid.NewGuid(),
                 AlunoId = Guid.NewGuid(),

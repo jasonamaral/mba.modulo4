@@ -1,4 +1,3 @@
-using BFF.API.Services.Conteudos;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -40,9 +39,9 @@ namespace Pagamentos.API.Controllers
         /// <response code="400">Erro de validação ou falha ao executar pagamento</response>
         [HttpPost("pagamento")]
         [SwaggerOperation(Summary = "Executa pagamento", Description = "Executa o pagamento do curso.")]
-        [ProducesResponseType(typeof(PagamentoCursoInputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagamentoCursoViewModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoInputModel pagamento)
+        public async Task<IActionResult> Pagamento([FromBody] PagamentoCursoViewModel pagamento)
         {
             if (!ModelState.IsValid)
             {
