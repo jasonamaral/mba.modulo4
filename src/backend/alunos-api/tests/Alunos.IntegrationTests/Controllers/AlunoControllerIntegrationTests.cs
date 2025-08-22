@@ -226,4 +226,28 @@ public class MockAlunoQueryService : IAlunoQueryService
 
         return Task.FromResult<IEnumerable<AulaCursoDto>>(aulas);
     }
+
+    public Task<IEnumerable<CertificadosDto>> ObterCertificadosPorAlunoIdAsync(Guid alunoId)
+    {
+        var certificados = new List<CertificadosDto>
+        {
+            new CertificadosDto
+            {
+                Id = Guid.NewGuid(),
+                NomeCurso = "Curso de Teste 1 (Mock)",
+                DataEmissao = DateTime.Now.AddDays(-10),
+                Codigo = "CERT-123456",
+                Url = "http://localhost/certificados/cert-mock-001.pdf"
+            },
+            new CertificadosDto
+            {
+                Id = Guid.NewGuid(),
+                NomeCurso = "Curso de Teste 2 (Mock)",
+                DataEmissao = DateTime.Now.AddDays(-5),
+                Codigo = "CERT-654321",
+                Url = "http://localhost/certificados/cert-mock-002.pdf"
+            }
+        };
+        return Task.FromResult<IEnumerable<CertificadosDto>>(certificados);
+    }
 }
