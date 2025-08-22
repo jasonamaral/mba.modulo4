@@ -33,7 +33,7 @@
 
     <mat-form-field appearance="outline" floatLabel="always" class="col-12">
       <mat-label>Vídeo URL</mat-label>
-      <input matInput formControlName="videoUrl" />
+      <input matInput formControlName="videoUrl" placeholder="https://exemplo.com/video.mp4" />
       <mat-error *ngIf="form.get('videoUrl')?.hasError('required')">Informe a URL do vídeo.</mat-error>
     </mat-form-field>
   </form>

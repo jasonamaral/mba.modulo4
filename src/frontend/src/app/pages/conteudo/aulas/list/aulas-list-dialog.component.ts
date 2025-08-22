@@ -14,6 +14,7 @@ import { CursosService } from '../../../../services/cursos.service';
 interface DialogData {
   curso: CursoModel;
   hasMatricula?: boolean;
+  pagamentoRealizado?: boolean;
 }
 
 @Component({
@@ -35,7 +36,7 @@ interface DialogData {
           </div>
           <div class="descricao" *ngIf="a.descricao">{{ a.descricao }}</div>
           <div class="meta">
-            <span *ngIf="a.videoUrl && data.hasMatricula">
+            <span *ngIf="a.videoUrl && data.hasMatricula && data.pagamentoRealizado">
               <span class="iconify" data-icon="mdi:play-circle-outline" data-width="18" data-height="18"></span>
               <a [href]="a.videoUrl" target="_blank" rel="noopener">Assistir vídeo</a>
             </span>

@@ -6,13 +6,23 @@ export interface MatriculaCreateModel {
 
 export interface MatriculaModel {
   id: string;
-  alunoId: string;
   cursoId: string;
-  cursoNome: string;
+  alunoId: string;
+  pagamentoPodeSerRealizado: boolean;
+  nomeCurso: string;
+  valor: number;
   dataMatricula: string;
-  status: string;
-  percentualConclusao: number;
   dataConclusao?: string;
+  estadoMatricula: string;
+  certificado?: {
+    id: string;
+    matriculaCursoId: string;
+    nomeCurso: string;
+    dataSolicitacao: string;
+    cargaHoraria: number;
+    notaFinal: number;
+    pathCertificado: string;
+    nomeInstrutor: string;
+  };
 }
-
 

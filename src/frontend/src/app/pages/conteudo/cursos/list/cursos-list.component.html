@@ -59,8 +59,25 @@
             </mat-card-content>
             <mat-card-actions class="course-actions">
               <button mat-button color="primary" (click)="openAulasDialog(c)">Ver aulas</button>
-              <button mat-flat-button color="accent" (click)="matricular(c)" [disabled]="c.podeSerMatriculado === false && !hasMatricula(c.id)" *ngIf="!isUserAdmin">
-                {{ hasMatricula(c.id) ? 'Já matriculado' : 'Matricular-se' }}
+              <button mat-flat-button *ngIf="!isUserAdmin" [color]="hasMatricula(c.id) ? 'warn' : 'accent'"
+                [disabled]="hasMatricula(c.id) && pagamentoRealizado(c.id)" matTooltip="{{ hasMatricula(c.id) 
+                          ? pagamentoRealizado(c.id) 
+                            ? 'Você já concluiu o pagamento deste curso.' 
+                            : 'Você já está matriculado, mas o pagamento ainda está pendente.' 
+                          : 'Clique para se matricular neste curso.' }}" matTooltipPosition="above"
+                (click)="matricular(c)">
+                <mat-icon>
+                  {{ hasMatricula(c.id)
+                  ? pagamentoRealizado(c.id)
+                  ? 'check_circle'
+                  : 'hourglass_top'
+                  : 'school' }}
+                </mat-icon>
+                {{ hasMatricula(c.id)
+                ? pagamentoRealizado(c.id)
+                ? 'Matriculado'
+                : 'Pendente pagamento'
+                : 'Matricular-se' }}
               </button>
               <button mat-flat-button color="accent" (click)="openEditDialog(c)" *ngIf="isUserAdmin">
                 Editar

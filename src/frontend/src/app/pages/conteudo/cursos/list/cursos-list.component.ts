@@ -51,7 +51,7 @@ export class CursosListComponent {
     private dialog: MatDialog,
     private matriculas: MatriculasService,
   ) { }
-  
+
   ngOnInit() {
     this.isUserAdmin = new LocalStorageUtils().isUserAdmin();
     // Responsividade: 2 colunas em telas médias/maiores, 1 coluna em telas menores
@@ -60,10 +60,6 @@ export class CursosListComponent {
       .subscribe(state => this.gridCols = state.matches ? 1 : 2);
     this.loadCursos();
     this.loadMatriculas();
-  }
-
-  hasMatricula(cursoId: string): boolean {
-    return !!this.matriculasAluno.find(m => m.cursoId === cursoId && m.alunoId === this.userId);
   }
 
   private loadCursos(): void {
@@ -137,25 +133,50 @@ export class CursosListComponent {
     this.dialog.open(AulasListDialogComponent, {
       width: '800px',
       maxWidth: '95vw',
-      data: { curso, hasMatricula: this.hasMatricula(curso.id) },
+      data: { curso, hasMatricula: this.hasMatricula(curso.id), pagamentoRealizado: this.pagamentoRealizado(curso.id) },
     });
   }
 
+  hasMatricula(cursoId: string): boolean {
+    return !!this.matriculasAluno.find(m => m.cursoId === cursoId && m.alunoId === this.userId);
+  }
+
+  pagamentoRealizado(cursoId: string): boolean {
+    const matricula = this.matriculasAluno.find(
+      m => m.cursoId === cursoId && m.alunoId === this.userId
+    );
+    return matricula ? !matricula.pagamentoPodeSerRealizado : false;
+  }
+
   matricular(c: CursoModel) {
+    const matricula = this.matriculasAluno.find(
+      m => m.cursoId === c.id && m.alunoId === this.userId
+    );
+
+    const pagamentoPodeSerRealizado = matricula ? matricula.pagamentoPodeSerRealizado : true;
+
+    if (matricula && !pagamentoPodeSerRealizado) {
+      this.toastr.warning('Pagamento já realizado ou não pode ser feito novamente para este curso.');
+      return;
+    }
+
     const ref = this.dialog.open(MatriculaAddComponent, {
       width: '600px',
       maxWidth: '95vw',
-      data: { curso: c, alunoId: this.userId }
-    });
-    
-    ref.afterClosed().subscribe(result => {
-      if (result?.inserted) {
-        this.loadMatriculas();
-        this.loadCursos();
+      data: {
+        curso: c,
+        alunoId: this.userId,
+        matriculaId: matricula?.id,
+        pagamentoPodeSerRealizado
       }
     });
+
+    ref.afterClosed().subscribe(() => {
+        this.loadMatriculas();
+        this.loadCursos();
+    });
   }
-  
+
   onPageChange(event: any) {
     this.filterCurso.pageSize = event.pageSize;
     this.filterCurso.pageIndex = event.pageIndex + 1;
