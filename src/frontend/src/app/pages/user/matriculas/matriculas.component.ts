@@ -5,12 +5,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatriculasService } from '../../../services/matriculas.service';
 import { MatriculaModel } from '../../../models/matricula.model';
+import { SolicitarCertificadoRequest } from '../../../models/certificado.model';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   standalone: true,
   selector: 'app-matriculas',
   templateUrl: './matriculas.component.html',
+  styleUrls: ['./matriculas.component.css'],
   imports: [CommonModule, MatTableModule, MatButtonModule, MatProgressBarModule]
 })
 export class MatriculasComponent {
@@ -22,13 +24,31 @@ export class MatriculasComponent {
   ngOnInit() { this.load(); }
 
   load() {
-    const alunoId = this.service.LocalStorage.getUser()?.usuarioToken?.id;
-    this.service.listarMatriculas(alunoId).subscribe({
+    this.service.listarMatriculas().subscribe({
       next: d => this.matriculas = d,
       error: (fail) => {
         const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
         if (Array.isArray(errors) && errors.length > 0) this.toastr.error(errors.join('\n'));
         else this.toastr.error('Falha ao carregar suas matrículas.');
+      }
+    });
+  }
+
+  solicitarCertificado(m: MatriculaModel) {
+    const request: SolicitarCertificadoRequest = {
+      alunoId: m.alunoId,
+      matriculaCursoId: m.id
+    };
+
+    this.service.solicitarCertificado(request).subscribe({
+      next: (result) => {
+        this.toastr.success('Certificado solicitado com sucesso!');
+        this.load(); // Recarrega a lista para atualizar o status
+      },
+      error: (fail) => {
+        const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];
+        if (Array.isArray(errors) && errors.length > 0) this.toastr.error(errors.join('\n'));
+        else this.toastr.error('Não foi possível solicitar o certificado.');
       }
     });
   }

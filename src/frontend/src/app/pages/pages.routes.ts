@@ -15,6 +15,10 @@ export const PagesRoutes: Routes = [
         loadComponent: () => import('./user/matriculas/matriculas.component').then(m => m.MatriculasComponent)
       },
       {
+        path: 'certificados/visualizar/:id',
+        loadComponent: () => import('./user/certificados/certificado-view').then(m => m.CertificadoViewComponent)
+      },
+      {
         path: 'certificados',
         loadComponent: () => import('./user/certificados/certificados.component').then(m => m.CertificadosComponent)
       },

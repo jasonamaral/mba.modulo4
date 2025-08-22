@@ -84,7 +84,7 @@ export class CursosListComponent {
   }
 
   private loadMatriculas(): void {
-    this.matriculas.listarMatriculas(this.userId).subscribe({
+    this.matriculas.listarMatriculas().subscribe({
       next: (matriculas) => {
         this.matriculasAluno = matriculas;
         console.log('Matrículas do aluno:', this.matriculasAluno);

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 import { CertificadosService } from '../../../services/certificados.service';
 import { CertificadoModel } from '../../../models/certificado.model';
 import { ToastrService } from 'ngx-toastr';
@@ -13,9 +14,15 @@ import { ToastrService } from 'ngx-toastr';
   imports: [CommonModule, MatTableModule, MatButtonModule]
 })
 export class CertificadosComponent {
-  cols = ['curso','codigo','data','acoes'];
+  cols = ['curso', 'data', 'acoes'];
   certificados: CertificadoModel[] = [];
-  constructor(private service: CertificadosService, private toastr: ToastrService) {}
+  
+  constructor(
+    private service: CertificadosService, 
+    private toastr: ToastrService,
+    private router: Router
+  ) {}
+  
   ngOnInit() {
     this.service.listar().subscribe({
       next: d => this.certificados = d,
@@ -26,7 +33,12 @@ export class CertificadosComponent {
       }
     });
   }
-  baixar(c: CertificadoModel) { window.open(c.url, '_blank'); }
+  
+  visualizar(c: CertificadoModel) {
+    this.router.navigate(['/pages/certificados/visualizar', c.id], {
+      state: { certificado: c }
+    });
+  }
 }
 
 
