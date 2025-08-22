@@ -132,7 +132,7 @@ export class AulasListDialogComponent {
 
   private loadAulas(cursoId: string): void {
     this.cursosService.getAulasByCurso(cursoId).subscribe({
-      next: (aulas) => {
+      next: ({ aulas }) => {
         this.aulas = aulas;
       },
       error: (err) => {
