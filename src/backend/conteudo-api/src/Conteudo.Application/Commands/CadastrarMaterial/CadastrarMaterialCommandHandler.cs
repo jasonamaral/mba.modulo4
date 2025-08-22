@@ -72,7 +72,7 @@ namespace Conteudo.Application.Commands.CadastrarMaterial
                 return false;
             }
 
-            var aula = await _aulaRepository.ObterPorIdAsync(request.AulaId);
+            var aula = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.AulaId);
             if (aula == null)
             {
                 await _mediatorHandler.PublicarNotificacaoDominio(

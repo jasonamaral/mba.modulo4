@@ -26,7 +26,7 @@ namespace Conteudo.Application.Commands.AtualizarAula
         public async Task<CommandResult> Handle(AtualizarAulaCommand request, CancellationToken cancellationToken)
         {
             _raizAgregacao = request.RaizAgregacao;
-            var aulaExistente = await _aulaRepository.ObterPorIdAsync(request.Id, false);
+            var aulaExistente = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.Id, false);
 
             if (!await ValidarRequisicao(request, aulaExistente))
                 return request.Resultado;

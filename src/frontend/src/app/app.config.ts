@@ -37,9 +37,10 @@ import { GlobalErrorInterceptor } from './interceptors/global-error.interceptor'
 import localePt from '@angular/common/locales/pt';
 import { PaginatorPtBr } from './components/PaginatorPtBr';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { NgxMaskConfig, provideEnvironmentNgxMask } from 'ngx-mask';
 
 registerLocaleData(localePt, 'pt-BR');
-
+const maskConfig: Partial<NgxMaskConfig> = { validation: false };
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -69,6 +70,7 @@ export const appConfig: ApplicationConfig = {
       progressBar: true,
       closeButton: true,
     }),
+    provideEnvironmentNgxMask(maskConfig),
     LocalStorageUtils,
     AuthGuard,
     { provide: LOCALE_ID, useValue: 'pt-BR' }, // Set the locale globally

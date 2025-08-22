@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Pagamentos.Application.ViewModels;
 
-public class PagamentoCursoInputModel
+public class PagamentoCursoViewModel
 {
     [Required(ErrorMessage = "O Id do Matricula é obrigatório.")]
     public Guid MatriculaId { get; set; }

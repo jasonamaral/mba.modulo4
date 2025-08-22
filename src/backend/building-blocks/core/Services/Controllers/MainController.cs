@@ -1,4 +1,4 @@
-﻿using Core.Communication;
+using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
 using Core.Notification;
@@ -75,22 +75,8 @@ public abstract class MainController(IMediatorHandler mediator
         return RespostaPadraoApi<T>();
     }
 
-    protected ActionResult RespostaPadraoApi<T>(CommandResult result)
+    protected ActionResult RespostaPadraoApi<T>(CommandResult result, HttpStatusCode statusCode = HttpStatusCode.OK)
     {
-        return RespostaPadraoApi(data: result.Data);
-    }
-
-    protected List<string> ObterMensagensDeErro()
-    {
-        var mensagens = new List<string>();
-        if (_notifications.TemNotificacao())
-        {
-            mensagens.AddRange(_notifications.ObterMensagens());
-        }
-        if (_notificador.TemErros())
-        {
-            mensagens.AddRange(_notificador.ObterErros());
-        }
-        return mensagens;
+        return RespostaPadraoApi(statusCode: statusCode, data: result.Data);
     }
 }

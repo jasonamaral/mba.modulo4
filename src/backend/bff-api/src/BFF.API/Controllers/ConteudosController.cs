@@ -24,16 +24,13 @@ namespace BFF.API.Controllers;
 public class ConteudosController : BffController
 {
     private readonly IConteudoService _conteudoService;
-    private readonly ICacheService _cacheService;
 
     public ConteudosController(IMediatorHandler mediator,
                              INotificationHandler<DomainNotificacaoRaiz> notifications,
                              INotificador notificador,
-                             IConteudoService conteudoService,
-                             ICacheService cacheService) : base(mediator, notifications, notificador)
+                             IConteudoService conteudoService) : base(mediator, notifications, notificador)
     {
         _conteudoService = conteudoService;
-        _cacheService = cacheService;
     }
 
     /// <summary>
@@ -53,19 +50,11 @@ public class ConteudosController : BffController
         {
             return ProcessarErro(HttpStatusCode.BadRequest, "Id do curso inválido.");
         }
-        var cacheKey = $"Curso_{cursoId}_IncludeAulas_{includeAulas}";
-        var cachedCurso = await _cacheService.GetAsync<ResponseResult<CursoDto>>(cacheKey);
-
-        if (cachedCurso != null)
-        {
-            return RespostaPadraoApi(HttpStatusCode.OK, cachedCurso, "Curso obtido do cache com sucesso");
-        }
 
         var resultado = await _conteudoService.ObterCursoPorIdAsync(cursoId, includeAulas);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
-            await _cacheService.SetAsync(cacheKey, resultado, TimeSpan.FromMinutes(30));
             return Ok(resultado);
         }
 
@@ -83,17 +72,10 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterTodosCursos([FromQuery] CursoFilter filter)
     {
-        var cacheKey = $"TodosCursos_Filtro:{JsonSerializer.Serialize(filter)}";
-        var cachedCursos = await _cacheService.GetAsync<ResponseResult<PagedResult<CursoDto>>>(cacheKey);
-
-        if (cachedCursos != null)
-            return Ok(cachedCursos);
-
         var resultado = await _conteudoService.ObterTodosCursosAsync(filter);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
-            await _cacheService.SetAsync(cacheKey, resultado, TimeSpan.FromMinutes(30));
             return Ok(resultado);
         }
         return BadRequest(resultado);
@@ -154,8 +136,6 @@ public class ConteudosController : BffController
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
 
-        await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
-
         return StatusCode(response?.Status ?? 500, response);
     }
 
@@ -174,7 +154,6 @@ public class ConteudosController : BffController
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
 
-        await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
         return Ok(response);
     }
 
@@ -193,7 +172,6 @@ public class ConteudosController : BffController
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
 
-        await _cacheService.RemovePatternAsync("TodosCursos_Filtro:");
         return Ok(response);
     }
 
@@ -244,8 +222,6 @@ public class ConteudosController : BffController
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
 
-        await _cacheService.RemovePatternAsync($"Curso_{cursoId}_IncludeAulas_*");
-
         return StatusCode(StatusCodes.Status201Created, response);
     }
 
@@ -269,8 +245,6 @@ public class ConteudosController : BffController
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
 
-        await _cacheService.RemovePatternAsync($"Curso_{cursoId}_IncludeAulas_*");
-
         return Ok(response);
     }
 
@@ -289,8 +263,6 @@ public class ConteudosController : BffController
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
-
-        await _cacheService.RemovePatternAsync($"Curso_{cursoId}_IncludeAulas_*");
 
         return Ok(response);
     }

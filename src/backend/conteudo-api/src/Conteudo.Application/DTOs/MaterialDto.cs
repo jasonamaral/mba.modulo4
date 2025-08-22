@@ -4,6 +4,9 @@ namespace Conteudo.Application.DTOs;
 
 public class CadastroMaterialDto
 {
+    [Required(ErrorMessage = "ID do curso é obrigatório")]
+    public Guid CursoId { get; set; }
+
     [Required(ErrorMessage = "ID da aula é obrigatório")]
     public Guid AulaId { get; set; }
 
@@ -30,6 +33,9 @@ public class CadastroMaterialDto
 
 public class AtualizarMaterialDto
 {
+    [Required(ErrorMessage = "ID do curso é obrigatório")]
+    public Guid CursoId { get; set; }
+
     [Required(ErrorMessage = "ID é obrigatório")]
     public Guid Id { get; set; }
 

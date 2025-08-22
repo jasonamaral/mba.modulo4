@@ -5,9 +5,9 @@ namespace Conteudo.Domain.Interfaces.Repositories;
 
 public interface IAulaRepository : IRepository<Aula>
 {
-    Task<IEnumerable<Aula>> ObterTodosAsync(bool includeMateriais = false);
+    Task<IEnumerable<Aula>> ObterTodosAsync(Guid cursoId, bool includeMateriais = false);
 
-    Task<Aula?> ObterPorIdAsync(Guid id, bool includeMateriais = false);
+    Task<Aula?> ObterPorIdAsync(Guid cursoId, Guid id, bool includeMateriais = false);
 
     Task<IEnumerable<Aula>> ObterPorCursoIdAsync(Guid cursoId, bool includeMateriais = false);
 
@@ -23,11 +23,11 @@ public interface IAulaRepository : IRepository<Aula>
 
     Task<Aula> AtualizarAulaAsync(Aula aula);
 
-    Task PublicarAulaAsync(Guid id);
+    Task PublicarAulaAsync(Guid cursoId, Guid id);
 
-    Task DespublicarAulaAsync(Guid id);
+    Task DespublicarAulaAsync(Guid cursoId, Guid id);
 
-    Task ExcluirAulaAsync(Guid id);
+    Task ExcluirAulaAsync(Guid cursoId, Guid id);
 
     Task<int> ContarAulasAsync();
 

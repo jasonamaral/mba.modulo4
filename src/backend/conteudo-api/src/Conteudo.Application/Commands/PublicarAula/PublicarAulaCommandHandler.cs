@@ -29,7 +29,7 @@ namespace Conteudo.Application.Commands.PublicarAula
                 if (!await ValidarRequisicao(request))
                     return request.Resultado;
 
-                await _aulaRepository.PublicarAulaAsync(request.Id);
+                await _aulaRepository.PublicarAulaAsync(request.CursoId, request.Id);
 
                 if (await _aulaRepository.UnitOfWork.Commit())
                 {
@@ -47,7 +47,7 @@ namespace Conteudo.Application.Commands.PublicarAula
 
         private async Task<bool> ValidarRequisicao(PublicarAulaCommand request)
         {
-            var aula = await _aulaRepository.ObterPorIdAsync(request.Id);
+            var aula = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
             if (aula == null)
             {
                 await _mediatorHandler.PublicarNotificacaoDominio(

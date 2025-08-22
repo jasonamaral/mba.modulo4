@@ -3,61 +3,104 @@
 </h3>
 <hr style="width:95%" />
 <mat-dialog-content class="dialog-body">
-  <mat-form-field appearance="outline" floatLabel="always" class="col-8">
-    <mat-label>Curso</mat-label>
-    <input matInput [value]="data.curso.nome || 'Curso sem nome'" readonly>
-  </mat-form-field>
+  <mat-stepper orientation="vertical" [linear]="true" #stepper>
+    
+    <!-- Step 1: Matrícula -->
+    <mat-step [stepControl]="formMatricula" [editable]="false" [completed]="matriculaCriada">
+      <form [formGroup]="formMatricula" (ngSubmit)="saveMatricula()" class="form-grid" autocomplete="off" novalidate>
+        <ng-template matStepLabel>
+          Matrícula no Curso {{data.curso.nome || 'Curso sem nome'}}
+        </ng-template>
 
-  <mat-form-field appearance="outline" floatLabel="always" class="col-8">
-    <mat-label>Valor</mat-label>
-    <input matInput formControlName="total" [value]="data.curso.valor | currency:'BRL'" readonly>
-    <mat-error *ngIf="form.get('total')?.hasError('required')">
-      Valor total é obrigatório.
-    </mat-error>
-  </mat-form-field>
+        <mat-form-field appearance="outline" floatLabel="always" class="col-12">
+          <mat-label>Curso</mat-label>
+          <input matInput [value]="data.curso.nome || 'Curso sem nome'" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="outline" floatLabel="always" class="col-12">
+          <mat-label>Observação</mat-label>
+          <input matInput formControlName="observacao">
+        </mat-form-field>
 
-  <form [formGroup]="form" (ngSubmit)="save()" class="form-grid" autocomplete="off" novalidate>
-    <mat-form-field appearance="outline" floatLabel="always" class="col-12">
-      <mat-label>Número Cartão</mat-label>
-      <mat-icon matPrefix>credit_card</mat-icon>
-      <input matInput formControlName="numeroCartao" required>
-      <mat-error *ngIf="form.get('numeroCartao')?.hasError('required')">
-        Número Cartão é obrigatório.
-      </mat-error>
-    </mat-form-field>
+        <div>
+          <button mat-raised-button color="primary" type="submit" [disabled]="saving || formMatricula.invalid">
+            <mat-icon *ngIf="saving" class="rotating">loop</mat-icon>
+            Matricular
+          </button>
+        </div>
+      </form>
+    </mat-step>
 
-    <mat-form-field appearance="outline" floatLabel="always" class="col-12">
-      <mat-label>Nome Titular Cartão</mat-label>
-      <mat-icon matPrefix>person</mat-icon>
-      <input matInput formControlName="nomeCartao" required>
-      <mat-error *ngIf="form.get('nomeCartao')?.hasError('required')">
-        Nome Titular Cartão é obrigatório.
-      </mat-error>
-    </mat-form-field>
+    <!-- Step 2: Pagamento -->
+    <mat-step [stepControl]="formPagamento" [editable]="!pagamentoRealizado" [completed]="pagamentoRealizado">
+      <form [formGroup]="formPagamento" (ngSubmit)="savePagamento()" class="form-grid" autocomplete="off" novalidate>
+        <ng-template matStepLabel>Preencha os dados do pagamento</ng-template>
 
-    <mat-form-field appearance="outline" floatLabel="always" class="col-6">
-      <mat-label>CVV</mat-label>
-      <mat-icon matPrefix>lock</mat-icon>
-      <input matInput formControlName="cvvCartao" required>
-      <mat-error *ngIf="form.get('cvvCartao')?.hasError('required')">
-        CVV é obrigatório.
-      </mat-error>
-    </mat-form-field>
+        <mat-form-field appearance="outline" floatLabel="always" class="col-12">
+          <mat-label>Valor</mat-label>
+          <input matInput [value]="data.curso.valor | currency:'BRL'" readonly>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" floatLabel="always" class="col-6">
-      <mat-label>Data de Validade</mat-label>
-      <mat-icon matPrefix>event</mat-icon>
-      <input matInput formControlName="expiracaoCartao" required>
-      <mat-error *ngIf="form.get('expiracaoCartao')?.hasError('required')">
-        Data de Validade é obrigatória.
-      </mat-error>
-    </mat-form-field>
-    <mat-dialog-actions align="end" class="col-12">
-      <button mat-stroked-button color="warn" (click)="cancel()" [disabled]="saving" type="button">Cancelar</button>
-      <button mat-raised-button color="primary" type="submit" [disabled]="saving || form.invalid">
-        <mat-icon class="rotating" *ngIf="saving">loop</mat-icon>
-        Matricular
-      </button>
-    </mat-dialog-actions>
-  </form>
+        <mat-form-field appearance="outline" floatLabel="always" class="col-12">
+          <mat-label>Número Cartão</mat-label>
+          <mat-icon matPrefix>credit_card</mat-icon>
+          <input matInput formControlName="numeroCartao" mask="0000 0000 0000 0000" placeholder="1111 2222 3333 4444" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" floatLabel="always" class="col-12">
+          <mat-label>Nome Titular Cartão</mat-label>
+          <mat-icon matPrefix>person</mat-icon>
+          <input matInput formControlName="nomeCartao" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" floatLabel="always" class="col-6">
+          <mat-label>CVV</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+          <input matInput formControlName="cvvCartao" mask="000" placeholder="123" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" floatLabel="always" class="col-6">
+          <mat-label>Data de Validade</mat-label>
+          <mat-icon matPrefix>event</mat-icon>
+          <input matInput formControlName="expiracaoCartao" mask="00/00" placeholder="MM/AA" required>
+        </mat-form-field>
+
+        <div class="col-12 flex-start">
+          <button mat-raised-button matStepperPrevious type="button" [disabled]="!canGoBack()" *ngIf="!matriculaCriada">Voltar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="saving || formPagamento.invalid">
+            Realizar Pagamento
+            <mat-icon *ngIf="saving" class="rotating">loop</mat-icon>
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Step 3: Finalização -->
+    <mat-step [editable]="false">
+      <ng-template matStepLabel>Finalizar</ng-template>
+      
+      <p *ngIf="matriculaCriada && pagamentoRealizado">
+        Matrícula e pagamento concluídos com sucesso.
+      </p>
+      <p *ngIf="matriculaCriada && !pagamentoRealizado">
+        Matrícula criada com sucesso, mas o pagamento ainda não foi realizado.
+      </p>
+      <p *ngIf="!matriculaCriada">
+        Matrícula não foi realizada.
+      </p>
+
+      <div class="flex-start">
+        <button mat-button matStepperPrevious [disabled]="!canGoBack()">Voltar</button>
+
+        <button mat-raised-button color="primary" (click)="retryPagamento()" 
+                *ngIf="matriculaCriada && !pagamentoRealizado && pagamentoPodeSerRealizado">
+          Tentar pagamento novamente
+        </button>
+
+        <button mat-stroked-button color="warn" (click)="this.dialogRef.close()" 
+                *ngIf="pagamentoRealizado || !matriculaCriada">
+          Fechar
+        </button>
+      </div>
+    </mat-step>
+  </mat-stepper>
 </mat-dialog-content>

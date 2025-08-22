@@ -21,12 +21,12 @@ namespace Conteudo.Application.Commands.ExcluirAula
 
         public async Task<CommandResult> Handle(ExcluirAulaCommand request, CancellationToken cancellationToken)
         {
-            var aula = await _aulaRepository.ObterPorIdAsync(request.Id);
+            var aula = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
 
             if (!await ValidarRequisicao(request, aula))
                 return request.Resultado;
 
-            await _aulaRepository.ExcluirAulaAsync(aula.Id);
+            await _aulaRepository.ExcluirAulaAsync(aula.CursoId, aula.Id);
 
             if (!await _aulaRepository.UnitOfWork.Commit())
             {

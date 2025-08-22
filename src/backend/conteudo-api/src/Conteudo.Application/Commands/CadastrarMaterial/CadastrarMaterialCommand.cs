@@ -6,6 +6,7 @@ namespace Conteudo.Application.Commands.CadastrarMaterial
 {
     public class CadastrarMaterialCommand : CommandRaiz, IRequest<CommandResult>
     {
+        public Guid CursoId { get; private set; }
         public Guid AulaId { get; private set; }
         public string Nome { get; private set; }
         public string Descricao { get; private set; }
@@ -17,6 +18,7 @@ namespace Conteudo.Application.Commands.CadastrarMaterial
         public int Ordem { get; private set; }
 
         public CadastrarMaterialCommand(
+            Guid cursoId,
             Guid aulaId,
             string nome,
             string descricao,
@@ -27,6 +29,7 @@ namespace Conteudo.Application.Commands.CadastrarMaterial
             string extensao,
             int ordem)
         {
+            CursoId = cursoId;
             AulaId = aulaId;
             Nome = nome;
             Descricao = descricao;

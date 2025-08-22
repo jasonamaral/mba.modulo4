@@ -1,6 +1,8 @@
 using Alunos.API.Controllers;
 using Alunos.Application.DTOs.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace Alunos.UnitTests.Controllers;
 
@@ -15,6 +17,21 @@ public class AlunoQueryControllerTests : TestBase
             MockAlunoQueryService.Object,
             Notifications,
             MockNotificador.Object);
+    }
+
+    private void SetUserContext(Guid alunoId)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, alunoId.ToString())
+        };
+        var identity = new ClaimsIdentity(claims, "TestAuthType");
+        var principal = new ClaimsPrincipal(identity);
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = principal }
+        };
     }
 
     [Fact]
@@ -173,7 +190,8 @@ public class AlunoQueryControllerTests : TestBase
         // Não configurar SetupMockNotificador para este teste de sucesso
 
         // Act
-        var result = await _controller.ObterMatriculasPorAlunoId(alunoId);
+        SetUserContext(alunoId);
+        var result = await _controller.ObterMatriculasPorAlunoId();
 
         // Assert
         result.Should().BeOfType<ObjectResult>();
@@ -194,7 +212,8 @@ public class AlunoQueryControllerTests : TestBase
         ConfigurarMockNotificador();
 
         // Act
-        var result = await _controller.ObterMatriculasPorAlunoId(alunoId);
+        SetUserContext(alunoId);
+        var result = await _controller.ObterMatriculasPorAlunoId();
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
@@ -215,7 +234,8 @@ public class AlunoQueryControllerTests : TestBase
         ConfigurarMockNotificador();
 
         // Act
-        var result = await _controller.ObterMatriculasPorAlunoId(alunoId);
+        SetUserContext(alunoId);
+        var result = await _controller.ObterMatriculasPorAlunoId();
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();

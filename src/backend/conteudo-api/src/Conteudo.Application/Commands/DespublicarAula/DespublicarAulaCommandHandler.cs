@@ -29,7 +29,7 @@ namespace Conteudo.Application.Commands.DespublicarAula
                 if (!await ValidarRequisicao(request))
                     return request.Resultado;
 
-                await _aulaRepository.DespublicarAulaAsync(request.Id);
+                await _aulaRepository.DespublicarAulaAsync(request.CursoId, request.Id);
 
                 if (await _aulaRepository.UnitOfWork.Commit())
                 {
@@ -47,7 +47,7 @@ namespace Conteudo.Application.Commands.DespublicarAula
 
         private async Task<bool> ValidarRequisicao(DespublicarAulaCommand request)
         {
-            var aula = await _aulaRepository.ObterPorIdAsync(request.Id);
+            var aula = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
             if (aula == null)
             {
                 await _mediatorHandler.PublicarNotificacaoDominio(
