@@ -305,22 +305,16 @@ Após ~5 minutos de inicialização:
 ### RabbitMQ
 - **Management UI**: http://localhost:15672
 - **Credenciais**: admin/admin123
-- **Filas configuradas**:
-  - `pagamento-confirmado`
-  - `matricula-realizada`
-  - `certificado-gerado`
-  - `usuario-registrado`
-  - `curso-finalizado`
 
 ### SQL Server
 - **Host**: localhost:1433
 - **Usuário**: sa
 - **Senha**: PlataformaEducacional123!
 - **Bancos criados automaticamente**:
-  - AuthDB
-  - ConteudoDB
-  - AlunosDB
-  - PagamentosDB
+  - alunos-dev
+  - auth-dev
+  - conteudo-dev
+  - pagamentos-dev
 
 ### Redis
 - **Host**: localhost:6379
@@ -346,7 +340,6 @@ Após ~5 minutos de inicialização:
 | Serviço | URL | Credenciais |
 |---------|-----|-------------|
 | 🐰 **RabbitMQ** | http://localhost:15672 | admin/admin123 |
-| 🗄️ **SQL Server** | localhost:1433 | sa/PlataformaEducacional123! |
 | 🔴 **Redis** | localhost:6379 | (sem senha) |
 
 ## 🛠️ Desenvolvimento
@@ -413,10 +406,10 @@ docker-compose logs -f rabbitmq
 
 ### Health Checks
 Todos os serviços possuem endpoints de health check:
-- Auth API: http://localhost:7001/health
-- Conteudo API: http://localhost:7002/health
-- Alunos API: http://localhost:7003/health
-- Pagamentos API: http://localhost:7004/health
+- Auth API: http://localhost:5001/health
+- Conteudo API: http://localhost:5002/health
+- Alunos API: http://localhost:5003/health
+- Pagamentos API: http://localhost:5004/health
 - BFF API: http://localhost:5000/health
 
 ### Monitorar Recursos
@@ -511,17 +504,6 @@ docker-compose logs rabbitmq
 docker-compose restart auth-api alunos-api pagamentos-api
 ```
 
-### Problema: Erro de certificado SSL
-**Solução:**
-```bash
-# Aceitar certificados auto-assinados no navegador
-# Ou usar URLs HTTP:
-# http://localhost:7001/swagger (Auth API)
-# http://localhost:7002/swagger (Conteudo API)
-# http://localhost:7003/swagger (Alunos API)
-# http://localhost:7004/swagger (Pagamentos API)
-```
-
 ### Monitoramento de Recursos
 ```bash
 # Ver uso detalhado
@@ -532,7 +514,6 @@ docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}
 
 ### Configurações de Segurança
 - ✅ JWT com chave secreta forte
-- ✅ Certificados SSL auto-assinados
 - ✅ Segregação de rede Docker
 - ✅ Health checks com timeout
 - ✅ Conexões com TrustServerCertificate
@@ -548,47 +529,77 @@ As configurações atuais são para **desenvolvimento/demonstração**:
 ### Estrutura do Projeto
 ```
 mba.modulo4/
-├── src/backend/          # Microserviços .NET
-│   ├── auth-api/         # Auth.API.sln
+├── src/backend/                    # Microserviços .NET
+│   ├── MBA.Modulo4.sln            # Solução principal
+│   ├── auth-api/                   # Auth.API.sln
 │   │   ├── src/
 │   │   │   ├── Auth.API/           # API Layer
 │   │   │   ├── Auth.Application/   # Application Layer
 │   │   │   ├── Auth.Domain/        # Domain Layer
 │   │   │   └── Auth.Infrastructure/# Infrastructure Layer
 │   │   └── tests/
-│   ├── alunos-api/       # Alunos.API.sln
+│   │       ├── Auth.UnitTests/     # Testes unitários
+│   │       └── Auth.IntegrationTests/ # Testes de integração
+│   ├── alunos-api/                 # Alunos.API.sln
 │   │   ├── src/
-│   │   │   ├── Alunos.API/
-│   │   │   ├── Alunos.Application/
-│   │   │   ├── Alunos.Domain/
-│   │   │   └── Alunos.Infrastructure/
+│   │   │   ├── Alunos.API/         # API Layer
+│   │   │   ├── Alunos.Application/ # Application Layer
+│   │   │   ├── Alunos.Domain/      # Domain Layer
+│   │   │   └── Alunos.Infrastructure/ # Infrastructure Layer
 │   │   └── tests/
-│   ├── conteudo-api/     # Conteudo.API.sln
+│   │       ├── Alunos.UnitTests/   # Testes unitários
+│   │       └── Alunos.IntegrationTests/ # Testes de integração
+│   ├── conteudo-api/               # Conteudo.API.sln
 │   │   ├── src/
-│   │   │   ├── Conteudo.API/
-│   │   │   ├── Conteudo.Application/
-│   │   │   ├── Conteudo.Domain/
-│   │   │   └── Conteudo.Infrastructure/
+│   │   │   ├── Conteudo.API/       # API Layer
+│   │   │   ├── Conteudo.Application/ # Application Layer
+│   │   │   ├── Conteudo.Domain/    # Domain Layer
+│   │   │   └── Conteudo.Infrastructure/ # Infrastructure Layer
 │   │   └── tests/
-│   ├── pagamentos-api/   # Pagamentos.API.sln
+│   │       ├── Conteudo.UnitTests/ # Testes unitários
+│   │       └── Conteudo.IntegrationTests/ # Testes de integração
+│   ├── pagamentos-api/             # Pagamentos.API.sln
 │   │   ├── src/
-│   │   │   ├── Pagamentos.API/
-│   │   │   ├── Pagamentos.Application/
-│   │   │   ├── Pagamentos.Domain/
-│   │   │   └── Pagamentos.Infrastructure/
+│   │   │   ├── Pagamentos.API/     # API Layer
+│   │   │   ├── Pagamentos.Application/ # Application Layer
+│   │   │   ├── Pagamentos.Domain/  # Domain Layer
+│   │   │   ├── Pagamentos.Infrastructure/ # Infrastructure Layer
+│   │   │   └── Pagamento.AntiCorruption/ # Camada anti-corrupção
 │   │   └── tests/
-│   └── bff-api/          # BFF.API.sln
-│       ├── src/
-│       │   ├── BFF.API/
-│       │   ├── BFF.Application/
-│       │   ├── BFF.Domain/
-│       │   └── BFF.Infrastructure/
-│       └── tests/
-├── src/frontend/         # Angular 18 SPA
-├── scripts/              # Scripts de automação
-├── config/               # Configurações
-├── docker-compose.yml    # Orquestração Docker
-└── README.md            # Este arquivo
+│   │       ├── Pagamentos.UnitTests/ # Testes unitários
+│   │       └── Pagamentos.IntegrationTests/ # Testes de integração
+│   ├── bff-api/                    # BFF.API.sln
+│   │   ├── src/
+│   │   │   ├── BFF.API/            # API Layer
+│   │   │   ├── BFF.Application/    # Application Layer
+│   │   │   ├── BFF.Domain/         # Domain Layer
+│   │   │   └── BFF.Infrastructure/ # Infrastructure Layer
+│   │   └── tests/
+│   │       ├── BFF.UnitTests/      # Testes unitários
+│   │       └── BFF.IntegrationTests/ # Testes de integração
+│   └── building-blocks/            # Componentes compartilhados
+│       ├── core/                    # Core.csproj - Funcionalidades base
+│       │   ├── Communication/       # Comunicação entre serviços
+│       │   ├── Data/                # Abstrações de dados
+│       │   ├── DomainObjects/       # Objetos de domínio base
+│       │   ├── DomainValidations/   # Validações compartilhadas
+│       │   ├── Exceptions/          # Exceções customizadas
+│       │   ├── Identidade/          # Identificação e autenticação
+│       │   ├── Mediator/            # Padrão mediator
+│       │   ├── Messages/            # Mensagens e comandos
+│       │   ├── Notification/        # Sistema de notificações
+│       │   ├── Services/            # Serviços base
+│       │   ├── SharedDtos/         # DTOs compartilhados
+│       │   ├── Utils/               # Utilitários gerais
+│       │   └── Tests/               # Core.Tests.csproj
+│       └── MessageBus/              # MessageBus.csproj - Comunicação assíncrona
+├── src/frontend/                    # Angular 18 SPA
+├── scripts/                         # Scripts de automação PowerShell
+├── docker/                          # Configurações Docker
+├── docker-compose.yml               # Orquestração Docker
+├── docker-compose-infra.yml         # Infraestrutura apenas
+├── docker-compose-simple.yml        # Versão simplificada
+└── README.md                        # Este arquivo
 ```
 
 ### Convenções
