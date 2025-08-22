@@ -19,7 +19,7 @@ public interface IConteudoService
 
     Task<ResponseResult<Guid?>> AdicionarCursoAsync(CursoCriarRequest curso);
 
-    Task<ResponseResult<CursoDto>> AtualizarCursoAsync(Guid id, AtualizarCursoRequest curso);
+    Task<ResponseResult<bool>> AtualizarCursoAsync(Guid id, AtualizarCursoRequest curso);
 
     Task<ResponseResult<bool?>> ExcluirCursoAsync(Guid cursoId);
 

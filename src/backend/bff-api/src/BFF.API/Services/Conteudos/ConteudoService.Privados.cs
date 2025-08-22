@@ -53,12 +53,12 @@ public partial class ConteudoService
         else { return CaptureRequestError<Guid?>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
-    public async Task<ResponseResult<CursoDto>> AtualizarCurso(Guid id, AtualizarCursoRequest curso)
+    public async Task<ResponseResult<bool>> AtualizarCurso(Guid id, AtualizarCursoRequest curso)
     {
         var url = $"api/cursos/{id}";
-        var apiResponse = await _apiClient.PutAsyncWithDetails<AtualizarCursoRequest, ResponseResult<CursoDto>>(url, curso);
+        var apiResponse = await _apiClient.PutAsyncWithDetails<AtualizarCursoRequest, ResponseResult<bool>>(url, curso);
         if (apiResponse.IsSuccess) { return apiResponse.Data; }
-        else { return CaptureRequestError<CursoDto>(apiResponse.ErrorContent, apiResponse.StatusCode); }
+        else { return CaptureRequestError<bool>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
     public async Task<ResponseResult<bool?>> ExcluirCurso(Guid cursoId)
