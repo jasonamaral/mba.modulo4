@@ -133,26 +133,25 @@ export class CursosListComponent {
     this.dialog.open(AulasListDialogComponent, {
       width: '800px',
       maxWidth: '95vw',
-      data: { curso, hasMatricula: this.hasMatricula(curso.id), pagamentoRealizado: this.pagamentoRealizado(curso.id) },
+      data: { curso, matriculaId: this.findMatricula(curso.id)?.id, pagamentoRealizado: this.pagamentoRealizado(curso.id) },
     });
   }
 
   hasMatricula(cursoId: string): boolean {
-    return !!this.matriculasAluno.find(m => m.cursoId === cursoId && m.alunoId === this.userId);
+    return !!this.findMatricula(cursoId);
+  }
+
+  findMatricula(cursoId: string) {
+    return this.matriculasAluno.find(m => m.cursoId === cursoId && m.alunoId === this.userId);
   }
 
   pagamentoRealizado(cursoId: string): boolean {
-    const matricula = this.matriculasAluno.find(
-      m => m.cursoId === cursoId && m.alunoId === this.userId
-    );
+    const matricula = this.findMatricula(cursoId);
     return matricula ? !matricula.pagamentoPodeSerRealizado : false;
   }
 
   matricular(c: CursoModel) {
-    const matricula = this.matriculasAluno.find(
-      m => m.cursoId === c.id && m.alunoId === this.userId
-    );
-
+    const matricula = this.findMatricula(c.id);
     const pagamentoPodeSerRealizado = matricula ? matricula.pagamentoPodeSerRealizado : true;
 
     if (matricula && !pagamentoPodeSerRealizado) {

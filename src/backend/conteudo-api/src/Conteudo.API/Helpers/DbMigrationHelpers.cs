@@ -32,7 +32,6 @@ public static class DbMigrationHelpers
 
     private static async Task EnsureSeedData(ConteudoDbContext context)
     {
-        await context.Database.EnsureDeletedAsync();
         await context.Database.MigrateAsync();
 
         if (!context.Categorias.Any())

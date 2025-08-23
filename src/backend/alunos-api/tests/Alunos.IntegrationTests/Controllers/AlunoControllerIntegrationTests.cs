@@ -250,4 +250,18 @@ public class MockAlunoQueryService : IAlunoQueryService
         };
         return Task.FromResult<IEnumerable<CertificadosDto>>(certificados);
     }
+
+    public Task<MatriculaCursoDto> ObterMatriculaPorIdAsync(Guid matriculaId, Guid alunoId)
+    {
+        var matricula = new MatriculaCursoDto
+        {
+            Id = matriculaId,
+            AlunoId = alunoId,
+            CursoId = Guid.NewGuid(),
+            NomeCurso = "Curso de Teste (Mock)",
+            DataMatricula = DateTime.Now.AddDays(-30),
+            EstadoMatricula = "Em Andamento"
+        };
+        return Task.FromResult(matricula);
+    }
 }

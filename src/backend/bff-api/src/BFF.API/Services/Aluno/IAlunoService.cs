@@ -10,6 +10,7 @@ public interface IAlunoService
 
     Task<ResponseResult<EvolucaoAlunoDto>> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid alunoId);
 
+    Task<ResponseResult<MatriculaCursoDto>> ObterMatriculaPorIdAsync(Guid matriculaId);
     Task<ResponseResult<ICollection<MatriculaCursoDto>>> ObterMatriculasPorAlunoIdAsync(Guid alunoId);
 
     Task<ResponseResult<CertificadoDto>> ObterCertificadoPorMatriculaIdAsync(Guid matriculaId);

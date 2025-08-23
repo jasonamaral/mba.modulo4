@@ -54,7 +54,7 @@ export class MatriculasComponent {
   }
 
   finalizar(m: MatriculaModel) {
-    this.service.finalizarCurso(m.cursoId).subscribe({
+    this.service.concluirCurso(m.alunoId, m.id).subscribe({
       next: () => {
         this.toastr.success('Curso finalizado com sucesso.');
         this.load();

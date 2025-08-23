@@ -1,19 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
 import { MaterialModule } from 'src/app/material.module';
 import { AulaModel } from 'src/app/pages/conteudo/models/aula.model';
 import { CursoModel } from '../../models/curso.model';
 import { LocalStorageUtils } from 'src/app/utils/localstorage';
-import { MatDialog } from '@angular/material/dialog';
 import { AulaEditDialogComponent } from '../edit/aula-edit-dialog.component';
-import { ToastrService } from 'ngx-toastr';
 import { AulaAddDialogComponent } from '../add/aula-add-dialog.component';
 import { CursosService } from '../../../../services/cursos.service';
+import { MatriculasService } from '../../../../services/matriculas.service';
 
 interface DialogData {
   curso: CursoModel;
-  hasMatricula?: boolean;
+  matriculaId?: string;
   pagamentoRealizado?: boolean;
 }
 
@@ -36,15 +37,15 @@ interface DialogData {
           </div>
           <div class="descricao" *ngIf="a.descricao">{{ a.descricao }}</div>
           <div class="meta">
-            <span *ngIf="a.videoUrl && data.hasMatricula && data.pagamentoRealizado">
+            <span *ngIf="a.videoUrl && !!data.matriculaId && data.pagamentoRealizado">
               <span class="iconify" data-icon="mdi:play-circle-outline" data-width="18" data-height="18"></span>
-              <a [href]="a.videoUrl" target="_blank" rel="noopener">Assistir vídeo</a>
+              <button mat-button mat-raised-button color="primary" (click)="assistirAula(a)" [disabled]="a.aulaRealizada">Assistir Aula</button>
             </span>
-            <span *ngIf="a.status" [ngClass]="{
-              'status-pendente': a.status === 'Pendente',
-              'status-concluida': a.status === 'Concluída'
+            <span *ngIf="a.videoUrl && !!data.matriculaId && data.pagamentoRealizado" [ngClass]="{
+              'status-pendente': !a.aulaRealizada,
+              'status-concluida': a.aulaRealizada
             }">
-              Status: {{ a.status }}
+              {{ a.aulaRealizada ? 'Concluída' : 'Pendente' }}
             </span>
           </div>
           <div class="actions bottom" *ngIf="isUserAdmin">
@@ -60,7 +61,11 @@ interface DialogData {
       </ng-template>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-raised-button mat-dialog-close color="primary">Fechar</button>
+      <button mat-raised-button color="primary" [disabled]="cursoFinalizado" (click)="finalizarCurso()" *ngIf="!isUserAdmin && concluiuCurso()">
+        <mat-icon>{{ cursoFinalizado ? 'check_circle' : 'school' }}</mat-icon>
+        {{ cursoFinalizado ? 'Curso Concluído' : 'Concluir Curso' }}
+      </button>
+      <button mat-raised-button mat-dialog-close color="secondary">Fechar</button>
     </mat-dialog-actions>
   `,
   styles: [
@@ -81,19 +86,29 @@ interface DialogData {
     `.actions.bottom{align-self:flex-start}`
   ]
 })
-export class AulasListDialogComponent {
+export class AulasListDialogComponent implements OnInit {
   aulas: (AulaModel & { status?: string })[] = [];
   isUserAdmin = false;
+  userId: string | null = null;
+  cursoFinalizado = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private dialogRef: MatDialogRef<AulasListDialogComponent>,
     private dialog: MatDialog,
     private cursosService: CursosService,
+    private matriculaService: MatriculasService,
     private toastr: ToastrService
   ) {
     this.aulas = (data.curso.aulas || []) as (AulaModel & { status?: string })[];
     this.isUserAdmin = new LocalStorageUtils().isUserAdmin();
+    this.userId = new LocalStorageUtils().getUser()?.usuarioToken?.id;
+  }
+
+  ngOnInit(): void {
+    this.loadAulas(this.data.curso.id);
+    this.loadAulasByMatricula();
+    this.loadMatricula();
   }
 
   close(): void {
@@ -130,17 +145,103 @@ export class AulasListDialogComponent {
     });
   }
 
-  private loadAulas(cursoId: string): void {
-    this.cursosService.getAulasByCurso(cursoId).subscribe({
-      next: ({ aulas }) => {
-        this.aulas = aulas;
+  assistirAula(aula: AulaModel): void {
+    if (!this.data.matriculaId || !this.userId || !aula.id || this.isUserAdmin)
+      return;
+
+   this.matriculaService.registrarHistoricoAprendizado(this.data.matriculaId, this.userId, aula.id, new Date().toISOString()).subscribe({
+     next: () => {
+      this.toastr.success('Progresso atualizado com sucesso!');
+      this.loadAulasByMatricula();
+     },
+     error: (err) => {
+       const errors = this.extractErrors(err);
+       this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao atualizar progresso.');
+     }
+   });
+  }
+
+  concluiuCurso(): boolean {
+    return this.aulas.every(a => a.aulaRealizada);
+  }
+
+  finalizarCurso(): void {
+    if (!this.data.matriculaId || !this.userId || this.isUserAdmin)
+      return;
+
+    this.matriculaService.concluirCurso(this.userId, this.data.matriculaId).subscribe({
+      next: () => {
+        this.toastr.success('Curso concluído com sucesso!');
+        this.loadAulasByMatricula();
+        this.cursoFinalizado = true;
       },
       error: (err) => {
-        const errors = (err?.error?.errors ?? err?.errors ?? []) as string[];
+        const errors = this.extractErrors(err);
+        this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao concluir curso.');
+      }
+    });
+  }
+
+  private loadAulas(cursoId: string): void {
+    if (!this.isUserAdmin)
+      return;
+
+    this.cursosService.getAulasByCurso(cursoId).subscribe({
+      next: ({ aulas }) => this.aulas = aulas,
+      error: (err) => {
+        const errors = this.extractErrors(err);
         this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao carregar aulas.');
       }
     });
   }
+
+  private loadAulasByMatricula(): void {
+    if (!this.data.matriculaId || this.isUserAdmin)
+      return;
+
+    this.matriculaService.obterAulasPorMatricula(this.data.matriculaId).subscribe({
+      next: (aulasDto) => {
+        this.aulas = (this.data.curso.aulas || []).map(aula => {
+          const aulaDto = aulasDto.find(ad => ad.aulaId === aula.id);
+          return {
+            id: aulaDto?.aulaId,
+            cursoId: aulaDto?.cursoId,
+            nome: aulaDto?.nomeAula,
+            numero: aula.numero,
+            dataInicio: aulaDto?.dataInicio,
+            dataTermino: aulaDto?.dataTermino,
+            aulaRealizada: aulaDto?.aulaJaIniciadaRealizada,
+            videoUrl: aula.videoUrl,
+            descricao: aula.descricao,
+            duracaoMinutos: aula.duracaoMinutos,
+            tipoAula: aula.tipoAula,
+            status: aula?.status
+          } as AulaModel;
+        });
+      },
+      error: (err) => {
+        const errors = this.extractErrors(err);
+        this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao carregar aulas.');
+      }
+    });
+  }
+
+  private loadMatricula(): void {
+    if (!this.data.matriculaId || this.isUserAdmin)
+      return;
+
+    this.matriculaService.obterMatricula(this.data.matriculaId).subscribe({
+      next: ({dataConclusao}) => {
+        this.cursoFinalizado = !!dataConclusao;
+      },
+      error: (err) => {
+        const errors = this.extractErrors(err);
+        this.toastr.error(Array.isArray(errors) ? errors.join('\n') : 'Erro ao carregar matrícula.');
+      }
+    });
+  }
+
+  private extractErrors(err: any): string[] {
+    return (err?.error?.errors ?? err?.errors ?? []) as string[];
+  }
 }
-
-

@@ -222,4 +222,40 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
 
         return [.. certificados.OrderByDescending(x => x.DataEmissao)];
     }
+
+    public async Task<MatriculaCursoDto?> ObterMatriculaPorIdAsync(Guid matriculaId, Guid alunoId)
+    {
+        var aluno = await _alunoRepository.ObterPorIdAsync(alunoId);
+        if (aluno == null) return null;
+
+        var matricula = await _alunoRepository.ObterMatriculaPorIdAsync(matriculaId);
+        if (matricula == null || matricula.AlunoId != aluno.Id) return null;
+
+        return new MatriculaCursoDto
+        {
+            Id = matricula.Id,
+            AlunoId = matricula.AlunoId,
+            CursoId = matricula.CursoId,
+            NomeCurso = matricula.NomeCurso,
+            Valor = matricula.Valor,
+            PagamentoPodeSerRealizado = matricula.PagamentoPodeSerRealizado(),
+            DataMatricula = matricula.DataMatricula,
+            DataConclusao = matricula.DataConclusao,
+            NotaFinal = matricula.ObterNotaFinalCurso(),
+            Observacao = matricula.Observacao,
+            EstadoMatricula = matricula.EstadoMatricula.ObterDescricao(),
+            Certificado = matricula.Certificado != null ? new CertificadoDto
+            {
+                Id = matricula.Certificado.Id,
+                MatriculaCursoId = matricula.Certificado.MatriculaCursoId,
+                NomeCurso = matricula.Certificado.NomeCurso,
+                DataSolicitacao = matricula.Certificado.DataSolicitacao,
+                DataEmissao = matricula.Certificado.DataEmissao,
+                CargaHoraria = matricula.Certificado.CargaHoraria,
+                NotaFinal = matricula.Certificado.NotaFinal,
+                PathCertificado = matricula.Certificado.PathCertificado,
+                NomeInstrutor = matricula.Certificado.NomeInstrutor
+            } : null
+        };
+    }
 }
