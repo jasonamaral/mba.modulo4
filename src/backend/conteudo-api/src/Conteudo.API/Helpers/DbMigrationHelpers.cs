@@ -24,7 +24,7 @@ public static class DbMigrationHelpers
         var context = scope.ServiceProvider.GetRequiredService<ConteudoDbContext>();
         var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
-        if (env.IsDevelopment())
+        if (env.IsDevelopment() || env.IsEnvironment("Docker"))
         {
             await EnsureSeedData(context);
         }
@@ -85,7 +85,7 @@ public static class DbMigrationHelpers
                     nivel: "Intermediário",
                     instrutor: "Maria Souza",
                     vagasMaximas: 20,
-                    imagemUrl: "https://exemplo.com/imagens/curso-csharp-avancado.jpg",
+                    imagemUrl: "http://localhost:4200/assets/images/curso-csharp-avancado.jpg",
                     validoAte: DateTime.UtcNow.AddYears(1),
                     categoriaId: catProgramacaoId
                 ),
@@ -107,7 +107,7 @@ public static class DbMigrationHelpers
                     nivel: "Básico/Intermediário",
                     instrutor: "Carlos Lima",
                     vagasMaximas: 25,
-                    imagemUrl: "https://exemplo.com/imagens/curso-sql.jpg",
+                    imagemUrl: "http://localhost:4200/assets/images/curso-sql.jpg",
                     validoAte: DateTime.UtcNow.AddYears(1),
                     categoriaId: catProgramacaoId
                 ),
@@ -129,7 +129,7 @@ public static class DbMigrationHelpers
                     nivel: "Básico",
                     instrutor: "Ana Pereira",
                     vagasMaximas: 20,
-                    imagemUrl: "https://exemplo.com/imagens/curso-docker.jpg",
+                    imagemUrl: "http://localhost:4200/assets/images/curso-docker.jpg",
                     validoAte: DateTime.UtcNow.AddYears(1),
                     categoriaId: catDevOpsId
                 ),
@@ -151,7 +151,7 @@ public static class DbMigrationHelpers
                     nivel: "Básico/Intermediário",
                     instrutor: "Ricardo Martins",
                     vagasMaximas: 25,
-                    imagemUrl: "https://exemplo.com/imagens/curso-angular.jpg",
+                    imagemUrl: "http://localhost:4200/assets/images/curso-angular.jpg",
                     validoAte: DateTime.UtcNow.AddYears(1),
                     categoriaId: catProgramacaoId
                 ),
@@ -173,7 +173,7 @@ public static class DbMigrationHelpers
                     nivel: "Básico",
                     instrutor: "João Oliveira",
                     vagasMaximas: 30,
-                    imagemUrl: "https://exemplo.com/imagens/curso-python.jpg",
+                    imagemUrl: "http://localhost:4200/assets/images/curso-python.jpg",
                     validoAte: DateTime.UtcNow.AddYears(1),
                     categoriaId: catProgramacaoId
                 ),
@@ -195,7 +195,7 @@ public static class DbMigrationHelpers
                 nivel: "Avançado",
                 instrutor: "Lucas Almeida",
                 vagasMaximas: 20,
-                imagemUrl: "https://exemplo.com/imagens/curso-kubernetes.jpg",
+                imagemUrl: "http://localhost:4200/assets/images/curso-kubernetes.jpg",
                 validoAte: DateTime.UtcNow.AddYears(1),
                 categoriaId: catDevOpsId
                 ),
@@ -217,7 +217,7 @@ public static class DbMigrationHelpers
                 nivel: "Intermediário",
                 instrutor: "Fernanda Costa",
                 vagasMaximas: 25,
-                imagemUrl: "https://exemplo.com/imagens/curso-javascript.jpg",
+                imagemUrl: "http://localhost:4200/assets/images/curso-javascript.jpg",
                 validoAte: DateTime.UtcNow.AddYears(1),
                 categoriaId: catProgramacaoId
                 ),
@@ -239,7 +239,7 @@ public static class DbMigrationHelpers
                 nivel: "Básico",
                 instrutor: "Patrícia Fernandes",
                 vagasMaximas: 30,
-                imagemUrl: "https://exemplo.com/imagens/curso-git.jpg",
+                imagemUrl: "http://localhost:4200/assets/images/curso-git.jpg",
                 validoAte: DateTime.UtcNow.AddYears(1),
                 categoriaId: catDevOpsId
                 )

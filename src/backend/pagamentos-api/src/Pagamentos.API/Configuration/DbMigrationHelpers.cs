@@ -26,7 +26,7 @@ namespace Pagamentos.API.Configuration
 
             var contextPagamento = scope.ServiceProvider.GetRequiredService<PagamentoContext>();
 
-            if (env.IsDevelopment() || env.IsEnvironment("Test"))
+            if (env.IsDevelopment() || env.IsEnvironment("Test") || env.IsEnvironment("Docker"))
             {
                 await MigrarBancosAsync(contextPagamento);
                 await EnsureSeedProducts(serviceProvider);

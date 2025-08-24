@@ -16,12 +16,16 @@ import { ToastrService } from 'ngx-toastr';
   imports: [CommonModule, MatTableModule, MatButtonModule, MatProgressBarModule]
 })
 export class MatriculasComponent {
-  cols = ['curso','status','progresso','acoes'];
+  cols = ['curso', 'status', 'progresso', 'acoes'];
   matriculas: MatriculaModel[] = [];
 
-  constructor(private service: MatriculasService, private toastr: ToastrService) {}
+  constructor(private service: MatriculasService, private toastr: ToastrService) { }
 
-  ngOnInit() { this.load(); }
+  ngOnInit() {
+    if (!this.service.LocalStorage.isUserAdmin()) {
+      this.load();
+    }
+  }
 
   load() {
     this.service.listarMatriculas().subscribe({
@@ -41,9 +45,9 @@ export class MatriculasComponent {
     };
 
     this.service.solicitarCertificado(request).subscribe({
-      next: (result) => {
+      next: () => {
         this.toastr.success('Certificado solicitado com sucesso!');
-        this.load(); // Recarrega a lista para atualizar o status
+        this.load(); 
       },
       error: (fail) => {
         const errors = (fail?.error?.errors ?? fail?.errors ?? []) as string[];

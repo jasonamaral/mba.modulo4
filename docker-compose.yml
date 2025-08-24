@@ -65,7 +65,7 @@ services:
       - "5001:5001"
       - "7001:7001"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5001;http://+:7001
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PlataformaEducacional123!
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AuthDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
@@ -97,7 +97,7 @@ services:
       - "5002:5002"
       - "7002:7002"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5002;http://+:7002
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PlataformaEducacional123!
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ConteudoDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
@@ -132,7 +132,7 @@ services:
       - "5003:5003"
       - "7003:7003"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5003;http://+:7003
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PlataformaEducacional123!
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AlunosDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
@@ -168,8 +168,8 @@ services:
       - "5004:5004"
       - "7004:7004"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URL=http://+:5004;http://+:7004
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:5004;http://+:7004
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PlataformaEducacional123!
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=PagamentosDB;User Id=sa;Password=PlataformaEducacional123!;TrustServerCertificate=True;
       - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
@@ -203,7 +203,7 @@ services:
       - "5000:5000"
       - "7000:7000"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5000;http://+:7000
       - JwtSettings__SecretKey=PlataformaEducacional123!SuperSecretKey2024@#$
       - JwtSettings__Issuer=PlataformaEducacional
