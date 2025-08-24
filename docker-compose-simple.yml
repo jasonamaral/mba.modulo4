@@ -20,8 +20,8 @@ services:
       - plataforma-network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 10
       start_period: 30s
 
@@ -34,6 +34,12 @@ services:
       - redis_data:/data
     networks:
       - plataforma-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 5
+      start_period: 5s
 
   # SQL Server removido - usando SQLite em desenvolvimento
 
@@ -46,9 +52,9 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5001
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/auth-dev.db;Cache=Shared;Mode=ReadWriteCreate
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/auth-dev.db
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
@@ -68,10 +74,10 @@ services:
       - plataforma-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 45s
 
   conteudo-api:
     build:
@@ -81,9 +87,9 @@ services:
     ports:
       - "5002:5002"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5002
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/conteudo-dev.db;Cache=Shared;Mode=ReadWriteCreate
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/conteudo-dev.db
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
@@ -105,10 +111,10 @@ services:
       - plataforma-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 45s
 
   alunos-api:
     build:
@@ -118,9 +124,9 @@ services:
     ports:
       - "5003:5003"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5003
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/alunos-dev.db;Cache=Shared;Mode=ReadWriteCreate
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/alunos-dev.db
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
@@ -145,10 +151,10 @@ services:
       - plataforma-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 45s
 
   pagamentos-api:
     build:
@@ -158,9 +164,9 @@ services:
     ports:
       - "5004:5004"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5004
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/pagamentos-dev.db;Cache=Shared;Mode=ReadWriteCreate
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/pagamentos-dev.db
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
       - JwtSettings__Audience=Auth.API.Users
@@ -182,10 +188,10 @@ services:
       - plataforma-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5004/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 45s
 
   bff-api:
     build:
@@ -196,7 +202,7 @@ services:
       - "5000:5000"
       - "7000:7000"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:5000;http://+:7000
       - JwtSettings__SecretKey=MinhaChaveSecretaSuperSegura123456789AbcDef
       - JwtSettings__Issuer=Auth.API
@@ -210,7 +216,7 @@ services:
       - MessageQueueConnection__MessageBus=host=rabbitmq:5672;username=admin;password=admin123;publisherConfirms=true;timeout=120;requestedHeartbeat=60;prefetchCount=1
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       auth-api:
         condition: service_healthy
       conteudo-api:
@@ -223,10 +229,10 @@ services:
       - plataforma-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 45s
 
   frontend:
     build:

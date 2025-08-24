@@ -7,7 +7,7 @@ namespace Pagamentos.API.Configuration
     {
         public static WebApplicationBuilder AddDbContextConfig(this WebApplicationBuilder builder)
         {
-            if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Test"))
+            if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Test") || builder.Environment.IsEnvironment("Docker"))
             {
                 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 

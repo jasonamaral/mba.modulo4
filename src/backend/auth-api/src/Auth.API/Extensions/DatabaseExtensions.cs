@@ -13,7 +13,7 @@ public static class DatabaseExtensions
     {
         var databaseSettings = configuration.GetSection("DatabaseSettings").Get<DatabaseSettings>() ?? new DatabaseSettings();
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        var isDevelopment = environment.IsDevelopment();
+        var isDevelopment = environment.IsDevelopment() || environment.IsEnvironment("Docker");
 
         if (isDevelopment)
         {

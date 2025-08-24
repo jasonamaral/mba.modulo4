@@ -23,7 +23,7 @@ public static class DbMigrationHelpers
         var context = scope.ServiceProvider.GetRequiredService<AlunoDbContext>();
         var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
-        if (env.IsDevelopment())
+        if (env.IsDevelopment() || env.IsEnvironment("Docker"))
         {
             await EnsureSeedData(context);
         }

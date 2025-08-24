@@ -54,12 +54,14 @@ export class CursosListComponent {
 
   ngOnInit() {
     this.isUserAdmin = new LocalStorageUtils().isUserAdmin();
-    // Responsividade: 2 colunas em telas médias/maiores, 1 coluna em telas menores
     this.breakpointObserver
       .observe(['(max-width: 992px)'])
       .subscribe(state => this.gridCols = state.matches ? 1 : 2);
     this.loadCursos();
-    this.loadMatriculas();
+
+    if (!this.isUserAdmin) {
+      this.loadMatriculas();
+    }
   }
 
   private loadCursos(): void {
@@ -87,7 +89,6 @@ export class CursosListComponent {
     this.matriculas.listarMatriculas().subscribe({
       next: (matriculas) => {
         this.matriculasAluno = matriculas;
-        console.log('Matrículas do aluno:', this.matriculasAluno);
       },
       error: (err) => {
         console.error('Erro ao carregar matrículas do aluno:', err);

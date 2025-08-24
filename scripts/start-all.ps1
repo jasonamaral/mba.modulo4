@@ -1,5 +1,7 @@
 Write-Host "Iniciando Plataforma Educacional..." -ForegroundColor Green
 Write-Host "=================================================" -ForegroundColor Cyan
+Write-Host "CORREÇÕES APLICADAS: Bancos SQLite + Performance otimizada" -ForegroundColor Green
+Write-Host "=================================================" -ForegroundColor Cyan
 
 # Detectar e navegar para a raiz do projeto
 $currentPath = Get-Location
@@ -207,7 +209,7 @@ Write-Host "   Aguardando RabbitMQ ficar saudavel..." -ForegroundColor Yellow
 # Aguarda RabbitMQ ficar 'healthy' para evitar timeout nas APIs ao registrar filas
 $rabbitContainer = "plataforma-rabbitmq"
 $elapsed = 0
-$timeoutSec = 180  # Aumentado para 3 minutos
+$timeoutSec = 90  # Otimizado: 2 minutos
 $rabbitReady = $false
 
 while ($elapsed -lt $timeoutSec -and -not $rabbitReady) {
@@ -216,9 +218,9 @@ while ($elapsed -lt $timeoutSec -and -not $rabbitReady) {
         if ($status -eq 'healthy') {
             Write-Host "   RabbitMQ HEALTHY" -ForegroundColor Green
             
-            # Aguarda mais um pouco para garantir que o RabbitMQ esteja totalmente operacional
+            # Aguarda um pouco para garantir que o RabbitMQ esteja totalmente operacional
             Write-Host "   Aguardando RabbitMQ ficar totalmente operacional..." -ForegroundColor Yellow
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 5
             
             # Testa conectividade com o RabbitMQ
             $rabbitReady = $true
@@ -247,14 +249,14 @@ Write-Host "3. Iniciando Auth API..." -ForegroundColor Blue
 docker-compose -f $composeFile up -d auth-api
 Write-Host "   Aguardando Auth API inicializar e criar banco SQLite..." -ForegroundColor Yellow
 
-# Aguarda mais tempo para o banco ser criado e verifica se foi criado corretamente
-Start-Sleep -Seconds 30
+# Aguarda o banco ser criado e verifica se foi criado corretamente
+Start-Sleep -Seconds 25
 
 # Verificar se o banco SQLite foi criado corretamente
 $authContainer = "plataforma-auth-api"
 $authDbPath = "/app/data/auth-dev.db"
 $elapsed = 0
-$timeoutSec = 120
+$timeoutSec = 90
 $dbReady = $false
 
 while ($elapsed -lt $timeoutSec -and -not $dbReady) {
@@ -282,13 +284,13 @@ if (-not $dbReady) {
 Write-Host "4. Iniciando Alunos API..." -ForegroundColor Blue
 docker-compose -f $composeFile up -d alunos-api
 Write-Host "   Aguardando Alunos API inicializar e criar banco SQLite..." -ForegroundColor Yellow
-Start-Sleep -Seconds 30
+Start-Sleep -Seconds 25
 
 # Verificar se o banco SQLite foi criado corretamente
 $alunosContainer = "plataforma-alunos-api"
 $alunosDbPath = "/app/data/alunos-dev.db"
 $elapsed = 0
-$timeoutSec = 120
+$timeoutSec = 90
 $dbReady = $false
 
 while ($elapsed -lt $timeoutSec -and -not $dbReady) {
@@ -316,13 +318,13 @@ if (-not $dbReady) {
 Write-Host "5. Iniciando Pagamentos API..." -ForegroundColor Blue
 docker-compose -f $composeFile up -d pagamentos-api
 Write-Host "   Aguardando Pagamentos API inicializar e criar banco SQLite..." -ForegroundColor Yellow
-Start-Sleep -Seconds 30
+Start-Sleep -Seconds 25
 
 # Verificar se o banco SQLite foi criado corretamente
 $pagamentosContainer = "plataforma-pagamentos-api"
 $pagamentosDbPath = "/app/data/pagamentos-dev.db"
 $elapsed = 0
-$timeoutSec = 120
+$timeoutSec = 90
 $dbReady = $false
 
 while ($elapsed -lt $timeoutSec -and -not $dbReady) {
@@ -350,13 +352,13 @@ if (-not $dbReady) {
 Write-Host "6. Iniciando Conteudo API..." -ForegroundColor Blue
 docker-compose -f $composeFile up -d conteudo-api
 Write-Host "   Aguardando Conteudo API inicializar e criar banco SQLite..." -ForegroundColor Yellow
-Start-Sleep -Seconds 30
+Start-Sleep -Seconds 25
 
 # Verificar se o banco SQLite foi criado corretamente
 $conteudoContainer = "plataforma-conteudo-api"
 $conteudoDbPath = "/app/data/conteudo-dev.db"
 $elapsed = 0
-$timeoutSec = 120
+$timeoutSec = 90
 $dbReady = $false
 
 while ($elapsed -lt $timeoutSec -and -not $dbReady) {
@@ -387,13 +389,13 @@ Write-Host "=== ETAPA 6: INICIANDO BFF E FRONTEND ===" -ForegroundColor Yellow
 Write-Host "7. Iniciando BFF API..." -ForegroundColor Blue
 docker-compose -f $composeFile up -d bff-api
 Write-Host "   Aguardando BFF API inicializar..." -ForegroundColor Yellow
-Start-Sleep -Seconds 15
+Start-Sleep -Seconds 10
 
 # Frontend
 Write-Host "8. Iniciando Frontend..." -ForegroundColor Blue
 docker-compose -f $composeFile up -d frontend
 Write-Host "   Aguardando Frontend inicializar..." -ForegroundColor Yellow
-Start-Sleep -Seconds 15
+Start-Sleep -Seconds 10
 
 Write-Host ""
 Write-Host "=== ETAPA 7: VERIFICAÇÃO FINAL ===" -ForegroundColor Yellow
