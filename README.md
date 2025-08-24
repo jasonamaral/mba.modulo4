@@ -245,7 +245,7 @@ docker-compose up -d bff-api frontend
 
 Após ~5 minutos de inicialização:
 
-- **🌐 Frontend**: http://localhost:4200
+- **🌐 Frontend**: http://localhost:4200 (aluno1@auth.api/Teste@123 ou admin@auth.api/Teste@123)
 - **📊 RabbitMQ Management**: http://localhost:15672 (admin/admin123)
 
 ## 🔧 Microserviços
