@@ -6,7 +6,6 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 ![Angular](https://img.shields.io/badge/Angular-18-red)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3-orange)
-![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-red)
 
 ## 📋 Índice
 
@@ -43,10 +42,10 @@ flowchart TD
   end
  subgraph Microservicos["🚀 Microserviços"]
     direction LR
-        Auth["🔐 Auth API<br>📍 5001/7001<br>🔑 Autenticação"]
-        Conteudo["📚 Conteudo API<br>📍 5002/7002<br>📖 Cursos &amp; Aulas"]
-        Alunos["🎓 Alunos API<br>📍 5003/7003<br>👨‍🎓 Matrículas"]
-        Pagamentos["💳 Pagamentos API<br>📍 5004/7004<br>💰 Transações"]
+        Auth["🔐 Auth API<br>📍 5001<br>🔑 Autenticação"]
+        Conteudo["📚 Conteudo API<br>📍 5002<br>📖 Cursos &amp; Aulas"]
+        Alunos["🎓 Alunos API<br>📍 5003<br>👨‍🎓 Matrículas"]
+        Pagamentos["💳 Pagamentos API<br>📍 5004<br>💰 Transações"]
   end
  subgraph Infra["🏗️ Infra — Dados & Cache"]
     direction LR
@@ -157,14 +156,13 @@ Cada microserviço segue a **Clean Architecture** com as seguintes camadas:
 
 ### ✅ **Scripts PowerShell**
 - ✅ Ordem correta de inicialização 
-- ✅ Configuração automática do RabbitMQ
 - ✅ Verificações de saúde dos Serviços
 - ✅ Mensagens informativas
 - ✅ Tratamento de erros
 
 ### 📋 **Opções Disponíveis**
 1. **PowerShell (.ps1)** - Automação completa
-2. **Docker Compose puro** - Manual, requer configuração do RabbitMQ
+2. **Docker Compose puro**
 
 ## 🚀 Pré-requisitos
 
@@ -174,7 +172,7 @@ Cada microserviço segue a **Clean Architecture** com as seguintes camadas:
 - **Git**
 
 ### Para Desenvolvimento
-- **.NET SDK 8.0**
+- **.NET SDK 9.0**
 - **Node.js 18+** (para Angular)
 - **Visual Studio 2022** ou **VS Code**
 
@@ -226,7 +224,7 @@ cd scripts
 **Manual (Docker Compose apenas):**
 ```powershell
 # Iniciar infraestrutura
-docker-compose up -d rabbitmq sqlserver redis
+docker-compose up -d rabbitmq redis
 
 # Aguardar inicialização (aguarde ~2 minutos)
 Start-Sleep -Seconds 120
@@ -252,7 +250,7 @@ Após ~5 minutos de inicialização:
 
 ## 🔧 Microserviços
 
-### Auth API (porta 5001/7001)
+### Auth API (porta 5001)
 **Responsabilidade**: Autenticação e autorização
 - ✅ Cadastro e login de usuários
 - ✅ Emissão e validação de tokens JWT
@@ -261,7 +259,7 @@ Após ~5 minutos de inicialização:
 - 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5001/swagger
 
-### Conteudo API (porta 5002/7002)
+### Conteudo API (porta 5002)
 **Responsabilidade**: Gestão de conteúdo educacional
 - ✅ CRUD de cursos
 - ✅ CRUD de aulas
@@ -270,7 +268,7 @@ Após ~5 minutos de inicialização:
 - 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5002/swagger
 
-### Alunos API (porta 5003/7003)
+### Alunos API (porta 5003)
 **Responsabilidade**: Jornada do aluno
 - ✅ Sistema de matrículas
 - ✅ Tracking de progresso
@@ -280,7 +278,7 @@ Após ~5 minutos de inicialização:
 - 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5003/swagger
 
-### Pagamentos API (porta 5004/7004)
+### Pagamentos API (porta 5004)
 **Responsabilidade**: Processamento financeiro
 - ✅ Processamento de pagamentos
 - ✅ Consulta de status
@@ -306,16 +304,6 @@ Após ~5 minutos de inicialização:
 - **Management UI**: http://localhost:15672
 - **Credenciais**: admin/admin123
 
-### SQL Server
-- **Host**: localhost:1433
-- **Usuário**: sa
-- **Senha**: PlataformaEducacional123!
-- **Bancos criados automaticamente**:
-  - alunos-dev
-  - auth-dev
-  - conteudo-dev
-  - pagamentos-dev
-
 ### Redis
 - **Host**: localhost:6379
 - **Uso**: Cache distribuído para BFF
@@ -331,10 +319,10 @@ Após ~5 minutos de inicialização:
 ### APIs (Swagger)
 | API | HTTPS | HTTP | Descrição |
 |-----|-------|------|-----------|
-| 🔐 **Auth** | https://localhost:5001 | http://localhost:7001 | Autenticação |
-| 📚 **Conteudo** | https://localhost:5002 | http://localhost:7002 | Cursos e aulas |
-| 🎓 **Alunos** | https://localhost:5003 | http://localhost:7003 | Matrículas |
-| 💳 **Pagamentos** | https://localhost:5004 | http://localhost:7004 | Transações |
+| 🔐 **Auth** | http://localhost:5001 | Autenticação |
+| 📚 **Conteudo** | http://localhost:5002 | Cursos e aulas |
+| 🎓 **Alunos** | http://localhost:5003 Matrículas |
+| 💳 **Pagamentos** | http://localhost:5004 | Transações |
 
 ### Infraestrutura
 | Serviço | URL | Credenciais |
@@ -343,12 +331,6 @@ Após ~5 minutos de inicialização:
 | 🔴 **Redis** | localhost:6379 | (sem senha) |
 
 ## 🛠️ Desenvolvimento
-
-### Modo Desenvolvimento (Apenas Infraestrutura)
-```powershell
-# Iniciar apenas RabbitMQ, SQL Server e Redis
-.\scripts\dev-mode.ps1
-```
 
 ### Executar APIs Localmente
 ```powershell
@@ -466,8 +448,6 @@ docker container prune -f
 ### Problema: Erro de conexão com banco
 **Solução:**
 ```bash
-# Verificar se SQL Server está rodando
-docker-compose logs sqlserver
 
 # Reiniciar SQL Server
 docker-compose restart sqlserver
