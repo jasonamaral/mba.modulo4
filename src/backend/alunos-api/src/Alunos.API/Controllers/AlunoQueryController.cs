@@ -83,6 +83,23 @@ public partial class AlunoController
         }
     }
 
+    [Authorize(Roles = "Usuario")]
+    [HttpGet("matricula/{matriculaId}")]
+    [ProducesResponseType(typeof(ResponseResult<MatriculaCursoDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ObterMatriculaPorId(Guid matriculaId)
+    {
+        var alunoId = User.GetUserId();
+        var matricula = await _alunoQueryService.ObterMatriculaPorIdAsync(matriculaId, alunoId);
+        if (matricula == null)
+        {
+            _notificador.AdicionarErro("Matrícula do aluno não encontrada.");
+            return RespostaPadraoApi<string>();
+        }
+        return RespostaPadraoApi(data: matricula);
+    }
+
     /// <summary>
     /// Obtem o certificado de conclusão do curso
     /// </summary>

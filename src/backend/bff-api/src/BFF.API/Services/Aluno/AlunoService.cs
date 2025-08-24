@@ -63,16 +63,28 @@ public partial class AlunoService : BaseApiService, IAlunoService
         return result ?? ReturnUnknowError<CertificadoDto>();
     }
 
+    public async Task<ResponseResult<MatriculaCursoDto>> ObterMatriculaPorIdAsync(Guid matriculaId)
+    {
+        var result = await ExecuteWithErrorHandling(() => ObterMatriculaPorId(matriculaId),
+            nameof(ObterMatriculaPorIdAsync),
+            matriculaId);
+        return result ?? ReturnUnknowError<MatriculaCursoDto>();
+    }
+
     public async Task<ResponseResult<ICollection<AulaCursoDto>>> ObterAulasPorMatriculaIdAsync(Guid matriculaId)
     {
         var aulaCursoDto = await ExecuteWithErrorHandling(() => ObterAulasPorMatriculaId(matriculaId),
             nameof(ObterAulasPorMatriculaIdAsync),
             matriculaId);
-
+        
         if (aulaCursoDto.Data != null)
         {
+            var cursoMatriculado = await ObterMatriculaPorIdAsync(matriculaId);
+            if (cursoMatriculado == null || cursoMatriculado.Data == null)
+                return aulaCursoDto;
+
             // Obtenho o curso e suas aulas para "adicionar" as aulas que não estão na matrícula (por não ter histórico ou novas aulas)
-            var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaId, includeAulas: true);
+            var cursoDto = await _conteudoService.ObterCursoPorIdAsync(cursoMatriculado.Data.CursoId, includeAulas: true);
 
             foreach (var aula in cursoDto.Data.Aulas)
             {
@@ -86,7 +98,6 @@ public partial class AlunoService : BaseApiService, IAlunoService
                         CursoId = aula.CursoId,
                         NomeAula = aula.Nome,
                         OrdemAula = aula.Numero,
-                        //Ativo = aula.Ativo,
                         DataInicio = null,
                         DataTermino = null,
                         AulaJaIniciadaRealizada = false,

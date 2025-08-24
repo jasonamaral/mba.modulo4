@@ -38,6 +38,14 @@ public partial class AlunoService
         else { return CaptureRequestError<CertificadoDto>(apiResponse.ErrorContent, apiResponse.StatusCode); }
     }
 
+    public async Task<ResponseResult<MatriculaCursoDto>> ObterMatriculaPorId(Guid matriculaId)
+    {
+        var url = $"api/aluno/matricula/{matriculaId}";
+        var apiResponse = await _apiClient.GetWithDetailsAsync<ResponseResult<MatriculaCursoDto>>(url);
+        if (apiResponse.IsSuccess) { return apiResponse.Data; }
+        else { return CaptureRequestError<MatriculaCursoDto>(apiResponse.ErrorContent, apiResponse.StatusCode); }
+    }
+
     public async Task<ResponseResult<ICollection<AulaCursoDto>>> ObterAulasPorMatriculaId(Guid matriculaId)
     {
         var url = $"api/aluno/aulas/{matriculaId}";

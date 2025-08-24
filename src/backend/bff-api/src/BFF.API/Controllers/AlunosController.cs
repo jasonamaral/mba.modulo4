@@ -25,7 +25,7 @@ public class AlunosController(IAlunoService aulaService,
     INotificationHandler<DomainNotificacaoRaiz> notifications,
     INotificador notificador) : BffController(mediator, notifications, notificador)
 {
-    private readonly IAlunoService _aulaService = aulaService;
+    private readonly IAlunoService _alunoService = aulaService;
     private readonly ILogger<AlunosController> _logger = logger;
 
     /// <summary>
@@ -45,7 +45,7 @@ public class AlunosController(IAlunoService aulaService,
             return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválido.");
         }
 
-        var resultado = await _aulaService.ObterAlunoPorIdAsync(alunoId);
+        var resultado = await _alunoService.ObterAlunoPorIdAsync(alunoId);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -72,7 +72,7 @@ public class AlunosController(IAlunoService aulaService,
             return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválido.");
         }
 
-        var resultado = await _aulaService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId);
+        var resultado = await _alunoService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -99,13 +99,32 @@ public class AlunosController(IAlunoService aulaService,
             return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Usuário não autenticado.");
         }
 
-        var resultado = await _aulaService.ObterMatriculasPorAlunoIdAsync(alunoId);
+        var resultado = await _alunoService.ObterMatriculasPorAlunoIdAsync(alunoId);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
             return Ok(resultado);
         }
 
+        return BadRequest(resultado);
+    }
+
+    [Authorize(Roles = "Usuario")]
+    [HttpGet("matricula/{matriculaId}")]
+    [ProducesResponseType(typeof(ResponseResult<MatriculaCursoDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ObterMatriculaPorIdAsync(Guid matriculaId)
+    {
+        if (matriculaId == Guid.Empty)
+        {
+            return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id da matrícula é inválida.");
+        }
+        var resultado = await _alunoService.ObterMatriculaPorIdAsync(matriculaId);
+        if (resultado?.Status == (int)HttpStatusCode.OK)
+        {
+            return Ok(resultado);
+        }
         return BadRequest(resultado);
     }
 
@@ -126,7 +145,7 @@ public class AlunosController(IAlunoService aulaService,
             return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id da matrícula é inválida.");
         }
 
-        var resultado = await _aulaService.ObterCertificadoPorMatriculaIdAsync(matriculaId);
+        var resultado = await _alunoService.ObterCertificadoPorMatriculaIdAsync(matriculaId);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -153,7 +172,7 @@ public class AlunosController(IAlunoService aulaService,
             return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id da matrícula é inválida.");
         }
 
-        var resultado = await _aulaService.ObterAulasPorMatriculaIdAsync(matriculaId);
+        var resultado = await _alunoService.ObterAulasPorMatriculaIdAsync(matriculaId);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -179,7 +198,7 @@ public class AlunosController(IAlunoService aulaService,
     {
         if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
 
-        var resultado = await _aulaService.MatricularAlunoAsync(dto);
+        var resultado = await _alunoService.MatricularAlunoAsync(dto);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -205,7 +224,7 @@ public class AlunosController(IAlunoService aulaService,
     {
         if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
 
-        var resultado = await _aulaService.RegistrarHistoricoAprendizadoAsync(dto);
+        var resultado = await _alunoService.RegistrarHistoricoAprendizadoAsync(dto);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -231,7 +250,7 @@ public class AlunosController(IAlunoService aulaService,
     {
         if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
 
-        var resultado = await _aulaService.ConcluirCursoAsync(dto);
+        var resultado = await _alunoService.ConcluirCursoAsync(dto);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -257,7 +276,7 @@ public class AlunosController(IAlunoService aulaService,
     {
         if (alunoId == Guid.Empty) { return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Id do aluno é inválida."); }
 
-        var resultado = await _aulaService.SolicitarCertificadoAsync(dto);
+        var resultado = await _alunoService.SolicitarCertificadoAsync(dto);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -284,7 +303,7 @@ public class AlunosController(IAlunoService aulaService,
             return ProcessarErro(System.Net.HttpStatusCode.BadRequest, "Usuário não autenticado.");
         }
 
-        var resultado = await _aulaService.ObterCertificadosPorAlunoIdAsync(alunoId);
+        var resultado = await _alunoService.ObterCertificadosPorAlunoIdAsync(alunoId);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {

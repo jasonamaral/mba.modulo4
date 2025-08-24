@@ -170,7 +170,7 @@ public class Aluno : Entidade, IRaizAgregacao
     {
         var matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         var historico = matriculaCurso.HistoricoAprendizado.FirstOrDefault(h => h.AulaId == aulaId);
-        //if (historico == null) { throw new DomainException("Histórico de aprendizado não foi localizado"); }
+
         return historico;
     }
 
