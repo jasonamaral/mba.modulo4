@@ -7,6 +7,13 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3-orange)
 
+### Integrantes
+- Hugo Domynique
+- Jairo Azevedo
+- Jason Santos do Amaral
+- Karina Esparza
+- Marco Aurelio Roque
+
 ## 📋 Índice
 
 - [Arquitetura do Sistema](#-arquitetura-do-sistema)
