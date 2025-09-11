@@ -3,7 +3,6 @@
 Avalie se o projeto atende a todos os requisitos funcionais definidos.
 * Será revisado na avalição final.
 
-
 ## Qualidade do Código 20%
 
 Considere clareza, organização e uso de padrões de codificação.
@@ -50,13 +49,12 @@ Considere clareza, organização e uso de padrões de codificação.
   - Remover métodos não utilizados.
   - Existe variação nas _namespaces_. Espera-se que todas comecem com `MBA.Modulo4`.
   - Quando usar contrutor primário, evite o use de propriedades privadas.
-  - 
 
 ## Eficiência e Desempenho 20%
 
 Avalie o desempenho e a eficiência das soluções implementadas.
 * Será revisado na avalição final.
-
+  - Propage o `CancellationToken` em todos os métodos assíncronos.
 
 ## Inovação e Diferenciais 10%
 
@@ -116,17 +114,3 @@ MBA.Modulo4
 
 Avalie a resolução dos problemas apontados na primeira avaliação de frontend
 * Será revisado na avalição final.
-
-
-## Notas
-
-| Critério                     | Peso | Nota | Nota Ponderada |
-|------------------------------|------|-----:|---------------:|
-| Funcionalidade               | 30%  |    5 |            1.5 |
-| Qualidade do Código          | 20%  |    7 |            1.4 |
-| Eficiência e Desempenho      | 20%  |    9 |            1.8 |
-| Inovação e Diferenciais      | 10%  |    8 |            0.8 |
-| Documentação e Organização   | 10%  |    5 |            0.5 |
-| Resolução de Feedbacks       | 10%  |    5 |            0.5 |
-| **Total**                    |      |      |        **6.5** |
-
