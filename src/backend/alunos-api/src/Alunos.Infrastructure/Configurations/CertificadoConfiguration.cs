@@ -11,8 +11,6 @@ public class CertificadoConfiguration : IEntityTypeConfiguration<Certificado>
 {
     public void Configure(EntityTypeBuilder<Certificado> builder)
     {
-        #region Mapping columns
-
         builder.ToTable("Certificados");
 
         builder.HasKey(x => x.Id)
@@ -74,22 +72,12 @@ public class CertificadoConfiguration : IEntityTypeConfiguration<Certificado>
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
 
-        #endregion Mapping columns
-
-        #region Indexes
-
         builder.HasIndex(x => x.MatriculaCursoId).HasDatabaseName("CertificadosMatriculaCursoIdIDX");
-
-        #endregion Indexes
-
-        #region Relationships
 
         builder.HasOne(x => x.MatriculaCurso)
            .WithOne(x => x.Certificado)
            .HasForeignKey<Certificado>(x => x.MatriculaCursoId)
            .HasConstraintName("CertificadoMatriculaCursoFK")
            .OnDelete(DeleteBehavior.Cascade);
-
-        #endregion Relationships
     }
 }

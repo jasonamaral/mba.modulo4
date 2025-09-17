@@ -10,7 +10,6 @@ namespace Core.Messages.Integration
 
         public PagamentoRecusadoEvent(Guid cursoId, Guid clienteId, Guid pagamentoId, Guid transacaoId, decimal total)
         {
-            //AggregateID = cursoId;
             Id = cursoId;
             ClienteId = clienteId;
             PagamentoId = pagamentoId;

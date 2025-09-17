@@ -45,7 +45,7 @@ public class AlunoTests
         aluno.Estado.Should().Be(estado);
         aluno.Cep.Should().Be(cep.Replace("-", "").Replace(".", ""));
         aluno.Foto.Should().Be(foto);
-        aluno.Ativo.Should().BeFalse(); // Por padrão, aluno inativo
+        aluno.Ativo.Should().BeFalse();
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class AlunoTests
         var nome = "João Silva";
         var email = "joao@teste.com";
         var cpf = "12345678901";
-        var dataNascimento = DateTime.Now.AddYears(1); // Data futura
+        var dataNascimento = DateTime.Now.AddYears(1);
         var genero = "Masculino";
         var cidade = "São Paulo";
         var estado = "SP";
@@ -322,7 +322,7 @@ public class AlunoTests
     {
         // Arrange
         var aluno = CriarAlunoValido();
-        aluno.AtivarAluno(); // Primeiro ativa
+        aluno.AtivarAluno();
 
         // Act
         aluno.InativarAluno();
@@ -359,7 +359,6 @@ public class AlunoTests
     {
         // Arrange
         var aluno = CriarAlunoValido();
-        // Aluno já é inativo por padrão
 
         // Act & Assert
         var action = () => aluno.MatricularAlunoEmCurso(Guid.NewGuid(), "Curso", 100.00m, "Obs");
@@ -374,17 +373,11 @@ public class AlunoTests
         var aluno = CriarAlunoValido();
         var cursoId = Guid.NewGuid();
 
-        // Matricula o aluno em um curso
         aluno.AtivarAluno();
         aluno.MatricularAlunoEmCurso(cursoId, "Curso de Teste", 100.00m, "Observação");
         var matricula = aluno.MatriculasCursos.First();
 
-        // Simula que todas as aulas foram concluídas
-        // (Este é um teste simplificado, na prática seria necessário registrar o histórico de todas as aulas)
-
         // Act
-        // Não é possível concluir o curso diretamente sem registrar o histórico das aulas
-        // Vou testar apenas se a matrícula foi criada corretamente
         matricula.Should().NotBeNull();
 
         // Assert

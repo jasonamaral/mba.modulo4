@@ -11,8 +11,6 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
 {
     public void Configure(EntityTypeBuilder<MatriculaCurso> builder)
     {
-        #region Mapping columns
-
         builder.ToTable("MatriculasCursos");
 
         builder.HasKey(x => x.Id)
@@ -59,10 +57,6 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
             .HasColumnType(DatabaseTypeConstant.Byte)
             .IsRequired();
 
-        //builder.Property(x => x.NotaFinal)
-        //    .HasColumnName("NotaFinal")
-        //    .HasColumnType(DatabaseTypeConstant.Byte);
-
         builder.Property(x => x.Observacao)
             .HasColumnName("Observacao")
             .HasColumnType(DatabaseTypeConstant.Varchar)
@@ -95,16 +89,8 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
 
-        #endregion Mapping columns
-
-        #region Indexes
-
         builder.HasIndex(x => x.AlunoId).HasDatabaseName("MatriculasCursosAlunoIdIDX");
         builder.HasIndex(x => x.CursoId).HasDatabaseName("MatriculasCursosCursoIdIDX");
-
-        #endregion Indexes
-
-        #region Relationships
 
         builder.HasOne(x => x.Certificado)
            .WithOne(x => x.MatriculaCurso)
@@ -117,7 +103,5 @@ public class MatriculaCursoConfiguration : IEntityTypeConfiguration<MatriculaCur
            .HasForeignKey(x => x.AlunoId)
            .HasConstraintName("MatriculasCursosAlunosFK")
            .OnDelete(DeleteBehavior.Cascade);
-
-        #endregion Relationships
     }
 }

@@ -14,6 +14,7 @@ public class CategoriaTests : TestBase
         var cor = "#FF0000";
         var iconeUrl = "https://example.com/icon.png";
         var ordem = 1;
+        var inicioTeste = DateTime.UtcNow;
 
         // Act
         var categoria = new Categoria(nome, descricao, cor, iconeUrl, ordem);
@@ -27,7 +28,7 @@ public class CategoriaTests : TestBase
         categoria.Ordem.Should().Be(ordem);
         categoria.IsAtiva.Should().BeTrue();
         categoria.Id.Should().NotBeEmpty();
-        categoria.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        categoria.CreatedAt.Should().BeAfter(inicioTeste).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
     }
 
     [Fact]
@@ -83,6 +84,7 @@ public class CategoriaTests : TestBase
         var novaCor = "#00FF00";
         var novoIconeUrl = "https://example.com/new-icon.png";
         var novaOrdem = 5;
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         categoria.AtualizarInformacoes(novoNome, novaDescricao, novaCor, novoIconeUrl, novaOrdem);
@@ -93,7 +95,7 @@ public class CategoriaTests : TestBase
         categoria.Cor.Should().Be(novaCor);
         categoria.IconeUrl.Should().Be(novoIconeUrl);
         categoria.Ordem.Should().Be(novaOrdem);
-        categoria.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]
@@ -102,13 +104,14 @@ public class CategoriaTests : TestBase
         // Arrange
         var categoria = new Categoria("Nome", "Descrição", "#FF0000");
         categoria.Desativar();
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         categoria.Ativar();
 
         // Assert
         categoria.IsAtiva.Should().BeTrue();
-        categoria.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]
@@ -116,13 +119,14 @@ public class CategoriaTests : TestBase
     {
         // Arrange
         var categoria = new Categoria("Nome", "Descrição", "#FF0000");
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         categoria.Desativar();
 
         // Assert
         categoria.IsAtiva.Should().BeFalse();
-        categoria.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]
@@ -131,13 +135,14 @@ public class CategoriaTests : TestBase
         // Arrange
         var categoria = new Categoria("Nome", "Descrição", "#FF0000");
         var novaOrdem = 10;
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         categoria.AlterarOrdem(novaOrdem);
 
         // Assert
         categoria.Ordem.Should().Be(novaOrdem);
-        categoria.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]

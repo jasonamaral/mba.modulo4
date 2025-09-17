@@ -8,12 +8,6 @@ namespace Pagamentos.API.Configuration
                 cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies())
             );
 
-            //builder.Services.AddMediatR(cfg =>
-            //                cfg.RegisterServicesFromAssemblies(
-            //                    typeof(Program).Assembly,
-            //                    typeof(Pagamentos.Domain.Events.PagamentoEventHandler).Assembly
-            //                ));
-
             return builder;
         }
     }

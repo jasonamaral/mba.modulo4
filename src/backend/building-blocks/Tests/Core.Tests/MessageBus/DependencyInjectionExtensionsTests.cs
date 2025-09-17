@@ -73,8 +73,6 @@ public class DependencyInjectionExtensionsTests : TestBase
         var connection = "   ";
 
         // Act & Assert
-        // Como string.IsNullOrEmpty("   ") retorna false, não deve lançar ArgumentNullException
-        // mas sim tentar conectar e falhar com EasyNetQException
         var action = () => services.AddMessageBus(connection);
         action.Should().Throw<EasyNetQ.EasyNetQException>();
     }
@@ -123,7 +121,7 @@ public class DependencyInjectionExtensionsTests : TestBase
 
         // Assert
         result.Should().NotBeNull();
-        services.Count.Should().Be(1); // Apenas o MessageBus foi adicionado
+        services.Count.Should().Be(1);
     }
 
     [Fact]
@@ -139,7 +137,7 @@ public class DependencyInjectionExtensionsTests : TestBase
 
         // Assert
         result.Should().NotBeNull();
-        services.Count.Should().Be(2); // Objeto + MessageBus
+        services.Count.Should().Be(2);
         var serviceProvider = services.BuildServiceProvider();
         var messageBus = serviceProvider.GetService<IMessageBus>();
         messageBus.Should().NotBeNull();

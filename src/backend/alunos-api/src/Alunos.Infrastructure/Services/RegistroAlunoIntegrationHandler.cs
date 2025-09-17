@@ -26,7 +26,6 @@ public class RegistroAlunoIntegrationHandler : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Retry simples para aguardar RabbitMQ ficar disponível dentro do container
         var tentativas = 0;
         while (tentativas < 10 && !stoppingToken.IsCancellationRequested)
         {

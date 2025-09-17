@@ -11,13 +11,6 @@ public class RegistrarProblemaHistoricoAprendizadoEventHandler(IMediatorHandler 
 
     public async Task Handle(RegistrarProblemaHistoricoAprendizadoEvent notification, CancellationToken cancellationToken)
     {
-        // O que fazer aqui?
-        // Gravar o problema no banco de dados?
-        // Enviar um e-mail para o suporte?
-        // Enviar uma notificação para o usuário?
-        // Registrar o problema em um log?
-        // Não sei o que fazer!!!
-
         _raizAgregacao = notification.RaizAgregacao;
         if (!ValidarRequisicao(notification)) { return; }
 

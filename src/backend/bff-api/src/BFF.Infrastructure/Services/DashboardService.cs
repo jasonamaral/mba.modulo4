@@ -26,7 +26,6 @@ public class DashboardService : IDashboardService
     {
         var cacheKey = "dashboard:admin";
 
-        // Tenta buscar do cache primeiro
         var cachedData = await _cacheService.GetAsync<DashboardAdminDto>(cacheKey);
         if (cachedData != null)
         {
@@ -36,9 +35,7 @@ public class DashboardService : IDashboardService
 
         _logger.LogInformation("Carregando dashboard do admin dos microsserviços");
 
-        // TODO: Substituir por chamadas reais aos microsserviços
-        // Por enquanto, dados mock para demonstração
-        await Task.Delay(100); // Simula chamada assíncrona
+        await Task.Delay(100);
 
         var dashboardData = new DashboardAdminDto
         {

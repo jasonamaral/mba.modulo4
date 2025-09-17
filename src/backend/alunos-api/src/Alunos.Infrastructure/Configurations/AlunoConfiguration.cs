@@ -11,8 +11,6 @@ public class AlunoConfiguration : IEntityTypeConfiguration<Aluno>
 {
     public void Configure(EntityTypeBuilder<Aluno> builder)
     {
-        #region Mapping columns
-
         builder.ToTable("Alunos");
 
         builder.HasKey(x => x.Id)
@@ -97,26 +95,16 @@ public class AlunoConfiguration : IEntityTypeConfiguration<Aluno>
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
 
-        #endregion Mapping columns
-
-        #region Indexes
-
         builder.HasIndex(x => x.Nome).HasDatabaseName("AlunosNomeIDX");
 
         builder.HasIndex(x => x.Email)
                .IsUnique()
                .HasDatabaseName("AlunosEmailUK");
 
-        #endregion Indexes
-
-        #region Relationships
-
         builder.HasMany(x => x.MatriculasCursos)
            .WithOne(x => x.Aluno)
            .HasForeignKey(x => x.AlunoId)
            .HasConstraintName("AlunosMatriculaCursoFK")
            .OnDelete(DeleteBehavior.Cascade);
-
-        #endregion Relationships
     }
 }

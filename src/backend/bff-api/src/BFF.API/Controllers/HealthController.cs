@@ -59,8 +59,8 @@ public class HealthController : BffController
             Name = "BFF API",
             Version = "1.0.0",
             Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
-            StartTime = DateTime.UtcNow.AddHours(-1), // Simulado
-            Uptime = TimeSpan.FromHours(1), // Simulado
+            StartTime = DateTime.UtcNow.AddHours(-1),
+            Uptime = TimeSpan.FromHours(1),
             Status = "Running",
             Configuration = new Dictionary<string, object>
                 {

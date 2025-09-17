@@ -37,9 +37,6 @@ namespace Pagamentos.Infrastructure.Context
 
             var sucesso = await base.SaveChangesAsync() > 0;
 
-            //TODO
-            // if (sucesso) await _mediatorHandler.PublicarEvento(this);
-
             return sucesso;
         }
 

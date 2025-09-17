@@ -36,8 +36,6 @@ public static class DbMigrationHelpers
 
         if (!context.Categorias.Any())
         {
-            #region Seed Categorias
-
             var categoriaProgramacao = new Categoria(
                 nome: "Programação",
                 descricao: "Cursos voltados para programação e desenvolvimento de software",
@@ -56,10 +54,6 @@ public static class DbMigrationHelpers
 
             context.Categorias.AddRange(categoriaProgramacao, categoriaDevOps);
             await context.SaveChangesAsync();
-
-            #endregion Seed Categorias
-
-            #region Seed Cursos
 
             var cursos = new List<Curso>();
             var catProgramacaoId = context.Categorias.First(c => c.Nome == "Programação").Id;
@@ -257,10 +251,6 @@ public static class DbMigrationHelpers
             context.Cursos.AddRange(cursos);
             await context.SaveChangesAsync();
 
-            #endregion Seed Cursos
-
-            #region Seed Aulas e Materiais
-
             var matriz = new Dictionary<Guid, List<Guid>>
             {
                 { cursos[0].Id, [Guid.Parse("9be503ca-83fb-41cb-98e4-8f0ae98692a0"), Guid.Parse("c55fd2e3-9a07-4b1d-8b35-237c12712ad4"), Guid.Parse("fbe91473-7e59-414b-90ef-c9a13b3c24ec")] },
@@ -294,7 +284,6 @@ public static class DbMigrationHelpers
                     aula.DefinirId(matriz[cursos[z].Id][i - 1]);
                     context.Aulas.Add(aula);
 
-                    // Material para cada aula
                     var material = new Material(
                         aulaId: aula.Id,
                         nome: $"Material da Aula {i}",
@@ -310,8 +299,6 @@ public static class DbMigrationHelpers
                     context.Materiais.Add(material);
                 }
                 await context.SaveChangesAsync();
-
-                #endregion Seed Aulas e Materiais
             }
         }
     }

@@ -57,7 +57,6 @@ public class AuthController : BffController
 
             if (result.Success && result.Data != null)
             {
-                // Se o resultado é um ResponseResult genérico, extrair o Data interno
                 var dataType = result.Data.GetType();
                 if (dataType.IsGenericType && dataType.GetGenericTypeDefinition() == typeof(ResponseResult<>))
                 {
@@ -107,7 +106,6 @@ public class AuthController : BffController
 
             if (result.Success && result.Data != null)
             {
-                // Se o resultado é um ResponseResult genérico, extrair o Data interno
                 var dataType = result.Data.GetType();
                 if (dataType.IsGenericType && dataType.GetGenericTypeDefinition() == typeof(ResponseResult<>))
                 {
@@ -154,7 +152,6 @@ public class AuthController : BffController
 
             if (result.Success && result.Data != null)
             {
-                // Se o resultado é um ResponseResult genérico, extrair o Data interno
                 var dataType = result.Data.GetType();
                 if (dataType.IsGenericType && dataType.GetGenericTypeDefinition() == typeof(ResponseResult<>))
                 {

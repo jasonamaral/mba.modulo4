@@ -14,7 +14,6 @@ public class CadastrarCursoCommand : CommandRaiz
     public DateTime? ValidoAte { get; set; }
     public Guid? CategoriaId { get; set; }
 
-    // Conteúdo Programático
     public string Resumo { get; set; } = string.Empty;
 
     public string Descricao { get; set; } = string.Empty;
@@ -28,7 +27,6 @@ public class CadastrarCursoCommand : CommandRaiz
 
     public CadastrarCursoCommand()
     {
-        // TODO :: Karina, podemos falar depois deste ponto? O Command precisa de uma raiz de agregação, normalmente o ID
         DefinirRaizAgregacao(Guid.NewGuid());
     }
 }

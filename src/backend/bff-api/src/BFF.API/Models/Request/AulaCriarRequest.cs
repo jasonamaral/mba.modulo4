@@ -29,6 +29,7 @@ namespace BFF.API.Models.Request
         [Required(ErrorMessage = "Tipo da aula é obrigatório")]
         [StringLength(50, ErrorMessage = "Tipo da aula deve ter no máximo 50 caracteres")]
         public string TipoAula { get; set; } = string.Empty;
+
         public bool IsObrigatoria { get; set; } = true;
         public string Observacoes { get; set; } = string.Empty;
     }

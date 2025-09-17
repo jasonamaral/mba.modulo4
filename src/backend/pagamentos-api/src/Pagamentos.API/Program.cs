@@ -15,7 +15,6 @@ builder
     .AddMediatrConfig()
     .AddDependencyInjectionConfig();
 
-
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

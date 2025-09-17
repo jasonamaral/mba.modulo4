@@ -2,7 +2,6 @@ using MediatR;
 
 namespace BFF.UnitTests.TestTypes;
 
-// Tipo simples para os testes
 public class DomainNotificacaoRaiz : INotification
 {
     public Guid RaizAgregacao { get; set; }
@@ -29,13 +28,11 @@ public class DomainNotificacaoRaiz : INotification
     }
 }
 
-// Interface simples para os testes
 public interface INotificador
 {
     void AdicionarErro(string mensagem);
 }
 
-// Interface simples para os testes
 public interface IMediatorHandler
 {
     Task<TResponse> EnviarComando<TResponse>(IRequest<TResponse> comando);

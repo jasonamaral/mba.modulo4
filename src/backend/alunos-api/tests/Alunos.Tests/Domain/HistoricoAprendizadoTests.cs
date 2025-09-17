@@ -6,8 +6,6 @@ namespace Alunos.Tests.Domain;
 
 public class HistoricoAprendizadoTests
 {
-    #region Helpers
-
     private static readonly Guid _matriculaIdValido = Guid.NewGuid();
     private static readonly Guid _cursoIdValido = Guid.NewGuid();
     private static readonly Guid _aulaIdValido = Guid.NewGuid();
@@ -15,10 +13,6 @@ public class HistoricoAprendizadoTests
     private static readonly byte _cargaHorariaValida = 20;
 
     private HistoricoAprendizado CriarHistoricoValido(DateTime? inicio = null, DateTime? termino = null) => new(_matriculaIdValido, _cursoIdValido, _aulaIdValido, _nomeAulaValido, _cargaHorariaValida, inicio ?? new DateTime(2024, 1, 1), termino);
-
-    #endregion Helpers
-
-    #region Construtores
 
     [Fact]
     public void Deve_criar_historico_valido()
@@ -75,10 +69,6 @@ public class HistoricoAprendizadoTests
         act.Should().Throw<DomainException>().WithMessage("*Data de término não pode ser superior à data atual*");
     }
 
-    #endregion Construtores
-
-    #region Overrides
-
     [Fact]
     public void ToString_deve_retornar_formatado_para_concluido()
     {
@@ -101,10 +91,6 @@ public class HistoricoAprendizadoTests
               .And.Contain(historico.NomeAula);
     }
 
-    #endregion Overrides
-
-    #region Overrides
-
     [Fact]
     public void ToString_deve_conter_nome_aula_e_em_andamento()
     {
@@ -125,6 +111,4 @@ public class HistoricoAprendizadoTests
         texto.Should().Contain("Iniciada em")
               .And.Contain(termino.ToString("dd/MM/yyyy"));
     }
-
-    #endregion Overrides
 }

@@ -10,7 +10,6 @@ public class MessageBus : IMessageBus
 {
     private IBus? _bus;
 
-    // Removido campo não utilizado
     private readonly string _connectionString;
 
     private readonly int _requestTimeoutSeconds;
@@ -77,7 +76,6 @@ public class MessageBus : IMessageBus
 
         return await retryPolicy.ExecuteAsync(async () =>
         {
-            // Implementa timeout manual quando a versão do EasyNetQ não expõe configuração de timeout
             var requestTask = _bus.RequestAsync<TRequest, TResponse>(request);
             var completed = await Task.WhenAny(requestTask, Task.Delay(TimeSpan.FromSeconds(_requestTimeoutSeconds)));
             if (completed == requestTask)

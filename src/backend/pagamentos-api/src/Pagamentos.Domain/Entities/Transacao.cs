@@ -9,8 +9,6 @@ namespace Pagamentos.Domain.Entities
         public Guid PagamentoId { get; set; }
         public decimal Total { get; set; }
         public StatusTransacao StatusTransacao { get; set; }
-
-        // EF. Rel.
         public Pagamento Pagamento { get; set; }
     }
 }

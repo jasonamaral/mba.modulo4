@@ -25,8 +25,6 @@ public partial class AlunoService : BaseApiService, IAlunoService
         _apiClient.SetBaseAddress(_apiSettings.AlunosApiUrl);
     }
 
-    #region Gets
-
     public async Task<ResponseResult<AlunoDto>> ObterAlunoPorIdAsync(Guid alunoId)
     {
         var result = await ExecuteWithErrorHandling(() => ObterAlunoPorId(alunoId),
@@ -76,14 +74,13 @@ public partial class AlunoService : BaseApiService, IAlunoService
         var aulaCursoDto = await ExecuteWithErrorHandling(() => ObterAulasPorMatriculaId(matriculaId),
             nameof(ObterAulasPorMatriculaIdAsync),
             matriculaId);
-        
+
         if (aulaCursoDto.Data != null)
         {
             var cursoMatriculado = await ObterMatriculaPorIdAsync(matriculaId);
             if (cursoMatriculado == null || cursoMatriculado.Data == null)
                 return aulaCursoDto;
 
-            // Obtenho o curso e suas aulas para "adicionar" as aulas que não estão na matrícula (por não ter histórico ou novas aulas)
             var cursoDto = await _conteudoService.ObterCursoPorIdAsync(cursoMatriculado.Data.CursoId, includeAulas: true);
 
             foreach (var aula in cursoDto.Data.Aulas)
@@ -109,10 +106,6 @@ public partial class AlunoService : BaseApiService, IAlunoService
 
         return aulaCursoDto ?? ReturnUnknowError<ICollection<AulaCursoDto>>();
     }
-
-    #endregion Gets
-
-    #region Posts and Puts
 
     public async Task<ResponseResult<Guid?>> MatricularAlunoAsync(MatriculaCursoRequest dto)
     {
@@ -147,7 +140,6 @@ public partial class AlunoService : BaseApiService, IAlunoService
             return new ResponseResult<bool?> { Status = 400, Errors = new ResponseErrorMessages { Mensagens = ["Matrícula não encontrada"] } };
         }
 
-        // TODO :: Isso está feio demais. Refatorar urgente! Deve ter um endpoint na AlunoApi para obter a matrícula por ID
         var cursoDto = await _conteudoService.ObterCursoPorIdAsync(matriculaCurso.Data.FirstOrDefault(x => x.Id == dto.MatriculaCursoId).CursoId, includeAulas: true);
         if (cursoDto == null || cursoDto.Data == null)
         {
@@ -165,7 +157,6 @@ public partial class AlunoService : BaseApiService, IAlunoService
             MatriculaCursoId = dto.MatriculaCursoId,
             AulaId = dto.AulaId,
             NomeAula = cursoDto.Data.Nome,
-            // TODO :: Verificar se a duração está correta, pois o DTO é em minutos e o API espera em horas
             DuracaoMinutos = (byte)cursoDto.Data.DuracaoHoras,
             DataTermino = dto.DataTermino
         };
@@ -222,6 +213,4 @@ public partial class AlunoService : BaseApiService, IAlunoService
 
         return result ?? ReturnUnknowError<ICollection<CertificadosDto>>();
     }
-
-    #endregion Posts and Puts
 }
