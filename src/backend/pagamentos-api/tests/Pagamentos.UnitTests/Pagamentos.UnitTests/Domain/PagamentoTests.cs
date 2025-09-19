@@ -99,10 +99,6 @@ namespace Pagamentos.UnitTests.Domain
                 StatusTransacao = Pagamentos.Domain.Enum.StatusTransacao.Pago
             };
 
-            // Act
-            // Note: A entidade Pagamento não tem propriedade Transacao direta
-            // Este teste verifica que a entidade pode ser criada
-
             // Assert
             pagamento.Should().NotBeNull();
         }

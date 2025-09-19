@@ -13,8 +13,6 @@ public class AlunoRegistradoIntegrationEvent : IntegrationEvent
     public string Estado { get; private set; }
     public string Cep { get; private set; }
     public string? Foto { get; private set; }
-    //public bool EhAdministrador { get; private set; }
-    //public DateTime DataCadastro { get; private set; }
 
     public AlunoRegistradoIntegrationEvent(
         Guid id,
@@ -28,8 +26,6 @@ public class AlunoRegistradoIntegrationEvent : IntegrationEvent
         string estado,
         string cep,
         string? foto)
-    //bool ehAdministrador,
-    //DateTime dataCadastro)
     {
         Id = id;
         Nome = nome;
@@ -42,7 +38,5 @@ public class AlunoRegistradoIntegrationEvent : IntegrationEvent
         Estado = estado;
         Cep = cep;
         Foto = foto;
-        //EhAdministrador = ehAdministrador;
-        //DataCadastro = dataCadastro;
     }
 }

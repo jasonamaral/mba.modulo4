@@ -24,15 +24,11 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
             if (!ValidarRequisicao(request)) { return request.Resultado; }
             if (!ObterAluno(request.AlunoId, out Aluno aluno)) { return request.Resultado; }
 
-            // Capturo o histórico anterior (se existir)
-            // Isto é um "bug" do EF que não consegue identificar corretamente o estado de mudança do objeto
             MatriculaCurso matriculaCurso = aluno.ObterMatriculaCursoPeloId(request.MatriculaCursoId);
             HistoricoAprendizado historicoAntigo = aluno.ObterHistoricoAprendizado(request.MatriculaCursoId, request.AulaId);
 
-            // Registro o histórico
             aluno.RegistrarHistoricoAprendizado(request.MatriculaCursoId, request.AulaId, request.NomeAula, request.DuracaoMinutos, request.DataTermino);
 
-            // Capturo o novo histórico
             HistoricoAprendizado historicoAtual = aluno.ObterHistoricoAprendizado(request.MatriculaCursoId, request.AulaId);
 
             await _alunoRepository.AtualizarEstadoHistoricoAprendizadoAsync(historicoAntigo, historicoAtual);

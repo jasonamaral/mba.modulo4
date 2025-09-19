@@ -1,4 +1,4 @@
-﻿using BFF.API.Extensions;
+using BFF.API.Extensions;
 using BFF.API.Filters;
 using BFF.API.Handlers;
 using BFF.API.Settings;
@@ -161,14 +161,14 @@ public static class ApiConfiguration
         var retryCount = settings?.RetryCount ?? 3;
 
         return Policy<HttpResponseMessage>
-            .Handle<HttpRequestException>()                          // erro de rede/DNS/reset
-            .Or<TaskCanceledException>()                             // timeout do HttpClient
+            .Handle<HttpRequestException>()
+            .Or<TaskCanceledException>()
             .OrResult(r =>
-                r.StatusCode == HttpStatusCode.BadGateway || // 502
-                r.StatusCode == HttpStatusCode.ServiceUnavailable || // 503
-                r.StatusCode == HttpStatusCode.GatewayTimeout || // 504
-                r.StatusCode == HttpStatusCode.RequestTimeout || // 408
-                (int)r.StatusCode == 429)                            // too many requests
+                r.StatusCode == HttpStatusCode.BadGateway ||
+                r.StatusCode == HttpStatusCode.ServiceUnavailable ||
+                r.StatusCode == HttpStatusCode.GatewayTimeout ||
+                r.StatusCode == HttpStatusCode.RequestTimeout ||
+                (int)r.StatusCode == 429)
             .WaitAndRetryAsync(
                 retryCount,
                 retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
@@ -187,11 +187,11 @@ public static class ApiConfiguration
             .Handle<HttpRequestException>()
             .Or<TaskCanceledException>()
             .OrResult(r =>
-                r.StatusCode == HttpStatusCode.BadGateway || // 502
-                r.StatusCode == HttpStatusCode.ServiceUnavailable || // 503
-                r.StatusCode == HttpStatusCode.GatewayTimeout || // 504
-                r.StatusCode == HttpStatusCode.RequestTimeout || // 408
-                (int)r.StatusCode == 429)                            // too many requests
+                r.StatusCode == HttpStatusCode.BadGateway ||
+                r.StatusCode == HttpStatusCode.ServiceUnavailable ||
+                r.StatusCode == HttpStatusCode.GatewayTimeout ||
+                r.StatusCode == HttpStatusCode.RequestTimeout ||
+                (int)r.StatusCode == 429)
             .CircuitBreakerAsync(
                 threshold,
                 duration,

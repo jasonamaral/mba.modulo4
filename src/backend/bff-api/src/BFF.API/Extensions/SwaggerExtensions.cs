@@ -22,7 +22,6 @@ public static class SwaggerExtensions
                 }
             });
 
-            // Configurar comentários XML
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             if (File.Exists(xmlPath))
@@ -30,7 +29,6 @@ public static class SwaggerExtensions
                 c.IncludeXmlComments(xmlPath);
             }
 
-            // Configuração para Swashbuckle 9.0.3 - padrão correto: "Bearer {token}"
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",

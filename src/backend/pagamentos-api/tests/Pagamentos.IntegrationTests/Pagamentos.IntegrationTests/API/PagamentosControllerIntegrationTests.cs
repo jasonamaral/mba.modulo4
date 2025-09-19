@@ -46,7 +46,6 @@ namespace Pagamentos.IntegrationTests.API
                 Times.Never
             );
 
-            // Simular o processamento
             await _mockMediator.Object.PublicarEvento(new PagamentoCursoEvent(
                 pagamentoRequest.MatriculaId,
                 pagamentoRequest.AlunoId,

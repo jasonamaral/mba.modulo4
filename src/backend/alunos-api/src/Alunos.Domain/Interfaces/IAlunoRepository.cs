@@ -6,8 +6,6 @@ namespace Alunos.Domain.Interfaces;
 
 public interface IAlunoRepository : IRepository<Aluno>
 {
-    #region Aluno
-
     Task<Aluno> ObterPorIdAsync(Guid alunoId);
 
     Task<Aluno> ObterPorEmailAsync(string email);
@@ -20,10 +18,6 @@ public interface IAlunoRepository : IRepository<Aluno>
 
     Task AtualizarAsync(Aluno aluno);
 
-    #endregion Aluno
-
-    #region Matrícula
-
     Task AdicionarMatriculaCursoAsync(MatriculaCurso matriculaCurso);
 
     Task AdicionarCertificadoMatriculaCursoAsync(Certificado certificado);
@@ -32,13 +26,8 @@ public interface IAlunoRepository : IRepository<Aluno>
 
     //Task<MatriculaCurso> ObterMatriculaPorAlunoECursoAsync(Guid alunoId, Guid cursoId);
 
-    #endregion Matrícula
-
-    #region Certificado
-
     Task AtualizarEstadoHistoricoAprendizadoAsync(HistoricoAprendizado historicoAntigo, HistoricoAprendizado historicoNovo);
 
     //Task<Certificado> ObterCertificadoPorMatriculaAsync(Guid matriculaId);
 
-    #endregion Certificado
 }

@@ -31,8 +31,6 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
         await _alunoRepository.AdicionarCertificadoMatriculaCursoAsync(certificado);
         if (await _alunoRepository.UnitOfWork.Commit())
         {
-            // TODO :: Devo enviar algo para mensageria para realizar a impressão/emissão do certificado?
-
             request.Resultado.Data = certificado.Id;
         }
 

@@ -11,8 +11,6 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
 {
     public void Configure(EntityTypeBuilder<Categoria> entity)
     {
-        #region Maping columns
-
         entity.ToTable("Categoria");
 
         entity.HasKey(a => a.Id)
@@ -54,11 +52,6 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
 
-        #endregion Maping columns
-
-        #region Indexes
-
-        // Índices
         entity.HasIndex(c => c.Nome)
             .HasDatabaseName("CategoriaNomeIDX")
             .IsUnique();
@@ -69,16 +62,9 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
         entity.HasIndex(c => c.Ordem)
             .HasDatabaseName("CategoriaOrdemIDX");
 
-        #endregion Indexes
-
-        #region Relationships
-
-        // Relacionamento com Cursos
         entity.HasMany(c => c.Cursos)
             .WithOne(curso => curso.Categoria)
             .HasForeignKey(curso => curso.CategoriaId)
             .OnDelete(DeleteBehavior.SetNull);
-
-        #endregion Relationships
     }
 }

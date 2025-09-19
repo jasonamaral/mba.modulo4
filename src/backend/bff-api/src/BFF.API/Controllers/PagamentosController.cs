@@ -1,7 +1,6 @@
 using BFF.API.Models.Request;
 using BFF.API.Services.Conteudos;
 using BFF.API.Services.Pagamentos;
-using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs.Pagamentos.Response;
 using Core.Communication;
 using Core.Mediator;
@@ -38,7 +37,6 @@ namespace BFF.API.Controllers
             _pagamentoService = pagamentoService;
             _logger = logger;
         }
-
 
         /// <summary>
         /// Registra um novo pagamento de curso.
@@ -92,7 +90,6 @@ namespace BFF.API.Controllers
             }
         }
 
-
         /// <summary>
         /// Obtém todos os pagamentos cadastrados.
         /// </summary>
@@ -118,7 +115,6 @@ namespace BFF.API.Controllers
                 return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao obter pagamentos via BFF");
             }
         }
-
 
         /// <summary>
         /// Obtém um pagamento específico pelo seu identificador único.

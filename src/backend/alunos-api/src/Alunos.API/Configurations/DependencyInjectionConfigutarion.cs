@@ -22,14 +22,11 @@ public static class DependencyInjectionConfigutarion
 {
     public static void RegisterServices(this IServiceCollection services)
     {
-        // Application
         services.AddScoped<IMediatorHandler, MediatorHandler>();
 
-        // Events
         services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
         services.AddScoped<INotificationHandler<RegistrarProblemaHistoricoAprendizadoEvent>, RegistrarProblemaHistoricoAprendizadoEventHandler>();
 
-        // Commands
         services.AddScoped<IRequestHandler<CadastrarAlunoCommand, CommandResult>, CadastrarAlunoCommandHandler>();
         services.AddScoped<IRequestHandler<MatricularAlunoCommand, CommandResult>, MatricularAlunoCommandHandler>();
         services.AddScoped<IRequestHandler<RegistrarHistoricoAprendizadoCommand, CommandResult>, RegistrarHistoricoAprendizadoCommandHandler>();
@@ -37,15 +34,12 @@ public static class DependencyInjectionConfigutarion
         services.AddScoped<IRequestHandler<SolicitarCertificadoCommand, CommandResult>, SolicitarCertificadoCommandHandler>();
         services.AddScoped<IRequestHandler<AtualizarPagamentoMatriculaCommand, CommandResult>, AtualizarPagamentoMatriculaCommandHandler>();
 
-        // Services
         services.AddScoped<IAlunoQueryService, AlunoQueryService>();
         services.AddScoped<IRegistroAlunoIntegrationService, RegistroAlunoIntegrationService>();
         services.AddScoped<IRegistroPagamentoIntegrationService, RegistroPagamentoIntegrationService>();
 
-        // Data
         services.AddScoped<IAlunoRepository, AlunoRepository>();
 
-        // Notification
         services.RegisterNotification();
     }
 }

@@ -7,7 +7,7 @@ public class AtualizarPagamentoMatriculaCommand : CommandRaiz
     public Guid AlunoId { get; init; }
     public Guid MatriculaCursoId { get; init; }
 
-    public AtualizarPagamentoMatriculaCommand(Guid alunoId, Guid matriculaCursoId) 
+    public AtualizarPagamentoMatriculaCommand(Guid alunoId, Guid matriculaCursoId)
     {
         DefinirRaizAgregacao(alunoId);
 

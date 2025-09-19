@@ -122,7 +122,7 @@ public class DomainNotificacaoRaizTests : TestBase
         var dataHoraOriginal = notificacao.DataHora;
 
         // Act
-        Thread.Sleep(100); // Aguarda um pouco
+        Thread.Sleep(100);
 
         // Assert
         notificacao.DataHora.Should().Be(dataHoraOriginal);

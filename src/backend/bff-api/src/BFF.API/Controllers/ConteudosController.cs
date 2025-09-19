@@ -1,6 +1,5 @@
 using BFF.API.Models.Request;
 using BFF.API.Services.Conteudos;
-using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
 using Core.Communication;
 using Core.Communication.Filters;
@@ -11,7 +10,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Text.Json;
 
 namespace BFF.API.Controllers;
 

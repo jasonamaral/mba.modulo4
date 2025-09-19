@@ -23,7 +23,6 @@ public abstract class TestBase
         Notifications = new TestableDomainNotificacaoHandler();
         MockNotificador = new Mock<INotificador>();
 
-        // Configuração padrão para evitar listas nulas
         MockNotificador
             .Setup(x => x.ObterErros())
             .Returns(new List<string>());
@@ -105,7 +104,6 @@ public abstract class TestBase
         }
     }
 
-    // Classe de teste que herda de DomainNotificacaoHandler para evitar problemas de cast
     public class TestableDomainNotificacaoHandler : DomainNotificacaoHandler
     {
     }

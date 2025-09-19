@@ -12,8 +12,6 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
 {
     public IUnitOfWork UnitOfWork => _context;
 
-    #region Alunos
-
     public async Task AdicionarAsync(Aluno aluno)
     {
         await _context.Alunos.AddAsync(aluno);
@@ -57,10 +55,6 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
             .FirstOrDefaultAsync(a => a.CodigoUsuarioAutenticacao == codigoUsuario);
     }
 
-    #endregion Alunos
-
-    #region Matricula Curso
-
     public async Task AdicionarMatriculaCursoAsync(MatriculaCurso matriculaCurso)
     {
         await _context.MatriculasCursos.AddAsync(matriculaCurso);
@@ -87,10 +81,6 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
     //        .FirstOrDefaultAsync(m => m.AlunoId == alunoId && m.CursoId == cursoId);
     //}
 
-    #endregion Matricula Curso
-
-    #region Certificado
-
     public async Task AtualizarEstadoHistoricoAprendizadoAsync(HistoricoAprendizado historicoAntigo, HistoricoAprendizado historicoNovo)
     {
         _context.AtualizarEstadoValueObject(historicoAntigo, historicoNovo);
@@ -103,8 +93,6 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
     //        .AsNoTracking()
     //        .FirstOrDefaultAsync(c => c.MatriculaCursoId == matriculaId);
     //}
-
-    #endregion Certificado
 
     public void Dispose()
     {

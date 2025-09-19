@@ -6,8 +6,6 @@ namespace Alunos.Tests.Domain;
 
 public class AlunoTests
 {
-    #region Helpers
-
     private static readonly Guid _codigoUsuario = Guid.NewGuid();
     private const string _nomeValido = "Jairo Azevedo";
     private const string _emailValido = "jsouza.lp@gmail.com";
@@ -20,10 +18,6 @@ public class AlunoTests
     private const string _fotoValido = "var/mnt/fotos/jairo.jpeg";
 
     private Aluno CriarAlunoValido() => new(_codigoUsuario, _nomeValido, _emailValido, _cpfValido, _dataNascimentoValida, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
-
-    #endregion Helpers
-
-    #region Construtores
 
     [Fact]
     public void Deve_criar_aluno_valido()
@@ -69,10 +63,6 @@ public class AlunoTests
         Action act = () => new Aluno(_codigoUsuario, _nomeValido, _emailValido, _cpfValido, dataFutura, _generoValido, _cidadeValido, _estadoValido, _cepValido, _fotoValido);
         act.Should().Throw<DomainException>().WithMessage("*Data de nascimento não pode ser superior à data atual*");
     }
-
-    #endregion Construtores
-
-    #region Métodos
 
     [Fact]
     public void Deve_ativar_e_inativar_aluno()
@@ -122,17 +112,13 @@ public class AlunoTests
     public void Nao_deve_matricular_aluno_em_curso_duplicado()
     {
         var aluno = CriarAlunoValido();
-        aluno.AtivarAluno(); // Ativar o aluno antes de matricular
+        aluno.AtivarAluno();
         var cursoId = Guid.NewGuid();
         aluno.MatricularAlunoEmCurso(cursoId, "Curso de Programação Avançada", 1000, "obs");
 
         Action act = () => aluno.MatricularAlunoEmCurso(cursoId, "Curso de Programação Avançada", 1000, "obs");
         act.Should().Throw<DomainException>().WithMessage("*Aluno já está matriculado neste curso*");
     }
-
-    #endregion Métodos
-
-    #region Overrides
 
     [Fact]
     public void ToString_deve_conter_nome_e_email()
@@ -143,6 +129,4 @@ public class AlunoTests
         texto.Should().Contain(_nomeValido)
               .And.Contain(_emailValido);
     }
-
-    #endregion Overrides
 }

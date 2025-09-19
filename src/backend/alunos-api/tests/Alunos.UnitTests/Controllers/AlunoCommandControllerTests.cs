@@ -61,7 +61,7 @@ public class AlunoCommandControllerTests : TestBase
         var alunoId = Guid.NewGuid();
         var dto = new MatriculaCursoRequest
         {
-            AlunoId = Guid.NewGuid(), // ID diferente
+            AlunoId = Guid.NewGuid(),
             CursoId = Guid.NewGuid(),
             CursoDisponivel = true,
             Nome = "Curso de Teste",
@@ -229,7 +229,7 @@ public class AlunoCommandControllerTests : TestBase
         {
             AlunoId = alunoId,
             MatriculaCursoId = matriculaId,
-            CursoDto = null // CursoDto nulo
+            CursoDto = null
         };
 
         ConfigurarMockNotificador();

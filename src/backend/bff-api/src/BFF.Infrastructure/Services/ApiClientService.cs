@@ -115,7 +115,6 @@ public class ApiClientService : IApiClientService, IDisposable
                 return ApiActionResult<TResponse>.SuccessResult(apiResponse.Data, successMessage);
             }
 
-            // Se não foi sucesso, retornar o mesmo status HTTP e conteúdo da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
                 try
@@ -154,7 +153,6 @@ public class ApiClientService : IApiClientService, IDisposable
                 return ApiActionResult<TResponse>.SuccessResult(apiResponse.Data, successMessage);
             }
 
-            // Se não foi sucesso, retornar o mesmo status HTTP e conteúdo da API chamada
             if (!string.IsNullOrEmpty(apiResponse.ErrorContent))
             {
                 try

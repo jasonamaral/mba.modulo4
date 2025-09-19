@@ -34,7 +34,6 @@ public class CadastroCursoDto
     public DateTime? ValidoAte { get; set; }
     public Guid? CategoriaId { get; set; }
 
-    // Conteúdo Programático
     [Required(ErrorMessage = "Resumo é obrigatório")]
     public string Resumo { get; set; } = string.Empty;
 

@@ -28,7 +28,6 @@ public class CategoriaControllerTests : TestBase
         _notificationsMock = new MockDomainNotificacaoHandler();
         _notificadorMock = new Mock<INotificador>();
 
-        // Configurar mocks para retornar listas vazias em vez de null
         _notificadorMock.Setup(x => x.ObterErros()).Returns(new List<string>());
         _notificadorMock.Setup(x => x.TemErros()).Returns(false);
 
@@ -38,7 +37,6 @@ public class CategoriaControllerTests : TestBase
             _notificationsMock,
             _notificadorMock.Object);
 
-        // Configurar contexto HTTP mock
         var httpContext = new DefaultHttpContext();
         var controllerContext = new ControllerContext
         {

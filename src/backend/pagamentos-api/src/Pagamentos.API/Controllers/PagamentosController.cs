@@ -22,7 +22,7 @@ namespace Pagamentos.API.Controllers
                                       IMediatorHandler mediator,
                                       INotificador notificador,
                                       INotificationHandler<DomainNotificacaoRaiz> notifications,
-                                      IMessageBus bus ) : MainController(mediator, notifications, notificador)
+                                      IMessageBus bus) : MainController(mediator, notifications, notificador)
     {
         private readonly IMessageBus _bus = bus;
         private readonly IMediatorHandler _mediator = mediator;
@@ -48,7 +48,6 @@ namespace Pagamentos.API.Controllers
                 return RespostaPadraoApi<CommandResult>(ModelState);
             }
 
-
             var eventoPagamento = new PagamentoCursoEvent(pagamento.MatriculaId,
                                                           pagamento.AlunoId,
                                                           pagamento.Total,
@@ -57,9 +56,7 @@ namespace Pagamentos.API.Controllers
                                                           pagamento.ExpiracaoCartao,
                                                           pagamento.CvvCartao);
 
-
             await _mediator.PublicarEvento(eventoPagamento);
-
 
             if (OperacaoValida())
             {
@@ -124,5 +121,4 @@ namespace Pagamentos.API.Controllers
             return RespostaPadraoApi(HttpStatusCode.NotFound, message);
         }
     }
-
 }

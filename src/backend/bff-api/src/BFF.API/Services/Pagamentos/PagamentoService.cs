@@ -128,7 +128,7 @@ namespace BFF.API.Services.Pagamentos
         private static ResponseResult<PagamentoDto> FailObterPagamento(int status, params string[] mensagens) => new()
         {
             Status = status,
-            Data = new PagamentoDto(), // ou null, se preferir
+            Data = new PagamentoDto(),
             Errors = new ResponseErrorMessages { Mensagens = mensagens?.ToList() ?? new List<string>() }
         };
 

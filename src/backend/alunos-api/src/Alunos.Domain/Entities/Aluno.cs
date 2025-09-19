@@ -52,8 +52,6 @@ public class Aluno : Entidade, IRaizAgregacao
         ValidarIntegridadeAluno();
     }
 
-    #region Manipuladores de Aluno
-
     public void AtivarAluno() => Ativo = true;
 
     public void InativarAluno() => Ativo = false;
@@ -81,10 +79,6 @@ public class Aluno : Entidade, IRaizAgregacao
     //    ValidarIntegridadeAluno(novaDataNascimento: dataNascimento);
     //    DataNascimento = dataNascimento;
     //}
-
-    #endregion Manipuladores de Aluno
-
-    #region Manipuladores de MatriculaCurso
 
     public int ObterQuantidadeAulasPendenteMatriculaCurso(Guid cursoId)
     {
@@ -148,10 +142,6 @@ public class Aluno : Entidade, IRaizAgregacao
     //    matriculaCurso.AtualizarObservacoes(observacao);
     //}
 
-    #endregion Manipuladores de MatriculaCurso
-
-    #region Manipuladores de HistoricoAprendizado
-
     public void RegistrarHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
@@ -171,10 +161,6 @@ public class Aluno : Entidade, IRaizAgregacao
         var matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         return matriculaCurso.ObterQuantidadeAulasRegistradas();
     }
-
-    #endregion Manipuladores de HistoricoAprendizado
-
-    #region Manipuladores de Certificado
 
     public void RequisitarCertificadoConclusao(Guid matriculaCursoId, decimal notaFinal, string pathCertificado, string nomeInstrutor)
     {
@@ -205,8 +191,6 @@ public class Aluno : Entidade, IRaizAgregacao
     //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
     //    matriculaCurso.AtualizarNomeInstrutor(nomeInstrutor);
     //}
-
-    #endregion Manipuladores de Certificado
 
     private void ValidarIntegridadeAluno(string novoNome = null,
         string novoEmail = null,

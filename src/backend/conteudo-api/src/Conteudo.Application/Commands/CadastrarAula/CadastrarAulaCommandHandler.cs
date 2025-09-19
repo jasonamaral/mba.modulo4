@@ -3,7 +3,6 @@ using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
-using FluentValidation.Results;
 using MediatR;
 
 namespace Conteudo.Application.Commands.CadastrarAula

@@ -28,10 +28,6 @@ public class ResultadoValidacaoTests : TestBase
 
         // Act
         resultado.AdicionarErro(mensagem);
-
-        // Assert
-        // Como não podemos acessar _erros diretamente, testamos o comportamento
-        // através da exceção que será lançada
     }
 
     [Fact]
@@ -45,7 +41,6 @@ public class ResultadoValidacaoTests : TestBase
         resultado.AdicionarErro(mensagem);
 
         // Assert
-        // O erro deve ser prefixado com o nome da entidade
     }
 
     [Fact]
@@ -56,11 +51,10 @@ public class ResultadoValidacaoTests : TestBase
 
         // Act
         resultado.AdicionarErro(string.Empty);
-        resultado.AdicionarErro("   "); // Espaços em branco
+        resultado.AdicionarErro("   ");
         resultado.AdicionarErro(null!);
 
         // Assert
-        // Não deve lançar exceção
     }
 
     [Fact]
@@ -99,7 +93,6 @@ public class ResultadoValidacaoTests : TestBase
         resultado.AdicionarErro(mensagem2);
 
         // Assert
-        // Deve lançar exceção com ambos os erros
         var action = () => resultado.DispararExcecaoDominioSeInvalido();
         action.Should().Throw<Plataforma.Educacao.Core.Exceptions.DomainException>();
     }

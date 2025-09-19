@@ -1,4 +1,4 @@
-﻿namespace BFF.API.Models.Request;
+namespace BFF.API.Models.Request;
 
 public class CursoCriarRequest
 {
@@ -12,7 +12,6 @@ public class CursoCriarRequest
     public DateTime? ValidoAte { get; set; }
     public Guid? CategoriaId { get; set; }
 
-    // Conteúdo Programático
     public string Resumo { get; set; } = string.Empty;
 
     public string Descricao { get; set; } = string.Empty;

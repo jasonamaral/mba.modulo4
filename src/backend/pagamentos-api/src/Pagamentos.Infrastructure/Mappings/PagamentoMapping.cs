@@ -26,7 +26,6 @@ namespace Pagamentos.Infrastructure.Mappings
                 .IsRequired()
                 .HasColumnType("varchar(4)");
 
-            // 1 : 1 => Pagamento : Transacao
             builder.HasOne(c => c.Transacao)
                 .WithOne(c => c.Pagamento);
 

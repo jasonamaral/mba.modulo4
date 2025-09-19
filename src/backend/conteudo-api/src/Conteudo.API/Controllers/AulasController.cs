@@ -5,7 +5,6 @@ using Conteudo.Application.Commands.ExcluirAula;
 using Conteudo.Application.Commands.PublicarAula;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
-using Conteudo.Domain.Entities;
 using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
@@ -145,7 +144,7 @@ namespace Conteudo.API.Controllers
         [ProducesResponseType(typeof(ResponseResult<bool?>), 200)]
         [ProducesResponseType(typeof(ResponseResult<string>), 400)]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Atualizar([FromRoute]Guid cursoId, Guid id, [FromBody] AtualizarAulaDto dto)
+        public async Task<IActionResult> Atualizar([FromRoute] Guid cursoId, Guid id, [FromBody] AtualizarAulaDto dto)
         {
             try
             {

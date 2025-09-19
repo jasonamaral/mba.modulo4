@@ -68,7 +68,7 @@ public class MatriculaCurso : Entidade
         var totalCargaHoraria = QuantidadeTotalCargaHoraria();
         if (totalCargaHoraria == 0) { throw new DomainException("Não é possível concluir um curso sem aulas realizadas"); }
 
-        return 10.00m; // TODO: Implementar lógica de cálculo da média final baseada nas notas das aulas
+        return 10.00m;
     }
 
     public decimal? ObterNotaFinalCurso()
@@ -76,13 +76,11 @@ public class MatriculaCurso : Entidade
         return Certificado?.NotaFinal ?? null;
     }
 
-    #region Manipuladores de MatriculaCurso
     internal void AtualizarNotaFinalCurso(byte notaFinal)
     {
         ValidarIntegridadeMatriculaCurso(novaNotaFinal: notaFinal);
         VerificarSeCertificadoExiste();
         Certificado.AtualizarNotaFinal(notaFinal);
-        //NotaFinal = notaFinal;
     }
 
     internal void RegistrarPagamentoMatricula()
@@ -115,9 +113,6 @@ public class MatriculaCurso : Entidade
     //    Observacao = observacao;
     //}
 
-    #endregion Manipuladores de MatriculaCurso
-
-    #region Manipuladores de HistoricoAprendizado
     internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         if (!MatriculaCursoDisponivel()) { throw new DomainException("Matrícula não está disponível para registrar histórico de aprendizado"); }
@@ -133,9 +128,7 @@ public class MatriculaCurso : Entidade
 
         _historicoAprendizado.Add(new HistoricoAprendizado(Id, CursoId, aulaId, nomeAula, cargaHoraria, dataInicio, dataTermino));
     }
-    #endregion Manipuladores de HistoricoAprendizado
 
-    #region Manipuladores de Certificado
     internal void RequisitarCertificadoConclusao(decimal notaFinal, string pathCertificado, string nomeInstrutor)
     {
         if (Certificado != null) { throw new DomainException("Certificado já foi solicitado para esta matrícula"); }
@@ -174,7 +167,6 @@ public class MatriculaCurso : Entidade
     {
         if (Certificado == null) { throw new DomainException("Certificado não foi solicitado para esta matrícula"); }
     }
-    #endregion Manipuladores de Certificado
 
     private void ValidarIntegridadeMatriculaCurso(int? novaNotaFinal = null,
         DateTime? novaDataConclusao = null,

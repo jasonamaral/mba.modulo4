@@ -42,7 +42,6 @@ public class CategoriaControllerIntegrationTests : IClassFixture<CustomWebApplic
         {
             builder.ConfigureServices(services =>
             {
-                // Remover serviços reais e adicionar mocks
                 var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(ICategoriaAppService));
                 if (descriptor != null)
                     services.Remove(descriptor);
@@ -220,7 +219,7 @@ public class CategoriaControllerIntegrationTests : IClassFixture<CustomWebApplic
         var id = Guid.NewGuid();
         var dto = new AtualizarCategoriaDto
         {
-            Id = Guid.NewGuid(), // ID diferente
+            Id = Guid.NewGuid(),
             Nome = "Categoria Atualizada",
             Descricao = "Descrição atualizada",
             Cor = "#00FF00"
@@ -242,7 +241,6 @@ public class CategoriaControllerIntegrationTests : IClassFixture<CustomWebApplic
     }
 }
 
-// Implementação mock do DomainNotificacaoHandler para testes de integração
 public class MockDomainNotificacaoHandler : DomainNotificacaoHandler
 {
     private readonly List<DomainNotificacaoRaiz> _notificacoes = new();

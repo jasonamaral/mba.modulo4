@@ -7,8 +7,6 @@ namespace Alunos.Tests.Domain;
 
 public class MatriculaCursoTests
 {
-    #region Helpers
-
     private static readonly Guid _alunoId = Guid.NewGuid();
     private static readonly Guid _cursoId = Guid.NewGuid();
     private static readonly string _nomeCurso = "Curso Completo de Testes Automatizados";
@@ -16,10 +14,6 @@ public class MatriculaCursoTests
     private static readonly string _observacao = "Observações iniciais";
 
     private MatriculaCurso CriarMatriculaValida() => new(_alunoId, _cursoId, _nomeCurso, _valor, _observacao);
-
-    #endregion Helpers
-
-    #region Construtores
 
     [Fact]
     public void Deve_criar_matricula_valida()
@@ -47,10 +41,6 @@ public class MatriculaCursoTests
         Action act = () => new MatriculaCurso(_alunoId, _cursoId, _nomeCurso, 0, _observacao);
         act.Should().Throw<DomainException>().WithMessage("*Valor da matrícula deve ser maior que zero*");
     }
-
-    #endregion Construtores
-
-    #region Regras de Dominio
 
     [Fact]
     public void Deve_registrar_pagamento()
@@ -100,10 +90,6 @@ public class MatriculaCursoTests
         act.Should().Throw<DomainException>().WithMessage("*Certificado só pode ser solicitado após a conclusão do curso*");
     }
 
-    #endregion Regras de Dominio
-
-    #region Overrides
-
     [Fact]
     public void ToString_deve_conter_nome_ids_e_status()
     {
@@ -114,6 +100,4 @@ public class MatriculaCursoTests
               .And.Contain(matricula.CursoId.ToString())
               .And.Contain("Concluído?");
     }
-
-    #endregion Overrides
 }

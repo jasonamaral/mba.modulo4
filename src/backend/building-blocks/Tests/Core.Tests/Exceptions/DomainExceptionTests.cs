@@ -115,6 +115,5 @@ public class DomainExceptionTests : TestBase
 
         // Act & Assert
         exception.Errors.Should().NotBeNull();
-        // Errors deve ser read-only, então não deve permitir modificação
     }
 }

@@ -32,6 +32,7 @@ public class CursoTests : TestBase
         var nivel = "Intermediário";
         var instrutor = "João Silva";
         var vagasMaximas = 30;
+        var inicioTeste = DateTime.UtcNow;
 
         // Act
         var curso = new Curso(nome, valor, _conteudoProgramatico, duracaoHoras, nivel, instrutor, vagasMaximas);
@@ -48,7 +49,7 @@ public class CursoTests : TestBase
         curso.VagasOcupadas.Should().Be(0);
         curso.Ativo.Should().BeTrue();
         curso.Id.Should().NotBeEmpty();
-        curso.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        curso.CreatedAt.Should().BeAfter(inicioTeste).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
     }
 
     [Fact]
@@ -129,6 +130,7 @@ public class CursoTests : TestBase
         var novoNivel = "Avançado";
         var novoInstrutor = "Novo Instrutor";
         var novasVagas = 40;
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         curso.AtualizarInformacoes(novoNome, novoValor, _conteudoProgramatico, novaDuracao, novoNivel, novoInstrutor, novasVagas);
@@ -140,7 +142,7 @@ public class CursoTests : TestBase
         curso.Nivel.Should().Be(novoNivel);
         curso.Instrutor.Should().Be(novoInstrutor);
         curso.VagasMaximas.Should().Be(novasVagas);
-        curso.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        curso.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]
@@ -149,13 +151,14 @@ public class CursoTests : TestBase
         // Arrange
         var curso = new Curso("Curso", 100m, _conteudoProgramatico, 20, "Básico", "Instrutor", 25);
         curso.Desativar();
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         curso.Ativar();
 
         // Assert
         curso.Ativo.Should().BeTrue();
-        curso.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        curso.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]
@@ -163,13 +166,14 @@ public class CursoTests : TestBase
     {
         // Arrange
         var curso = new Curso("Curso", 100m, _conteudoProgramatico, 20, "Básico", "Instrutor", 25);
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         curso.Desativar();
 
         // Assert
         curso.Ativo.Should().BeFalse();
-        curso.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        curso.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]
@@ -177,13 +181,14 @@ public class CursoTests : TestBase
     {
         // Arrange
         var curso = new Curso("Curso", 100m, _conteudoProgramatico, 20, "Básico", "Instrutor", 25);
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         curso.AdicionarMatricula();
 
         // Assert
         curso.VagasOcupadas.Should().Be(1);
-        curso.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        curso.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]
@@ -205,13 +210,14 @@ public class CursoTests : TestBase
         var curso = new Curso("Curso", 100m, _conteudoProgramatico, 20, "Básico", "Instrutor", 25);
         curso.AdicionarMatricula();
         curso.AdicionarMatricula();
+        var inicioOperacao = DateTime.UtcNow;
 
         // Act
         curso.RemoverMatricula();
 
         // Assert
         curso.VagasOcupadas.Should().Be(1);
-        curso.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        curso.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
     [Fact]

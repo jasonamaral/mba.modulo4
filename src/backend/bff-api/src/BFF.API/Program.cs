@@ -9,15 +9,12 @@ internal class Program
 
         builder.AddApiConfiguration();
 
-        // Configuração global do JSON
         builder.Services.AddJsonConfiguration();
 
         builder.Services.AddAuthorization();
 
-        // Health Checks
         builder.Services.AddHealthChecks();
 
-        // Configurar para usar a porta especificada
         var urls = builder.Configuration["Urls"];
         if (!string.IsNullOrEmpty(urls))
         {
@@ -26,14 +23,10 @@ internal class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
         {
             app.UseSwaggerConfiguration();
         }
-
-        // Remover HTTPS redirection
-        // app.UseHttpsRedirection();
 
         app.UseCors("AllowedOrigins");
         app.UseAuthentication();

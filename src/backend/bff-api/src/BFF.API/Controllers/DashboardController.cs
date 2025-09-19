@@ -54,7 +54,6 @@ public class DashboardController : BffController
             return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
         }
 
-        // Busca dados em paralelo nas APIs: perfil, matrículas e evolução
         var matriculasTask = _alunoService.ObterMatriculasPorAlunoIdAsync(userId);
         var evolucaoTask = _alunoService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(userId);
 
@@ -69,7 +68,6 @@ public class DashboardController : BffController
             .Select(m => m.Certificado)
             .ToList();
 
-        // Calcula progresso geral a partir da evolução
         var totalAulas = evolucaoResponse?.Data?.MatriculasCursos?.Sum(m => m.QuantidadeAulasNoCurso) ?? 0;
         var aulasRealizadas = evolucaoResponse?.Data?.MatriculasCursos?.Sum(m => m.QuantidadeAulasRealizadas) ?? 0;
         var cursosConcluidos = matriculas.Count(m => m.DataConclusao.HasValue || string.Equals(m.EstadoMatricula, "Concluido", StringComparison.OrdinalIgnoreCase));
@@ -81,7 +79,7 @@ public class DashboardController : BffController
             CursosConcluidos = cursosConcluidos,
             CertificadosEmitidos = certificados.Count(c => c.DataEmissao.HasValue),
             PercentualConcluidoGeral = percentualGeral,
-            HorasEstudadas = 0 // Não há dado confiável de horas no momento
+            HorasEstudadas = 0
         };
 
         var dashboard = new DashboardAlunoDto

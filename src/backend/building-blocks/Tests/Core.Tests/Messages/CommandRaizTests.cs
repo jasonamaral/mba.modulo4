@@ -96,7 +96,7 @@ public class CommandRaizTests : TestBase
         var dataHoraOriginal = comando.DataHora;
 
         // Act
-        Thread.Sleep(100); // Aguarda um pouco
+        Thread.Sleep(100);
         comando.DefinirRaizAgregacao(Guid.NewGuid());
 
         // Assert

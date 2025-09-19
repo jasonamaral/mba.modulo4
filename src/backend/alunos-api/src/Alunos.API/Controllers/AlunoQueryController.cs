@@ -1,5 +1,5 @@
-using Alunos.Application.DTOs.Response;
 using Alunos.API.Extensions;
+using Alunos.Application.DTOs.Response;
 using Core.Communication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -67,7 +67,7 @@ public partial class AlunoController
         try
         {
             var alunoId = User.GetUserId();
-            
+
             var matriculas = await _alunoQueryService.ObterMatriculasPorAlunoIdAsync(alunoId);
             if (matriculas == null || !matriculas.Any())
             {
