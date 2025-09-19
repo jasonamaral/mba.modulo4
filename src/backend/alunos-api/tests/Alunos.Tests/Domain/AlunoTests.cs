@@ -89,9 +89,9 @@ public class AlunoTests
     public void Deve_atualizar_nome_email_contato()
     {
         var aluno = CriarAlunoValido();
-        aluno.AtualizarNomeAluno("Novo Nome");
-        aluno.AtualizarEmailAluno("novo@email.com");
-        aluno.AtualizarContatoAluno("12345");
+        //aluno.AtualizarNomeAluno("Novo Nome");
+        //aluno.AtualizarEmailAluno("novo@email.com");
+        //aluno.AtualizarContatoAluno("12345");
 
         aluno.Nome.Should().Be("Novo Nome");
         aluno.Email.Should().Be("novo@email.com");
@@ -103,7 +103,7 @@ public class AlunoTests
     {
         var aluno = CriarAlunoValido();
         var novaData = new DateTime(1985, 5, 20);
-        aluno.AtualizarDataNascimento(novaData);
+        // aluno.AtualizarDataNascimento(novaData);
 
         aluno.DataNascimento.Should().Be(novaData);
     }

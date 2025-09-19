@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace Alunos.Domain.Enumerators
 {
-    public enum EstadoMatriculaCursoEnum
+    public enum EstadoMatriculaCurso
     {
         [Description("Pendente de pagamento")]
         PendentePagamento = 1,

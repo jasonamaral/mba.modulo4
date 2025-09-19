@@ -10,7 +10,7 @@ public class EvolucaoMatriculaCursoDto
     public DateTime? DataConclusao { get; set; }
     public string EstadoMatricula { get; set; }
     public CertificadoDto Certificado { get; set; }
-    public int QuantidadeAulasNoCurso { get; set; }
+    //public int QuantidadeAulasNoCurso { get; set; }
     public int QuantidadeAulasRealizadas { get; set; }
     public int QuantidadeAulasEmAndamento { get; set; }
 }

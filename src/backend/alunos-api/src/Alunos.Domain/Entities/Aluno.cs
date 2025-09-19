@@ -7,14 +7,12 @@ namespace Alunos.Domain.Entities;
 
 public class Aluno : Entidade, IRaizAgregacao
 {
-    #region Atributos
-
     public Guid CodigoUsuarioAutenticacao { get; }
     public string Nome { get; private set; }
     public string Email { get; private set; }
     public string Cpf { get; }
     public DateTime DataNascimento { get; private set; }
-    public string Telefone { get; private set; }
+    public string Telefone { get; private set; } // Não é validado! Falar com a equipe
     public bool Ativo { get; private set; }
     public string Genero { get; private set; }
     public string Cidade { get; private set; }
@@ -24,10 +22,6 @@ public class Aluno : Entidade, IRaizAgregacao
 
     private readonly List<MatriculaCurso> _matriculasCursos = [];
     public IReadOnlyCollection<MatriculaCurso> MatriculasCursos => _matriculasCursos.AsReadOnly();
-
-    #endregion Atributos
-
-    #region CTOR
 
     // EF Compatibility
     protected Aluno()
@@ -58,39 +52,35 @@ public class Aluno : Entidade, IRaizAgregacao
         ValidarIntegridadeAluno();
     }
 
-    #endregion CTOR
-
-    #region Métodos
-
     #region Manipuladores de Aluno
 
     public void AtivarAluno() => Ativo = true;
 
     public void InativarAluno() => Ativo = false;
 
-    internal void AtualizarNomeAluno(string nome)
-    {
-        ValidarIntegridadeAluno(novoNome: nome ?? string.Empty);
-        Nome = nome.Trim();
-    }
+    //internal void AtualizarNomeAluno(string nome)
+    //{
+    //    ValidarIntegridadeAluno(novoNome: nome ?? string.Empty);
+    //    Nome = nome.Trim();
+    //}
 
-    internal void AtualizarEmailAluno(string email)
-    {
-        ValidarIntegridadeAluno(novoEmail: email ?? string.Empty);
-        Email = email.Trim().ToLowerInvariant();
-    }
+    //internal void AtualizarEmailAluno(string email)
+    //{
+    //    ValidarIntegridadeAluno(novoEmail: email ?? string.Empty);
+    //    Email = email.Trim().ToLowerInvariant();
+    //}
 
-    internal void AtualizarContatoAluno(string contato)
-    {
-        ValidarIntegridadeAluno(novoContato: contato ?? string.Empty);
-        Telefone = contato.Trim();
-    }
+    //internal void AtualizarContatoAluno(string contato)
+    //{
+    //    ValidarIntegridadeAluno(novoContato: contato ?? string.Empty);
+    //    Telefone = contato.Trim();
+    //}
 
-    public void AtualizarDataNascimento(DateTime dataNascimento)
-    {
-        ValidarIntegridadeAluno(novaDataNascimento: dataNascimento);
-        DataNascimento = dataNascimento;
-    }
+    //public void AtualizarDataNascimento(DateTime dataNascimento)
+    //{
+    //    ValidarIntegridadeAluno(novaDataNascimento: dataNascimento);
+    //    DataNascimento = dataNascimento;
+    //}
 
     #endregion Manipuladores de Aluno
 
@@ -101,13 +91,13 @@ public class Aluno : Entidade, IRaizAgregacao
         return _matriculasCursos.Count(m => m.CursoId == cursoId && m.PodeConcluirCurso() == false);
     }
 
-    public MatriculaCurso ObterMatriculaPorCursoId(Guid cursoId)
-    {
-        var matriculaCurso = _matriculasCursos.FirstOrDefault(m => m.CursoId == cursoId);
-        if (matriculaCurso == null) { throw new DomainException("Matrícula pelo Curso não foi localizada"); }
+    //public MatriculaCurso ObterMatriculaCursoPeloCurso(Guid cursoId)
+    //{
+    //    var matriculaCurso = _matriculasCursos.FirstOrDefault(m => m.CursoId == cursoId);
+    //    if (matriculaCurso == null) { throw new DomainException("Matrícula pelo Curso não foi localizada"); }
 
-        return matriculaCurso;
-    }
+    //    return matriculaCurso;
+    //}
 
     public MatriculaCurso ObterMatriculaCursoPeloId(Guid matriculaCursoId)
     {
@@ -117,20 +107,22 @@ public class Aluno : Entidade, IRaizAgregacao
         return matriculaCurso;
     }
 
-    public void MatricularAlunoEmCurso(Guid cursoId, string nomeCurso, decimal valor, string observacao)
+    public MatriculaCurso MatricularAlunoEmCurso(Guid cursoId, string nomeCurso, decimal valor, string observacao)
     {
         if (_matriculasCursos.Any(m => m.CursoId == cursoId)) { throw new DomainException("Aluno já está matriculado neste curso"); }
         if (!Ativo) { throw new DomainException("Aluno inativo não pode ser matriculado em cursos"); }
 
         var novaMatricula = new MatriculaCurso(Id, cursoId, nomeCurso, valor, observacao);
         _matriculasCursos.Add(novaMatricula);
+
+        return novaMatricula;
     }
 
-    internal void AtualizarNotaFinalCurso(Guid matriculaCursoId, byte notaFinal)
-    {
-        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
-        matriculaCurso.AtualizarNotaFinalCurso(notaFinal);
-    }
+    //internal void AtualizarNotaFinalCurso(Guid matriculaCursoId, byte notaFinal)
+    //{
+    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
+    //    matriculaCurso.AtualizarNotaFinalCurso(notaFinal);
+    //}
 
     public void AtualizarPagamentoMatricula(Guid matriculaCursoId)
     {
@@ -138,11 +130,11 @@ public class Aluno : Entidade, IRaizAgregacao
         matriculaCurso.RegistrarPagamentoMatricula();
     }
 
-    public void AtualizarAbandonoMatricula(Guid matriculaCursoId)
-    {
-        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
-        matriculaCurso.RegistrarAbandonoMatricula();
-    }
+    //public void AtualizarAbandonoMatricula(Guid matriculaCursoId)
+    //{
+    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
+    //    matriculaCurso.RegistrarAbandonoMatricula();
+    //}
 
     public void ConcluirCurso(Guid matriculaCursoId)
     {
@@ -150,11 +142,11 @@ public class Aluno : Entidade, IRaizAgregacao
         matriculaCurso.ConcluirCurso();
     }
 
-    internal void AtualizarObservacoes(Guid matriculaCursoId, string observacao)
-    {
-        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
-        matriculaCurso.AtualizarObservacoes(observacao);
-    }
+    //internal void AtualizarObservacoes(Guid matriculaCursoId, string observacao)
+    //{
+    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
+    //    matriculaCurso.AtualizarObservacoes(observacao);
+    //}
 
     #endregion Manipuladores de MatriculaCurso
 
@@ -190,29 +182,29 @@ public class Aluno : Entidade, IRaizAgregacao
         matriculaCurso.RequisitarCertificadoConclusao(notaFinal, pathCertificado, nomeInstrutor);
     }
 
-    public void ComunicarDataEmissaoCertificado(Guid matriculaCursoId, DateTime dataEmissao)
-    {
-        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
-        matriculaCurso.ComunicarDataEmissaoCertificado(dataEmissao);
-    }
+    //public void ComunicarDataEmissaoCertificado(Guid matriculaCursoId, DateTime dataEmissao)
+    //{
+    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
+    //    matriculaCurso.ComunicarDataEmissaoCertificado(dataEmissao);
+    //}
 
-    public void AtualizarCargaHoraria(Guid matriculaCursoId, short cargaHoraria)
-    {
-        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
-        matriculaCurso.AtualizarCargaHoraria(cargaHoraria);
-    }
+    //public void AtualizarCargaHoraria(Guid matriculaCursoId, short cargaHoraria)
+    //{
+    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
+    //    matriculaCurso.AtualizarCargaHoraria(cargaHoraria);
+    //}
 
-    public void AtualizarPathCertificado(Guid matriculaCursoId, string path)
-    {
-        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
-        matriculaCurso.AtualizarPathCertificado(path);
-    }
+    //public void AtualizarPathCertificado(Guid matriculaCursoId, string path)
+    //{
+    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
+    //    matriculaCurso.AtualizarPathCertificado(path);
+    //}
 
-    public void AtualizarNomeInstrutor(Guid matriculaCursoId, string nomeInstrutor)
-    {
-        MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
-        matriculaCurso.AtualizarNomeInstrutor(nomeInstrutor);
-    }
+    //public void AtualizarNomeInstrutor(Guid matriculaCursoId, string nomeInstrutor)
+    //{
+    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
+    //    matriculaCurso.AtualizarNomeInstrutor(nomeInstrutor);
+    //}
 
     #endregion Manipuladores de Certificado
 
@@ -259,8 +251,6 @@ public class Aluno : Entidade, IRaizAgregacao
 
         validacao.DispararExcecaoDominioSeInvalido();
     }
-
-    #endregion Métodos
 
     public override string ToString() => $"{Nome} (Email: {Email})";
 }

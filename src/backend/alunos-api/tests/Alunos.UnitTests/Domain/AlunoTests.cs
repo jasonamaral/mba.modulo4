@@ -403,7 +403,7 @@ public class AlunoTests
         var novaData = DateTime.Now.AddYears(-30);
 
         // Act
-        aluno.AtualizarDataNascimento(novaData);
+        //aluno.AtualizarDataNascimento(novaData);
 
         // Assert
         aluno.DataNascimento.Date.Should().Be(novaData.Date);
@@ -417,7 +417,7 @@ public class AlunoTests
         var novaData = DateTime.Now.AddYears(1);
 
         // Act & Assert
-        var action = () => aluno.AtualizarDataNascimento(novaData);
+        //var action = () => aluno.AtualizarDataNascimento(novaData);
         action.Should().Throw<DomainException>()
             .WithMessage("*Data de Nascimento*");
     }

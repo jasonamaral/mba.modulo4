@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alunos.Infrastructure.Repositories;
 
-public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
+public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
 {
-    private readonly AlunoDbContext _context = context;
     public IUnitOfWork UnitOfWork => _context;
 
     #region Alunos
@@ -44,10 +43,10 @@ public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
             .FirstOrDefaultAsync(a => a.Email == email);
     }
 
-    public async Task<bool> ExisteEmailAsync(string email)
-    {
-        return await _context.Alunos.AnyAsync(a => a.Email == email);
-    }
+    //public async Task<bool> ExisteEmailAsync(string email)
+    //{
+    //    return await _context.Alunos.AnyAsync(a => a.Email == email);
+    //}
 
     public async Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario)
     {
@@ -81,12 +80,12 @@ public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
             .FirstOrDefaultAsync(m => m.Id == matriculaId);
     }
 
-    public async Task<MatriculaCurso?> ObterMatriculaPorAlunoECursoAsync(Guid alunoId, Guid cursoId)
-    {
-        return await _context.MatriculasCursos
-            .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.AlunoId == alunoId && m.CursoId == cursoId);
-    }
+    //public async Task<MatriculaCurso?> ObterMatriculaPorAlunoECursoAsync(Guid alunoId, Guid cursoId)
+    //{
+    //    return await _context.MatriculasCursos
+    //        .AsNoTracking()
+    //        .FirstOrDefaultAsync(m => m.AlunoId == alunoId && m.CursoId == cursoId);
+    //}
 
     #endregion Matricula Curso
 
@@ -98,12 +97,12 @@ public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
         await Task.CompletedTask;
     }
 
-    public async Task<Certificado?> ObterCertificadoPorMatriculaAsync(Guid matriculaId)
-    {
-        return await _context.Certificados
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.MatriculaCursoId == matriculaId);
-    }
+    //public async Task<Certificado?> ObterCertificadoPorMatriculaAsync(Guid matriculaId)
+    //{
+    //    return await _context.Certificados
+    //        .AsNoTracking()
+    //        .FirstOrDefaultAsync(c => c.MatriculaCursoId == matriculaId);
+    //}
 
     #endregion Certificado
 

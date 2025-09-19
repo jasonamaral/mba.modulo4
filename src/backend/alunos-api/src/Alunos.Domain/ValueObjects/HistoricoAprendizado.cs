@@ -4,8 +4,6 @@ namespace Alunos.Domain.ValueObjects;
 
 public class HistoricoAprendizado
 {
-    #region Atributos
-
     public Guid Id { get; }
     public Guid MatriculaCursoId { get; }
     public Guid CursoId { get; }
@@ -14,10 +12,6 @@ public class HistoricoAprendizado
     public int CargaHoraria { get; }
     public DateTime DataInicio { get; }
     public DateTime? DataTermino { get; }
-
-    #endregion Atributos
-
-    #region CTOR
 
     // EF Compatibility
     protected HistoricoAprendizado()
@@ -43,14 +37,11 @@ public class HistoricoAprendizado
         ValidarIntegridadeHistoricoAprendizado();
     }
 
-    #endregion CTOR
-
-    #region Métodos
-
     private void ValidarIntegridadeHistoricoAprendizado()
     {
         var validacao = new ResultadoValidacao<HistoricoAprendizado>();
 
+        ValidacaoGuid.DeveSerValido(MatriculaCursoId, "Identifição da matrícula não pode ser vazio", validacao);
         ValidacaoGuid.DeveSerValido(CursoId, "Identifição do curso não pode ser vazio", validacao);
         ValidacaoGuid.DeveSerValido(AulaId, "Identifição da aula não pode ser vazio", validacao);
         ValidacaoTexto.DevePossuirConteudo(NomeAula, "Nome da aula não pode ser vazio", validacao);
@@ -69,8 +60,6 @@ public class HistoricoAprendizado
 
         validacao.DispararExcecaoDominioSeInvalido();
     }
-
-    #endregion Métodos
 
     public override string ToString()
     {
