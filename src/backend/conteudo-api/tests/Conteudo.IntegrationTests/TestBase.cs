@@ -25,7 +25,6 @@ public abstract class TestBase
     }
 }
 
-// Classe personalizada para configurar o WebApplicationFactory para testes
 public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -34,7 +33,6 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
 
         builder.ConfigureServices(services =>
         {
-            // Remover serviços de infraestrutura que dependem de banco de dados
             var dbContextDescriptor = services.FirstOrDefault(d => d.ServiceType.Name.Contains("DbContext"));
             if (dbContextDescriptor != null)
                 services.Remove(dbContextDescriptor);
@@ -43,14 +41,11 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
             if (dbMigrationDescriptor != null)
                 services.Remove(dbMigrationDescriptor);
 
-            // Configurar autenticação para testes
             services.RemoveAll<JwtBearerHandler>();
 
-            // Adicionar autenticação de teste que sempre retorna sucesso
             services.AddAuthentication("Test")
                 .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 
-            // Configurar a autenticação de teste como padrão
             services.Configure<AuthenticationOptions>(options =>
             {
                 options.DefaultScheme = "Test";
@@ -61,7 +56,6 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
     }
 }
 
-// Handler de autenticação para testes
 public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticationOptions>
 {
     public TestAuthenticationHandler(

@@ -1,8 +1,8 @@
 using Alunos.API.Controllers;
 using Alunos.Application.DTOs.Response;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 
 namespace Alunos.UnitTests.Controllers;
 
@@ -55,8 +55,6 @@ public class AlunoQueryControllerTests : TestBase
 
         MockAlunoQueryService.Setup(x => x.ObterAlunoPorIdAsync(alunoId))
             .ReturnsAsync(aluno);
-
-        // Não configurar SetupMockNotificador para este teste de sucesso
 
         // Act
         var result = await _controller.ObterAlunoPorId(alunoId);
@@ -123,8 +121,6 @@ public class AlunoQueryControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId))
             .ReturnsAsync(evolucao);
 
-        // Não configurar SetupMockNotificador para este teste de sucesso
-
         // Act
         var result = await _controller.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId);
 
@@ -186,8 +182,6 @@ public class AlunoQueryControllerTests : TestBase
 
         MockAlunoQueryService.Setup(x => x.ObterMatriculasPorAlunoIdAsync(alunoId))
             .ReturnsAsync(matriculas);
-
-        // Não configurar SetupMockNotificador para este teste de sucesso
 
         // Act
         SetUserContext(alunoId);
@@ -265,8 +259,6 @@ public class AlunoQueryControllerTests : TestBase
         MockAlunoQueryService.Setup(x => x.ObterCertificadoPorMatriculaIdAsync(matriculaId))
             .ReturnsAsync(certificado);
 
-        // Não configurar SetupMockNotificador para este teste de sucesso
-
         // Act
         var result = await _controller.ObterCertificadoPorMatriculaId(matriculaId);
 
@@ -328,8 +320,6 @@ public class AlunoQueryControllerTests : TestBase
 
         MockAlunoQueryService.Setup(x => x.ObterAulasPorMatriculaIdAsync(matriculaId))
             .ReturnsAsync(aulas);
-
-        // Não configurar SetupMockNotificador para este teste de sucesso
 
         // Act
         var result = await _controller.ObterAulasPorMatriculaId(matriculaId);

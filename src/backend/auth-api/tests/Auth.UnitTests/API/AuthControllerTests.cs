@@ -43,7 +43,7 @@ public class AuthControllerTests : TestBase
         user.Should().NotBeNull();
         user.Nome.Should().Be("Usuário Teste");
         user.Email.Should().Be("teste@email.com");
-        user.EmailConfirmed.Should().BeFalse(); // Valor padrão
+        user.EmailConfirmed.Should().BeFalse();
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class AuthControllerTests : TestBase
         refreshToken.Should().NotBeNull();
         refreshToken.Token.Should().NotBeEmpty();
         refreshToken.Username.Should().Be("teste@email.com");
-        refreshToken.ExpirationDate.Should().Be(default(DateTime)); // Valor padrão
+        refreshToken.ExpirationDate.Should().Be(default(DateTime));
     }
 
     [Fact]
@@ -149,7 +149,7 @@ public class AuthControllerTests : TestBase
 
         // Assert
         user.Should().NotBeNull();
-        user.Nome.Should().Be(string.Empty); // Valor padrão é string.Empty, não null
+        user.Nome.Should().Be(string.Empty);
         user.Email.Should().BeNull();
         user.UserName.Should().BeNull();
         user.EmailConfirmed.Should().BeFalse();

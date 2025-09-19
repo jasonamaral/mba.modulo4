@@ -26,7 +26,6 @@ public class CacheService : ICacheService
         _redisSettings = redisOptions.Value;
         _logger = logger;
 
-        // Tenta usar distributed cache (Redis) primeiro, senão usa memory cache
         _distributedCache = serviceProvider.GetService<IDistributedCache>();
         _memoryCache = serviceProvider.GetService<IMemoryCache>();
 
@@ -65,7 +64,6 @@ public class CacheService : ICacheService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao buscar item do cache: {Key}. Erro: {Error}", fullKey, ex.Message);
-            // Remove o item corrompido do cache
             await RemoveAsync(key);
         }
 
@@ -140,7 +138,6 @@ public class CacheService : ICacheService
         {
             if (_useDistributedCache && !string.IsNullOrEmpty(_redisSettings.ConnectionString))
             {
-                // Usa StackExchange.Redis para varrer e remover por padrão
                 var multiplexer = await StackExchange.Redis.ConnectionMultiplexer.ConnectAsync(_redisSettings.ConnectionString);
                 try
                 {

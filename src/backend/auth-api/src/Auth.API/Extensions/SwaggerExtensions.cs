@@ -22,7 +22,6 @@ public static class SwaggerExtensions
                 }
             });
 
-            // Configurar comentários XML
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             if (File.Exists(xmlPath))

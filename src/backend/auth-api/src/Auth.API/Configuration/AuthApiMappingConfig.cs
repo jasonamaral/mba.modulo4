@@ -10,7 +10,7 @@ public class AuthApiMappingConfig : IRegister
     {
         config.NewConfig<RegistroRequest, AlunoRegistradoIntegrationEvent>()
             .ConstructUsing(src => new AlunoRegistradoIntegrationEvent(
-                Guid.Empty, // Será definido manualmente
+                Guid.Empty,
                 src.Nome,
                 src.Email,
                 src.CPF,
@@ -21,8 +21,6 @@ public class AuthApiMappingConfig : IRegister
                 src.Estado,
                 src.CEP,
                 src.Foto
-            //src.EhAdministrador,
-            //DateTime.UtcNow
             ));
     }
 }

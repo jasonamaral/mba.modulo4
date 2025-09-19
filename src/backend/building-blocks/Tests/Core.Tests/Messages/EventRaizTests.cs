@@ -72,7 +72,7 @@ public class EventRaizTests : TestBase
     {
         // Arrange
         var evento = new EventoTeste();
-        var validacao = new ValidationResult(); // Sem erros
+        var validacao = new ValidationResult();
 
         // Act
         evento.DefinirValidacao(validacao);
@@ -109,7 +109,7 @@ public class EventRaizTests : TestBase
         var dataHoraOriginal = evento.DataHora;
 
         // Act
-        Thread.Sleep(100); // Aguarda um pouco
+        Thread.Sleep(100);
         evento.DefinirRaizAgregacao(Guid.NewGuid());
 
         // Assert

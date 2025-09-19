@@ -26,9 +26,6 @@ namespace Pagamentos.API.Configuration
         {
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
-            //services.AddScoped<IMediatorHandler, MediatorHandler>();
-            //services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>, DomainNotificacaoHandler>();
-
             services.AddScoped<DomainNotificacaoHandler>();
             services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>>(sp =>
                                sp.GetRequiredService<DomainNotificacaoHandler>());

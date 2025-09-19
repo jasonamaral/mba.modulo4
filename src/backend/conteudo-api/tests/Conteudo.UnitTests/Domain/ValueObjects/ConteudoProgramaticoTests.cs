@@ -115,8 +115,6 @@ public class ConteudoProgramaticoTests : TestBase
         novoConteudo.Recursos.Should().Be(novosRecursos);
         novoConteudo.Avaliacao.Should().Be(novaAvaliacao);
         novoConteudo.Bibliografia.Should().Be(novaBibliografia);
-
-        // Verificar que o objeto original não foi alterado
         conteudoOriginal.Resumo.Should().Be("Resumo Original");
         conteudoOriginal.Descricao.Should().Be("Descrição Original");
         conteudoOriginal.Objetivos.Should().Be("Objetivos Originais");

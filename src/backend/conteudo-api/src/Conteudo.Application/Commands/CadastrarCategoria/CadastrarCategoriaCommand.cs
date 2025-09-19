@@ -12,7 +12,6 @@ public class CadastrarCategoriaCommand : CommandRaiz
 
     public CadastrarCategoriaCommand()
     {
-        // TODO :: Karina, podemos falar depois deste ponto? O Command precisa de uma raiz de agregação, normalmente o ID
         DefinirRaizAgregacao(Guid.NewGuid());
     }
 }

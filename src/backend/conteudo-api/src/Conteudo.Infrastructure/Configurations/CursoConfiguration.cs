@@ -11,8 +11,6 @@ public class CursoConfiguration : IEntityTypeConfiguration<Curso>
 {
     public void Configure(EntityTypeBuilder<Curso> entity)
     {
-        #region Mapping columns
-
         entity.ToTable("Cursos");
 
         entity.HasKey(a => a.Id)
@@ -113,18 +111,9 @@ public class CursoConfiguration : IEntityTypeConfiguration<Curso>
                 .HasMaxLength(1024);
         });
 
-        #endregion Mapping columns
-
-        #region Indexes
-
-        // Índices
         entity.HasIndex(c => c.Nome)
             .HasDatabaseName("CursoNomeIDX")
             .IsUnique();
-
-        //SqlServer não se dá bem com índice do tipo BIT
-        //entity.HasIndex(c => c.Ativo)
-        //    .HasDatabaseName("CursoAtivoIDX");
 
         entity.HasIndex(c => c.ValidoAte)
             .HasDatabaseName("CursoValidoAteIDX");
@@ -132,22 +121,14 @@ public class CursoConfiguration : IEntityTypeConfiguration<Curso>
         entity.HasIndex(c => c.CategoriaId)
             .HasDatabaseName("CursoCategoriaIdIDX");
 
-        #endregion Indexes
-
-        #region Indexes
-
-        // Relacionamento com Categoria
         entity.HasOne(c => c.Categoria)
             .WithMany(cat => cat.Cursos)
             .HasForeignKey(c => c.CategoriaId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // Relacionamento com Aulas
         entity.HasMany(c => c.Aulas)
             .WithOne(a => a.Curso)
             .HasForeignKey(a => a.CursoId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        #endregion Indexes
     }
 }

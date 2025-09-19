@@ -11,8 +11,6 @@ public class AulaConfiguration : IEntityTypeConfiguration<Aula>
 {
     public void Configure(EntityTypeBuilder<Aula> entity)
     {
-        #region Mapping columns
-
         entity.ToTable("Aulas");
 
         entity.HasKey(a => a.Id)
@@ -61,10 +59,6 @@ public class AulaConfiguration : IEntityTypeConfiguration<Aula>
             .HasColumnName("DataAlteracao")
             .HasColumnType(DatabaseTypeConstant.DateTime);
 
-        #endregion Mapping columns
-
-        #region Indexes
-
         entity.HasIndex(x => x.Nome)
             .HasDatabaseName("AlunosNomeIDX");
 
@@ -78,22 +72,14 @@ public class AulaConfiguration : IEntityTypeConfiguration<Aula>
         entity.HasIndex(a => a.TipoAula)
             .HasDatabaseName("AlunosTipoAulaIDX");
 
-        #endregion Indexes
-
-        #region Relationships
-
-        // Relacionamento com Curso
         entity.HasOne(a => a.Curso)
             .WithMany(c => c.Aulas)
             .HasForeignKey(a => a.CursoId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Relacionamento com Materiais
         entity.HasMany(a => a.Materiais)
             .WithOne(m => m.Aula)
             .HasForeignKey(m => m.AulaId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        #endregion Relationships
     }
 }

@@ -20,7 +20,6 @@ public class CursoDto
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    // Conteúdo Programático
     public string Resumo { get; set; } = string.Empty;
 
     public string Descricao { get; set; } = string.Empty;

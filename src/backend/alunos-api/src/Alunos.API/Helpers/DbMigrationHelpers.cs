@@ -49,7 +49,6 @@ public static class DbMigrationHelpers
         aluno.DefinirId(alunoId);
         aluno.AtivarAluno();
 
-        // Trato o curso 1 como finalizado
         Guid cursoIdUm = Guid.Parse("f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c");
         aluno.MatricularAlunoEmCurso(cursoIdUm, "C# Avançado", 499.90m, $"Observação Aluno {nome} - Curso 1-C# Avançado");
 
@@ -61,7 +60,6 @@ public static class DbMigrationHelpers
         aluno.ConcluirCurso(matriculaUm.Id);
         aluno.RequisitarCertificadoConclusao(matriculaUm.Id, 10, $"/var/mnt/certificados/{aluno.Id}_{matriculaUm.Id}.pdf", "Curso Online");
 
-        // Trato o curso 2 como em andamento
         Guid cursoIdDois = Guid.Parse("a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d");
         aluno.MatricularAlunoEmCurso(cursoIdDois, "SQL Server do Zero ao Avançado", 499.90m, $"Observação Aluno {nome} - Curso 2-SQL Server do Zero ao Avançado");
 

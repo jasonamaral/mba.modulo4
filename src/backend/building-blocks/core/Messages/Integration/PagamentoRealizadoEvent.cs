@@ -10,7 +10,6 @@ namespace Core.Messages.Integration
 
         public PagamentoRealizadoEvent(Guid Id, Guid clienteId, Guid pagamentoId, Guid transacaoId, decimal total)
         {
-            // AggregateID = Id;
             this.Id = Id;
             ClienteId = clienteId;
             PagamentoId = pagamentoId;

@@ -204,7 +204,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
         if (aluno == null || aluno.MatriculasCursos == null) return [];
 
         var certificados = new List<CertificadosDto>();
-        
+
         foreach (var matricula in aluno.MatriculasCursos)
         {
             if (matricula.Certificado != null && !string.IsNullOrEmpty(matricula.Certificado.PathCertificado))

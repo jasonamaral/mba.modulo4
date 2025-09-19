@@ -37,7 +37,7 @@ public class JwtSettingsTests : TestBase
     [InlineData(30)]
     [InlineData(60)]
     [InlineData(120)]
-    [InlineData(1440)] // 24 horas
+    [InlineData(1440)]
     public void JwtSettings_ExpiryMinutes_DeveAceitarValoresValidos(int expiryMinutes)
     {
         // Arrange

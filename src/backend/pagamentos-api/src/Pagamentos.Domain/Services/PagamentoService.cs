@@ -46,7 +46,6 @@ namespace Pagamentos.Domain.Services
 
             if (transacao.StatusTransacao == StatusTransacao.Pago)
             {
-                //TODO
                 await _mediatorHandler.PublicarEvento(new PagamentoRealizadoEvent(cobranca.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, cobranca.Valor));
 
                 pagamento.Status = transacao.StatusTransacao.ToString();

@@ -65,7 +65,6 @@ public abstract class BffController : MainController
         {
             try
             {
-                // Tenta deserializar como ResponseResult para erros
                 var responseResult = System.Text.Json.JsonSerializer.Deserialize<Core.Communication.ResponseResult<object>>(
                     content,
                     new System.Text.Json.JsonSerializerOptions
@@ -75,7 +74,6 @@ public abstract class BffController : MainController
 
                 if (responseResult != null && responseResult.Errors?.Mensagens?.Any() == true)
                 {
-                    // Adiciona os erros ao notificador
                     foreach (var erro in responseResult.Errors.Mensagens)
                     {
                         _notificador.AdicionarErro(erro);
@@ -83,13 +81,11 @@ public abstract class BffController : MainController
                 }
                 else
                 {
-                    // Se não conseguir extrair erros específicos, adiciona mensagem genérica
                     _notificador.AdicionarErro($"Erro na API externa: {response.StatusCode} - {content}");
                 }
             }
             catch
             {
-                // Se falhar na deserialização, adiciona mensagem genérica
                 _notificador.AdicionarErro($"Erro na API externa: {response.StatusCode} - {content}");
             }
 

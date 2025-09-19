@@ -10,8 +10,6 @@ namespace Alunos.Domain.Entities;
 
 public class MatriculaCurso : Entidade
 {
-    #region Atributos
-
     public Guid AlunoId { get; }
     public Guid CursoId { get; }
     public string NomeCurso { get; }
@@ -27,10 +25,6 @@ public class MatriculaCurso : Entidade
 
     [JsonIgnore]
     public Aluno Aluno { get; private set; }
-
-    #endregion Atributos
-
-    #region CTOR
 
     // EF Compatibility
     protected MatriculaCurso()
@@ -53,10 +47,6 @@ public class MatriculaCurso : Entidade
         ValidarIntegridadeMatriculaCurso();
     }
 
-    #endregion CTOR
-
-    #region Métodos
-
     internal short QuantidadeTotalCargaHoraria() => (short)_historicoAprendizado.Sum(x => x.CargaHoraria);
 
     public int QuantidadeAulasFinalizadas() => _historicoAprendizado.Count(h => h.DataTermino.HasValue);
@@ -78,7 +68,7 @@ public class MatriculaCurso : Entidade
         var totalCargaHoraria = QuantidadeTotalCargaHoraria();
         if (totalCargaHoraria == 0) { throw new DomainException("Não é possível concluir um curso sem aulas realizadas"); }
 
-        return 10.00m; // TODO: Implementar lógica de cálculo da média final baseada nas notas das aulas
+        return 10.00m;
     }
 
     public decimal? ObterNotaFinalCurso()
@@ -86,22 +76,11 @@ public class MatriculaCurso : Entidade
         return Certificado?.NotaFinal ?? null;
     }
 
-    //internal HistoricoAprendizado ObterHistoricoAulaPeloId(Guid aulaId)
-    //{
-    //    var historico = _historicoAprendizado.FirstOrDefault(h => h.CursoId == CursoId && h.AulaId == aulaId);
-    //    if (historico == null) { throw new DomainException("Historico não foi localizado"); }
-
-    //    return historico;
-    //}
-
-    #region Manipuladores de MatriculaCurso
-
     internal void AtualizarNotaFinalCurso(byte notaFinal)
     {
         ValidarIntegridadeMatriculaCurso(novaNotaFinal: notaFinal);
         VerificarSeCertificadoExiste();
         Certificado.AtualizarNotaFinal(notaFinal);
-        //NotaFinal = notaFinal;
     }
 
     internal void RegistrarPagamentoMatricula()
@@ -134,10 +113,6 @@ public class MatriculaCurso : Entidade
         Observacao = observacao;
     }
 
-    #endregion Manipuladores de MatriculaCurso
-
-    #region Manipuladores de HistoricoAprendizado
-
     internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
         if (!MatriculaCursoDisponivel()) { throw new DomainException("Matrícula não está disponível para registrar histórico de aprendizado"); }
@@ -153,10 +128,6 @@ public class MatriculaCurso : Entidade
 
         _historicoAprendizado.Add(new HistoricoAprendizado(Id, CursoId, aulaId, nomeAula, cargaHoraria, dataInicio, dataTermino));
     }
-
-    #endregion Manipuladores de HistoricoAprendizado
-
-    #region Manipuladores de Certificado
 
     internal void RequisitarCertificadoConclusao(decimal notaFinal, string pathCertificado, string nomeInstrutor)
     {
@@ -196,8 +167,6 @@ public class MatriculaCurso : Entidade
     {
         if (Certificado == null) { throw new DomainException("Certificado não foi solicitado para esta matrícula"); }
     }
-
-    #endregion Manipuladores de Certificado
 
     private void ValidarIntegridadeMatriculaCurso(int? novaNotaFinal = null,
         DateTime? novaDataConclusao = null,
@@ -257,8 +226,6 @@ public class MatriculaCurso : Entidade
             validacao.AdicionarErro("Não é possível alterar o estado da matrícula para pagamento abandonado com o curso concluído");
         }
     }
-
-    #endregion Métodos
 
     public override string ToString()
     {

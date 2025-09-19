@@ -120,8 +120,8 @@ public class ApplicationUserTests : TestBase
     }
 
     [Theory]
-    [InlineData("12345678901")] // 11 dígitos
-    [InlineData("123.456.789-01")] // 14 caracteres com formatação
+    [InlineData("12345678901")]
+    [InlineData("123.456.789-01")]
     public void ApplicationUser_CPFDeveTerTamanhoValido(string cpf)
     {
         // Arrange & Act

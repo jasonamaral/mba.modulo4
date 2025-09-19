@@ -53,7 +53,6 @@ public class AuthController(IMediatorHandler mediator
 
         if (result.Succeeded)
         {
-            // Adicionar role
             var roleName = registroRequest.EhAdministrador ? "Administrador" : "Usuario";
             await _authService.UserManager.AddToRoleAsync(user, roleName);
 
@@ -151,8 +150,6 @@ public class AuthController(IMediatorHandler mediator
              registroRequest.Estado,
              registroRequest.CEP,
              registroRequest.Foto
-         //registroRequest.EhAdministrador,
-         //DateTime.Now
          );
 
         try
@@ -161,7 +158,6 @@ public class AuthController(IMediatorHandler mediator
         }
         catch (Exception ex)
         {
-            // Converte falhas de infraestrutura em ValidationResult inválido para ser retornado ao cliente
             var validationResult = new ValidationResult();
             validationResult.Errors.Add(new ValidationFailure("RegistroAluno", $"Falha ao registrar aluno no serviço de Alunos: {ex.Message}"));
             return new ResponseMessage(validationResult);
