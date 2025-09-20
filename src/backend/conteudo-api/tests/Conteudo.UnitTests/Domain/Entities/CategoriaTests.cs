@@ -98,63 +98,63 @@ public class CategoriaTests : TestBase
         categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
     }
 
-    [Fact]
-    public void Ativar_DeveAtivarCategoria()
-    {
-        // Arrange
-        var categoria = new Categoria("Nome", "Descrição", "#FF0000");
-        categoria.Desativar();
-        var inicioOperacao = DateTime.UtcNow;
+    //[Fact]
+    //public void Ativar_DeveAtivarCategoria()
+    //{
+    //    // Arrange
+    //    var categoria = new Categoria("Nome", "Descrição", "#FF0000");
+    //    categoria.Desativar();
+    //    var inicioOperacao = DateTime.UtcNow;
 
-        // Act
-        categoria.Ativar();
+    //    // Act
+    //    categoria.Ativar();
 
-        // Assert
-        categoria.IsAtiva.Should().BeTrue();
-        categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
-    }
+    //    // Assert
+    //    categoria.IsAtiva.Should().BeTrue();
+    //    categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
+    //}
 
-    [Fact]
-    public void Desativar_DeveDesativarCategoria()
-    {
-        // Arrange
-        var categoria = new Categoria("Nome", "Descrição", "#FF0000");
-        var inicioOperacao = DateTime.UtcNow;
+    //[Fact]
+    //public void Desativar_DeveDesativarCategoria()
+    //{
+    //    // Arrange
+    //    var categoria = new Categoria("Nome", "Descrição", "#FF0000");
+    //    var inicioOperacao = DateTime.UtcNow;
 
-        // Act
-        categoria.Desativar();
+    //    // Act
+    //    categoria.Desativar();
 
-        // Assert
-        categoria.IsAtiva.Should().BeFalse();
-        categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
-    }
+    //    // Assert
+    //    categoria.IsAtiva.Should().BeFalse();
+    //    categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
+    //}
 
-    [Fact]
-    public void AlterarOrdem_ComOrdemValida_DeveAlterarOrdem()
-    {
-        // Arrange
-        var categoria = new Categoria("Nome", "Descrição", "#FF0000");
-        var novaOrdem = 10;
-        var inicioOperacao = DateTime.UtcNow;
+    //[Fact]
+    //public void AlterarOrdem_ComOrdemValida_DeveAlterarOrdem()
+    //{
+    //    // Arrange
+    //    var categoria = new Categoria("Nome", "Descrição", "#FF0000");
+    //    var novaOrdem = 10;
+    //    var inicioOperacao = DateTime.UtcNow;
 
-        // Act
-        categoria.AlterarOrdem(novaOrdem);
+    //    // Act
+    //    categoria.AlterarOrdem(novaOrdem);
 
-        // Assert
-        categoria.Ordem.Should().Be(novaOrdem);
-        categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
-    }
+    //    // Assert
+    //    categoria.Ordem.Should().Be(novaOrdem);
+    //    categoria.UpdatedAt.Should().BeAfter(inicioOperacao).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(3));
+    //}
 
-    [Fact]
-    public void AlterarOrdem_ComOrdemNegativa_DeveLancarExcecao()
-    {
-        // Arrange
-        var categoria = new Categoria("Nome", "Descrição", "#FF0000");
+    //[Fact]
+    //public void AlterarOrdem_ComOrdemNegativa_DeveLancarExcecao()
+    //{
+    //    // Arrange
+    //    var categoria = new Categoria("Nome", "Descrição", "#FF0000");
 
-        // Act & Assert
-        var action = () => categoria.AlterarOrdem(-1);
-        action.Should().Throw<DomainException>().WithMessage("Ordem não pode ser negativa");
-    }
+    //    // Act & Assert
+    //    var action = () => categoria.AlterarOrdem(-1);
+    //    action.Should().Throw<DomainException>().WithMessage("Ordem não pode ser negativa");
+    //}
 
     [Fact]
     public void Propriedades_DeveRetornarValoresCorretos()
@@ -163,8 +163,8 @@ public class CategoriaTests : TestBase
         var categoria = new Categoria("Nome", "Descrição", "#FF0000");
 
         // Act & Assert
-        categoria.TotalCursos.Should().Be(0);
-        categoria.CursosAtivos.Should().Be(0);
+        //categoria.TotalCursos.Should().Be(0);
+        //categoria.CursosAtivos.Should().Be(0);
         categoria.Cursos.Should().NotBeNull();
         categoria.Cursos.Should().BeEmpty();
     }

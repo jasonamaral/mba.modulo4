@@ -99,23 +99,23 @@ public class Material : Entidade, IRaizAgregacao
         AtualizarDataModificacao();
     }
 
-    public void AlterarOrdem(int novaOrdem)
-    {
-        if (novaOrdem < 0)
-            throw new DomainException("Ordem não pode ser negativa");
+    //public void AlterarOrdem(int novaOrdem)
+    //{
+    //    if (novaOrdem < 0)
+    //        throw new DomainException("Ordem não pode ser negativa");
 
-        Ordem = novaOrdem;
-        AtualizarDataModificacao();
-    }
+    //    Ordem = novaOrdem;
+    //    AtualizarDataModificacao();
+    //}
 
-    public string TamanhoFormatado => TamanhoBytes switch
-    {
-        < 1024 => $"{TamanhoBytes} bytes",
-        < 1024 * 1024 => $"{TamanhoBytes / 1024:F1} KB",
-        < 1024 * 1024 * 1024 => $"{TamanhoBytes / (1024 * 1024):F1} MB",
-        _ => $"{TamanhoBytes / (1024 * 1024 * 1024):F1} GB"
-    };
+    //public string TamanhoFormatado => TamanhoBytes switch
+    //{
+    //    < 1024 => $"{TamanhoBytes} bytes",
+    //    < 1024 * 1024 => $"{TamanhoBytes / 1024:F1} KB",
+    //    < 1024 * 1024 * 1024 => $"{TamanhoBytes / (1024 * 1024):F1} MB",
+    //    _ => $"{TamanhoBytes / (1024 * 1024 * 1024):F1} GB"
+    //};
 
-    public bool EhArquivo => !string.IsNullOrEmpty(Extensao);
-    public bool EhLink => string.IsNullOrEmpty(Extensao);
+    //public bool EhArquivo => !string.IsNullOrEmpty(Extensao);
+    //public bool EhLink => string.IsNullOrEmpty(Extensao);
 }

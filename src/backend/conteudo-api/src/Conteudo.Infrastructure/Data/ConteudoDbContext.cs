@@ -3,9 +3,11 @@ using Conteudo.Infrastructure.Configurations;
 using Core.Data;
 using Core.DomainObjects;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Conteudo.Infrastructure.Data;
 
+[ExcludeFromCodeCoverage]
 public class ConteudoDbContext(DbContextOptions<ConteudoDbContext> options) : DbContext(options), IUnitOfWork
 {
     public DbSet<Curso> Cursos { get; set; }

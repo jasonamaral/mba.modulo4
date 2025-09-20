@@ -4,7 +4,7 @@ namespace Conteudo.Application.Interfaces.Services;
 
 public interface IMaterialAppService
 {
-    Task<IEnumerable<MaterialDto>> ObterTodosAsync();
+    //Task<IEnumerable<MaterialDto>> ObterTodosAsync();
 
     Task<MaterialDto?> ObterPorIdAsync(Guid id);
 

@@ -7,11 +7,11 @@ namespace Conteudo.Application.Services
 {
     public class MaterialAppService(IMaterialRepository materialRepository) : IMaterialAppService
     {
-        public async Task<IEnumerable<MaterialDto>> ObterTodosAsync()
-        {
-            var materiais = await materialRepository.ObterTodosAsync();
-            return materiais.Adapt<IEnumerable<MaterialDto>>();
-        }
+        //public async Task<IEnumerable<MaterialDto>> ObterTodosAsync()
+        //{
+        //    var materiais = await materialRepository.ObterTodosAsync();
+        //    return materiais.Adapt<IEnumerable<MaterialDto>>();
+        //}
 
         public async Task<MaterialDto?> ObterPorIdAsync(Guid id)
         {

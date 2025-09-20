@@ -68,30 +68,30 @@ public class Categoria : Entidade, IRaizAgregacao
         AtualizarDataModificacao();
     }
 
-    public void Ativar()
-    {
-        IsAtiva = true;
-        AtualizarDataModificacao();
-    }
+    //public void Ativar()
+    //{
+    //    IsAtiva = true;
+    //    AtualizarDataModificacao();
+    //}
 
-    public void Desativar()
-    {
-        if (_cursos.Any(c => c.Ativo))
-            throw new DomainException("Não é possível desativar categoria com cursos ativos");
+    //public void Desativar()
+    //{
+    //    if (_cursos.Any(c => c.Ativo))
+    //        throw new DomainException("Não é possível desativar categoria com cursos ativos");
 
-        IsAtiva = false;
-        AtualizarDataModificacao();
-    }
+    //    IsAtiva = false;
+    //    AtualizarDataModificacao();
+    //}
 
-    public void AlterarOrdem(int novaOrdem)
-    {
-        if (novaOrdem < 0)
-            throw new DomainException("Ordem não pode ser negativa");
+    //public void AlterarOrdem(int novaOrdem)
+    //{
+    //    if (novaOrdem < 0)
+    //        throw new DomainException("Ordem não pode ser negativa");
 
-        Ordem = novaOrdem;
-        AtualizarDataModificacao();
-    }
+    //    Ordem = novaOrdem;
+    //    AtualizarDataModificacao();
+    //}
 
-    public int TotalCursos => _cursos.Count;
-    public int CursosAtivos => _cursos.Count(c => c.Ativo);
+    //public int TotalCursos => _cursos.Count;
+    //public int CursosAtivos => _cursos.Count(c => c.Ativo);
 }

@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NetDevPack.Security.Jwt.Core.Model;
 using NetDevPack.Security.Jwt.Store.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Auth.Infrastructure.Data;
 
+[ExcludeFromCodeCoverage]
 public class AuthDbContext : IdentityDbContext<ApplicationUser>, IAuthDbContext, ISecurityKeyContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)

@@ -1,4 +1,4 @@
-﻿using Conteudo.Application.Interfaces.Services;
+using Conteudo.Application.Interfaces.Services;
 using Conteudo.Domain.Interfaces.Repositories;
 using Core.Communication;
 using Core.Communication.Filters;
@@ -15,11 +15,11 @@ public class CursoQueryService(ICursoRepository cursoRepository) : ICursoQuery
         return cursos.Adapt<PagedResult<CursoDto>>();
     }
 
-    public async Task<IEnumerable<CursoDto>> ObterTodosAsync(bool includeAulas = false)
-    {
-        var cursos = await cursoRepository.ObterTodosAsync(includeAulas);
-        return cursos.Adapt<IEnumerable<CursoDto>>();
-    }
+    //public async Task<IEnumerable<CursoDto>> ObterTodosAsync(bool includeAulas = false)
+    //{
+    //    var cursos = await cursoRepository.ObterTodosAsync(includeAulas);
+    //    return cursos.Adapt<IEnumerable<CursoDto>>();
+    //}
 
     public async Task<CursoDto?> ObterPorIdAsync(Guid id, bool includeAulas = false)
     {

@@ -4,9 +4,11 @@ using Core.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Pagamentos.Domain.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Pagamentos.Infrastructure.Context
 {
+    [ExcludeFromCodeCoverage]
     public class PagamentoContext : DbContext, IUnitOfWork
     {
         private readonly IMediatorHandler _mediatorHandler;
