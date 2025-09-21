@@ -7,11 +7,9 @@ namespace Alunos.Application.Queries;
 
 public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQueryService
 {
-    private readonly IAlunoRepository _alunoRepository = alunoRepository;
-
     public async Task<AlunoDto> ObterAlunoPorIdAsync(Guid alunoId)
     {
-        var aluno = await _alunoRepository.ObterPorIdAsync(alunoId);
+        var aluno = await alunoRepository.ObterPorIdAsync(alunoId);
         if (aluno == null) return null;
 
         return new AlunoDto
@@ -59,7 +57,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
 
     public async Task<EvolucaoAlunoDto> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid alunoId)
     {
-        var aluno = await _alunoRepository.ObterPorIdAsync(alunoId);
+        var aluno = await alunoRepository.ObterPorIdAsync(alunoId);
         if (aluno == null) return null;
 
         return new EvolucaoAlunoDto
@@ -91,7 +89,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
 
     public async Task<IEnumerable<MatriculaCursoDto>> ObterMatriculasPorAlunoIdAsync(Guid alunoId)
     {
-        var aluno = await _alunoRepository.ObterPorIdAsync(alunoId);
+        var aluno = await alunoRepository.ObterPorIdAsync(alunoId);
         if (aluno == null) return [];
 
         return aluno.MatriculasCursos.Select(m => new MatriculaCursoDto
@@ -124,7 +122,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
 
     public async Task<MatriculaCursoDto> ObterInformacaoMatriculaCursoAsync(Guid matriculaCursoId)
     {
-        var matriculaCurso = await _alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId);
+        var matriculaCurso = await alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId);
         if (matriculaCurso == null) return null;
 
         return new MatriculaCursoDto
@@ -157,7 +155,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
 
     public async Task<CertificadoDto> ObterCertificadoPorMatriculaIdAsync(Guid matriculaCursoId)
     {
-        var matricula = await _alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId);
+        var matricula = await alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId);
         if (matricula == null || matricula.Certificado == null) return null;
 
         return new CertificadoDto
@@ -176,7 +174,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
 
     public async Task<IEnumerable<AulaCursoDto>> ObterAulasPorMatriculaIdAsync(Guid matriculaCursoId)
     {
-        var matricula = await _alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId);
+        var matricula = await alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId);
         if (matricula == null) return null;
 
         var retorno = new List<AulaCursoDto>();
@@ -200,7 +198,7 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
 
     public async Task<IEnumerable<CertificadosDto>> ObterCertificadosPorAlunoIdAsync(Guid alunoId)
     {
-        var aluno = await _alunoRepository.ObterPorIdAsync(alunoId);
+        var aluno = await alunoRepository.ObterPorIdAsync(alunoId);
         if (aluno == null || aluno.MatriculasCursos == null) return [];
 
         var certificados = new List<CertificadosDto>();
@@ -225,10 +223,10 @@ public class AlunoQueryService(IAlunoRepository alunoRepository) : IAlunoQuerySe
 
     public async Task<MatriculaCursoDto?> ObterMatriculaPorIdAsync(Guid matriculaId, Guid alunoId)
     {
-        var aluno = await _alunoRepository.ObterPorIdAsync(alunoId);
+        var aluno = await alunoRepository.ObterPorIdAsync(alunoId);
         if (aluno == null) return null;
 
-        var matricula = await _alunoRepository.ObterMatriculaPorIdAsync(matriculaId);
+        var matricula = await alunoRepository.ObterMatriculaPorIdAsync(matriculaId);
         if (matricula == null || matricula.AlunoId != aluno.Id) return null;
 
         return new MatriculaCursoDto

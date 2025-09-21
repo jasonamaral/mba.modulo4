@@ -12,19 +12,11 @@ namespace BFF.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class HealthController : BffController
+public class HealthController(
+    IMediatorHandler mediator,
+    INotificationHandler<DomainNotificacaoRaiz> notifications,
+    INotificador notificador) : BffController(mediator, notifications, notificador)
 {
-    private readonly ILogger<HealthController> _logger;
-
-    public HealthController(
-        ILogger<HealthController> logger,
-        IMediatorHandler mediator,
-        INotificationHandler<DomainNotificacaoRaiz> notifications,
-        INotificador notificador) : base(mediator, notifications, notificador)
-    {
-        _logger = logger;
-    }
-
     /// <summary>
     /// Verificar saúde da API
     /// </summary>

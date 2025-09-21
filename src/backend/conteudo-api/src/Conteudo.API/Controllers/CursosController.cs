@@ -29,9 +29,6 @@ public class CursosController(ICursoQuery cursoAppService
                            , INotificador notificador
                            , INotificationHandler<DomainNotificacaoRaiz> notifications) : MainController(mediator, notifications, notificador)
 {
-    private readonly ICursoQuery _cursoAppService = cursoAppService;
-    private readonly IMediatorHandler _mediator = mediator;
-
     /// <summary>
     /// Obtém um curso por ID
     /// </summary>
@@ -44,7 +41,7 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCurso([FromRoute] Guid id, [FromQuery] bool includeAulas = false)
     {
-        var curso = await _cursoAppService.ObterPorIdAsync(id, includeAulas);
+        var curso = await cursoAppService.ObterPorIdAsync(id, includeAulas);
         if (curso == null)
         {
             _notificador.AdicionarErro("Curso não encontrado.");
@@ -65,7 +62,7 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursos([FromQuery] CursoFilter filter)
     {
-        var cursos = await _cursoAppService.ObterTodosAsync(filter);
+        var cursos = await cursoAppService.ObterTodosAsync(filter);
         return RespostaPadraoApi(data: cursos);
     }
 
@@ -84,7 +81,7 @@ public class CursosController(ICursoQuery cursoAppService
         if (categoriaId == Guid.Empty)
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria inválido");
 
-        var cursos = await _cursoAppService.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
+        var cursos = await cursoAppService.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
         return RespostaPadraoApi(data: cursos);
     }
 
@@ -99,7 +96,7 @@ public class CursosController(ICursoQuery cursoAppService
     public async Task<IActionResult> CadastrarCurso([FromBody] CadastroCursoDto dto)
     {
         var command = dto.Adapt<CadastrarCursoCommand>();
-        return RespostaPadraoApi<Guid?>(await _mediator.ExecutarComando(command));
+        return RespostaPadraoApi<Guid?>(await _mediatorHandler.ExecutarComando(command));
     }
 
     /// <summary>
@@ -121,7 +118,7 @@ public class CursosController(ICursoQuery cursoAppService
 
         var command = dto.Adapt<AtualizarCursoCommand>();
 
-        return RespostaPadraoApi<CursoDto>(await _mediator.ExecutarComando(command));
+        return RespostaPadraoApi<CursoDto>(await _mediatorHandler.ExecutarComando(command));
     }
 
     /// <summary>
@@ -136,7 +133,7 @@ public class CursosController(ICursoQuery cursoAppService
     public async Task<IActionResult> ExcluirCurso([FromRoute] Guid id)
     {
         var command = new ExcluirCursoCommand(id);
-        return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
+        return RespostaPadraoApi<bool?>(await _mediatorHandler.ExecutarComando(command));
     }
 
     /// <summary>
@@ -150,7 +147,7 @@ public class CursosController(ICursoQuery cursoAppService
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterConteudoProgramatico([FromRoute] Guid id)
     {
-        var curso = await _cursoAppService.ObterPorIdAsync(id);
+        var curso = await cursoAppService.ObterPorIdAsync(id);
         if (curso == null)
         {
             _notificador.AdicionarErro("Curso não encontrado.");

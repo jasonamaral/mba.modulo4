@@ -8,21 +8,10 @@ using Pagamentos.Domain.Models;
 
 namespace Pagamentos.Domain.Services
 {
-    public class PagamentoService : IPagamentoService
+    public class PagamentoService(IPagamentoCartaoCreditoFacade pagamentoCartaoCreditoFacade,
+                            IPagamentoRepository pagamentoRepository,
+                            IMediatorHandler mediatorHandler) : IPagamentoService
     {
-        private readonly IPagamentoCartaoCreditoFacade _pagamentoCartaoCreditoFacade;
-        private readonly IPagamentoRepository _pagamentoRepository;
-        private readonly IMediatorHandler _mediatorHandler;
-
-        public PagamentoService(IPagamentoCartaoCreditoFacade pagamentoCartaoCreditoFacade,
-                                IPagamentoRepository pagamentoRepository,
-                                IMediatorHandler mediatorHandler)
-        {
-            _pagamentoCartaoCreditoFacade = pagamentoCartaoCreditoFacade;
-            _pagamentoRepository = pagamentoRepository;
-            _mediatorHandler = mediatorHandler;
-        }
-
         public async Task<Transacao> RealizarPagamento(PagamentoCurso pagamentoAnuidade)
         {
             var cobranca = new CobrancaCurso
@@ -42,24 +31,24 @@ namespace Pagamentos.Domain.Services
                 AlunoId = pagamentoAnuidade.ClienteId
             };
 
-            var transacao = _pagamentoCartaoCreditoFacade.RealizarPagamento(cobranca, pagamento);
+            var transacao = pagamentoCartaoCreditoFacade.RealizarPagamento(cobranca, pagamento);
 
             if (transacao.StatusTransacao == StatusTransacao.Pago)
             {
-                await _mediatorHandler.PublicarEvento(new PagamentoRealizadoEvent(cobranca.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, cobranca.Valor));
+                await mediatorHandler.PublicarEvento(new PagamentoRealizadoEvent(cobranca.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, cobranca.Valor));
 
                 pagamento.Status = transacao.StatusTransacao.ToString();
                 pagamento.Transacao = transacao;
 
-                _pagamentoRepository.Adicionar(pagamento);
-                _pagamentoRepository.AdicionarTransacao(transacao);
+                pagamentoRepository.Adicionar(pagamento);
+                pagamentoRepository.AdicionarTransacao(transacao);
 
-                await _pagamentoRepository.UnitOfWork.Commit();
+                await pagamentoRepository.UnitOfWork.Commit();
                 return transacao;
             }
 
-            await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz("pagamento", "A operadora recusou o pagamento"));
-            await _mediatorHandler.PublicarEvento(new PagamentoRecusadoEvent(cobranca.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, cobranca.Valor));
+            await mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz("pagamento", "A operadora recusou o pagamento"));
+            await mediatorHandler.PublicarEvento(new PagamentoRecusadoEvent(cobranca.Id, pagamentoAnuidade.ClienteId, transacao.PagamentoId, transacao.Id, cobranca.Valor));
 
             return transacao;
         }

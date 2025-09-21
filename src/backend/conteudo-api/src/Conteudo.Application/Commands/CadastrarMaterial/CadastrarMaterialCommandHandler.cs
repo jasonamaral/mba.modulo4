@@ -8,21 +8,11 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.CadastrarMaterial
 {
-    public class CadastrarMaterialCommandHandler : IRequestHandler<CadastrarMaterialCommand, CommandResult>
+    public class CadastrarMaterialCommandHandler(IMaterialRepository materialRepository,
+                                            IAulaRepository aulaRepository,
+                                            IMediatorHandler mediatorHandler) : IRequestHandler<CadastrarMaterialCommand, CommandResult>
     {
-        private readonly IMaterialRepository _materialRepository;
-        private readonly IAulaRepository _aulaRepository;
-        private readonly IMediatorHandler _mediatorHandler;
         private Guid _raizAgregacao;
-
-        public CadastrarMaterialCommandHandler(IMaterialRepository materialRepository,
-                                                IAulaRepository aulaRepository,
-                                                IMediatorHandler mediatorHandler)
-        {
-            _materialRepository = materialRepository;
-            _aulaRepository = aulaRepository;
-            _mediatorHandler = mediatorHandler;
-        }
 
         public async Task<CommandResult> Handle(CadastrarMaterialCommand request, CancellationToken cancellationToken)
         {
@@ -43,9 +33,9 @@ namespace Conteudo.Application.Commands.CadastrarMaterial
                     request.Extensao,
                     request.Ordem);
 
-                await _materialRepository.CadastrarMaterialAsync(material);
+                await materialRepository.CadastrarMaterialAsync(material);
 
-                if (await _materialRepository.UnitOfWork.Commit())
+                if (await materialRepository.UnitOfWork.Commit())
                 {
                     request.Resultado.Data = material.Id;
                 }
@@ -66,23 +56,23 @@ namespace Conteudo.Application.Commands.CadastrarMaterial
             {
                 foreach (var erro in request.Erros)
                 {
-                    await _mediatorHandler.PublicarNotificacaoDominio(
+                    await mediatorHandler.PublicarNotificacaoDominio(
                         new DomainNotificacaoRaiz(_raizAgregacao, nameof(Material), erro));
                 }
                 return false;
             }
 
-            var aula = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.AulaId);
+            var aula = await aulaRepository.ObterPorIdAsync(request.CursoId, request.AulaId);
             if (aula == null)
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(_raizAgregacao, nameof(Material), "Aula não encontrada"));
                 return false;
             }
 
-            if (await _materialRepository.ExistePorNomeAsync(request.AulaId, request.Nome))
+            if (await materialRepository.ExistePorNomeAsync(request.AulaId, request.Nome))
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(_raizAgregacao, nameof(Material), "Já existe um material com este nome na aula"));
                 return false;
             }

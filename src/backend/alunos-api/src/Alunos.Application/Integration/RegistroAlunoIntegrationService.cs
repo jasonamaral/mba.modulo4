@@ -10,9 +10,6 @@ namespace Alunos.Application.Integration;
 public class RegistroAlunoIntegrationService(IMediatorHandler mediatorHandler,
     ILogger<RegistroAlunoIntegrationService> logger) : IRegistroAlunoIntegrationService
 {
-    private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
-    private readonly ILogger<RegistroAlunoIntegrationService> _logger = logger;
-
     public async Task<ResponseMessage> ProcessarAlunoRegistradoAsync(AlunoRegistradoIntegrationEvent message)
     {
         try
@@ -30,7 +27,7 @@ public class RegistroAlunoIntegrationService(IMediatorHandler mediatorHandler,
                 message.Foto
             );
 
-            var resultado = await _mediatorHandler.EnviarComando(registrarClienteCommand);
+            var resultado = await mediatorHandler.EnviarComando(registrarClienteCommand);
 
             if (resultado.IsValid)
             {
@@ -38,13 +35,13 @@ public class RegistroAlunoIntegrationService(IMediatorHandler mediatorHandler,
             }
             else
             {
-                _logger.LogWarning("Falha na validação do comando de registro. ID: {UserId}, Erros: {Erros}", message.Id, string.Join(", ", resultado.Errors.Select(e => e.ErrorMessage)));
+                logger.LogWarning("Falha na validação do comando de registro. ID: {UserId}, Erros: {Erros}", message.Id, string.Join(", ", resultado.Errors.Select(e => e.ErrorMessage)));
                 return new ResponseMessage(resultado);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao processar evento de usuário registrado. ID: {UserId}", message.Id);
+            logger.LogError(ex, "Erro ao processar evento de usuário registrado. ID: {UserId}", message.Id);
             var validationResult = new FluentValidation.Results.ValidationResult();
             validationResult.Errors.Add(new FluentValidation.Results.ValidationFailure("Exception", ex.Message));
             return new ResponseMessage(validationResult);

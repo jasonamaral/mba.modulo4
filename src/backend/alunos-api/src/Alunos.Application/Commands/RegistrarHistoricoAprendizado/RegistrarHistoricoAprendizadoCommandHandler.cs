@@ -12,8 +12,6 @@ namespace Alunos.Application.Commands.RegistrarHistoricoAprendizado;
 public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<RegistrarHistoricoAprendizadoCommand, CommandResult>
 {
-    private readonly IAlunoRepository _alunoRepository = alunoRepository;
-    private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
     private Guid _raizAgregacao;
 
     public async Task<CommandResult> Handle(RegistrarHistoricoAprendizadoCommand request, CancellationToken cancellationToken)
@@ -31,15 +29,15 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
 
             HistoricoAprendizado historicoAtual = aluno.ObterHistoricoAprendizado(request.MatriculaCursoId, request.AulaId);
 
-            await _alunoRepository.AtualizarEstadoHistoricoAprendizadoAsync(historicoAntigo, historicoAtual);
-            if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
+            await alunoRepository.AtualizarEstadoHistoricoAprendizadoAsync(historicoAntigo, historicoAtual);
+            if (await alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
 
             return request.Resultado;
         }
         catch (Exception ex)
         {
             string mensagem = $"Erro registrando histórico de Aprendizado. Exception: {ex}";
-            await _mediatorHandler.PublicarEvento(new RegistrarProblemaHistoricoAprendizadoEvent(request.AlunoId,
+            await mediatorHandler.PublicarEvento(new RegistrarProblemaHistoricoAprendizadoEvent(request.AlunoId,
                 request.MatriculaCursoId,
                 request.AulaId,
                 request.DataTermino,
@@ -56,7 +54,7 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
         {
             foreach (var erro in request.Erros)
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), erro)).GetAwaiter().GetResult();
+                mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), erro)).GetAwaiter().GetResult();
             }
 
             return false;
@@ -67,10 +65,10 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
 
     private bool ObterAluno(Guid alunoId, out Domain.Entities.Aluno aluno)
     {
-        aluno = _alunoRepository.ObterPorIdAsync(alunoId).Result;
+        aluno = alunoRepository.ObterPorIdAsync(alunoId).Result;
         if (aluno == null)
         {
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
+            mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
             return false;
         }
 

@@ -10,8 +10,6 @@ namespace Alunos.Application.Commands.SolicitarCertificado;
 public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<SolicitarCertificadoCommand, CommandResult>
 {
-    private readonly IAlunoRepository _alunoRepository = alunoRepository;
-    private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
     private Guid _raizAgregacao;
 
     public async Task<CommandResult> Handle(SolicitarCertificadoCommand request, CancellationToken cancellationToken)
@@ -28,8 +26,8 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
         aluno.RequisitarCertificadoConclusao(request.MatriculaCursoId, notaFinal, pathCertificado, nomeInstrutor);
         var certificado = aluno.ObterMatriculaCursoPeloId(request.MatriculaCursoId).Certificado;
 
-        await _alunoRepository.AdicionarCertificadoMatriculaCursoAsync(certificado);
-        if (await _alunoRepository.UnitOfWork.Commit())
+        await alunoRepository.AdicionarCertificadoMatriculaCursoAsync(certificado);
+        if (await alunoRepository.UnitOfWork.Commit())
         {
             request.Resultado.Data = certificado.Id;
         }
@@ -45,7 +43,7 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
         {
             foreach (var erro in request.Erros)
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), erro)).GetAwaiter().GetResult();
+                mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), erro)).GetAwaiter().GetResult();
             }
 
             return false;
@@ -56,10 +54,10 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
 
     private bool ObterAluno(Guid alunoId, out Domain.Entities.Aluno aluno)
     {
-        aluno = _alunoRepository.ObterPorIdAsync(alunoId).Result;
+        aluno = alunoRepository.ObterPorIdAsync(alunoId).Result;
         if (aluno == null)
         {
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
+            mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
             return false;
         }
 
@@ -68,10 +66,10 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
 
     private bool ObterMatriculaCurso(Guid matriculaCursoId, out MatriculaCurso matriculaCurso)
     {
-        matriculaCurso = _alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId).Result;
+        matriculaCurso = alunoRepository.ObterMatriculaPorIdAsync(matriculaCursoId).Result;
         if (matriculaCurso == null)
         {
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Matricula do aluno não encontrado.")).GetAwaiter().GetResult();
+            mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Matricula do aluno não encontrado.")).GetAwaiter().GetResult();
             return false;
         }
 

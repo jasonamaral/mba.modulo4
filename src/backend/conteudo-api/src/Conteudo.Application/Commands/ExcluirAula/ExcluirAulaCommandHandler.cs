@@ -7,30 +7,21 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.ExcluirAula
 {
-    public class ExcluirAulaCommandHandler : IRequestHandler<ExcluirAulaCommand, CommandResult>
+    public class ExcluirAulaCommandHandler(IAulaRepository aulaRepository,
+                                     IMediatorHandler mediatorHandler) : IRequestHandler<ExcluirAulaCommand, CommandResult>
     {
-        private readonly IAulaRepository _aulaRepository;
-        private readonly IMediatorHandler _mediatorHandler;
-
-        public ExcluirAulaCommandHandler(IAulaRepository aulaRepository,
-                                         IMediatorHandler mediatorHandler)
-        {
-            _aulaRepository = aulaRepository;
-            _mediatorHandler = mediatorHandler;
-        }
-
         public async Task<CommandResult> Handle(ExcluirAulaCommand request, CancellationToken cancellationToken)
         {
-            var aula = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
+            var aula = await aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
 
             if (!await ValidarRequisicao(request, aula))
                 return request.Resultado;
 
-            await _aulaRepository.ExcluirAulaAsync(aula.CursoId, aula.Id);
+            await aulaRepository.ExcluirAulaAsync(aula.CursoId, aula.Id);
 
-            if (!await _aulaRepository.UnitOfWork.Commit())
+            if (!await aulaRepository.UnitOfWork.Commit())
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(request.RaizAgregacao, nameof(Aula), "Erro ao excluir aula."));
                 return request.Resultado;
             }
@@ -47,7 +38,7 @@ namespace Conteudo.Application.Commands.ExcluirAula
             {
                 foreach (var erro in request.Erros)
                 {
-                    await _mediatorHandler.PublicarNotificacaoDominio(
+                    await mediatorHandler.PublicarNotificacaoDominio(
                         new DomainNotificacaoRaiz(request.RaizAgregacao, nameof(Aula), erro));
                 }
                 return false;
@@ -55,7 +46,7 @@ namespace Conteudo.Application.Commands.ExcluirAula
 
             if (aula == null)
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(request.RaizAgregacao, nameof(Aula), "Aula não encontrada."));
                 return false;
             }

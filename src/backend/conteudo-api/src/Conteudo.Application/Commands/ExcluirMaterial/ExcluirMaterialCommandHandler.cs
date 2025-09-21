@@ -7,30 +7,21 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.ExcluirMaterial
 {
-    public class ExcluirMaterialCommandHandler : IRequestHandler<ExcluirMaterialCommand, CommandResult>
+    public class ExcluirMaterialCommandHandler(IMaterialRepository materialRepository,
+                                         IMediatorHandler mediatorHandler) : IRequestHandler<ExcluirMaterialCommand, CommandResult>
     {
-        private readonly IMaterialRepository _materialRepository;
-        private readonly IMediatorHandler _mediatorHandler;
-
-        public ExcluirMaterialCommandHandler(IMaterialRepository materialRepository,
-                                             IMediatorHandler mediatorHandler)
-        {
-            _materialRepository = materialRepository;
-            _mediatorHandler = mediatorHandler;
-        }
-
         public async Task<CommandResult> Handle(ExcluirMaterialCommand request, CancellationToken cancellationToken)
         {
-            var material = await _materialRepository.ObterPorIdAsync(request.Id);
+            var material = await materialRepository.ObterPorIdAsync(request.Id);
 
             if (!await ValidarRequisicao(request, material))
                 return request.Resultado;
 
-            await _materialRepository.ExcluirMaterialAsync(material.Id);
+            await materialRepository.ExcluirMaterialAsync(material.Id);
 
-            if (!await _materialRepository.UnitOfWork.Commit())
+            if (!await materialRepository.UnitOfWork.Commit())
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(request.RaizAgregacao, nameof(Material), "Erro ao excluir o material."));
                 return request.Resultado;
             }
@@ -47,7 +38,7 @@ namespace Conteudo.Application.Commands.ExcluirMaterial
             {
                 foreach (var erro in request.Erros)
                 {
-                    await _mediatorHandler.PublicarNotificacaoDominio(
+                    await mediatorHandler.PublicarNotificacaoDominio(
                         new DomainNotificacaoRaiz(request.RaizAgregacao, nameof(Material), erro));
                 }
                 return false;
@@ -55,7 +46,7 @@ namespace Conteudo.Application.Commands.ExcluirMaterial
 
             if (material == null)
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(request.RaizAgregacao, nameof(Material), "Material não encontrado."));
                 return false;
             }

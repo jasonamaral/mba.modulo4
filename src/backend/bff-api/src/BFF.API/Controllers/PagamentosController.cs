@@ -19,25 +19,13 @@ namespace BFF.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class PagamentosController : BffController
+    public class PagamentosController(IMediatorHandler mediator,
+                                INotificationHandler<DomainNotificacaoRaiz> notifications,
+                                INotificador notificador,
+                                ILogger<PagamentosController> logger,
+                                IPagamentoService pagamentoService,
+                                IConteudoService conteudoService) : BffController(mediator, notifications, notificador)
     {
-        private readonly IPagamentoService _pagamentoService;
-        private readonly IConteudoService _conteudoService;
-
-        private readonly ILogger<PagamentosController> _logger;
-
-        public PagamentosController(IMediatorHandler mediator,
-                                    INotificationHandler<DomainNotificacaoRaiz> notifications,
-                                    INotificador notificador,
-                                    ILogger<PagamentosController> logger,
-                                    IPagamentoService pagamentoService,
-                                    IConteudoService conteudoService) : base(mediator, notifications, notificador)
-        {
-            _conteudoService = conteudoService;
-            _pagamentoService = pagamentoService;
-            _logger = logger;
-        }
-
         /// <summary>
         /// Registra um novo pagamento de curso.
         /// </summary>
@@ -60,7 +48,7 @@ namespace BFF.API.Controllers
 
             try
             {
-                var cursoResp = await _conteudoService.ObterCursoPorIdAsync(pagamento.CursoId, false);
+                var cursoResp = await conteudoService.ObterCursoPorIdAsync(pagamento.CursoId, false);
 
                 if (cursoResp?.Status == (int)HttpStatusCode.OK)
                 {
@@ -74,7 +62,7 @@ namespace BFF.API.Controllers
                     return RespostaPadraoApi(HttpStatusCode.NotFound, "Curso não encontrado.");
                 }
 
-                var resultado = await _pagamentoService.ExecutarPagamento(pagamento);
+                var resultado = await pagamentoService.ExecutarPagamento(pagamento);
 
                 if (resultado?.Status == (int)HttpStatusCode.OK)
                 {
@@ -85,7 +73,7 @@ namespace BFF.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao processar pagamento via BFF");
+                logger.LogError(ex, "Erro ao processar pagamento via BFF");
                 return ProcessarErro(HttpStatusCode.InternalServerError, "Erro interno do servidor");
             }
         }
@@ -106,12 +94,12 @@ namespace BFF.API.Controllers
         {
             try
             {
-                var pagamentos = await _pagamentoService.ObterTodos();
+                var pagamentos = await pagamentoService.ObterTodos();
                 return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao obter pagamentos via BFF");
+                logger.LogError(ex, "Erro ao obter pagamentos via BFF");
                 return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao obter pagamentos via BFF");
             }
         }
@@ -135,12 +123,12 @@ namespace BFF.API.Controllers
         {
             try
             {
-                var pagamentos = await _pagamentoService.ObterPorIdPagamento(id);
+                var pagamentos = await pagamentoService.ObterPorIdPagamento(id);
                 return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao obter pagamentos via BFF");
+                logger.LogError(ex, "Erro ao obter pagamentos via BFF");
                 return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro ao obter pagamentos via BFF");
             }
         }

@@ -24,7 +24,6 @@ public partial class AlunoController(IMediatorHandler mediator,
     INotificationHandler<DomainNotificacaoRaiz> notifications,
     INotificador notificador) : MainController(mediator, notifications, notificador)
 {
-    private readonly IAlunoQueryService _alunoQueryService = alunoQueryService;
 
     /// <summary>
     /// Realiza a matrícula do aluno em um curso
@@ -64,7 +63,7 @@ public partial class AlunoController(IMediatorHandler mediator,
         if (!ModelState.IsValid) { return RespostaPadraoApi<CommandResult>(ModelState); }
         if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
 
-        var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
+        var matriculaCurso = await alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
         if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
 
         var comando = new RegistrarHistoricoAprendizadoCommand(dto.AlunoId,
@@ -96,7 +95,7 @@ public partial class AlunoController(IMediatorHandler mediator,
         if (alunoId != dto.AlunoId) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do aluno não confere"); }
         if (dto.CursoDto == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Curso desta matrícula não encontrada"); }
 
-        var matriculaCurso = await _alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
+        var matriculaCurso = await alunoQueryService.ObterInformacaoMatriculaCursoAsync(dto.MatriculaCursoId);
         if (matriculaCurso == null) { return RespostaPadraoApi(HttpStatusCode.BadRequest, "Matrícula não encontrada"); }
 
         var comando = new ConcluirCursoCommand(dto.AlunoId, dto.MatriculaCursoId, dto.CursoDto);

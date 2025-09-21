@@ -8,21 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Alunos.Infrastructure.Services;
 
-public class RegistroAlunoIntegrationHandler : BackgroundService
+public class RegistroAlunoIntegrationHandler(
+    IServiceProvider serviceProvider,
+    IMessageBus bus,
+    ILogger<RegistroAlunoIntegrationHandler> logger) : BackgroundService
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IMessageBus _bus;
-    private readonly ILogger<RegistroAlunoIntegrationHandler> _logger;
-
-    public RegistroAlunoIntegrationHandler(
-        IServiceProvider serviceProvider,
-        IMessageBus bus,
-        ILogger<RegistroAlunoIntegrationHandler> logger)
-    {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _bus = bus ?? throw new ArgumentNullException(nameof(bus));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    private readonly IMessageBus _bus = bus ?? throw new ArgumentNullException(nameof(bus));
+    private readonly ILogger<RegistroAlunoIntegrationHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
