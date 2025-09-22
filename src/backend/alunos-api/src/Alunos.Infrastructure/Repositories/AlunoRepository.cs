@@ -24,21 +24,31 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
         await Task.CompletedTask;
     }
 
-    public async Task<Aluno> ObterPorIdAsync(Guid alunoId)
+    public async Task<Aluno> ObterPorIdAsync(Guid alunoId, bool noTracked = true)
     {
-        return await _context.Alunos
+        var query = _context.Alunos.AsQueryable();
+
+        if (noTracked)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query
             .Include(a => a.MatriculasCursos)
             .ThenInclude(m => m.Certificado)
-            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.CodigoUsuarioAutenticacao == alunoId);
     }
 
-    public async Task<Aluno> ObterPorEmailAsync(string email)
+    public async Task<Aluno> ObterPorEmailAsync(string email, bool noTracked = true)
     {
-        return await _context.Alunos
-            .Include(a => a.MatriculasCursos)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Email == email);
+        var query = _context.Alunos.AsQueryable(); 
+
+        if (noTracked)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query.Include(a => a.MatriculasCursos).FirstOrDefaultAsync(a => a.Email == email);
     }
 
     //public async Task<bool> ExisteEmailAsync(string email)
@@ -46,12 +56,18 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
     //    return await _context.Alunos.AnyAsync(a => a.Email == email);
     //}
 
-    public async Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario)
+    public async Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario, bool noTracked = true)
     {
-        return await _context.Alunos
+        var query = _context.Alunos.AsQueryable();
+
+        if (noTracked)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query
             .Include(a => a.MatriculasCursos)
             .ThenInclude(m => m.Certificado)
-            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.CodigoUsuarioAutenticacao == codigoUsuario);
     }
 
@@ -65,12 +81,18 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
         await _context.Certificados.AddAsync(certificado);
     }
 
-    public async Task<MatriculaCurso?> ObterMatriculaPorIdAsync(Guid matriculaId)
+    public async Task<MatriculaCurso?> ObterMatriculaPorIdAsync(Guid matriculaId, bool noTracked = true)
     {
-        return await _context.MatriculasCursos
+        var query = _context.MatriculasCursos.AsQueryable();
+
+        if (noTracked)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query
             .Include(m => m.HistoricoAprendizado)
             .Include(m => m.Certificado)
-            .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == matriculaId);
     }
 

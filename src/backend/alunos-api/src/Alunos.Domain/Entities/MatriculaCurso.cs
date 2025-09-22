@@ -98,7 +98,7 @@ public class MatriculaCurso : Entidade
     internal void ConcluirCurso()
     {
         if (EstadoMatricula == EstadoMatriculaCurso.Abandonado) { throw new DomainException("Não é possível concluir um curso com estado de pagamento abandonado"); }
-        if (!PodeConcluirCurso()) { throw new DomainException("Não é possível concluir o curso, existem aulas não finalizadas"); }
+        if (EstadoMatricula != EstadoMatriculaCurso.Concluido && !PodeConcluirCurso()) { throw new DomainException("Não é possível concluir o curso, existem aulas não finalizadas"); }
         if (MatriculaCursoConcluido()) { throw new DomainException("Curso já foi concluído"); }
 
         var dataAtual = DateTime.Now;
