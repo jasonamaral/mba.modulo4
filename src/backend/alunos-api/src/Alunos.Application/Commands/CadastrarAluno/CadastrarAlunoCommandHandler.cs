@@ -10,8 +10,6 @@ namespace Alunos.Application.Commands.CadastrarAluno;
 
 public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMediatorHandler mediatorHandler) : IRequestHandler<CadastrarAlunoCommand, CommandResult>
 {
-    private readonly IAlunoRepository _alunoRepository = alunoRepository;
-    private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
     private Guid _raizAgregacao;
 
     public async Task<CommandResult> Handle(CadastrarAlunoCommand request, CancellationToken cancellationToken)
@@ -34,8 +32,8 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
 
             aluno.DefinirId(request.Id);
             aluno.AtivarAluno();
-            await _alunoRepository.AdicionarAsync(aluno);
-            if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = aluno.Id; }
+            await alunoRepository.AdicionarAsync(aluno);
+            if (await alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = aluno.Id; }
 
             return request.Resultado;
         }
@@ -53,22 +51,22 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
         {
             foreach (var erro in request.Erros)
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aluno), erro));
+                await mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aluno), erro));
             }
             return false;
         }
 
-        var alunoExistente = await _alunoRepository.ObterPorIdAsync(request.Id);
+        var alunoExistente = await alunoRepository.ObterPorIdAsync(request.Id);
         if (alunoExistente != null)
         {
-            await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aluno), "Já existe um aluno cadastrado com este código."));
+            await mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aluno), "Já existe um aluno cadastrado com este código."));
             return false;
         }
 
-        alunoExistente = await _alunoRepository.ObterPorEmailAsync(request.Email);
+        alunoExistente = await alunoRepository.ObterPorEmailAsync(request.Email);
         if (alunoExistente != null)
         {
-            await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aluno), "Já existe um aluno cadastrado com este email."));
+            await mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aluno), "Já existe um aluno cadastrado com este email."));
             return false;
         }
 

@@ -8,17 +8,9 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.DespublicarAula
 {
-    public class DespublicarAulaCommandHandler : IRequestHandler<DespublicarAulaCommand, CommandResult>
+    public class DespublicarAulaCommandHandler(IAulaRepository aulaRepository, IMediatorHandler mediatorHandler) : IRequestHandler<DespublicarAulaCommand, CommandResult>
     {
-        private readonly IAulaRepository _aulaRepository;
-        private readonly IMediatorHandler _mediatorHandler;
         private Guid _raizAgregacao;
-
-        public DespublicarAulaCommandHandler(IAulaRepository aulaRepository, IMediatorHandler mediatorHandler)
-        {
-            _aulaRepository = aulaRepository;
-            _mediatorHandler = mediatorHandler;
-        }
 
         public async Task<CommandResult> Handle(DespublicarAulaCommand request, CancellationToken cancellationToken)
         {
@@ -29,9 +21,9 @@ namespace Conteudo.Application.Commands.DespublicarAula
                 if (!await ValidarRequisicao(request))
                     return request.Resultado;
 
-                await _aulaRepository.DespublicarAulaAsync(request.CursoId, request.Id);
+                await aulaRepository.DespublicarAulaAsync(request.CursoId, request.Id);
 
-                if (await _aulaRepository.UnitOfWork.Commit())
+                if (await aulaRepository.UnitOfWork.Commit())
                 {
                     request.Resultado.Data = request.Id;
                 }
@@ -47,10 +39,10 @@ namespace Conteudo.Application.Commands.DespublicarAula
 
         private async Task<bool> ValidarRequisicao(DespublicarAulaCommand request)
         {
-            var aula = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
+            var aula = await aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
             if (aula == null)
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), "Aula não encontrada"));
                 return false;
             }

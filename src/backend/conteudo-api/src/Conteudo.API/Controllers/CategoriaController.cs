@@ -1,4 +1,4 @@
-﻿using Conteudo.Application.Commands.AtualizarCategoria;
+using Conteudo.Application.Commands.AtualizarCategoria;
 using Conteudo.Application.Commands.CadastrarCategoria;
 using Conteudo.Application.DTOs;
 using Conteudo.Application.Interfaces.Services;
@@ -26,9 +26,6 @@ public class CategoriaController(IMediatorHandler mediator
                               , INotificationHandler<DomainNotificacaoRaiz> notifications
                               , INotificador notificador) : MainController(mediator, notifications, notificador)
 {
-    private readonly IMediatorHandler _mediator = mediator;
-    private readonly ICategoriaAppService _categoriaAppService = categoriaAppService;
-
     /// <summary>
     /// Retorna uma categoria pelo ID.
     /// </summary>
@@ -39,7 +36,7 @@ public class CategoriaController(IMediatorHandler mediator
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterPorId(Guid id)
     {
-        var categoria = await _categoriaAppService.ObterPorIdAsync(id);
+        var categoria = await categoriaAppService.ObterPorIdAsync(id);
 
         if (categoria == null)
         {
@@ -59,7 +56,7 @@ public class CategoriaController(IMediatorHandler mediator
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterTodos()
     {
-        var categorias = await _categoriaAppService.ObterTodasCategoriasAsync();
+        var categorias = await categoriaAppService.ObterTodasCategoriasAsync();
         return RespostaPadraoApi(data: categorias);
     }
 
@@ -74,7 +71,7 @@ public class CategoriaController(IMediatorHandler mediator
     public async Task<IActionResult> CadastrarCategoria([FromBody] CadastroCategoriaDto dto)
     {
         var command = dto.Adapt<CadastrarCategoriaCommand>();
-        return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.ExecutarComando(command));
+        return RespostaPadraoApi(HttpStatusCode.Created, await _mediatorHandler.ExecutarComando(command));
     }
 
     /// <summary>
@@ -92,6 +89,6 @@ public class CategoriaController(IMediatorHandler mediator
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da categoria não confere.");
 
         var command = dto.Adapt<AtualizarCategoriaCommand>();
-        return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
+        return RespostaPadraoApi<bool?>(await _mediatorHandler.ExecutarComando(command));
     }
 }

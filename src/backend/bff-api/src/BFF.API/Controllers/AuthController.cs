@@ -17,24 +17,15 @@ namespace BFF.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : BffController
+public class AuthController(
+    IApiClientService apiClient,
+    IOptions<ApiSettings> apiSettings,
+    ILogger<AuthController> logger,
+    IMediatorHandler mediator,
+    INotificationHandler<DomainNotificacaoRaiz> notifications,
+    INotificador notificador) : BffController(mediator, notifications, notificador)
 {
-    private readonly IApiClientService _apiClient;
-    private readonly ApiSettings _apiSettings;
-    private readonly ILogger<AuthController> _logger;
-
-    public AuthController(
-        IApiClientService apiClient,
-        IOptions<ApiSettings> apiSettings,
-        ILogger<AuthController> logger,
-        IMediatorHandler mediator,
-        INotificationHandler<DomainNotificacaoRaiz> notifications,
-        INotificador notificador) : base(mediator, notifications, notificador)
-    {
-        _apiClient = apiClient;
-        _apiSettings = apiSettings.Value;
-        _logger = logger;
-    }
+    private readonly ApiSettings _apiSettings = apiSettings.Value;
 
     /// <summary>
     /// Registrar novo usuário
@@ -49,8 +40,8 @@ public class AuthController : BffController
     {
         try
         {
-            _apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
-            var result = await _apiClient.PostAsyncWithActionResult<RegistroRequest, ResponseResult<AuthRegistroResponse>>(
+            apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
+            var result = await apiClient.PostAsyncWithActionResult<RegistroRequest, ResponseResult<AuthRegistroResponse>>(
                 "/api/auth/registro",
                 request,
                 "Usuário registrado com sucesso");
@@ -80,7 +71,7 @@ public class AuthController : BffController
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao processar registro via BFF para: {Email}", request.Email);
+            logger.LogError(ex, "Erro ao processar registro via BFF para: {Email}", request.Email);
             return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
@@ -98,8 +89,8 @@ public class AuthController : BffController
     {
         try
         {
-            _apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
-            var result = await _apiClient.PostAsyncWithActionResult<LoginRequest, ResponseResult<AuthLoginResponse>>(
+            apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
+            var result = await apiClient.PostAsyncWithActionResult<LoginRequest, ResponseResult<AuthLoginResponse>>(
                 "/api/auth/login",
                 request,
                 "Login realizado com sucesso");
@@ -129,7 +120,7 @@ public class AuthController : BffController
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao processar login via BFF para: {Email}", request.Email);
+            logger.LogError(ex, "Erro ao processar login via BFF para: {Email}", request.Email);
             return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }
@@ -147,8 +138,8 @@ public class AuthController : BffController
     {
         try
         {
-            _apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
-            var result = await _apiClient.PostAsyncWithActionResult<RefreshTokenRequest, ResponseResult<AuthRefreshTokenResponse>>("/api/auth/refresh-token", request, "Token renovado com sucesso");
+            apiClient.SetBaseAddress(_apiSettings.AuthApiUrl);
+            var result = await apiClient.PostAsyncWithActionResult<RefreshTokenRequest, ResponseResult<AuthRefreshTokenResponse>>("/api/auth/refresh-token", request, "Token renovado com sucesso");
 
             if (result.Success && result.Data != null)
             {
@@ -175,7 +166,7 @@ public class AuthController : BffController
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao processar refresh token via BFF");
+            logger.LogError(ex, "Erro ao processar refresh token via BFF");
             return ProcessarErro(System.Net.HttpStatusCode.InternalServerError, "Erro interno do servidor");
         }
     }

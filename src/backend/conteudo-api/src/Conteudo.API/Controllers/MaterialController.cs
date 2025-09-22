@@ -28,9 +28,6 @@ namespace Conteudo.API.Controllers
                                     INotificationHandler<DomainNotificacaoRaiz> notifications,
                                     INotificador notificador) : MainController(mediator, notifications, notificador)
     {
-        private readonly IMediatorHandler _mediator = mediator;
-        private readonly IMaterialAppService _materialAppService = materialAppService;
-
         /// <summary>
         /// Obtém um material por ID
         /// </summary>
@@ -43,7 +40,7 @@ namespace Conteudo.API.Controllers
         {
             try
             {
-                var material = await _materialAppService.ObterPorIdAsync(id);
+                var material = await materialAppService.ObterPorIdAsync(id);
 
                 if (material == null)
                 {
@@ -74,7 +71,7 @@ namespace Conteudo.API.Controllers
                 if (aulaId == Guid.Empty)
                     return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da aula inválido");
 
-                var materiais = await _materialAppService.ObterPorAulaIdAsync(aulaId);
+                var materiais = await materialAppService.ObterPorAulaIdAsync(aulaId);
                 return RespostaPadraoApi(data: materiais);
             }
             catch (Exception ex)
@@ -94,7 +91,7 @@ namespace Conteudo.API.Controllers
         {
             try
             {
-                var materiais = await _materialAppService.ObterAtivosAsync();
+                var materiais = await materialAppService.ObterAtivosAsync();
                 return RespostaPadraoApi(data: materiais);
             }
             catch (Exception ex)
@@ -118,7 +115,7 @@ namespace Conteudo.API.Controllers
                 if (aulaId == Guid.Empty)
                     return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da aula inválido");
 
-                var materiais = await _materialAppService.ObterAtivosPorAulaIdAsync(aulaId);
+                var materiais = await materialAppService.ObterAtivosPorAulaIdAsync(aulaId);
                 return RespostaPadraoApi(data: materiais);
             }
             catch (Exception ex)
@@ -142,7 +139,7 @@ namespace Conteudo.API.Controllers
                 if (aulaId == Guid.Empty)
                     return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID da aula inválido");
 
-                var materiais = await _materialAppService.ObterObrigatoriosPorAulaIdAsync(aulaId);
+                var materiais = await materialAppService.ObterObrigatoriosPorAulaIdAsync(aulaId);
                 return RespostaPadraoApi(data: materiais);
             }
             catch (Exception ex)
@@ -164,7 +161,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = dto.Adapt<CadastrarMaterialCommand>();
-                return RespostaPadraoApi(HttpStatusCode.Created, await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi(HttpStatusCode.Created, await _mediatorHandler.ExecutarComando(command));
             }
             catch (Exception ex)
             {
@@ -189,7 +186,7 @@ namespace Conteudo.API.Controllers
                     return RespostaPadraoApi(HttpStatusCode.BadRequest, "ID do material não confere");
 
                 var command = dto.Adapt<AtualizarMaterialCommand>();
-                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediatorHandler.ExecutarComando(command));
             }
             catch (Exception ex)
             {
@@ -210,7 +207,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = new ExcluirMaterialCommand(id);
-                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediatorHandler.ExecutarComando(command));
             }
             catch (Exception ex)
             {

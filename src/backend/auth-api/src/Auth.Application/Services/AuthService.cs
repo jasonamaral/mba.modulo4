@@ -5,7 +5,6 @@ using Auth.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NetDevPack.Security.Jwt.Core.Interfaces;
@@ -14,36 +13,17 @@ using System.Security.Claims;
 
 namespace Auth.Application.Services;
 
-public class AuthService
+public class AuthService(
+    UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
+    IAuthDbContext context,
+    IJwtService jwtService,
+    IHttpContextAccessor accessor,
+    IOptions<AppTokenSettings> appTokenSettingsSettings)
 {
-    public readonly UserManager<ApplicationUser> UserManager;
-    public readonly SignInManager<ApplicationUser> SignInManager;
-    private readonly IAuthDbContext _context;
-    private readonly ILogger<AuthService> _logger;
-    private readonly JwtSettings _jwtSettings;
-    private readonly IJwtService _jwtService;
-    private readonly IHttpContextAccessor _accessor;
-    private readonly AppTokenSettings _appTokenSettingsSettings;
-
-    public AuthService(
-        UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,
-        IAuthDbContext context,
-        ILogger<AuthService> logger,
-        IOptions<JwtSettings> jwtSettings,
-        IJwtService jwksService,
-        IHttpContextAccessor accessor,
-        IOptions<AppTokenSettings> appTokenSettingsSettings)
-    {
-        UserManager = userManager;
-        SignInManager = signInManager;
-        _context = context;
-        _logger = logger;
-        _jwtSettings = jwtSettings.Value;
-        _jwtService = jwksService;
-        _accessor = accessor;
-        _appTokenSettingsSettings = appTokenSettingsSettings.Value;
-    }
+    public readonly UserManager<ApplicationUser> UserManager = userManager;
+    public readonly SignInManager<ApplicationUser> SignInManager = signInManager;
+    private readonly AppTokenSettings _appTokenSettingsSettings = appTokenSettingsSettings.Value;
 
     public async Task<UsuarioRespostaLoginDto> GerarJwt(string email)
     {
@@ -60,7 +40,7 @@ public class AuthService
 
     public async Task<RefreshToken?> ObterRefreshToken(Guid refreshToken)
     {
-        var token = await _context.RefreshTokens.AsNoTracking()
+        var token = await context.RefreshTokens.AsNoTracking()
             .FirstOrDefaultAsync(u => u.Token == refreshToken);
 
         return token != null && token.ExpirationDate.ToLocalTime() > DateTime.Now ? token : null;
@@ -91,8 +71,8 @@ public class AuthService
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var currentIssuer =
-            $"{_accessor.HttpContext!.Request.Scheme}://{_accessor.HttpContext!.Request.Host}";
-        var key = await _jwtService.GetCurrentSigningCredentials();
+            $"{accessor.HttpContext!.Request.Scheme}://{accessor.HttpContext!.Request.Host}";
+        var key = await jwtService.GetCurrentSigningCredentials();
         var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
         {
             Issuer = currentIssuer,
@@ -132,10 +112,10 @@ public class AuthService
             ExpirationDate = DateTime.UtcNow.AddHours(_appTokenSettingsSettings.RefreshTokenExpiration)
         };
 
-        _context.RefreshTokens.RemoveRange(_context.RefreshTokens.Where(u => u.Username == email));
-        await _context.RefreshTokens.AddAsync(refreshToken);
+        context.RefreshTokens.RemoveRange(context.RefreshTokens.Where(u => u.Username == email));
+        await context.RefreshTokens.AddAsync(refreshToken);
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         return refreshToken;
     }

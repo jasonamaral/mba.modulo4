@@ -21,7 +21,7 @@ public partial class AlunoController
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ObterAlunoPorId(Guid id)
     {
-        var aluno = await _alunoQueryService.ObterAlunoPorIdAsync(id);
+        var aluno = await alunoQueryService.ObterAlunoPorIdAsync(id);
         if (aluno == null)
         {
             _notificador.AdicionarErro("Aluno não encontrado.");
@@ -43,7 +43,7 @@ public partial class AlunoController
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(Guid alunoId)
     {
-        var aluno = await _alunoQueryService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId);
+        var aluno = await alunoQueryService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(alunoId);
         if (aluno == null)
         {
             _notificador.AdicionarErro("Evolução da matricula do aluno não encontrado.");
@@ -68,7 +68,7 @@ public partial class AlunoController
         {
             var alunoId = User.GetUserId();
 
-            var matriculas = await _alunoQueryService.ObterMatriculasPorAlunoIdAsync(alunoId);
+            var matriculas = await alunoQueryService.ObterMatriculasPorAlunoIdAsync(alunoId);
             if (matriculas == null || !matriculas.Any())
             {
                 _notificador.AdicionarErro("Matrícula do aluno não encontrada.");
@@ -91,7 +91,7 @@ public partial class AlunoController
     public async Task<IActionResult> ObterMatriculaPorId(Guid matriculaId)
     {
         var alunoId = User.GetUserId();
-        var matricula = await _alunoQueryService.ObterMatriculaPorIdAsync(matriculaId, alunoId);
+        var matricula = await alunoQueryService.ObterMatriculaPorIdAsync(matriculaId, alunoId);
         if (matricula == null)
         {
             _notificador.AdicionarErro("Matrícula do aluno não encontrada.");
@@ -112,7 +112,7 @@ public partial class AlunoController
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ObterCertificadoPorMatriculaId(Guid matriculaId)
     {
-        var certificado = await _alunoQueryService.ObterCertificadoPorMatriculaIdAsync(matriculaId);
+        var certificado = await alunoQueryService.ObterCertificadoPorMatriculaIdAsync(matriculaId);
         if (certificado == null)
         {
             _notificador.AdicionarErro("Certificado não encontrado.");
@@ -134,7 +134,7 @@ public partial class AlunoController
     [ProducesResponseType(typeof(ResponseResult<string>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ObterAulasPorMatriculaId(Guid matriculaId)
     {
-        var aulas = await _alunoQueryService.ObterAulasPorMatriculaIdAsync(matriculaId);
+        var aulas = await alunoQueryService.ObterAulasPorMatriculaIdAsync(matriculaId);
         if (aulas == null)
         {
             _notificador.AdicionarErro("Aulas não encontradas não encontrado.");
@@ -158,7 +158,7 @@ public partial class AlunoController
     {
         try
         {
-            var certificados = await _alunoQueryService.ObterCertificadosPorAlunoIdAsync(alunoId);
+            var certificados = await alunoQueryService.ObterCertificadosPorAlunoIdAsync(alunoId);
             if (certificados == null || !certificados.Any())
             {
                 _notificador.AdicionarErro("Nenhum certificado encontrado para o aluno.");

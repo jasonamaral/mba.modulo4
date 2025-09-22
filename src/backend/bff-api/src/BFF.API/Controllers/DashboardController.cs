@@ -1,6 +1,5 @@
 using BFF.API.Extensions;
 using BFF.API.Services.Aluno;
-using BFF.API.Services.Conteudos;
 using BFF.Application.Interfaces.Services;
 using BFF.Domain.DTOs;
 using Core.Mediator;
@@ -18,28 +17,13 @@ namespace BFF.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class DashboardController : BffController
+public class DashboardController(
+    IDashboardService dashboardService,
+    IMediatorHandler mediator,
+    INotificationHandler<DomainNotificacaoRaiz> notifications,
+    INotificador notificador,
+    IAlunoService alunoService) : BffController(mediator, notifications, notificador)
 {
-    private readonly IDashboardService _dashboardService;
-    private readonly ILogger<DashboardController> _logger;
-    private readonly IAlunoService _alunoService;
-    private readonly IConteudoService _conteudoService;
-
-    public DashboardController(
-        IDashboardService dashboardService,
-        ILogger<DashboardController> logger,
-        IMediatorHandler mediator,
-        INotificationHandler<DomainNotificacaoRaiz> notifications,
-        INotificador notificador,
-        IAlunoService alunoService,
-        IConteudoService conteudoService) : base(mediator, notifications, notificador)
-    {
-        _dashboardService = dashboardService;
-        _logger = logger;
-        _alunoService = alunoService;
-        _conteudoService = conteudoService;
-    }
-
     /// <summary>
     /// Obter dashboard do aluno
     /// </summary>
@@ -54,8 +38,8 @@ public class DashboardController : BffController
             return ProcessarErro(System.Net.HttpStatusCode.Unauthorized, "Token inválido");
         }
 
-        var matriculasTask = _alunoService.ObterMatriculasPorAlunoIdAsync(userId);
-        var evolucaoTask = _alunoService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(userId);
+        var matriculasTask = alunoService.ObterMatriculasPorAlunoIdAsync(userId);
+        var evolucaoTask = alunoService.ObterEvolucaoMatriculasCursoDoAlunoPorIdAsync(userId);
 
         await Task.WhenAll(matriculasTask, evolucaoTask);
 
@@ -100,7 +84,7 @@ public class DashboardController : BffController
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> GetDashboardAdmin()
     {
-        var dashboard = await _dashboardService.GetDashboardAdminAsync();
+        var dashboard = await dashboardService.GetDashboardAdminAsync();
 
         if (dashboard != null)
         {

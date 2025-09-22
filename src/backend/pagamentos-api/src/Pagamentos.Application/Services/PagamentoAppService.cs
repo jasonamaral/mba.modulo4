@@ -5,31 +5,24 @@ using Pagamentos.Domain.Interfaces;
 
 namespace Pagamentos.Application.Services
 {
-    public class PagamentoAppService : IPagamentoConsultaAppService, IPagamentoComandoAppService
+    public class PagamentoAppService(IPagamentoRepository pagamentoRepository) : IPagamentoConsultaAppService, IPagamentoComandoAppService
     {
-        private readonly IPagamentoRepository _pagamentoRepository;
-
-        public PagamentoAppService(IPagamentoRepository pagamentoRepository)
-        {
-            _pagamentoRepository = pagamentoRepository;
-        }
-
         public async Task<PagamentoViewModel> ObterPorId(Guid id)
         {
-            var pagamento = await _pagamentoRepository.ObterPorId(id);
+            var pagamento = await pagamentoRepository.ObterPorId(id);
             return pagamento.Adapt<PagamentoViewModel>();
         }
 
         public async Task<IEnumerable<PagamentoViewModel>> ObterTodos()
         {
-            var pagamentos = await _pagamentoRepository.ObterTodos();
+            var pagamentos = await pagamentoRepository.ObterTodos();
 
             return pagamentos.Adapt<IEnumerable<PagamentoViewModel>>();
         }
 
         public void Dispose()
         {
-            _pagamentoRepository?.Dispose();
+            pagamentoRepository?.Dispose();
         }
     }
 }

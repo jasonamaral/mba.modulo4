@@ -11,8 +11,6 @@ namespace Alunos.Application.Commands.ConcluirCurso;
 public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<ConcluirCursoCommand, CommandResult>
 {
-    private readonly IAlunoRepository _alunoRepository = alunoRepository;
-    private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
     private Guid _raizAgregacao;
 
     public async Task<CommandResult> Handle(ConcluirCursoCommand request, CancellationToken cancellationToken)
@@ -26,8 +24,8 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
 
         aluno.ConcluirCurso(request.MatriculaCursoId);
 
-        await _alunoRepository.AtualizarAsync(aluno);
-        if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
+        await alunoRepository.AtualizarAsync(aluno);
+        if (await alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
 
         return request.Resultado;
     }
@@ -39,7 +37,7 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
         {
             foreach (var erro in request.Erros)
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), erro)).GetAwaiter().GetResult();
+                mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), erro)).GetAwaiter().GetResult();
             }
             return false;
         }
@@ -49,10 +47,10 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
 
     private bool ObterAluno(Guid alunoId, out Domain.Entities.Aluno aluno)
     {
-        aluno = _alunoRepository.ObterPorIdAsync(alunoId).Result;
+        aluno = alunoRepository.ObterPorIdAsync(alunoId).Result;
         if (aluno == null)
         {
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
+            mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
             return false;
         }
 
@@ -66,7 +64,7 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
         if (quantidadeAulasPendentes > 0)
         {
             retorno = false;
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), $"Existe(m) {quantidadeAulasPendentes} aula(s) pendente(s) para este curso")).GetAwaiter().GetResult();
+            mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), $"Existe(m) {quantidadeAulasPendentes} aula(s) pendente(s) para este curso")).GetAwaiter().GetResult();
         }
 
         int totalAulasAtivos = cursoDto.Aulas.Count();
@@ -74,7 +72,7 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
         if (totalAulasMatricula < totalAulasAtivos)
         {
             retorno = false;
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), $"Curso não pode ser concluído. Exist(m) {totalAulasAtivos - totalAulasMatricula} aula(s) não iniciada(s)")).GetAwaiter().GetResult();
+            mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), $"Curso não pode ser concluído. Exist(m) {totalAulasAtivos - totalAulasMatricula} aula(s) não iniciada(s)")).GetAwaiter().GetResult();
         }
 
         return retorno;

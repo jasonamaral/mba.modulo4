@@ -9,17 +9,12 @@ using System.Text.Json;
 
 namespace BFF.API.Services.Pagamentos
 {
-    public class PagamentoService : BaseApiService, IPagamentoService
+    public class PagamentoService(IOptions<ApiSettings> apiSettings,
+                            IApiClientService apiClient,
+                            ILogger<PagamentoService> logger) : BaseApiService(apiClient, logger), IPagamentoService
     {
-        private readonly ApiSettings _apiSettings;
+        private readonly ApiSettings _apiSettings = apiSettings?.Value ?? throw new ArgumentNullException(nameof(apiSettings));
         private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-
-        public PagamentoService(IOptions<ApiSettings> apiSettings,
-                                IApiClientService apiClient,
-                                ILogger<PagamentoService> logger) : base(apiClient, logger)
-        {
-            _apiSettings = apiSettings?.Value ?? throw new ArgumentNullException(nameof(apiSettings));
-        }
 
         public async Task<ResponseResult<bool>> ExecutarPagamento(PagamentoCursoInputModel pagamentoCursoInputModel)
         {

@@ -19,18 +19,11 @@ namespace BFF.API.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public class ConteudosController : BffController
+public class ConteudosController(IMediatorHandler mediator,
+                         INotificationHandler<DomainNotificacaoRaiz> notifications,
+                         INotificador notificador,
+                         IConteudoService conteudoService) : BffController(mediator, notifications, notificador)
 {
-    private readonly IConteudoService _conteudoService;
-
-    public ConteudosController(IMediatorHandler mediator,
-                             INotificationHandler<DomainNotificacaoRaiz> notifications,
-                             INotificador notificador,
-                             IConteudoService conteudoService) : base(mediator, notifications, notificador)
-    {
-        _conteudoService = conteudoService;
-    }
-
     /// <summary>
     /// Obtém um curso por ID
     /// </summary>
@@ -49,7 +42,7 @@ public class ConteudosController : BffController
             return ProcessarErro(HttpStatusCode.BadRequest, "Id do curso inválido.");
         }
 
-        var resultado = await _conteudoService.ObterCursoPorIdAsync(cursoId, includeAulas);
+        var resultado = await conteudoService.ObterCursoPorIdAsync(cursoId, includeAulas);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -70,7 +63,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterTodosCursos([FromQuery] CursoFilter filter)
     {
-        var resultado = await _conteudoService.ObterTodosCursosAsync(filter);
+        var resultado = await conteudoService.ObterTodosCursosAsync(filter);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
         {
@@ -92,7 +85,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterCursosPorCategoria([FromRoute] Guid categoriaId, [FromQuery] bool includeAulas = false)
     {
-        var resultado = await _conteudoService.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
+        var resultado = await conteudoService.ObterPorCategoriaIdAsync(categoriaId, includeAulas);
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
@@ -111,7 +104,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterTodasCategorias()
     {
-        var resultado = await _conteudoService.ObterTodasCategoriasAsync();
+        var resultado = await conteudoService.ObterTodasCategoriasAsync();
 
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
@@ -129,7 +122,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AdicionarCurso([FromBody] CursoCriarRequest curso)
     {
-        var response = await _conteudoService.AdicionarCursoAsync(curso);
+        var response = await conteudoService.AdicionarCursoAsync(curso);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
@@ -147,7 +140,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AtualizarCurso(Guid cursoId, [FromBody] AtualizarCursoRequest curso)
     {
-        var response = await _conteudoService.AtualizarCursoAsync(cursoId, curso);
+        var response = await conteudoService.AtualizarCursoAsync(cursoId, curso);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
@@ -165,7 +158,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ExcluirCurso(Guid cursoId)
     {
-        var response = await _conteudoService.ExcluirCursoAsync(cursoId);
+        var response = await conteudoService.ExcluirCursoAsync(cursoId);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
@@ -183,7 +176,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterAulasPorCursoId([FromRoute] Guid cursoId)
     {
-        var resultado = await _conteudoService.ObterCursoPorIdAsync(cursoId, true);
+        var resultado = await conteudoService.ObterCursoPorIdAsync(cursoId, true);
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
         return BadRequest(resultado);
@@ -199,7 +192,7 @@ public class ConteudosController : BffController
     [Authorize(Roles = "Usuario, Administrador")]
     public async Task<IActionResult> ObterConteudoProgramaticoPorCursoId([FromRoute] Guid cursoId)
     {
-        var resultado = await _conteudoService.ObterConteudoProgramaticoPorCursoIdAsync(cursoId);
+        var resultado = await conteudoService.ObterConteudoProgramaticoPorCursoIdAsync(cursoId);
         if (resultado?.Status == (int)HttpStatusCode.OK)
             return Ok(resultado);
         return BadRequest(resultado);
@@ -215,7 +208,7 @@ public class ConteudosController : BffController
     public async Task<IActionResult> AdicionarAula([FromRoute] Guid cursoId,
                                                     [FromBody] AulaCriarRequest request)
     {
-        var response = await _conteudoService.AdicionarAulaAsync(cursoId, request);
+        var response = await conteudoService.AdicionarAulaAsync(cursoId, request);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
@@ -238,7 +231,7 @@ public class ConteudosController : BffController
         if (aulaId != request.Id)
             return ProcessarErro(HttpStatusCode.BadRequest, "ID da aula na rota não confere com o corpo.");
 
-        var response = await _conteudoService.AtualizarAulaAsync(cursoId, request);
+        var response = await conteudoService.AtualizarAulaAsync(cursoId, request);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);
@@ -257,7 +250,7 @@ public class ConteudosController : BffController
         [FromRoute] Guid cursoId,
         [FromRoute] Guid aulaId)
     {
-        var response = await _conteudoService.ExcluirAulaAsync(cursoId, aulaId);
+        var response = await conteudoService.ExcluirAulaAsync(cursoId, aulaId);
 
         if (response?.Status == (int)HttpStatusCode.BadRequest)
             return BadRequest(response);

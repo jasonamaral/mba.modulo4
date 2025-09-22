@@ -25,9 +25,6 @@ public class AuthController(IMediatorHandler mediator
                                   , AuthService authService
                                   , INotificationHandler<DomainNotificacaoRaiz> notifications, IMessageBus bus, INotificador notificador) : MainController(mediator, notifications, notificador)
 {
-    private readonly AuthService _authService = authService;
-    private readonly IMessageBus _bus = bus;
-    private new readonly INotificador _notificador = notificador;
 
     /// <summary>
     /// Registra um novo usuário no sistema
@@ -49,12 +46,12 @@ public class AuthController(IMediatorHandler mediator
             EmailConfirmed = true
         };
 
-        var result = await _authService.UserManager.CreateAsync(user, registroRequest.Senha);
+        var result = await authService.UserManager.CreateAsync(user, registroRequest.Senha);
 
         if (result.Succeeded)
         {
             var roleName = registroRequest.EhAdministrador ? "Administrador" : "Usuario";
-            await _authService.UserManager.AddToRoleAsync(user, roleName);
+            await authService.UserManager.AddToRoleAsync(user, roleName);
 
             if (!registroRequest.EhAdministrador)
             {
@@ -62,12 +59,12 @@ public class AuthController(IMediatorHandler mediator
 
                 if (!clienteResult.ValidationResult.IsValid)
                 {
-                    await _authService.UserManager.DeleteAsync(user);
+                    await authService.UserManager.DeleteAsync(user);
                     return RespostaPadraoApi(HttpStatusCode.BadRequest, clienteResult.ValidationResult);
                 }
             }
 
-            return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(registroRequest.Email));
+            return RespostaPadraoApi(HttpStatusCode.OK, await authService.GerarJwt(registroRequest.Email));
         }
 
         foreach (var error in result.Errors)
@@ -90,11 +87,11 @@ public class AuthController(IMediatorHandler mediator
     {
         if (!ModelState.IsValid) return RespostaPadraoApi(HttpStatusCode.BadRequest, ModelState);
 
-        var result = await _authService.SignInManager.PasswordSignInAsync(loginRequest.Email, loginRequest.Senha, false, true);
+        var result = await authService.SignInManager.PasswordSignInAsync(loginRequest.Email, loginRequest.Senha, false, true);
 
         if (result.Succeeded)
         {
-            return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(loginRequest.Email));
+            return RespostaPadraoApi(HttpStatusCode.OK, await authService.GerarJwt(loginRequest.Email));
         }
 
         if (result.IsLockedOut)
@@ -123,7 +120,7 @@ public class AuthController(IMediatorHandler mediator
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "Refresh Token inválido.");
         }
 
-        var token = await _authService.ObterRefreshToken(Guid.Parse(refreshToken));
+        var token = await authService.ObterRefreshToken(Guid.Parse(refreshToken));
 
         if (token is null)
         {
@@ -131,12 +128,12 @@ public class AuthController(IMediatorHandler mediator
             return RespostaPadraoApi(HttpStatusCode.BadRequest, "Refresh Token expirado");
         }
 
-        return RespostaPadraoApi(HttpStatusCode.OK, await _authService.GerarJwt(token.Username));
+        return RespostaPadraoApi(HttpStatusCode.OK, await authService.GerarJwt(token.Username));
     }
 
     private async Task<ResponseMessage> RegistrarAluno(RegistroRequest registroRequest)
     {
-        var usuario = await _authService.UserManager.FindByEmailAsync(registroRequest.Email);
+        var usuario = await authService.UserManager.FindByEmailAsync(registroRequest.Email);
 
         var usuarioRegistrado = new AlunoRegistradoIntegrationEvent(
              Guid.Parse(usuario!.Id),
@@ -154,7 +151,7 @@ public class AuthController(IMediatorHandler mediator
 
         try
         {
-            return await _bus.RequestAsync<AlunoRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
+            return await bus.RequestAsync<AlunoRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
         }
         catch (Exception ex)
         {

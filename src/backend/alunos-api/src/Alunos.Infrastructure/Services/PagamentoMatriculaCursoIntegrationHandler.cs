@@ -12,10 +12,6 @@ public class PagamentoMatriculaCursoIntegrationHandler(IServiceProvider serviceP
     IMessageBus bus,
     ILogger<PagamentoMatriculaCursoIntegrationHandler> logger) : BackgroundService
 {
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private readonly IMessageBus _bus = bus;
-    private readonly ILogger<PagamentoMatriculaCursoIntegrationHandler> _logger = logger;
-
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         SetResponder();
@@ -24,8 +20,8 @@ public class PagamentoMatriculaCursoIntegrationHandler(IServiceProvider serviceP
 
     private void SetResponder()
     {
-        _bus.RespondAsync<PagamentoMatriculaCursoIntegrationEvent, ResponseMessage>(async request => await ProcessarPagamentoMatriculaCurso(request));
-        _bus.AdvancedBus.Connected += OnConnect;
+        bus.RespondAsync<PagamentoMatriculaCursoIntegrationEvent, ResponseMessage>(async request => await ProcessarPagamentoMatriculaCurso(request));
+        bus.AdvancedBus.Connected += OnConnect;
     }
 
     private void OnConnect(object? s, EventArgs e)
@@ -37,14 +33,14 @@ public class PagamentoMatriculaCursoIntegrationHandler(IServiceProvider serviceP
     {
         try
         {
-            using var scope = _serviceProvider.CreateScope();
+            using var scope = serviceProvider.CreateScope();
             var integrationService = scope.ServiceProvider.GetRequiredService<IRegistroPagamentoIntegrationService>();
 
             return await integrationService.ProcessarPagamentoMatriculaCursoAsync(message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao processar evento de pagamento de matrícula-curso. Id Aluno: {AlunoId} Id Curso: {CursoId}", message.AlunoId, message.CursoId);
+            logger.LogError(ex, "Erro ao processar evento de pagamento de matrícula-curso. Id Aluno: {AlunoId} Id Curso: {CursoId}", message.AlunoId, message.CursoId);
             var validationResult = new FluentValidation.Results.ValidationResult();
             validationResult.Errors.Add(new FluentValidation.Results.ValidationFailure("Exception", ex.Message));
             return new ResponseMessage(validationResult);
@@ -53,7 +49,7 @@ public class PagamentoMatriculaCursoIntegrationHandler(IServiceProvider serviceP
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Parando consumidor de eventos PagamentoMatriculaCursoIntegrationHandler");
+        logger.LogInformation("Parando consumidor de eventos PagamentoMatriculaCursoIntegrationHandler");
         await base.StopAsync(cancellationToken);
     }
 
