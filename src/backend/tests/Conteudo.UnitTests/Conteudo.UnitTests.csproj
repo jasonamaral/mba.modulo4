@@ -5,6 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,9 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Conteudo.Domain\Conteudo.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Conteudo.Application\Conteudo.Application.csproj" />
-    <ProjectReference Include="..\..\src\Conteudo.API\Conteudo.API.csproj" />
+    <ProjectReference Include="..\..\conteudo-api\src\Conteudo.Domain\Conteudo.Domain.csproj" />
+    <ProjectReference Include="..\..\conteudo-api\src\Conteudo.Domain\Conteudo.Domain.csproj" />
+    <ProjectReference Include="..\..\conteudo-api\src\Conteudo.Application\Conteudo.Application.csproj" />
+    <ProjectReference Include="..\..\conteudo-api\src\Conteudo.API\Conteudo.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>

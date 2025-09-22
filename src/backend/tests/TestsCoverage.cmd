@@ -2,7 +2,7 @@
 cd..
 setlocal
 echo === Limpando relatórios antigos ===
-if exist .\coverage-report rmdir /s /q .\coverage-report
+if exist tests\coverage-report rmdir /s /q tests\coverage-report
 
 echo === Limpando testes antigos ===
 set "testesCaminho=.\TestResults"
@@ -13,8 +13,17 @@ for /d /r %testesCaminho% %%d in (TestResults) do (
     )
 )
 
+echo === Executando testes Conteudo.IntegrationTests ===
+dotnet test tests\Conteudo.IntegrationTests --collect:"XPlat Code Coverage"
+
 echo === Executando testes Conteudo.UnitTests ===
-dotnet test Conteudo.UnitTests\Conteudo.UnitTests --collect:"XPlat Code Coverage"
+dotnet test tests\Conteudo.UnitTests --collect:"XPlat Code Coverage"
+
+
+
+
+
+
 
 echo === Gerando Relatório de Cobertura ===
 reportgenerator -reports:tests\**\coverage.cobertura.xml -targetdir:tests\coverage-report -reporttypes:Html

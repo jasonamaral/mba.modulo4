@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BFF.API\BFF.API.csproj" />
-    <ProjectReference Include="..\..\..\building-blocks\core\Core.csproj" />
+    <ProjectReference Include="..\..\bff-api\src\BFF.API\BFF.API.csproj" />
+    <ProjectReference Include="..\..\building-blocks\core\Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

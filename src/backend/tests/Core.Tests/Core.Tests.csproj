@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\core\Core.csproj" />
-    <ProjectReference Include="..\..\MessageBus\MessageBus.csproj" />
+    <ProjectReference Include="..\..\building-blocks\core\Core.csproj" />
+    <ProjectReference Include="..\..\building-blocks\MessageBus\MessageBus.csproj" />
   </ItemGroup>
 
   <ItemGroup>

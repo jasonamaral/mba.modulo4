@@ -29,10 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Auth.API\Auth.API.csproj" />
-    <ProjectReference Include="..\..\src\Auth.Domain\Auth.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Auth.Application\Auth.Application.csproj" />
-    <ProjectReference Include="..\..\src\Auth.Infrastructure\Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\auth-api\src\Auth.API\Auth.API.csproj" />
+    <ProjectReference Include="..\..\auth-api\src\Auth.Application\Auth.Application.csproj" />
+    <ProjectReference Include="..\..\auth-api\src\Auth.Domain\Auth.Domain.csproj" />
+    <ProjectReference Include="..\..\auth-api\src\Auth.Infrastructure\Auth.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

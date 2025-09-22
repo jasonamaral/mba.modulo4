@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Alunos.Application\Alunos.Application.csproj" />
-    <ProjectReference Include="..\..\src\Alunos.Domain\Alunos.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Alunos.Infrastructure\Alunos.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\alunos-api\src\Alunos.Application\Alunos.Application.csproj" />
+    <ProjectReference Include="..\..\alunos-api\src\Alunos.Domain\Alunos.Domain.csproj" />
+    <ProjectReference Include="..\..\alunos-api\src\Alunos.Infrastructure\Alunos.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

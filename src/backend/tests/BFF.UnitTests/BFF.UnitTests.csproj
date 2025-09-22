@@ -30,9 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BFF.Application\BFF.Application.csproj" />
-    <ProjectReference Include="..\..\src\BFF.Domain\BFF.Domain.csproj" />
-    <ProjectReference Include="..\..\src\BFF.API\BFF.API.csproj" />
+    <ProjectReference Include="..\..\bff-api\src\BFF.API\BFF.API.csproj" />
+    <ProjectReference Include="..\..\bff-api\src\BFF.Application\BFF.Application.csproj" />
+    <ProjectReference Include="..\..\bff-api\src\BFF.Domain\BFF.Domain.csproj" />
   </ItemGroup>
 
 </Project>
