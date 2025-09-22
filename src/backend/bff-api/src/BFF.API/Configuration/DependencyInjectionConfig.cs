@@ -7,9 +7,11 @@ using Core.Messages;
 using Core.Notification;
 using Core.Utils;
 using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class DependencyInjectionConfig
 {
     public static void RegisterServices(this IServiceCollection services)

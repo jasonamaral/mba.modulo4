@@ -44,12 +44,11 @@ public class AlunosControllerIntegrationTests
         constructors.Should().HaveCount(1);
         var constructor = constructors.First();
         var parameters = constructor.GetParameters();
-        parameters.Should().HaveCount(5);
+        parameters.Should().HaveCount(4);
         parameters[0].ParameterType.Should().Be(typeof(IAlunoService));
-        parameters[1].ParameterType.Should().Be(typeof(ILogger<AlunosController>));
-        parameters[2].ParameterType.Should().Be(typeof(IMediatorHandler));
-        parameters[3].ParameterType.Should().Be(typeof(INotificationHandler<DomainNotificacaoRaiz>));
-        parameters[4].ParameterType.Should().Be(typeof(INotificador));
+        parameters[1].ParameterType.Should().Be(typeof(IMediatorHandler));
+        parameters[2].ParameterType.Should().Be(typeof(INotificationHandler<DomainNotificacaoRaiz>));
+        parameters[3].ParameterType.Should().Be(typeof(INotificador));
     }
 
     [Fact]

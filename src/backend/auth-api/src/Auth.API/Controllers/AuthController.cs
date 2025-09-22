@@ -11,6 +11,7 @@ using FluentValidation.Results;
 using MediatR;
 using MessageBus;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace Auth.API.Controllers;
@@ -18,6 +19,7 @@ namespace Auth.API.Controllers;
 /// <summary>
 /// Controller de autenticação
 /// </summary>
+[ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]

@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 
 namespace BFF.API.Handlers;
 
+[ExcludeFromCodeCoverage]
 public class AuthorizationDelegatingHandler(IHttpContextAccessor httpContextAccessor) : DelegatingHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

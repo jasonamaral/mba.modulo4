@@ -1,8 +1,10 @@
 using Microsoft.OpenApi.Models;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Auth.API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class SwaggerExtensions
 {
     public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)

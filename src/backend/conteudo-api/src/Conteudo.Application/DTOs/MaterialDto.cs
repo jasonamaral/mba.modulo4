@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Conteudo.Application.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class CadastroMaterialDto
 {
     [Required(ErrorMessage = "ID do curso é obrigatório")]
@@ -31,6 +33,7 @@ public class CadastroMaterialDto
     public int Ordem { get; set; } = 0;
 }
 
+[ExcludeFromCodeCoverage]
 public class AtualizarMaterialDto
 {
     [Required(ErrorMessage = "ID do curso é obrigatório")]

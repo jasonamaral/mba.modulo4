@@ -15,9 +15,11 @@ using Core.Mediator;
 using Core.Messages;
 using Core.Utils;
 using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Alunos.API.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class DependencyInjectionConfigutarion
 {
     public static void RegisterServices(this IServiceCollection services)

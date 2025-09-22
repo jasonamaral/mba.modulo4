@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Alunos.Application.DTOs.Request;
 
+[ExcludeFromCodeCoverage]
 public class MatriculaCursoRequest
 {
     [Required(ErrorMessage = "ID do aluno é obrigatório")]

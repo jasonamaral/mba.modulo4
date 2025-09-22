@@ -1,9 +1,11 @@
 using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Auth.API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class IdentityExtensions
 {
     public static IServiceCollection AddIdentityConfiguration(this IServiceCollection services)

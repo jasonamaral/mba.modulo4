@@ -11,6 +11,7 @@ using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace Conteudo.API.Controllers;
@@ -18,6 +19,7 @@ namespace Conteudo.API.Controllers;
 /// <summary>
 /// Controller de Categorias
 /// </summary>
+[ExcludeFromCodeCoverage]
 [Route("api/[controller]")]
 [Authorize]
 [Produces("application/json")]

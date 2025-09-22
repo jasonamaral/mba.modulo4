@@ -19,12 +19,14 @@ using Core.Mediator;
 using Core.Messages;
 using Core.Utils;
 using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Conteudo.API.Configuration;
 
 /// <summary>
 /// Configura injeção de dependências para a API de Conteúdo
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DependencyInjectionConfig
 {
     public static void RegisterServices(this IServiceCollection services)

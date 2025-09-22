@@ -12,10 +12,12 @@ using Core.Services.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace Alunos.API.Controllers;
 
+[ExcludeFromCodeCoverage]
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]

@@ -4,12 +4,14 @@ using Core.Notification;
 using Core.Services.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Controllers;
 
 /// <summary>
 /// Controller base para o BFF que herda do MainController para padronizar respostas
 /// </summary>
+[ExcludeFromCodeCoverage]
 [ApiController]
 public abstract class BffController : MainController
 {

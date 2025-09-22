@@ -1,9 +1,11 @@
 using Auth.API.Configuration;
 using Auth.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Auth.API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabaseConfiguration(

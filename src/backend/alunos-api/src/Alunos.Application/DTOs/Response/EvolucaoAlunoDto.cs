@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Alunos.Application.DTOs.Response;
 
+[ExcludeFromCodeCoverage]
 public class EvolucaoAlunoDto
 {
     public Guid Id { get; set; }

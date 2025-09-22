@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Pagamentos.Application.ViewModels;
 
+[ExcludeFromCodeCoverage]
 public class PagamentoCursoViewModel
 {
     [Required(ErrorMessage = "O Id do Matricula é obrigatório.")]

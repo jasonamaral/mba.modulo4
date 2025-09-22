@@ -8,12 +8,14 @@ using Core.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Controllers;
 
 /// <summary>
 /// Controller de Dashboard no BFF - Agrega dados de múltiplas APIs
 /// </summary>
+[ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]

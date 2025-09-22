@@ -1,23 +1,25 @@
-namespace Pagamentos.API.Configuration
+using System.Diagnostics.CodeAnalysis;
+
+namespace Pagamentos.API.Configuration;
+
+[ExcludeFromCodeCoverage]
+public static class CorsConfig
 {
-    public static class CorsConfig
+    public static WebApplicationBuilder AddCorsConfig(this WebApplicationBuilder builder)
     {
-        public static WebApplicationBuilder AddCorsConfig(this WebApplicationBuilder builder)
+        builder.Services.AddCors(options =>
         {
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("Development", builder =>
-                            builder.AllowAnyOrigin()
-                                   .AllowAnyMethod()
-                                   .AllowAnyHeader());
+            options.AddPolicy("Development", builder =>
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader());
 
-                options.AddPolicy("Production", builder =>
-                            builder.WithOrigins("https://localhost:9000")
-                                   .WithMethods("POST")
-                                   .AllowAnyHeader());
-            });
+            options.AddPolicy("Production", builder =>
+                        builder.WithOrigins("https://localhost:9000")
+                               .WithMethods("POST")
+                               .AllowAnyHeader());
+        });
 
-            return builder;
-        }
+        return builder;
     }
 }

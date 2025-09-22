@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Conteudo.Application.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class CadastroCursoDto
 {
     [Required(ErrorMessage = "Nome é obrigatório")]

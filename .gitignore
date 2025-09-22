@@ -6,3 +6,4 @@
 *.db-wal
 src/api_prototype1
 **/TestResults
+src/backend/tests/coverage-report

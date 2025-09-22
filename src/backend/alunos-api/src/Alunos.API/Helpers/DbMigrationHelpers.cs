@@ -1,9 +1,11 @@
 using Alunos.Domain.Entities;
 using Alunos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Alunos.API.Helpers;
 
+[ExcludeFromCodeCoverage]
 public static class DbMigrationHelpers
 {
     public static void UseDbMigrationHelper(this WebApplication app)

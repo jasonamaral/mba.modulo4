@@ -4,10 +4,12 @@ using Conteudo.Application.Commands.CadastrarCurso;
 using Conteudo.Application.Mappings;
 using Core.Identidade;
 using Mapster;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace Conteudo.API.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class ApiConfiguration
 {
     public static WebApplicationBuilder AddApiConfiguration(this WebApplicationBuilder builder)

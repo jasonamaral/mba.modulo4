@@ -3,10 +3,12 @@ using Alunos.API.Filters;
 using Alunos.Application.Commands.AtualizarPagamento;
 using Core.Identidade;
 using Mapster;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace Alunos.API.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class ApiConfiguration
 {
     public static WebApplicationBuilder AddApiConfiguration(this WebApplicationBuilder builder)
