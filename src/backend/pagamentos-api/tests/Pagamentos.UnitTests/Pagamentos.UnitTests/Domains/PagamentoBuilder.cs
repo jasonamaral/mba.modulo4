@@ -23,8 +23,8 @@ public class PagamentoBuilder
     public PagamentoBuilder ComExpiracao(string v) { _expiracaoCartao = v; return this; }
     public PagamentoBuilder ComCvv(string v) { _cvvCartao = v; return this; }
 
-    public Pagamento Build()
-        => new Pagamento
+    public Domain.Entities.Pagamento Build()
+        => new Domain.Entities.Pagamento
         {
             CobrancaCursoId = _cobrancaCursoId,
             AlunoId = _alunoId,

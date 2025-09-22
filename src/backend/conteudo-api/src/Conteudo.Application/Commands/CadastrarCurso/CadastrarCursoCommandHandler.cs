@@ -12,8 +12,6 @@ public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
                                         ICursoRepository cursoRepository,
                                         ICategoriaRepository categoriaRepository) : IRequestHandler<CadastrarCursoCommand, CommandResult>
 {
-    private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
-    private readonly ICursoRepository _cursoRepository = cursoRepository;
     private Guid _raizAgregacao;
 
     public async Task<CommandResult> Handle(CadastrarCursoCommand request, CancellationToken cancellationToken)
@@ -40,8 +38,8 @@ public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
                               request.ValidoAte,
                               request.CategoriaId);
 
-        await _cursoRepository.Adicionar(curso);
-        if (await _cursoRepository.UnitOfWork.Commit())
+        await cursoRepository.Adicionar(curso);
+        if (await cursoRepository.UnitOfWork.Commit())
             request.Resultado.Data = curso.Id;
         else
             request.Resultado.Data = Guid.Empty;
@@ -55,14 +53,14 @@ public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
         {
             foreach (var erro in request.Erros)
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), erro)).GetAwaiter().GetResult();
+                mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), erro)).GetAwaiter().GetResult();
             }
             return false;
         }
 
-        if (await _cursoRepository.ExistePorNomeAsync(request.Nome))
+        if (await cursoRepository.ExistePorNomeAsync(request.Nome))
         {
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Já existe um curso com este nome.")).GetAwaiter().GetResult();
+            mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Já existe um curso com este nome.")).GetAwaiter().GetResult();
             return false;
         }
 
@@ -71,7 +69,7 @@ public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
             var categoria = await categoriaRepository.ObterPorIdAsync((Guid)request.CategoriaId);
             if (categoria == null)
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Categoria não encontrada")).GetAwaiter().GetResult();
+                mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Curso), "Categoria não encontrada")).GetAwaiter().GetResult();
                 return false;
             }
         }

@@ -30,9 +30,6 @@ namespace Conteudo.API.Controllers
                                 INotificationHandler<DomainNotificacaoRaiz> notifications,
                                 INotificador notificador) : MainController(mediator, notifications, notificador)
     {
-        private readonly IMediatorHandler _mediator = mediator;
-        private readonly IAulaAppService _aulaAppService = aulaAppService;
-
         /// <summary>
         /// Obtém uma aula por ID
         /// </summary>
@@ -47,7 +44,7 @@ namespace Conteudo.API.Controllers
         {
             try
             {
-                var aula = await _aulaAppService.ObterPorIdAsync(cursoId, id, includeMateriais);
+                var aula = await aulaAppService.ObterPorIdAsync(cursoId, id, includeMateriais);
 
                 if (aula == null)
                 {
@@ -76,7 +73,7 @@ namespace Conteudo.API.Controllers
         {
             try
             {
-                var aulas = await _aulaAppService.ObterTodosAsync(cursoId, includeMateriais);
+                var aulas = await aulaAppService.ObterTodosAsync(cursoId, includeMateriais);
                 return RespostaPadraoApi(data: aulas);
             }
             catch (Exception ex)
@@ -97,7 +94,7 @@ namespace Conteudo.API.Controllers
         {
             try
             {
-                var aulas = await _aulaAppService.ObterPublicadasAsync(includeMateriais);
+                var aulas = await aulaAppService.ObterPublicadasAsync(includeMateriais);
                 return RespostaPadraoApi(data: aulas);
             }
             catch (Exception ex)
@@ -126,7 +123,7 @@ namespace Conteudo.API.Controllers
                 }
 
                 var command = dto.Adapt<CadastrarAulaCommand>();
-                return RespostaPadraoApi<Guid>(await _mediator.ExecutarComando(command), HttpStatusCode.Created);
+                return RespostaPadraoApi<Guid>(await _mediatorHandler.ExecutarComando(command), HttpStatusCode.Created);
             }
             catch (Exception ex)
             {
@@ -160,7 +157,7 @@ namespace Conteudo.API.Controllers
                 }
 
                 var command = dto.Adapt<AtualizarAulaCommand>();
-                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediatorHandler.ExecutarComando(command));
             }
             catch (Exception ex)
             {
@@ -182,7 +179,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = new ExcluirAulaCommand(cursoId, id);
-                return RespostaPadraoApi<bool>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool>(await _mediatorHandler.ExecutarComando(command));
             }
             catch (Exception ex)
             {
@@ -204,7 +201,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = new PublicarAulaCommand(cursoId, id);
-                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediatorHandler.ExecutarComando(command));
             }
             catch (Exception ex)
             {
@@ -226,7 +223,7 @@ namespace Conteudo.API.Controllers
             try
             {
                 var command = new DespublicarAulaCommand(cursoId, id);
-                return RespostaPadraoApi<bool?>(await _mediator.ExecutarComando(command));
+                return RespostaPadraoApi<bool?>(await _mediatorHandler.ExecutarComando(command));
             }
             catch (Exception ex)
             {

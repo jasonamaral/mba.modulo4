@@ -30,7 +30,8 @@ public class CadastrarAlunoCommand : CommandRaiz, IRequest<CommandResult>
         string cep,
         string foto)
     {
-        DefinirRaizAgregacao(Id);
+        DefinirRaizAgregacao(id);
+
         Id = id;
         Nome = nome;
         Email = email;

@@ -6,34 +6,25 @@ using Microsoft.Extensions.Options;
 
 namespace BFF.Infrastructure.Services;
 
-public class DashboardService : IDashboardService
+public class DashboardService(
+    ICacheService cacheService,
+    IOptions<CacheSettings> cacheOptions,
+    ILogger<DashboardService> logger) : IDashboardService
 {
-    private readonly ICacheService _cacheService;
-    private readonly CacheSettings _cacheSettings;
-    private readonly ILogger<DashboardService> _logger;
-
-    public DashboardService(
-        ICacheService cacheService,
-        IOptions<CacheSettings> cacheOptions,
-        ILogger<DashboardService> logger)
-    {
-        _cacheService = cacheService;
-        _cacheSettings = cacheOptions.Value;
-        _logger = logger;
-    }
+    private readonly CacheSettings _cacheSettings = cacheOptions.Value;
 
     public async Task<DashboardAdminDto> GetDashboardAdminAsync()
     {
         var cacheKey = "dashboard:admin";
 
-        var cachedData = await _cacheService.GetAsync<DashboardAdminDto>(cacheKey);
+        var cachedData = await cacheService.GetAsync<DashboardAdminDto>(cacheKey);
         if (cachedData != null)
         {
-            _logger.LogInformation("Dashboard do admin recuperado do cache");
+            logger.LogInformation("Dashboard do admin recuperado do cache");
             return cachedData;
         }
 
-        _logger.LogInformation("Carregando dashboard do admin dos microsserviços");
+        logger.LogInformation("Carregando dashboard do admin dos microsserviços");
 
         await Task.Delay(100);
 
@@ -123,9 +114,9 @@ public class DashboardService : IDashboardService
         };
 
         // Salva no cache usando a configuração específica para dashboard
-        await _cacheService.SetAsync(cacheKey, dashboardData, _cacheSettings.DashboardExpiration);
+        await cacheService.SetAsync(cacheKey, dashboardData, _cacheSettings.DashboardExpiration);
 
-        _logger.LogInformation("Dashboard do admin salvo no cache por {Minutes} minutos",
+        logger.LogInformation("Dashboard do admin salvo no cache por {Minutes} minutos",
             _cacheSettings.DashboardExpiration.TotalMinutes);
 
         return dashboardData;

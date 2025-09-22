@@ -8,25 +8,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Alunos.Infrastructure.Repositories;
 
-public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
+public class AlunoRepository(AlunoDbContext context) : IAlunoRepository
 {
-    public IUnitOfWork UnitOfWork => _context;
+    public IUnitOfWork UnitOfWork => context;
 
     public async Task AdicionarAsync(Aluno aluno)
     {
-        await _context.Alunos.AddAsync(aluno);
+        await context.Alunos.AddAsync(aluno);
     }
 
     public async Task AtualizarAsync(Aluno aluno)
     {
         aluno.AtualizarDataModificacao();
-        _context.Alunos.Update(aluno);
+        context.Alunos.Update(aluno);
         await Task.CompletedTask;
     }
 
     public async Task<Aluno> ObterPorIdAsync(Guid alunoId, bool noTracked = true)
     {
-        var query = _context.Alunos.AsQueryable();
+        var query = context.Alunos.AsQueryable();
 
         if (noTracked)
         {
@@ -41,7 +41,7 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
 
     public async Task<Aluno> ObterPorEmailAsync(string email, bool noTracked = true)
     {
-        var query = _context.Alunos.AsQueryable(); 
+        var query = context.Alunos.AsQueryable(); 
 
         if (noTracked)
         {
@@ -58,7 +58,7 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
 
     public async Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario, bool noTracked = true)
     {
-        var query = _context.Alunos.AsQueryable();
+        var query = context.Alunos.AsQueryable();
 
         if (noTracked)
         {
@@ -73,17 +73,17 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
 
     public async Task AdicionarMatriculaCursoAsync(MatriculaCurso matriculaCurso)
     {
-        await _context.MatriculasCursos.AddAsync(matriculaCurso);
+        await context.MatriculasCursos.AddAsync(matriculaCurso);
     }
 
     public async Task AdicionarCertificadoMatriculaCursoAsync(Certificado certificado)
     {
-        await _context.Certificados.AddAsync(certificado);
+        await context.Certificados.AddAsync(certificado);
     }
 
     public async Task<MatriculaCurso?> ObterMatriculaPorIdAsync(Guid matriculaId, bool noTracked = true)
     {
-        var query = _context.MatriculasCursos.AsQueryable();
+        var query = context.MatriculasCursos.AsQueryable();
 
         if (noTracked)
         {
@@ -105,7 +105,7 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
 
     public async Task AtualizarEstadoHistoricoAprendizadoAsync(HistoricoAprendizado historicoAntigo, HistoricoAprendizado historicoNovo)
     {
-        _context.AtualizarEstadoValueObject(historicoAntigo, historicoNovo);
+        context.AtualizarEstadoValueObject(historicoAntigo, historicoNovo);
         await Task.CompletedTask;
     }
 
@@ -118,7 +118,7 @@ public class AlunoRepository(AlunoDbContext _context) : IAlunoRepository
 
     public void Dispose()
     {
-        _context?.Dispose();
+        context?.Dispose();
         GC.SuppressFinalize(this);
     }
 }

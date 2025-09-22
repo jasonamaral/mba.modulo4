@@ -22,12 +22,12 @@ public class PagamentoRepositoryTests : IDisposable
     }
 
     // ------------ Helpers ------------
-    private static Pagamento NovoPagamento(
+    private static Domain.Entities.Pagamento NovoPagamento(
         Guid? cobrancaId = null,
         Guid? alunoId = null,
         string status = "Criado",
         decimal valor = 123.45m)
-    => new Pagamento
+    => new Domain.Entities.Pagamento
     {
         CobrancaCursoId = cobrancaId ?? Guid.NewGuid(),
         AlunoId = alunoId ?? Guid.NewGuid(),

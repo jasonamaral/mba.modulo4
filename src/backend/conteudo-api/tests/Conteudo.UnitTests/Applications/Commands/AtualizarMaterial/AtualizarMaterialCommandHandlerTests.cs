@@ -16,7 +16,7 @@ public class AtualizarMaterialCommandHandlerTests
     {
         _uow.Setup(u => u.Commit()).ReturnsAsync(true);
         _materiais.Setup(r => r.UnitOfWork).Returns(_uow.Object);
-        return new AtualizarMaterialCommandHandler(_materiais.Object, Mock.Of<IAulaRepository>(), _mediator.Object);
+        return new AtualizarMaterialCommandHandler(_materiais.Object, _mediator.Object);
     }
 
     private static Material MaterialExistente(Guid aulaId) =>

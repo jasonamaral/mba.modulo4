@@ -24,10 +24,6 @@ namespace Pagamentos.API.Controllers
                                       INotificationHandler<DomainNotificacaoRaiz> notifications,
                                       IMessageBus bus) : MainController(mediator, notifications, notificador)
     {
-        private readonly IMessageBus _bus = bus;
-        private readonly IMediatorHandler _mediator = mediator;
-        private readonly IPagamentoConsultaAppService _pagamentoConsultaAppService = pagamentoConsultaAppService;
-
         /// <summary>
         /// Executa o pagamento de um curso.
         /// </summary>
@@ -56,14 +52,14 @@ namespace Pagamentos.API.Controllers
                                                           pagamento.ExpiracaoCartao,
                                                           pagamento.CvvCartao);
 
-            await _mediator.PublicarEvento(eventoPagamento);
+            await _mediatorHandler.PublicarEvento(eventoPagamento);
 
             if (OperacaoValida())
             {
                 try
                 {
                     PagamentoMatriculaCursoIntegrationEvent pagamentoMatriculaCursoIntegrationEvent = new PagamentoMatriculaCursoIntegrationEvent(pagamento.AlunoId, pagamento.MatriculaId);
-                    await _bus.RequestAsync<PagamentoMatriculaCursoIntegrationEvent, ResponseMessage>(pagamentoMatriculaCursoIntegrationEvent);
+                    await bus.RequestAsync<PagamentoMatriculaCursoIntegrationEvent, ResponseMessage>(pagamentoMatriculaCursoIntegrationEvent);
                 }
                 catch (Exception ex)
                 {
@@ -88,7 +84,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<PagamentoViewModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult> ObterTodos()
         {
-            var pagamentos = await _pagamentoConsultaAppService.ObterTodos();
+            var pagamentos = await pagamentoConsultaAppService.ObterTodos();
             return RespostaPadraoApi(HttpStatusCode.OK, pagamentos);
         }
 
@@ -108,7 +104,7 @@ namespace Pagamentos.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> ObterPorId(Guid id)
         {
-            var pagamento = await _pagamentoConsultaAppService.ObterPorId(id);
+            var pagamento = await pagamentoConsultaAppService.ObterPorId(id);
             if (pagamento == null)
                 return NotFoundResponse("Pagamento não encontrado.");
 

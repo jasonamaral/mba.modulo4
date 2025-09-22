@@ -9,8 +9,6 @@ namespace Alunos.Application.Commands.AtualizarPagamento;
 public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRepository,
     IMediatorHandler mediatorHandler) : IRequestHandler<AtualizarPagamentoMatriculaCommand, CommandResult>
 {
-    private readonly IAlunoRepository _alunoRepository = alunoRepository;
-    private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
     private Guid _raizAgregacao;
 
     public async Task<CommandResult> Handle(AtualizarPagamentoMatriculaCommand request, CancellationToken cancellationToken)
@@ -21,8 +19,8 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
 
         aluno.AtualizarPagamentoMatricula(request.MatriculaCursoId);
 
-        await _alunoRepository.AtualizarAsync(aluno);
-        if (await _alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
+        await alunoRepository.AtualizarAsync(aluno);
+        if (await alunoRepository.UnitOfWork.Commit()) { request.Resultado.Data = true; }
 
         return request.Resultado;
     }
@@ -34,7 +32,7 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
         {
             foreach (var erro in request.Erros)
             {
-                _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), erro)).GetAwaiter().GetResult();
+                mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), erro)).GetAwaiter().GetResult();
             }
             return false;
         }
@@ -44,10 +42,10 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
 
     private bool ObterAluno(Guid alunoId, out Domain.Entities.Aluno aluno)
     {
-        aluno = _alunoRepository.ObterPorIdAsync(alunoId).Result;
+        aluno = alunoRepository.ObterPorIdAsync(alunoId).Result;
         if (aluno == null)
         {
-            _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
+            mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Domain.Entities.Aluno), "Aluno não encontrado.")).GetAwaiter().GetResult();
             return false;
         }
 

@@ -6,26 +6,17 @@ using Pagamentos.Domain.Models;
 
 namespace Pagamento.AntiCorruption.Services
 {
-    public class PagamentoCartaoCreditoFacade : IPagamentoCartaoCreditoFacade
+    public class PagamentoCartaoCreditoFacade(IPayPalGateway payPalGateway, IConfigurationManager configManager) : IPagamentoCartaoCreditoFacade
     {
-        private readonly IPayPalGateway _payPalGateway;
-        private readonly IConfigurationManager _configManager;
-
-        public PagamentoCartaoCreditoFacade(IPayPalGateway payPalGateway, IConfigurationManager configManager)
-        {
-            _payPalGateway = payPalGateway;
-            _configManager = configManager;
-        }
-
         public Transacao RealizarPagamento(CobrancaCurso cobrancaCurso, Pagamentos.Domain.Entities.Pagamento pagamento)
         {
-            var apiKey = _configManager.GetValue("apiKey");
-            var encriptionKey = _configManager.GetValue("encriptionKey");
+            var apiKey = configManager.GetValue("apiKey");
+            var encriptionKey = configManager.GetValue("encriptionKey");
 
-            var serviceKey = _payPalGateway.GetPayPalServiceKey(apiKey, encriptionKey);
-            var cardHashKey = _payPalGateway.GetCardHashKey(serviceKey, pagamento.NumeroCartao);
+            var serviceKey = payPalGateway.GetPayPalServiceKey(apiKey, encriptionKey);
+            var cardHashKey = payPalGateway.GetCardHashKey(serviceKey, pagamento.NumeroCartao);
 
-            var pagamentoResult = _payPalGateway.CommitTransaction(cardHashKey, cobrancaCurso.Id.ToString(), pagamento.Valor);
+            var pagamentoResult = payPalGateway.CommitTransaction(cardHashKey, cobrancaCurso.Id.ToString(), pagamento.Valor);
 
             var transacao = new Transacao
             {

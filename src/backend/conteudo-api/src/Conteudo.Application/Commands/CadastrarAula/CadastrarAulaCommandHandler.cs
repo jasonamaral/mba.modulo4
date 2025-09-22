@@ -7,21 +7,11 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.CadastrarAula
 {
-    public class CadastrarAulaCommandHandler : IRequestHandler<CadastrarAulaCommand, CommandResult>
+    public class CadastrarAulaCommandHandler(IAulaRepository aulaRepository,
+                                        ICursoRepository cursoRepository,
+                                        IMediatorHandler mediatorHandler) : IRequestHandler<CadastrarAulaCommand, CommandResult>
     {
-        private readonly IAulaRepository _aulaRepository;
-        private readonly ICursoRepository _cursoRepository;
-        private readonly IMediatorHandler _mediatorHandler;
         private Guid _raizAgregacao;
-
-        public CadastrarAulaCommandHandler(IAulaRepository aulaRepository,
-                                            ICursoRepository cursoRepository,
-                                            IMediatorHandler mediatorHandler)
-        {
-            _aulaRepository = aulaRepository;
-            _cursoRepository = cursoRepository;
-            _mediatorHandler = mediatorHandler;
-        }
 
         public async Task<CommandResult> Handle(CadastrarAulaCommand request, CancellationToken cancellationToken)
         {
@@ -40,9 +30,9 @@ namespace Conteudo.Application.Commands.CadastrarAula
                 request.IsObrigatoria,
                 request.Observacoes);
 
-            await _aulaRepository.CadastrarAulaAsync(aula);
+            await aulaRepository.CadastrarAulaAsync(aula);
 
-            if (await _aulaRepository.UnitOfWork.Commit())
+            if (await aulaRepository.UnitOfWork.Commit())
                 request.Resultado.Data = aula.Id;
 
             return request.Resultado;
@@ -55,23 +45,23 @@ namespace Conteudo.Application.Commands.CadastrarAula
             {
                 foreach (var erro in request.Erros)
                 {
-                    await _mediatorHandler.PublicarNotificacaoDominio(
+                    await mediatorHandler.PublicarNotificacaoDominio(
                         new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), erro));
                 }
                 return false;
             }
 
-            var curso = await _cursoRepository.ObterPorIdAsync(request.CursoId);
+            var curso = await cursoRepository.ObterPorIdAsync(request.CursoId);
             if (curso == null)
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), "Curso não encontrado"));
                 return false;
             }
 
-            if (await _aulaRepository.ExistePorNumeroAsync(request.CursoId, request.Numero))
+            if (await aulaRepository.ExistePorNumeroAsync(request.CursoId, request.Numero))
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), "Já existe uma aula com este número no curso"));
                 return false;
             }

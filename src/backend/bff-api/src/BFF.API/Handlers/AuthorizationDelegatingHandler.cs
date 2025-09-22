@@ -2,18 +2,11 @@ using System.Net.Http.Headers;
 
 namespace BFF.API.Handlers;
 
-public class AuthorizationDelegatingHandler : DelegatingHandler
+public class AuthorizationDelegatingHandler(IHttpContextAccessor httpContextAccessor) : DelegatingHandler
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public AuthorizationDelegatingHandler(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var authorization = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].FirstOrDefault();
+        var authorization = httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].FirstOrDefault();
 
         if (!string.IsNullOrWhiteSpace(authorization))
         {

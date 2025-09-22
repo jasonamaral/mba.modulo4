@@ -5,15 +5,8 @@ using Pagamentos.Domain.Models;
 
 namespace Pagamentos.Domain.Events
 {
-    public class PagamentoEventHandler : INotificationHandler<PagamentoCursoEvent>
+    public class PagamentoEventHandler(IPagamentoService pagamentoService) : INotificationHandler<PagamentoCursoEvent>
     {
-        private readonly IPagamentoService _pagamentoService;
-
-        public PagamentoEventHandler(IPagamentoService pagamentoService)
-        {
-            _pagamentoService = pagamentoService;
-        }
-
         public async Task Handle(PagamentoCursoEvent message, CancellationToken cancellationToken)
         {
             var pagamentoCurso = new PagamentoCurso
@@ -27,7 +20,7 @@ namespace Pagamentos.Domain.Events
                 CvvCartao = message.CvvCartao
             };
 
-            await _pagamentoService.RealizarPagamento(pagamentoCurso);
+            await pagamentoService.RealizarPagamento(pagamentoCurso);
         }
     }
 }

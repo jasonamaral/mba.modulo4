@@ -52,11 +52,14 @@ public class ExcluirAulaCommandHandlerTests
     [Fact]
     public async Task HappyPath_deve_excluir_commit_e_retornar_true()
     {
-        var cmd = new ExcluirAulaCommand(Guid.NewGuid(), Guid.NewGuid());
+        var cursoId = Guid.NewGuid();
+        var aula = new Aula(cursoId, "A1", "d", 1, 10, "u", "V", true, "");
+
+        var cmd = new ExcluirAulaCommand(cursoId, aula.Id);
         var sut = CriarSut();
 
         _aulas.Setup(r => r.ObterPorIdAsync(cmd.CursoId, cmd.Id, false))
-              .ReturnsAsync(new Aula(cmd.CursoId, "A1", "d", 1, 10, "u", "V", true, ""));
+              .ReturnsAsync(aula);
 
         var res = await sut.Handle(cmd, CancellationToken.None);
 
@@ -71,11 +74,14 @@ public class ExcluirAulaCommandHandlerTests
     [Fact]
     public async Task Commit_false_deve_notificar_e_manter_Data_nula()
     {
-        var cmd = new ExcluirAulaCommand(Guid.NewGuid(), Guid.NewGuid());
+        var cursoId = Guid.NewGuid();
+        var aula = new Aula(cursoId, "A1", "d", 1, 10, "u", "V", true, "");
+
+        var cmd = new ExcluirAulaCommand(cursoId, aula.Id);
         var sut = CriarSut();
 
-        _aulas.Setup(r => r.ObterPorIdAsync(cmd.CursoId, cmd.Id, false))
-              .ReturnsAsync(new Aula(cmd.CursoId, "A1", "d", 1, 10, "u", "V", true, ""));
+        _aulas.Setup(r => r.ObterPorIdAsync(cmd.CursoId, aula.Id, false))
+              .ReturnsAsync(aula);
         _uow.Setup(u => u.Commit()).ReturnsAsync(false);
 
         var res = await sut.Handle(cmd, CancellationToken.None);

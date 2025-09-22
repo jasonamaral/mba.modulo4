@@ -49,7 +49,7 @@ public class TransacaoTests
     public void Deve_associar_pagamento_navegacao_e_sincronizar_pagamentoId()
     {
         // Pagamento é anêmico também; usamos valores simples
-        var pagamento = new Pagamento
+        var pagamento = new Domain.Entities.Pagamento
         {
             CobrancaCursoId = Guid.NewGuid(),
             AlunoId = Guid.NewGuid(),

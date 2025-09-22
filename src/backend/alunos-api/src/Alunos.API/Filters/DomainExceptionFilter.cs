@@ -8,16 +8,13 @@ namespace Alunos.API.Filters;
 
 public class DomainExceptionFilter(IActionResultExecutor<ObjectResult> executor, ILogger<ExceptionFilter> logger) : IExceptionFilter
 {
-    private readonly IActionResultExecutor<ObjectResult> _executor = executor;
-    private readonly ILogger _logger = logger;
-
     public void OnException(ExceptionContext context)
     {
         if (context.Exception is DomainException ex)
         {
             context.ExceptionHandled = true;
             string erro = $"Erro de DOMINIO: {context?.Exception?.Message ?? context.Exception?.ToString()}";
-            _logger.LogError(context?.Exception, erro);
+            logger.LogError(context?.Exception, erro);
 
             var outputResponse = new
             {
@@ -32,7 +29,7 @@ public class DomainExceptionFilter(IActionResultExecutor<ObjectResult> executor,
                 Value = outputResponse
             };
 
-            _executor.ExecuteAsync(new ActionContext(context.HttpContext, context.RouteData, context.ActionDescriptor), output)
+            executor.ExecuteAsync(new ActionContext(context.HttpContext, context.RouteData, context.ActionDescriptor), output)
                 .GetAwaiter()
                 .GetResult();
         }

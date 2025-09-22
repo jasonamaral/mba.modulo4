@@ -11,8 +11,6 @@ public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
                                             , IMediatorHandler mediatorHandler)
     : IRequestHandler<CadastrarCategoriaCommand, CommandResult>
 {
-    private readonly IMediatorHandler _mediatorHandler = mediatorHandler;
-    private readonly ICategoriaRepository _categoriaRepository = categoriaRepository;
     private Guid _raizAgregacao;
 
     public async Task<CommandResult> Handle(CadastrarCategoriaCommand request, CancellationToken cancellationToken)
@@ -26,9 +24,9 @@ public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
                                     request.IconeUrl,
                                     request.Ordem);
 
-        _categoriaRepository.Adicionar(categoria);
+        categoriaRepository.Adicionar(categoria);
 
-        if (await _categoriaRepository.UnitOfWork.Commit())
+        if (await categoriaRepository.UnitOfWork.Commit())
             request.Resultado.Data = categoria.Id;
 
         return request.Resultado;
@@ -41,14 +39,14 @@ public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
         {
             foreach (var erro in request.Erros)
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), erro));
+                await mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), erro));
             }
             return false;
         }
 
-        if (await _categoriaRepository.ExistePorNome(request.Nome))
+        if (await categoriaRepository.ExistePorNome(request.Nome))
         {
-            await _mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), "Já existe uma categoria com este nome."));
+            await mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Categoria), "Já existe uma categoria com este nome."));
             return false;
         }
 

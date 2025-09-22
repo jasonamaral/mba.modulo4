@@ -8,17 +8,9 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.PublicarAula
 {
-    public class PublicarAulaCommandHandler : IRequestHandler<PublicarAulaCommand, CommandResult>
+    public class PublicarAulaCommandHandler(IAulaRepository aulaRepository, IMediatorHandler mediatorHandler) : IRequestHandler<PublicarAulaCommand, CommandResult>
     {
-        private readonly IAulaRepository _aulaRepository;
-        private readonly IMediatorHandler _mediatorHandler;
         private Guid _raizAgregacao;
-
-        public PublicarAulaCommandHandler(IAulaRepository aulaRepository, IMediatorHandler mediatorHandler)
-        {
-            _aulaRepository = aulaRepository;
-            _mediatorHandler = mediatorHandler;
-        }
 
         public async Task<CommandResult> Handle(PublicarAulaCommand request, CancellationToken cancellationToken)
         {
@@ -29,9 +21,9 @@ namespace Conteudo.Application.Commands.PublicarAula
                 if (!await ValidarRequisicao(request))
                     return request.Resultado;
 
-                await _aulaRepository.PublicarAulaAsync(request.CursoId, request.Id);
+                await aulaRepository.PublicarAulaAsync(request.CursoId, request.Id);
 
-                if (await _aulaRepository.UnitOfWork.Commit())
+                if (await aulaRepository.UnitOfWork.Commit())
                 {
                     request.Resultado.Data = request.Id;
                 }
@@ -47,10 +39,20 @@ namespace Conteudo.Application.Commands.PublicarAula
 
         private async Task<bool> ValidarRequisicao(PublicarAulaCommand request)
         {
-            var aula = await _aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
+            request.DefinirValidacao(new PublicarAulaCommandValidator().Validate(request));
+            if (!request.EhValido())
+            {
+                foreach (var erro in request.Erros)
+                {
+                    mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), erro)).GetAwaiter().GetResult();
+                }
+                return false;
+            }
+
+            var aula = await aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
             if (aula == null)
             {
-                await _mediatorHandler.PublicarNotificacaoDominio(
+                await mediatorHandler.PublicarNotificacaoDominio(
                     new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), "Aula não encontrada"));
                 return false;
             }

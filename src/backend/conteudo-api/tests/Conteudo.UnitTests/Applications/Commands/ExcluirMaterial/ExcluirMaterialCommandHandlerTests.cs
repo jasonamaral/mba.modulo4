@@ -52,10 +52,13 @@ public class ExcluirMaterialCommandHandlerTests
     [Fact]
     public async Task HappyPath_deve_excluir_commit_e_retornar_true()
     {
-        var cmd = new ExcluirMaterialCommand(Guid.NewGuid());
+        var aulaId = Guid.NewGuid();
+        var material = new Material(aulaId, "M", "d", "PDF", "u", false, 0, ".pdf", 0);
+
+        var cmd = new ExcluirMaterialCommand(material.Id);
         var sut = CriarSut();
 
-        _materiais.Setup(r => r.ObterPorIdAsync(cmd.Id)).ReturnsAsync(new Material(Guid.NewGuid(), "M", "d", "PDF", "u", false, 0, ".pdf", 0));
+        _materiais.Setup(r => r.ObterPorIdAsync(cmd.Id)).ReturnsAsync(material);
 
         var res = await sut.Handle(cmd, CancellationToken.None);
 

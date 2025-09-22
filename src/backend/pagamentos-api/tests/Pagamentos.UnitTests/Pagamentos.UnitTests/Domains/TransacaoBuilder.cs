@@ -8,7 +8,7 @@ public class TransacaoBuilder
     private Guid _pagamentoId = Guid.NewGuid();
     private decimal _total = 100m;
     private StatusTransacao _status = default; // geralmente 0
-    private Pagamento? _pagamento = null;
+    private Domain.Entities.Pagamento? _pagamento = null;
 
     public TransacaoBuilder ComCobrancaId(Guid v) { _cobrancaCursoId = v; return this; }
     public TransacaoBuilder ComPagamentoId(Guid v) { _pagamentoId = v; return this; }
@@ -18,7 +18,7 @@ public class TransacaoBuilder
     /// <summary>
     /// Define a navegação e sincroniza PagamentoId com o Id do pagamento.
     /// </summary>
-    public TransacaoBuilder ComPagamento(Pagamento p)
+    public TransacaoBuilder ComPagamento(Domain.Entities.Pagamento p)
     {
         _pagamento = p;
         _pagamentoId = p.Id;
