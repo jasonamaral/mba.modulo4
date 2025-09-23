@@ -2,7 +2,7 @@
 
 Uma plataforma educacional moderna baseada em arquitetura de **microserviços**, desenvolvida com **.NET 8**, **Angular 18**, **RabbitMQ**, **SQL Server** e **Redis**, totalmente containerizada com **Docker**.
 
-![.NET](https://img.shields.io/badge/.NET-8.0-blue)
+![.NET](https://img.shields.io/badge/.NET-9.0-blue)
 ![Angular](https://img.shields.io/badge/Angular-18-red)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3-orange)
@@ -23,9 +23,15 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 - [Infraestrutura](#-infraestrutura)
 - [URLs de Acesso](#-urls-de-acesso)
 - [Desenvolvimento](#-desenvolvimento)
+- [Testes](#-testes)
+- [Building Blocks] (#-building-blocks)
+- [Script] (#-Script)
+- [Usuários de Exemplo] (#-usuario-de-exemplo)
 - [Monitoramento](#-monitoramento)
 - [Solução de Problemas](#-solução-de-problemas)
+- [Segurança] (#-Seguranca)
 - [Contribuição](#-contribuição)
+- [Licença] (#-licenca) 
 
 ## 🏗️ Arquitetura do Sistema
 
