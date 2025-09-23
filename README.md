@@ -315,7 +315,7 @@ Após ~5 minutos de inicialização:
 - 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: http://localhost:5000/swagger
 
-## 🏗️ Infraestrutura
+##🏗️Infraestrutura
 
 ### RabbitMQ
 - **Management UI**: http://localhost:15672
