@@ -1,6 +1,6 @@
 # 🎓 Plataforma Educacional Distribuída
 
-Uma plataforma educacional moderna baseada em arquitetura de **microserviços**, desenvolvida com **.NET 8**, **Angular 18**, **RabbitMQ**, **SQL Server** e **Redis**, totalmente containerizada com **Docker**.
+Uma plataforma educacional moderna baseada em arquitetura de **microserviços**, desenvolvida com **.NET 9**, **Angular 18**, **RabbitMQ**, **SQL Server** e **Redis**, totalmente containerizada com **Docker**.
 
 ![.NET](https://img.shields.io/badge/.NET-9.0-blue)
 ![Angular](https://img.shields.io/badge/Angular-18-red)
@@ -243,7 +243,7 @@ docker-compose up -d rabbitmq redis
 Start-Sleep -Seconds 120
 
 # Iniciar microserviços
-docker-compose up -d auth-api conteudo-api alunos-api pagamentos-api
+docker compose up -d auth-api conteudo-api alunos-api pagamentos-api
 
 # Aguardar APIs (aguarde ~1 minuto)
 Start-Sleep -Seconds 60
@@ -300,7 +300,7 @@ Após ~5 minutos de inicialização:
 - 🔄 Camada Anti-Corrupção (Pagamentos API)
      Responsável por isolar integrações externas (gateways de pagamento) do domínio principal.
      Evita que dependências externas contaminem as regras de negócio.
-     Implementada em src/backend/pagamentos-api/Pagamento.AntiCorruption.
+     Implementada em src/backend/pagamentos-api/Pagamentos.AntiCorruption.
 - 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5004/swagger
 
@@ -333,7 +333,7 @@ Após ~5 minutos de inicialização:
 | 🔗 **BFF API** | http://localhost:5000 | Gateway para frontend |
 
 ### APIs (Swagger)
-| API | HTTPS | HTTP | Descrição |
+| API | HTTP | Descrição |
 |-----|-------|------|-----------|
 | 🔐 **Auth** | http://localhost:5001 | Autenticação |
 | 📚 **Conteudo** | http://localhost:5002 | Cursos e aulas |
