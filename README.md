@@ -16,7 +16,7 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 
 ## 📋 Índice
 
-- [Arquitetura do Sistema](#-arquitetura-do-sistema)
+- [Arquitetura do Sistema](#️-arquitetura-do-sistema)
 - [Pré-requisitos](#-pré-requisitos)
 - [Execução Rápida](#-execução-rápida)
 - [Microserviços](#-microserviços)
@@ -24,14 +24,14 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 - [URLs de Acesso](#-urls-de-acesso)
 - [Desenvolvimento](#-desenvolvimento)
 - [Testes](#-testes)
-- [Building Blocks] (#-building-blocks)
-- [Script] (#-Script)
-- [Usuários de Exemplo] (#-usuario-de-exemplo)
+- [Building Blocks](#-building-blocks)
+- [Script](#-script)
+- [Usuários de Exemplo](#-usuários-de-exemplo)
 - [Monitoramento](#-monitoramento)
 - [Solução de Problemas](#-solução-de-problemas)
-- [Segurança] (#-Seguranca)
+- [Segurança](#-segurança)
 - [Contribuição](#-contribuição)
-- [Licença] (#-licenca) 
+- [Licença](#-licença)
 
 ## 🏗️ Arquitetura do Sistema
 
