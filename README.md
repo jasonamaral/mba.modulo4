@@ -25,7 +25,7 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 - [Desenvolvimento](#%EF%B8%8F-desenvolvimento)
 - [Testes](#-testes)
 - [Building Blocks](#-building-blocks)
-- [Script](#-script)
+- [Script](#-scripts)
 - [Usuários de Exemplo](#-usuários-de-exemplo)
 - [Monitoramento](#-monitoramento)
 - [Solução de Problemas](#-solução-de-problemas)
@@ -577,9 +577,8 @@ As configurações atuais são para **desenvolvimento/demonstração**:
 - Certificados auto-assinados
 - Configurações de desenvolvimento
 
-## 🤝 Contribuição
+## Estrutura do Projeto
 
-### Estrutura do Projeto
 ```
 mba.modulo4/
 ├── src/backend/                    # Microserviços .NET
