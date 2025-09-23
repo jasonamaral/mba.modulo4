@@ -20,7 +20,7 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 - [Pré-requisitos](#-pré-requisitos)
 - [Execução Rápida](#-execução-rápida)
 - [Microserviços](#-microserviços)
-- [Infraestrutura](#-infraestrutura)
+- [Infraestrutura](#%EF%B8%8F-infraestrutura)
 - [URLs de Acesso](#-urls-de-acesso)
 - [Desenvolvimento](#-desenvolvimento)
 - [Testes](#-testes)
