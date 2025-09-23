@@ -298,6 +298,10 @@ Após ~5 minutos de inicialização:
 - ✅ Webhooks de confirmação
 - ✅ Emissão de eventos
 - ✅ Histórico de transações
+- 🔄 Camada Anti-Corrupção (Pagamentos API)
+     Responsável por isolar integrações externas (gateways de pagamento) do domínio principal.
+     Evita que dependências externas contaminem as regras de negócio.
+     Implementada em src/backend/pagamentos-api/Pagamento.AntiCorruption.
 - 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5004/swagger
 
