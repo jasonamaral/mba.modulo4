@@ -22,7 +22,7 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 - [Microserviços](#-microserviços)
 - [Infraestrutura](#%EF%B8%8F-infraestrutura)
 - [URLs de Acesso](#-urls-de-acesso)
-- [Desenvolvimento](#-desenvolvimento)
+- [Desenvolvimento](#%EF%B8%8F-desenvolvimento)
 - [Testes](#-testes)
 - [Building Blocks](#-building-blocks)
 - [Script](#-script)
@@ -389,6 +389,63 @@ docker-compose build auth-api
 docker-compose up -d auth-api
 ```
 
+## 🧪 Testes
+Cada microserviço possui testes automatizados:
+
+- **UnitTests** → Validação de regras de negócio isoladas.  
+- **IntegrationTests** → Testam endpoints reais com banco de dados em memória ou SQL local.
+
+### Executando os testes
+```bash
+# Testes unitários
+dotnet test src/backend/auth-api/tests/Auth.UnitTests
+dotnet test src/backend/pagamentos-api/tests/Pagamentos.UnitTests
+
+# Testes de integração
+dotnet test src/backend/alunos-api/tests/Alunos.IntegrationTests
+```
+
+> Framework utilizado: **xUnit**  
+> Cobertura recomendada: **80%+** (utilizando **Coverlet + ReportGenerator**)
+
+
+## 🧩 Building Blocks
+A pasta `building-blocks/` contém componentes reutilizáveis entre microserviços:
+
+- **Core** (`Core.csproj`)  
+  - Communication (mensagens entre serviços)  
+  - DomainObjects (objetos base de domínio)  
+  - DomainValidations (validações reutilizáveis)  
+  - Exceptions (exceções customizadas)  
+  - Mediator (implementação do padrão Mediator)  
+  - Notification (notificações de domínio)  
+  - SharedDtos (DTOs comuns)  
+  - Utils (funções auxiliares)  
+
+- **MessageBus** (`MessageBus.csproj`)  
+  - Implementação de **comunicação assíncrona** via RabbitMQ  
+  - Base para publicação e consumo de eventos entre microserviços
+  
+
+## 📜 Scripts
+Na pasta `scripts/` existem automações úteis:
+
+- `start-all.ps1` → Inicializa toda a plataforma (infra + serviços)  
+- `stop-all.ps1` → Para todos os containers  
+- `setup-rabbitmq.sh` → Configura filas e exchanges no RabbitMQ  
+- `rebuild-service.ps1` → Rebuild de um serviço específico  
+- `clean.ps1` → Remove containers, imagens e volumes antigos  
+
+## 👤 Usuários de Exemplo
+A aplicação já possui usuários pré-configurados para testes:
+
+| Usuário | Senha | Perfil |
+|---------|-------|--------|
+| `admin@auth.api` | `Teste@123` | Administrador |
+| `aluno1@auth.api` | `Teste@123` | Aluno |
+
+
+
 ## 📊 Monitoramento
 
 ### Logs dos Serviços
@@ -560,7 +617,7 @@ mba.modulo4/
 │   │   │   ├── Pagamentos.Application/ # Application Layer
 │   │   │   ├── Pagamentos.Domain/  # Domain Layer
 │   │   │   ├── Pagamentos.Infrastructure/ # Infrastructure Layer
-│   │   │   └── Pagamento.AntiCorruption/ # Camada anti-corrupção
+│   │   │   └── Pagamentos.AntiCorruption/ # Camada anti-corrupção
 │   │   └── tests/
 │   │       ├── Pagamentos.UnitTests/ # Testes unitários
 │   │       └── Pagamentos.IntegrationTests/ # Testes de integração
@@ -573,7 +630,7 @@ mba.modulo4/
 │   │   └── tests/
 │   │       ├── BFF.UnitTests/      # Testes unitários
 │   │       └── BFF.IntegrationTests/ # Testes de integração
-│   └── building-blocks/            # Componentes compartilhados
+│   └── building-blocks/             # Componentes compartilhados
 │       ├── core/                    # Core.csproj - Funcionalidades base
 │       │   ├── Communication/       # Comunicação entre serviços
 │       │   ├── Data/                # Abstrações de dados
@@ -585,12 +642,14 @@ mba.modulo4/
 │       │   ├── Messages/            # Mensagens e comandos
 │       │   ├── Notification/        # Sistema de notificações
 │       │   ├── Services/            # Serviços base
-│       │   ├── SharedDtos/         # DTOs compartilhados
+│       │   ├── SharedDtos/          # DTOs compartilhados
 │       │   ├── Utils/               # Utilitários gerais
 │       │   └── Tests/               # Core.Tests.csproj
 │       └── MessageBus/              # MessageBus.csproj - Comunicação assíncrona
 ├── src/frontend/                    # Angular 18 SPA
 ├── scripts/                         # Scripts de automação PowerShell
+├── infra/                           # (separar configs de infraestrutura, se aplicável)
+├── docs/                            # Documentação extra
 ├── docker/                          # Configurações Docker
 ├── docker-compose.yml               # Orquestração Docker
 ├── docker-compose-infra.yml         # Infraestrutura apenas
