@@ -20,7 +20,7 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 - [Pré-requisitos](#-pré-requisitos)
 - [Execução Rápida](#-execução-rápida)
 - [Microserviços](#-microserviços)
-- [Infraestrutura](#-infraestrutura)
+- [Infraestrutura](#infraestrutura)
 - [URLs de Acesso](#-urls-de-acesso)
 - [Desenvolvimento](#-desenvolvimento)
 - [Testes](#-testes)
@@ -315,7 +315,7 @@ Após ~5 minutos de inicialização:
 - 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: http://localhost:5000/swagger
 
-##🏗️Infraestrutura
+## ️Infraestrutura
 
 ### RabbitMQ
 - **Management UI**: http://localhost:15672
