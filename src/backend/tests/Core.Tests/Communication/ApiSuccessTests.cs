@@ -2,7 +2,7 @@ using Core.Communication;
 
 namespace Core.Tests.Communication;
 
-public class ApiSuccessTests : TestBase
+public class ApiSuccessTests
 {
     [Fact]
     public void ApiSuccess_DeveCriarComPropriedadesPadrao()
@@ -83,5 +83,31 @@ public class ApiSuccessTests : TestBase
 
         // Assert
         apiSuccess.Data.Should().Be(data);
+    }
+
+    [Fact]
+    public void ApiError_defaults_e_setters()
+    {
+        var err = new ApiError
+        {
+            Message = "falhou",
+            Details = new List<string> { "e1", "e2" }
+        };
+
+        err.Message.Should().Be("falhou");
+        err.Details.Should().BeEquivalentTo(new[] { "e1", "e2" });
+    }
+
+    [Fact]
+    public void ApiSuccess_defaults_e_setters()
+    {
+        var ok = new ApiSuccess
+        {
+            Message = "ok",
+            Data = new { id = 1 }
+        };
+
+        ok.Message.Should().Be("ok");
+        ok.Data.Should().NotBeNull();
     }
 }

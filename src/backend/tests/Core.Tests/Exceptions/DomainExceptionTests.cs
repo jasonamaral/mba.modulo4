@@ -2,7 +2,7 @@ using Plataforma.Educacao.Core.Exceptions;
 
 namespace Core.Tests.Exceptions;
 
-public class DomainExceptionTests : TestBase
+public class DomainExceptionTests
 {
     [Fact]
     public void DomainException_DeveCriarComMensagem()
@@ -115,5 +115,23 @@ public class DomainExceptionTests : TestBase
 
         // Act & Assert
         exception.Errors.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void SingleMessage_deve_preencher_Message_e_Errors()
+    {
+        var ex = new DomainException("erro X");
+
+        ex.Message.Should().Contain("erro X");
+        ex.Errors.Should().ContainSingle().Which.Should().Be("erro X");
+    }
+
+    [Fact]
+    public void MultipleMessages_deve_concatenar_Message_e_preservar_lista()
+    {
+        var ex = new DomainException(new[] { "e1", "e2" });
+
+        ex.Message.Should().Contain("e1").And.Contain("e2");
+        ex.Errors.Should().BeEquivalentTo(new[] { "e1", "e2" });
     }
 }

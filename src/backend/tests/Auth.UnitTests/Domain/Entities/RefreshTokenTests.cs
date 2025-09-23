@@ -1,6 +1,6 @@
 using Auth.Domain.Entities;
 
-namespace Auth.UnitTests.Domain;
+namespace Auth.UnitTests.Domain.Entities;
 
 public class RefreshTokenTests : TestBase
 {
@@ -169,7 +169,7 @@ public class RefreshTokenTests : TestBase
         refreshToken.Token.Should().NotBe(Guid.Empty);
         refreshToken.Id.Should().NotBe(Guid.Empty);
         refreshToken.Username.Should().BeNull();
-        refreshToken.ExpirationDate.Should().Be(default(DateTime));
+        refreshToken.ExpirationDate.Should().Be(default);
     }
 
     [Fact]
@@ -193,5 +193,31 @@ public class RefreshTokenTests : TestBase
         refreshToken.Token.Should().Be(token);
         refreshToken.Username.Should().Be(username);
         refreshToken.ExpirationDate.Should().Be(expirationDate);
+    }
+
+    [Fact]
+    public void Ctor_deve_gerar_Id_e_Token()
+    {
+        var t = new RefreshToken();
+
+        t.Id.Should().NotBe(Guid.Empty);
+        t.Token.Should().NotBe(Guid.Empty);
+
+        // defaults
+        t.Username.Should().BeNull();
+        t.ExpirationDate.Should().Be(default);
+    }
+
+    [Fact]
+    public void Setters_devem_preencher_campos()
+    {
+        var t = new RefreshToken
+        {
+            Username = "user",
+            ExpirationDate = DateTime.UtcNow.AddDays(7)
+        };
+
+        t.Username.Should().Be("user");
+        t.ExpirationDate.Should().BeAfter(DateTime.UtcNow.AddDays(6)).And.BeBefore(DateTime.UtcNow.AddDays(8));
     }
 }

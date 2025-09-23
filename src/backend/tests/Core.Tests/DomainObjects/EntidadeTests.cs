@@ -2,7 +2,7 @@ using Core.DomainObjects;
 
 namespace Core.Tests.DomainObjects;
 
-public class EntidadeTests : TestBase
+public class EntidadeTests
 {
     private class EntidadeTeste : Entidade
     {
@@ -99,5 +99,37 @@ public class EntidadeTests : TestBase
 
         // Act & Assert
         entidade.Equals(outroObjeto).Should().BeFalse();
+    }
+
+    [Fact]
+    public void Ctor_deve_definir_Id_e_CreatedAt_e_UpdatedAt_nulo()
+    {
+        var now = DateTime.UtcNow;
+        var e = new EntidadeTeste();
+
+        e.Id.Should().NotBe(Guid.Empty);
+        e.CreatedAt.Should().BeOnOrAfter(now).And.BeOnOrBefore(DateTime.UtcNow.AddSeconds(1));
+        e.UpdatedAt.Should().BeNull();
+    }
+
+    [Fact]
+    public void DefinirId_deve_substituir_Id()
+    {
+        var e = new EntidadeTeste();
+        var novoId = Guid.NewGuid();
+
+        e.DefinirId(novoId);
+        e.Id.Should().Be(novoId);
+    }
+
+    [Fact]
+    public async Task AtualizarDataModificacao_deve_setar_UpdatedAt_para_UtcNow()
+    {
+        var e = new EntidadeTeste();
+        await Task.Delay(5); // garante diferença mínima
+        e.AtualizarDataModificacao();
+
+        e.UpdatedAt.Should().NotBeNull();
+        e.UpdatedAt!.Value.Should().BeOnOrBefore(DateTime.UtcNow);
     }
 }

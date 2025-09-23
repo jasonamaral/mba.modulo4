@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Core.Tests.Utils;
 
-public class EnumeratorExtensionTests : TestBase
+public class EnumeratorExtensionTests
 {
     public enum StatusTeste
     {

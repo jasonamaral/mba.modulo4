@@ -2,7 +2,7 @@ using Core.Communication;
 
 namespace Core.Tests.Communication;
 
-public class ApiErrorTests : TestBase
+public class ApiErrorTests
 {
     [Fact]
     public void ApiError_DeveCriarComPropriedadesPadrao()

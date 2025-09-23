@@ -1,9 +1,12 @@
+using Core.Communication;
 using Core.Mediator;
 using Core.Messages;
+using FluentValidation.Results;
+using MediatR;
 
 namespace Core.Tests.Mediator;
 
-public class MediatorHandlerTests : TestBase
+public class MediatorHandlerTests 
 {
     private class ComandoTeste : CommandRaiz
     {
@@ -108,5 +111,53 @@ public class MediatorHandlerTests : TestBase
         notificacao.Valor.Should().Be("valor");
         notificacao.NotificacaoId.Should().NotBe(Guid.Empty);
         notificacao.DataHora.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+    }
+
+    [Fact]
+    public async Task EnviarComando_deve_retornar_ValidationResult_do_CommandResult()
+    {
+        var mediator = new Mock<IMediator>();
+        var sut = new MediatorHandler(mediator.Object);
+
+        var vr = new ValidationResult(new[] { new ValidationFailure("a", "b") });
+        var cr = new CommandResult(vr);
+
+        mediator.Setup(m => m.Send(It.IsAny<ComandoTeste>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cr);
+
+        var retorno = await sut.EnviarComando(new ComandoTeste());
+
+        retorno.Should().BeSameAs(vr);
+    }
+
+    [Fact]
+    public async Task ExecutarComando_deve_retornar_CommandResult_do_mediator()
+    {
+        var mediator = new Mock<IMediator>();
+        var sut = new MediatorHandler(mediator.Object);
+
+        var cr = new CommandResult(new ValidationResult());
+        mediator.Setup(m => m.Send(It.IsAny<ComandoTeste>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cr);
+
+        var retorno = await sut.ExecutarComando(new ComandoTeste());
+
+        retorno.Should().BeSameAs(cr);
+    }
+
+    [Fact]
+    public async Task PublicarEvento_e_PublicarNotificacaoDominio_devem_invocar_mediator_Publish()
+    {
+        var mediator = new Mock<IMediator>();
+        var sut = new MediatorHandler(mediator.Object);
+
+        var evt = new EventoTeste();
+        var not = new NotificacaoTeste(Guid.NewGuid().ToString(), "Conteudo enviado na notificação");
+
+        await sut.PublicarEvento(evt);
+        await sut.PublicarNotificacaoDominio(not);
+
+        mediator.Verify(m => m.Publish(evt, It.IsAny<CancellationToken>()), Times.Once);
+        mediator.Verify(m => m.Publish(not, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

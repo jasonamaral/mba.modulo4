@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Core.Tests.Messages;
 
-public class DomainNotificacaoRaizTests : TestBase
+public class DomainNotificacaoRaizTests
 {
     [Fact]
     public void DomainNotificacaoRaiz_DeveCriarComRaizAgregacaoEChaveValor()
@@ -126,5 +126,31 @@ public class DomainNotificacaoRaizTests : TestBase
 
         // Assert
         notificacao.DataHora.Should().Be(dataHoraOriginal);
+    }
+
+    [Fact]
+    public void Ctor_com_raiz_deve_preencher_campos()
+    {
+        var antes = DateTime.Now.AddSeconds(-1);
+        var raiz = Guid.NewGuid();
+
+        var n = new DomainNotificacaoRaiz(raiz, "k", "v");
+
+        n.RaizAgregacao.Should().Be(raiz);
+        n.Chave.Should().Be("k");
+        n.Valor.Should().Be("v");
+        n.NotificacaoId.Should().NotBe(Guid.Empty);
+        n.DataHora.Should().BeOnOrAfter(antes);
+    }
+
+    [Fact]
+    public void Ctor_sem_raiz_deve_gerar_id_e_manter_chave_valor()
+    {
+        var n = new DomainNotificacaoRaiz("k", "v");
+
+        n.RaizAgregacao.Should().Be(Guid.Empty);
+        n.Chave.Should().Be("k");
+        n.Valor.Should().Be("v");
+        n.NotificacaoId.Should().NotBe(Guid.Empty);
     }
 }

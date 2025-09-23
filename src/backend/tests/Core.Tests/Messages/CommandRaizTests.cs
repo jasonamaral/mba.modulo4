@@ -3,7 +3,7 @@ using FluentValidation.Results;
 
 namespace Core.Tests.Messages;
 
-public class CommandRaizTests : TestBase
+public class CommandRaizTests 
 {
     private class ComandoTeste : CommandRaiz
     {
@@ -116,5 +116,51 @@ public class CommandRaizTests : TestBase
         comando.Validacao.Should().BeNull();
         comando.Erros.Should().BeEmpty();
         comando.EhValido().Should().BeTrue();
+    }
+
+    [Fact]
+    public void Ctor_deve_inicializar_DataHora_UTC_e_Resultado_com_Validacao_vazia()
+    {
+        var antes = DateTime.UtcNow.AddSeconds(-1);
+        var cmd = new ComandoTeste();
+        var depois = DateTime.UtcNow.AddSeconds(1);
+
+        cmd.DataHora.Should().BeOnOrAfter(antes).And.BeOnOrBefore(depois);
+        cmd.Resultado.Should().NotBeNull();
+        cmd.Erros.Should().BeEmpty();
+        cmd.EhValido().Should().BeTrue(); // Validacao.IsValid == true por padrão
+    }
+
+    [Fact]
+    public void DefinirRaizAgregacao_deve_setar_propriedade()
+    {
+        var id = Guid.NewGuid();
+        var cmd = new ComandoTeste();
+
+        cmd.DefinirRaizAgregacao(id);
+
+        cmd.RaizAgregacao.Should().Be(id);
+    }
+
+    [Fact]
+    public void DefinirValidacao_deve_trocar_ValidationResult_e_refletir_em_Resultado()
+    {
+        var invalido = new ValidationResult(new[] { new ValidationFailure("a", "b") });
+        var cmd = new ComandoTeste();
+
+        cmd.DefinirValidacao(invalido);
+
+        cmd.Validacao.Should().BeSameAs(invalido);
+        cmd.Resultado.ObterValidationResult().Should().BeSameAs(invalido);
+        cmd.EhValido().Should().BeFalse();
+        cmd.Erros.Should().Contain("b");
+    }
+
+    [Fact]
+    public void EhValido_true_quando_Validacao_null()
+    {
+        var cmd = new ComandoTeste();
+        cmd.DefinirValidacao(null!); // força null
+        cmd.EhValido().Should().BeTrue();
     }
 }

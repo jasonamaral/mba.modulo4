@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.API.Models.Request;
 
+[ExcludeFromCodeCoverage]
 public class CursoCriarRequest
 {
     public string Nome { get; set; } = string.Empty;

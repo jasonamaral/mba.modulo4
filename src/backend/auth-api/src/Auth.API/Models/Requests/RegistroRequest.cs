@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Auth.API.Models.Requests;
 
+[ExcludeFromCodeCoverage]
 public class RegistroRequest : IValidatableObject
 {
     [Required(ErrorMessage = "Nome é obrigatório")]

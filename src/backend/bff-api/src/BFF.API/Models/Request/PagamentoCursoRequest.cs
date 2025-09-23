@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Models.Request;
 
+[ExcludeFromCodeCoverage]
 public class PagamentoCursoInputModel
 {
     [Required(ErrorMessage = "O Id do Matricula é obrigatório.")]

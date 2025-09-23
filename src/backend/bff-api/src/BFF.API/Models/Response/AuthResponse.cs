@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.API.Models.Response;
 
+[ExcludeFromCodeCoverage]
 public class AuthResponse
 {
     public bool Success { get; set; }

@@ -1,8 +1,9 @@
 using Core.DomainValidations;
+using Plataforma.Educacao.Core.Exceptions;
 
 namespace Core.Tests.DomainValidations;
 
-public class ResultadoValidacaoTests : TestBase
+public class ResultadoValidacaoTests 
 {
     private class EntidadeTeste
     {
@@ -114,5 +115,24 @@ public class ResultadoValidacaoTests : TestBase
 
         action1.Should().Throw<Plataforma.Educacao.Core.Exceptions.DomainException>();
         action2.Should().Throw<Plataforma.Educacao.Core.Exceptions.DomainException>();
+    }
+
+    [Fact]
+    public void DispararExcecaoDominioSeInvalido_deve_lancar_quando_houver_erros_com_prefixo_do_tipo()
+    {
+        var r = new ResultadoValidacao<object>();
+
+        r.AdicionarErro("campo obrigatório");
+        Action act = () => r.DispararExcecaoDominioSeInvalido();
+
+        act.Should().Throw<DomainException>()
+           .Which.Errors.Should().Contain(e => e.StartsWith("(Object)"));
+    }
+
+    [Fact]
+    public void DispararExcecaoDominioSeInvalido_nao_deve_lancar_quando_sem_erros()
+    {
+        var r = new ResultadoValidacao<object>();
+        r.Invoking(x => x.DispararExcecaoDominioSeInvalido()).Should().NotThrow();
     }
 }

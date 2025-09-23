@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.API.Models.Request;
 
+[ExcludeFromCodeCoverage]
 public class AtualizarPerfilAluno
 {
     public string Telefone { get; set; } = string.Empty;

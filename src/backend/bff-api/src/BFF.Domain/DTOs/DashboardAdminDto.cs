@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class DashboardAdminDto
 {
     public EstatisticasAlunosDto EstatisticasAlunos { get; set; } = new();

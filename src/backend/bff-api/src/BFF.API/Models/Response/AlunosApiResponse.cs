@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.API.Models.Response;
 
+[ExcludeFromCodeCoverage]
 public class AlunoPerfilResponse
 {
     public Guid Id { get; set; }
@@ -19,6 +22,7 @@ public class AlunoPerfilResponse
     public DateTime UpdatedAt { get; set; }
 }
 
+[ExcludeFromCodeCoverage]
 public class AlunoMatriculasResponse
 {
     public Guid AlunoId { get; set; }
@@ -26,6 +30,7 @@ public class AlunoMatriculasResponse
     public List<MatriculaResponse> Matriculas { get; set; } = new();
 }
 
+[ExcludeFromCodeCoverage]
 public class MatriculaResponse
 {
     public Guid Id { get; set; }

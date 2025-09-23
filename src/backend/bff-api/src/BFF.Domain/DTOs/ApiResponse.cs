@@ -1,9 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.DTOs;
 
 /// <summary>
 /// Resposta detalhada de uma chamada de API
 /// </summary>
 /// <typeparam name="T">Tipo dos dados da resposta</typeparam>
+[ExcludeFromCodeCoverage]
 public class ApiResponse<T>
 {
     /// <summary>

@@ -3,7 +3,7 @@ using FluentValidation.Results;
 
 namespace Core.Tests.Messages;
 
-public class EventRaizTests : TestBase
+public class EventRaizTests 
 {
     private class EventoTeste : EventRaiz
     {
@@ -129,5 +129,40 @@ public class EventRaizTests : TestBase
         evento.Validacao.Should().BeNull();
         evento.Erros.Should().BeEmpty();
         evento.EhValido().Should().BeTrue();
+    }
+
+    [Fact]
+    public void Ctor_deve_definir_DataHora_UTC()
+    {
+        var antes = DateTime.UtcNow.AddSeconds(-1);
+        var e = new EventoTeste();
+        var depois = DateTime.UtcNow.AddSeconds(1);
+
+        e.DataHora.Should().BeOnOrAfter(antes).And.BeOnOrBefore(depois);
+    }
+
+    [Fact]
+    public void DefinirRaizAgregacao_e_DefinirValidacao_devem_setar_propriedades()
+    {
+        var id = Guid.NewGuid();
+        var vr = new ValidationResult();
+
+        var e = new EventoTeste();
+        e.DefinirRaizAgregacao(id);
+        e.DefinirValidacao(vr);
+
+        e.RaizAgregacao.Should().Be(id);
+        e.Validacao.Should().BeSameAs(vr);
+        e.EhValido().Should().BeTrue();
+    }
+
+    [Fact]
+    public void EhValido_false_quando_validacao_invalida()
+    {
+        var e = new EventoTeste();
+        e.DefinirValidacao(new ValidationResult(new[] { new ValidationFailure("x", "y") }));
+
+        e.EhValido().Should().BeFalse();
+        e.Erros.Should().Contain("y");
     }
 }

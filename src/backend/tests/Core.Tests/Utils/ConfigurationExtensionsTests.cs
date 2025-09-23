@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Core.Tests.Utils;
 
-public class ConfigurationExtensionsTests : TestBase
+public class ConfigurationExtensionsTests
 {
     [Fact]
     public void GetMessageQueueConnection_DeveRetornarValorQuandoConfigurado()

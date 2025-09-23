@@ -2,7 +2,7 @@ using Core.Notification;
 
 namespace Core.Tests.Notification;
 
-public class NotificacaoTests : TestBase
+public class NotificacaoTests 
 {
     [Fact]
     public void Notificacao_DeveCriarComPropriedadesPadrao()
@@ -102,5 +102,22 @@ public class NotificacaoTests : TestBase
         notificacao1.Mensagem.Should().Be("Erro 1");
         notificacao2.Tipo.Should().Be(TipoNotificacao.Informacao);
         notificacao2.Mensagem.Should().Be("Info 2");
+    }
+
+    [Fact]
+    public void Defaults_e_setters()
+    {
+        var n = new Notificacao();
+
+        // defaults
+        n.Tipo.Should().Be(TipoNotificacao.Informacao); // enum default = 0
+        n.Mensagem.Should().Be(string.Empty);
+
+        // setters
+        n.Tipo = TipoNotificacao.Erro;
+        n.Mensagem = "falhou";
+
+        n.Tipo.Should().Be(TipoNotificacao.Erro);
+        n.Mensagem.Should().Be("falhou");
     }
 }

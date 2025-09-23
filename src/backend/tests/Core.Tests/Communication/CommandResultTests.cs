@@ -3,7 +3,7 @@ using FluentValidation.Results;
 
 namespace Core.Tests.Communication;
 
-public class CommandResultTests : TestBase
+public class CommandResultTests
 {
     [Fact]
     public void CommandResult_DeveCriarComValidationResult()
@@ -128,5 +128,40 @@ public class CommandResultTests : TestBase
 
         // Act & Assert
         commandResult.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Ctor_deve_refletir_ValidationResult_e_Data()
+    {
+        var vr = new ValidationResult(); // IsValid = true
+        var cr = new CommandResult(vr, data: 123);
+
+        cr.IsValid.Should().BeTrue();
+        cr.Data.Should().Be(123);
+        cr.ObterValidationResult().Should().BeSameAs(vr);
+    }
+
+    [Fact]
+    public void AdicionarErro_deve_incluir_mensagem_e_IsValid_ficar_false()
+    {
+        var cr = new CommandResult(new ValidationResult());
+        cr.AdicionarErro("boom");
+
+        cr.IsValid.Should().BeFalse();
+        cr.ObterErros().Should().ContainSingle().Which.Should().Be("boom");
+    }
+
+    [Fact]
+    public void AtualizarValidationResult_deve_trocar_instancia_e_refletir_em_IsValid()
+    {
+        var vrTrue = new ValidationResult();               // válido
+        var vrFalse = new ValidationResult(new[] { new ValidationFailure("x", "y") }); // inválido
+
+        var cr = new CommandResult(vrTrue);
+        cr.IsValid.Should().BeTrue();
+
+        cr.AtualizarValidationResult(vrFalse);
+        cr.ObterValidationResult().Should().BeSameAs(vrFalse);
+        cr.IsValid.Should().BeFalse();
     }
 }

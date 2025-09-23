@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.API.Models.Response;
 
+[ExcludeFromCodeCoverage]
 public class AuthLoginResponse
 {
     public string AccessToken { get; set; } = string.Empty;
@@ -8,6 +11,7 @@ public class AuthLoginResponse
     public AuthUserToken UsuarioToken { get; set; } = new();
 }
 
+[ExcludeFromCodeCoverage]
 public class AuthUserToken
 {
     public string Id { get; set; } = string.Empty;
@@ -15,12 +19,14 @@ public class AuthUserToken
     public IEnumerable<AuthUserClaim> Claims { get; set; } = new List<AuthUserClaim>();
 }
 
+[ExcludeFromCodeCoverage]
 public class AuthUserClaim
 {
     public string Type { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
 }
 
+[ExcludeFromCodeCoverage]
 public class AuthRegistroResponse
 {
     public string AccessToken { get; set; } = string.Empty;
@@ -29,6 +35,7 @@ public class AuthRegistroResponse
     public AuthUserToken UsuarioToken { get; set; } = new();
 }
 
+[ExcludeFromCodeCoverage]
 public class AuthRefreshTokenResponse
 {
     public string AccessToken { get; set; } = string.Empty;

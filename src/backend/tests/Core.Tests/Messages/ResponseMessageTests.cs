@@ -3,7 +3,7 @@ using FluentValidation.Results;
 
 namespace Core.Tests.Messages;
 
-public class ResponseMessageTests : TestBase
+public class ResponseMessageTests
 {
     [Fact]
     public void ResponseMessage_DeveCriarComValidationResult()
@@ -80,5 +80,25 @@ public class ResponseMessageTests : TestBase
 
         // Assert
         responseMessage.ValidationResult.Should().BeNull();
+    }
+
+    [Fact]
+    public void Construtor_deve_guardar_ValidationResult()
+    {
+        var vr = new ValidationResult();
+        var rm = new ResponseMessage(vr);
+
+        rm.ValidationResult.Should().BeSameAs(vr);
+    }
+
+    [Fact]
+    public void Property_set_deve_permitir_troca_de_ValidationResult()
+    {
+        var rm = new ResponseMessage(new ValidationResult());
+        var novo = new ValidationResult();
+
+        rm.ValidationResult = novo;
+
+        rm.ValidationResult.Should().BeSameAs(novo);
     }
 }
