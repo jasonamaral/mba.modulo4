@@ -30,7 +30,7 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 - [Monitoramento](#-monitoramento)
 - [Solução de Problemas](#-solução-de-problemas)
 - [Segurança](#-segurança)
-- [Contribuição](#-contribuição)
+- [Estrutura do Projeto](#estrutura-do-projeto)
 - [Licença](#-licença)
 
 ## 🏗️ Arquitetura do Sistema
