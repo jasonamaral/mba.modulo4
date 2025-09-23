@@ -33,7 +33,7 @@ public class MatricularAlunoCommandHandler(IAlunoRepository alunoRepository,
     private bool ValidarRequisicao(MatricularAlunoCommand request)
     {
         request.DefinirValidacao(new MatricularAlunoCommandValidator().Validate(request));
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

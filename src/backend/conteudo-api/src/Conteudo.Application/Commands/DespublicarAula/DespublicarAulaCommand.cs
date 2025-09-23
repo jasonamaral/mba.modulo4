@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.DespublicarAula
 {
-    public class DespublicarAulaCommand : CommandRaiz, IRequest<CommandResult>
+    public class DespublicarAulaCommand : RaizCommand, IRequest<CommandResult>
     {
         public Guid CursoId { get; private set; }
         public Guid Id { get; private set; }

@@ -42,14 +42,14 @@ public abstract class TestBase
     protected void ConfigurarMockMediatorHandler(CommandResult result)
     {
         MockMediatorHandler
-            .Setup(x => x.ExecutarComando(It.IsAny<CommandRaiz>()))
+            .Setup(x => x.ExecutarComando(It.IsAny<RaizCommand>()))
             .Returns(Task.FromResult(result));
     }
 
     protected void ConfigurarMockMediatorHandlerComExcecao(Exception exception)
     {
         MockMediatorHandler
-            .Setup(x => x.ExecutarComando(It.IsAny<CommandRaiz>()))
+            .Setup(x => x.ExecutarComando(It.IsAny<RaizCommand>()))
             .ThrowsAsync(exception);
     }
 

@@ -43,7 +43,7 @@ namespace Conteudo.Application.Commands.AtualizarMaterial
         private async Task<bool> ValidarRequisicao(AtualizarMaterialCommand request, Material material)
         {
             request.DefinirValidacao(new AtualizarMaterialCommandValidator().Validate(request));
-            if (!request.EhValido())
+            if (!request.EstaValido())
             {
                 foreach (var erro in request.Erros)
                 {

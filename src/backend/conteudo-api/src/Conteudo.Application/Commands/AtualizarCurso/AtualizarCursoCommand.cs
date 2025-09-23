@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Conteudo.Application.Commands.AtualizarCurso;
 
-public class AtualizarCursoCommand : CommandRaiz
+public class AtualizarCursoCommand : RaizCommand
 {
     public Guid Id { get; set; }
     public string Nome { get; set; } = string.Empty;

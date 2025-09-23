@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Alunos.Application.Commands.SolicitarCertificado;
 
-public class SolicitarCertificadoCommand : CommandRaiz
+public class SolicitarCertificadoCommand : RaizCommand
 {
     public Guid AlunoId { get; private set; }
     public Guid MatriculaCursoId { get; private set; }

@@ -25,7 +25,7 @@ public class MatriculaCursoTests
         matricula.CursoId.Should().Be(_cursoId);
         matricula.Valor.Should().Be(_valor);
         matricula.Observacao.Should().Be(_observacao);
-        matricula.EstadoMatricula.Should().Be(EstadoMatriculaCursoEnum.PendentePagamento);
+        matricula.EstadoMatricula.Should().Be(EstadoMatriculaCurso.PendentePagamento);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class MatriculaCursoTests
         var matricula = CriarMatriculaValida();
         matricula.RegistrarPagamentoMatricula();
 
-        matricula.EstadoMatricula.Should().Be(EstadoMatriculaCursoEnum.PagamentoRealizado);
+        matricula.EstadoMatricula.Should().Be(EstadoMatriculaCurso.PagamentoRealizado);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class MatriculaCursoTests
         var matricula = CriarMatriculaValida();
         matricula.RegistrarAbandonoMatricula();
 
-        matricula.EstadoMatricula.Should().Be(EstadoMatriculaCursoEnum.Abandonado);
+        matricula.EstadoMatricula.Should().Be(EstadoMatriculaCurso.Abandonado);
     }
 
     [Fact]

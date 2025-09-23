@@ -49,7 +49,7 @@ public class CadastrarCursoCommandHandler(IMediatorHandler mediatorHandler,
     private async Task<bool> ValidarRequisicao(CadastrarCursoCommand request)
     {
         request.DefinirValidacao(new CadastrarCursoCommandValidator().Validate(request));
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

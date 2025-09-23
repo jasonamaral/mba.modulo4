@@ -22,7 +22,7 @@ public class EventRaizTests : TestBase
         evento.DataHora.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
         evento.Validacao.Should().BeNull();
         evento.Erros.Should().BeEmpty();
-        evento.EhValido().Should().BeTrue();
+        evento.EstaValido().Should().BeTrue();
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class EventRaizTests : TestBase
         // Assert
         evento.Validacao.Should().Be(validacao);
         evento.Erros.Should().Contain("Erro de teste");
-        evento.EhValido().Should().BeFalse();
+        evento.EstaValido().Should().BeFalse();
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class EventRaizTests : TestBase
         var evento = new EventoTeste();
 
         // Act & Assert
-        evento.EhValido().Should().BeTrue();
+        evento.EstaValido().Should().BeTrue();
         evento.Erros.Should().BeEmpty();
     }
 
@@ -78,7 +78,7 @@ public class EventRaizTests : TestBase
         evento.DefinirValidacao(validacao);
 
         // Assert
-        evento.EhValido().Should().BeTrue();
+        evento.EstaValido().Should().BeTrue();
         evento.Erros.Should().BeEmpty();
     }
 
@@ -95,7 +95,7 @@ public class EventRaizTests : TestBase
         evento.DefinirValidacao(validacao);
 
         // Assert
-        evento.EhValido().Should().BeFalse();
+        evento.EstaValido().Should().BeFalse();
         evento.Erros.Should().HaveCount(2);
         evento.Erros.Should().Contain("Erro 1");
         evento.Erros.Should().Contain("Erro 2");
@@ -128,6 +128,6 @@ public class EventRaizTests : TestBase
         // Assert
         evento.Validacao.Should().BeNull();
         evento.Erros.Should().BeEmpty();
-        evento.EhValido().Should().BeTrue();
+        evento.EstaValido().Should().BeTrue();
     }
 }

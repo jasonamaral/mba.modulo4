@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Conteudo.Application.Commands.CadastrarCurso;
 
-public class CadastrarCursoCommand : CommandRaiz
+public class CadastrarCursoCommand : RaizCommand
 {
     public string Nome { get; set; } = string.Empty;
     public decimal Valor { get; set; }

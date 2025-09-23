@@ -904,7 +904,7 @@
             <line number="10" hits="10" branch="False" />
           </lines>
         </class>
-        <class name="Core.Messages.CommandRaiz" filename="core\Messages\CommandRaiz.cs" line-rate="1" branch-rate="0.875" complexity="15">
+        <class name="Core.Messages.RaizCommand" filename="core\Messages\RaizCommand.cs" line-rate="1" branch-rate="0.875" complexity="15">
           <methods>
             <method name="get_RaizAgregacao" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -950,7 +950,7 @@
                 </line>
               </lines>
             </method>
-            <method name="EhValido" signature="()" line-rate="1" branch-rate="1" complexity="2">
+            <method name="EstaValido" signature="()" line-rate="1" branch-rate="1" complexity="2">
               <lines>
                 <line number="32" hits="5" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
@@ -1170,7 +1170,7 @@
                 </line>
               </lines>
             </method>
-            <method name="EhValido" signature="()" line-rate="1" branch-rate="1" complexity="2">
+            <method name="EstaValido" signature="()" line-rate="1" branch-rate="1" complexity="2">
               <lines>
                 <line number="30" hits="6" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
@@ -1764,7 +1764,7 @@
         </class>
         <class name="Core.DomainValidations.ResultadoValidacao`1" filename="core\DomainValidations\ResultadoValidacao.cs" line-rate="1" branch-rate="1" complexity="6">
           <methods>
-            <method name="get__ehValido" signature="()" line-rate="1" branch-rate="1" complexity="1">
+            <method name="get__estaValido" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
                 <line number="8" hits="5" branch="False" />
               </lines>

@@ -7,13 +7,13 @@ namespace Core.Mediator;
 
 public class MediatorHandler(IMediator mediator) : IMediatorHandler
 {
-    public async Task<ValidationResult> EnviarComando<T>(T comando) where T : CommandRaiz
+    public async Task<ValidationResult> EnviarComando<T>(T comando) where T : RaizCommand
     {
         var result = await mediator.Send(comando);
         return result.ObterValidationResult();
     }
 
-    public async Task<CommandResult> ExecutarComando<T>(T comando) where T : CommandRaiz
+    public async Task<CommandResult> ExecutarComando<T>(T comando) where T : RaizCommand
     {
         return await mediator.Send(comando);
     }

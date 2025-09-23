@@ -34,7 +34,7 @@ namespace Conteudo.Application.Commands.ExcluirAula
         {
             request.DefinirValidacao(new ExcluirAulaCommandValidator().Validate(request));
 
-            if (!request.EhValido())
+            if (!request.EstaValido())
             {
                 foreach (var erro in request.Erros)
                 {

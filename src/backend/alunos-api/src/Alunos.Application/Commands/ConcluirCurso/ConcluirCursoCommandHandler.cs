@@ -33,7 +33,7 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
     private bool ValidarRequisicao(ConcluirCursoCommand request)
     {
         request.DefinirValidacao(new ConcluirCursoCommandValidator().Validate(request));
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

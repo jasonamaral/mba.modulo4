@@ -1,4 +1,4 @@
-﻿using FluentValidation.Results;
+using FluentValidation.Results;
 using MediatR;
 
 namespace Core.Messages;
@@ -27,5 +27,5 @@ public class EventRaiz : INotification
 
     public ICollection<string> Erros => Validacao?.Errors?.Select(e => e.ErrorMessage).ToList() ?? [];
 
-    public virtual bool EhValido() => Validacao == null || Validacao.IsValid;
+    public virtual bool EstaValido() => Validacao == null || Validacao.IsValid;
 }

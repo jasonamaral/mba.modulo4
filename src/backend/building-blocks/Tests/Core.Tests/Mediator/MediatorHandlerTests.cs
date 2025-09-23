@@ -5,7 +5,7 @@ namespace Core.Tests.Mediator;
 
 public class MediatorHandlerTests : TestBase
 {
-    private class ComandoTeste : CommandRaiz
+    private class ComandoTeste : RaizCommand
     {
         public string Nome { get; set; } = string.Empty;
     }
@@ -33,14 +33,14 @@ public class MediatorHandlerTests : TestBase
     }
 
     [Fact]
-    public void ComandoTeste_DeveHerdarDeCommandRaiz()
+    public void ComandoTeste_DeveHerdarDeRaizCommand()
     {
         // Arrange & Act
         var comando = new ComandoTeste { Nome = "Teste" };
 
         // Assert
         comando.Should().NotBeNull();
-        comando.Should().BeAssignableTo<CommandRaiz>();
+        comando.Should().BeAssignableTo<RaizCommand>();
         comando.Nome.Should().Be("Teste");
     }
 
@@ -70,7 +70,7 @@ public class MediatorHandlerTests : TestBase
     }
 
     [Fact]
-    public void CommandRaiz_DeveTerPropriedadesCorretas()
+    public void RaizCommand_DeveTerPropriedadesCorretas()
     {
         // Arrange & Act
         var comando = new ComandoTeste();

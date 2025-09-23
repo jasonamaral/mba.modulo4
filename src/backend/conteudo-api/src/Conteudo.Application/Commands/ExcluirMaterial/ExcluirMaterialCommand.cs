@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.ExcluirMaterial
 {
-    public class ExcluirMaterialCommand : CommandRaiz, IRequest<CommandResult>
+    public class ExcluirMaterialCommand : RaizCommand, IRequest<CommandResult>
     {
         public Guid Id { get; }
 

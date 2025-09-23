@@ -159,7 +159,7 @@ public class CategoriaControllerIntegrationTests : IClassFixture<CustomWebApplic
 
         var validationResult = new ValidationResult();
         var commandResult = new CommandResult(validationResult, Guid.NewGuid());
-        _mediatorHandlerMock.Setup(x => x.ExecutarComando(It.IsAny<CommandRaiz>()))
+        _mediatorHandlerMock.Setup(x => x.ExecutarComando(It.IsAny<RaizCommand>()))
             .ReturnsAsync(commandResult);
 
         var json = JsonSerializer.Serialize(dto);
@@ -193,7 +193,7 @@ public class CategoriaControllerIntegrationTests : IClassFixture<CustomWebApplic
 
         var validationResult = new ValidationResult();
         var commandResult = new CommandResult(validationResult, true);
-        _mediatorHandlerMock.Setup(x => x.ExecutarComando(It.IsAny<CommandRaiz>()))
+        _mediatorHandlerMock.Setup(x => x.ExecutarComando(It.IsAny<RaizCommand>()))
             .ReturnsAsync(commandResult);
 
         var json = JsonSerializer.Serialize(dto);

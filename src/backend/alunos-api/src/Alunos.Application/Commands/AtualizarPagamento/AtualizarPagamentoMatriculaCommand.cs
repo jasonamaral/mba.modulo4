@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Alunos.Application.Commands.AtualizarPagamento;
 
-public class AtualizarPagamentoMatriculaCommand : CommandRaiz
+public class AtualizarPagamentoMatriculaCommand : RaizCommand
 {
     public Guid AlunoId { get; init; }
     public Guid MatriculaCursoId { get; init; }
