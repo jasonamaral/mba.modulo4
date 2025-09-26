@@ -15,11 +15,11 @@ public interface ICursoRepository : IRepository<Curso>
 
     Task<IEnumerable<Curso>> ObterPorCategoriaIdAsync(Guid categoriaId, bool includeAulas = false);
 
-    Task<IEnumerable<Curso>> ObterAtivosAsync(bool includeAulas = false);
+    //Task<IEnumerable<Curso>> ObterAtivosAsync(bool includeAulas = false);
 
-    Task<IEnumerable<Curso>> ObterPorPesquisaAsync(string searchTerm, bool includeAulas = false);
+    //Task<IEnumerable<Curso>> ObterPorPesquisaAsync(string searchTerm, bool includeAulas = false);
 
-    Task<bool> ExistePorIdAsync(Guid id);
+    //Task<bool> ExistePorIdAsync(Guid id);
 
     Task<bool> ExistePorNomeAsync(string nome, Guid? excludeId = null);
 
@@ -29,9 +29,9 @@ public interface ICursoRepository : IRepository<Curso>
 
     Task Deletar(Curso curso);
 
-    Task<int> ContarAsync();
+    //Task<int> ContarAsync();
 
-    Task<int> ContarAtivosAsync();
+    //Task<int> ContarAtivosAsync();
 
-    Task<int> ContarPorCategoriaAsync(Guid categoriaId);
+    //Task<int> ContarPorCategoriaAsync(Guid categoriaId);
 }

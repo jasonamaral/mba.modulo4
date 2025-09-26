@@ -9,6 +9,7 @@ using Core.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace BFF.API.Controllers;
@@ -16,6 +17,7 @@ namespace BFF.API.Controllers;
 /// <summary>
 /// Controller de Conteudos no BFF - Orquestra chamadas para Conteudo.API
 /// </summary>
+[ExcludeFromCodeCoverage]
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]

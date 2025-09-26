@@ -6,10 +6,12 @@ using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace Core.Services.Controllers;
 
+[ExcludeFromCodeCoverage]
 [ApiController]
 public abstract class MainController(IMediatorHandler mediator
                                    , INotificationHandler<DomainNotificacaoRaiz> notifications

@@ -6,13 +6,13 @@ namespace Alunos.Domain.Interfaces;
 
 public interface IAlunoRepository : IRepository<Aluno>
 {
-    Task<Aluno> ObterPorIdAsync(Guid alunoId);
+    Task<Aluno> ObterPorIdAsync(Guid alunoId, bool noTracked = true);
 
-    Task<Aluno> ObterPorEmailAsync(string email);
+    Task<Aluno> ObterPorEmailAsync(string email, bool noTracked = true);
 
-    Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario);
+    Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario, bool noTracked = true);
 
-    Task<bool> ExisteEmailAsync(string email);
+    //Task<bool> ExisteEmailAsync(string email);
 
     Task AdicionarAsync(Aluno aluno);
 
@@ -22,11 +22,12 @@ public interface IAlunoRepository : IRepository<Aluno>
 
     Task AdicionarCertificadoMatriculaCursoAsync(Certificado certificado);
 
-    Task<MatriculaCurso> ObterMatriculaPorIdAsync(Guid matriculaId);
+    Task<MatriculaCurso> ObterMatriculaPorIdAsync(Guid matriculaId, bool noTracked = true);
 
-    Task<MatriculaCurso> ObterMatriculaPorAlunoECursoAsync(Guid alunoId, Guid cursoId);
+    //Task<MatriculaCurso> ObterMatriculaPorAlunoECursoAsync(Guid alunoId, Guid cursoId);
 
     Task AtualizarEstadoHistoricoAprendizadoAsync(HistoricoAprendizado historicoAntigo, HistoricoAprendizado historicoNovo);
 
-    Task<Certificado> ObterCertificadoPorMatriculaAsync(Guid matriculaId);
+    //Task<Certificado> ObterCertificadoPorMatriculaAsync(Guid matriculaId);
+
 }

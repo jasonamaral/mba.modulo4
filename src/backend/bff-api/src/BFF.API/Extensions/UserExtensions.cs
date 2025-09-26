@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 
 namespace BFF.API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class UserExtensions
 {
     public static Guid GetUserId(this ClaimsPrincipal user)

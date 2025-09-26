@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.API.Models.Response;
 
+[ExcludeFromCodeCoverage]
 public class HealthCheckResponse
 {
     public string Status { get; set; } = string.Empty;
@@ -9,6 +12,7 @@ public class HealthCheckResponse
     public List<ServiceHealthResponse> Services { get; set; } = new();
 }
 
+[ExcludeFromCodeCoverage]
 public class ServiceHealthResponse
 {
     public string Name { get; set; } = string.Empty;
@@ -18,6 +22,7 @@ public class ServiceHealthResponse
     public string? ErrorMessage { get; set; }
 }
 
+[ExcludeFromCodeCoverage]
 public class ApiStatusResponse
 {
     public string Name { get; set; } = string.Empty;

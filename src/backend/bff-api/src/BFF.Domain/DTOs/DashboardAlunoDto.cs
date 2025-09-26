@@ -1,8 +1,10 @@
 using BFF.Domain.DTOs.Alunos.Response;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace BFF.Domain.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class DashboardAlunoDto
 {
     [JsonIgnore]

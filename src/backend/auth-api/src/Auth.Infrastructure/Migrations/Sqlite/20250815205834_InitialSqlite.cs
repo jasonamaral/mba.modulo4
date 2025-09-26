@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore.Migrations;
+using System.Diagnostics.CodeAnalysis;
 
 #nullable disable
 
 namespace Auth.Infrastructure.Migrations.Sqlite
 {
     /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     public partial class InitialSqlite : Migration
     {
         /// <inheritdoc />

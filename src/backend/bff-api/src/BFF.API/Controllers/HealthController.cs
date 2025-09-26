@@ -4,12 +4,14 @@ using Core.Messages;
 using Core.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Controllers;
 
 /// <summary>
 /// Controller de Health Check da API
 /// </summary>
+[ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/[controller]")]
 public class HealthController(

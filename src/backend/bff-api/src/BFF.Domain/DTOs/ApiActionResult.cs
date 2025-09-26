@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class ApiActionResult<T>
 {
     public bool Success { get; set; }

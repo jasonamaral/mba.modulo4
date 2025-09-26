@@ -1,41 +1,42 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json;
 
-namespace Pagamentos.API.Configuration.Middleware
+namespace Pagamentos.API.Configuration.Middleware;
+
+[ExcludeFromCodeCoverage]
+public class ExceptionHandlingMiddleware
 {
-    public class ExceptionHandlingMiddleware
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+        _next = next;
+        _logger = logger;
+    }
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+    public async Task Invoke(HttpContext context)
+    {
+        try
         {
-            _next = next;
-            _logger = logger;
+            await _next(context);
         }
-
-        public async Task Invoke(HttpContext context)
+        catch (Exception ex)
         {
-            try
+            _logger.LogError(ex, "Ocorreu um erro não tratado.");
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            var errorResponse = new
             {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Ocorreu um erro não tratado.");
+                context.Response.StatusCode,
+                Message = "Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde.",
+            };
 
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-                var errorResponse = new
-                {
-                    context.Response.StatusCode,
-                    Message = "Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde.",
-                };
-
-                var json = JsonSerializer.Serialize(errorResponse);
-                await context.Response.WriteAsync(json);
-            }
+            var json = JsonSerializer.Serialize(errorResponse);
+            await context.Response.WriteAsync(json);
         }
     }
 }

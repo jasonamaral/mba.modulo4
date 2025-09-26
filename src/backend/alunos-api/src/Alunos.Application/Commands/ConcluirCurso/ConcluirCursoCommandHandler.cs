@@ -18,7 +18,7 @@ public class ConcluirCursoCommandHandler(IAlunoRepository alunoRepository,
         _raizAgregacao = request.RaizAgregacao;
         if (!ValidarRequisicao(request)) { return request.Resultado; }
         if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
-        var matriculaCurso = aluno.ObterMatriculaCursoPeloId(request.MatriculaCursoId);
+        //var matriculaCurso = aluno.ObterMatriculaCurso(request.MatriculaCursoId);
 
         if (!ValidarSeMatriculaCursoPodeSerConcluido(aluno, request.CursoDto, request.MatriculaCursoId)) { return request.Resultado; }
 

@@ -19,8 +19,7 @@ public class MatricularAlunoCommandHandler(IAlunoRepository alunoRepository,
         if (!ValidarRequisicao(request)) { return request.Resultado; }
         if (!ObterAluno(request.AlunoId, out Domain.Entities.Aluno aluno)) { return request.Resultado; }
 
-        aluno.MatricularAlunoEmCurso(request.CursoId, request.NomeCurso, request.ValorCurso, request.Observacao);
-        var matricula = aluno.ObterMatriculaPorCursoId(request.CursoId);
+        var matricula = aluno.MatricularAlunoEmCurso(request.CursoId, request.NomeCurso, request.ValorCurso, request.Observacao);
         await AlunoRepository.AdicionarMatriculaCursoAsync(matricula);
         if (await alunoRepository.UnitOfWork.Commit())
         {

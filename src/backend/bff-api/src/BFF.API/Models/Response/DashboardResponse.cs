@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.API.Models.Response;
 
+[ExcludeFromCodeCoverage]
 public class DashboardAlunoResponse
 {
     public AlunoPerfilResponse Aluno { get; set; } = new();
@@ -10,6 +13,7 @@ public class DashboardAlunoResponse
     public ProgressoGeralResponse ProgressoGeral { get; set; } = new();
 }
 
+[ExcludeFromCodeCoverage]
 public class DashboardAdminResponse
 {
     public EstatisticasGeraisResponse EstatisticasGerais { get; set; } = new();
@@ -19,6 +23,7 @@ public class DashboardAdminResponse
     public List<PagamentoRecenteResponse> PagamentosRecentes { get; set; } = new();
 }
 
+[ExcludeFromCodeCoverage]
 public class CertificadoResponse
 {
     public Guid Id { get; set; }
@@ -28,6 +33,7 @@ public class CertificadoResponse
     public string UrlDownload { get; set; } = string.Empty;
 }
 
+[ExcludeFromCodeCoverage]
 public class CursoRecomendadoResponse
 {
     public Guid Id { get; set; }
@@ -39,6 +45,7 @@ public class CursoRecomendadoResponse
     public string ImagemUrl { get; set; } = string.Empty;
 }
 
+[ExcludeFromCodeCoverage]
 public class PagamentoResponse
 {
     public Guid Id { get; set; }
@@ -49,6 +56,7 @@ public class PagamentoResponse
     public string FormaPagamento { get; set; } = string.Empty;
 }
 
+[ExcludeFromCodeCoverage]
 public class ProgressoGeralResponse
 {
     public int TotalCursos { get; set; }
@@ -59,6 +67,7 @@ public class ProgressoGeralResponse
     public int CertificadosObtidos { get; set; }
 }
 
+[ExcludeFromCodeCoverage]
 public class EstatisticasGeraisResponse
 {
     public int TotalAlunos { get; set; }
@@ -69,6 +78,7 @@ public class EstatisticasGeraisResponse
     public int CursosAtivos { get; set; }
 }
 
+[ExcludeFromCodeCoverage]
 public class CursoPopularResponse
 {
     public Guid Id { get; set; }
@@ -78,6 +88,7 @@ public class CursoPopularResponse
     public decimal AvaliacaoMedia { get; set; }
 }
 
+[ExcludeFromCodeCoverage]
 public class AlunoRecenteResponse
 {
     public Guid Id { get; set; }
@@ -87,6 +98,7 @@ public class AlunoRecenteResponse
     public int TotalMatriculas { get; set; }
 }
 
+[ExcludeFromCodeCoverage]
 public class MatriculaRecenteResponse
 {
     public Guid Id { get; set; }
@@ -96,6 +108,7 @@ public class MatriculaRecenteResponse
     public decimal Valor { get; set; }
 }
 
+[ExcludeFromCodeCoverage]
 public class PagamentoRecenteResponse
 {
     public Guid Id { get; set; }

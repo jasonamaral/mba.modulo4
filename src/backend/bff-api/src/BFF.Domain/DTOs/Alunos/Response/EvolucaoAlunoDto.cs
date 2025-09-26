@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.DTOs.Alunos.Response;
 
+[ExcludeFromCodeCoverage]
 public class EvolucaoAlunoDto
 {
     public Guid Id { get; set; }

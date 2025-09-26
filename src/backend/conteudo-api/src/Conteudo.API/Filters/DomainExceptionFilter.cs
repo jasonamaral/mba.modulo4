@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Plataforma.Educacao.Core.Exceptions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Conteudo.API.Filters;
 
+[ExcludeFromCodeCoverage]
 public class DomainExceptionFilter(IActionResultExecutor<ObjectResult> executor, ILogger<ExceptionFilter> logger) : IExceptionFilter
 {
     public void OnException(ExceptionContext context)

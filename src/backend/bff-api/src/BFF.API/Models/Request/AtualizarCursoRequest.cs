@@ -1,5 +1,8 @@
-﻿namespace BFF.API.Models.Request;
+using System.Diagnostics.CodeAnalysis;
 
+namespace BFF.API.Models.Request;
+
+[ExcludeFromCodeCoverage]
 public class AtualizarCursoRequest
 {
     public Guid Id { get; set; }

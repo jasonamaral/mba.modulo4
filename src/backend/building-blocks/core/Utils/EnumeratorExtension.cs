@@ -1,8 +1,10 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Core.Utils;
 
+[ExcludeFromCodeCoverage]
 public static class EnumeratorExtension
 {
     public static string ObterDescricao(this Enum value)

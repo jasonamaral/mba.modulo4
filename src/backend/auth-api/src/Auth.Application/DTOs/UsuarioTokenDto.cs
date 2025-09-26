@@ -1,5 +1,8 @@
-﻿namespace Auth.Application.DTOs;
+using System.Diagnostics.CodeAnalysis;
 
+namespace Auth.Application.DTOs;
+
+[ExcludeFromCodeCoverage]
 public class UsuarioTokenDto
 {
     public string Id { get; set; }

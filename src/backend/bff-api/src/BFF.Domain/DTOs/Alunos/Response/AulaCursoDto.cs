@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.DTOs.Alunos.Response;
 
+[ExcludeFromCodeCoverage]
 public class AulaCursoDto
 {
     public Guid AulaId { get; set; }

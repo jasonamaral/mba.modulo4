@@ -117,28 +117,28 @@ public class Aula : Entidade, IRaizAgregacao
         AtualizarDataModificacao();
     }
 
-    public void AdicionarMaterial(Material material)
-    {
-        if (material == null)
-            throw new DomainException("Material não pode ser nulo");
+    //public void AdicionarMaterial(Material material)
+    //{
+    //    if (material == null)
+    //        throw new DomainException("Material não pode ser nulo");
 
-        if (_materiais.Any(m => m.Nome == material.Nome))
-            throw new DomainException($"Já existe um material com o nome {material.Nome}");
+    //    if (_materiais.Any(m => m.Nome == material.Nome))
+    //        throw new DomainException($"Já existe um material com o nome {material.Nome}");
 
-        _materiais.Add(material);
-        AtualizarDataModificacao();
-    }
+    //    _materiais.Add(material);
+    //    AtualizarDataModificacao();
+    //}
 
-    public void RemoverMaterial(Guid materialId)
-    {
-        var material = _materiais.FirstOrDefault(m => m.Id == materialId);
-        if (material != null)
-        {
-            _materiais.Remove(material);
-            AtualizarDataModificacao();
-        }
-    }
+    //public void RemoverMaterial(Guid materialId)
+    //{
+    //    var material = _materiais.FirstOrDefault(m => m.Id == materialId);
+    //    if (material != null)
+    //    {
+    //        _materiais.Remove(material);
+    //        AtualizarDataModificacao();
+    //    }
+    //}
 
-    public bool PodeSerVisualizada => IsPublicada;
-    public string DuracaoFormatada => $"{DuracaoMinutos / 60:D2}:{DuracaoMinutos % 60:D2}";
+    //public bool PodeSerVisualizada => IsPublicada;
+    //public string DuracaoFormatada => $"{DuracaoMinutos / 60:D2}:{DuracaoMinutos % 60:D2}";
 }

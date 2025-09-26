@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Pagamentos.Domain.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Pagamentos.Infrastructure.Mappings
 {
+    [ExcludeFromCodeCoverage]
     public class PagamentoMapping : IEntityTypeConfiguration<Pagamento>
     {
         public void Configure(EntityTypeBuilder<Pagamento> builder)

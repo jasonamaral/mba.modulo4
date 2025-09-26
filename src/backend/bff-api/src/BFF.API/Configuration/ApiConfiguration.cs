@@ -6,11 +6,13 @@ using BFF.Domain.Settings;
 using Core.Identidade;
 using Mapster;
 using Polly;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json;
 
 namespace BFF.API.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class ApiConfiguration
 {
     public static WebApplicationBuilder AddApiConfiguration(this WebApplicationBuilder builder)

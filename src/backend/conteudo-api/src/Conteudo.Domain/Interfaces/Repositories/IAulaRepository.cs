@@ -15,7 +15,7 @@ public interface IAulaRepository : IRepository<Aula>
 
     Task<IEnumerable<Aula>> ObterPublicadasPorCursoIdAsync(Guid cursoId, bool includeMateriais = false);
 
-    Task<bool> ExisteAsync(Guid id);
+    //Task<bool> ExisteAsync(Guid id);
 
     Task<bool> ExistePorNumeroAsync(Guid cursoId, int numero, Guid? excludeId = null);
 
@@ -29,9 +29,9 @@ public interface IAulaRepository : IRepository<Aula>
 
     Task ExcluirAulaAsync(Guid cursoId, Guid id);
 
-    Task<int> ContarAulasAsync();
+    //Task<int> ContarAulasAsync();
 
-    Task<int> ContarAulasPorCursoAsync(Guid cursoId);
+    //Task<int> ContarAulasPorCursoAsync(Guid cursoId);
 
-    Task<int> ContarAulasPublicadasAsync();
+    //Task<int> ContarAulasPublicadasAsync();
 }

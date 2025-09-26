@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Alunos.Application.DTOs.Response;
 
+[ExcludeFromCodeCoverage]
 public class AulaCursoDto
 {
     public Guid AulaId { get; set; }
@@ -9,6 +12,6 @@ public class AulaCursoDto
     public bool Ativo { get; set; }
     public DateTime? DataInicio { get; set; }
     public DateTime? DataTermino { get; set; }
-    public bool AulaJaIniciadaRealizada => DataTermino.HasValue;
+    //public bool AulaJaIniciadaRealizada => DataTermino.HasValue;
     public string Url { get; set; }
 }

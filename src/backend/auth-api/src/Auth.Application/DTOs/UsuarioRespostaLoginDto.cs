@@ -1,5 +1,8 @@
-﻿namespace Auth.Application.DTOs;
+using System.Diagnostics.CodeAnalysis;
 
+namespace Auth.Application.DTOs;
+
+[ExcludeFromCodeCoverage]
 public class UsuarioRespostaLoginDto
 {
     public string AccessToken { get; set; }

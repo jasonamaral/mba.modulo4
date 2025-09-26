@@ -11,38 +11,39 @@ using Pagamentos.Domain.Interfaces;
 using Pagamentos.Domain.Services;
 using Pagamentos.Infrastructure.Repositories;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Pagamentos.API.Configuration
+namespace Pagamentos.API.Configuration;
+
+[ExcludeFromCodeCoverage]
+public static class DependencyInjectionConfig
 {
-    public static class DependencyInjectionConfig
+    public static WebApplicationBuilder AddDependencyInjectionConfig(this WebApplicationBuilder builder)
     {
-        public static WebApplicationBuilder AddDependencyInjectionConfig(this WebApplicationBuilder builder)
-        {
-            builder.Services.ResolveDependencies();
-            return builder;
-        }
+        builder.Services.ResolveDependencies();
+        return builder;
+    }
 
-        public static IServiceCollection ResolveDependencies(this IServiceCollection services)
-        {
-            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+    public static IServiceCollection ResolveDependencies(this IServiceCollection services)
+    {
+        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
-            services.AddScoped<DomainNotificacaoHandler>();
-            services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>>(sp =>
-                               sp.GetRequiredService<DomainNotificacaoHandler>());
+        services.AddScoped<DomainNotificacaoHandler>();
+        services.AddScoped<INotificationHandler<DomainNotificacaoRaiz>>(sp =>
+                           sp.GetRequiredService<DomainNotificacaoHandler>());
 
-            services.AddScoped<IMediatorHandler, MediatorHandler>();
+        services.AddScoped<IMediatorHandler, MediatorHandler>();
 
-            services.AddScoped<INotificador, Notificador>();
+        services.AddScoped<INotificador, Notificador>();
 
-            services.AddScoped<IPagamentoConsultaAppService, PagamentoAppService>();
-            services.AddScoped<IPagamentoComandoAppService, PagamentoAppService>();
-            services.AddScoped<IPagamentoRepository, PagamentoRepository>();
-            services.AddScoped<IPagamentoService, PagamentoService>();
-            services.AddScoped<IPagamentoCartaoCreditoFacade, PagamentoCartaoCreditoFacade>();
-            services.AddScoped<IPayPalGateway, PayPalGateway>();
-            services.AddScoped<Pagamento.AntiCorruption.Interfaces.IConfigurationManager, Pagamento.AntiCorruption.Services.ConfigurationManager>();
+        services.AddScoped<IPagamentoConsultaAppService, PagamentoAppService>();
+        services.AddScoped<IPagamentoComandoAppService, PagamentoAppService>();
+        services.AddScoped<IPagamentoRepository, PagamentoRepository>();
+        services.AddScoped<IPagamentoService, PagamentoService>();
+        services.AddScoped<IPagamentoCartaoCreditoFacade, PagamentoCartaoCreditoFacade>();
+        services.AddScoped<IPayPalGateway, PayPalGateway>();
+        services.AddScoped<Pagamento.AntiCorruption.Interfaces.IConfigurationManager, Pagamento.AntiCorruption.Services.ConfigurationManager>();
 
-            return services;
-        }
+        return services;
     }
 }

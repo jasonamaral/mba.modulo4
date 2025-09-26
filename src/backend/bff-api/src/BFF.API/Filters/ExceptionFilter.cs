@@ -2,9 +2,11 @@ using Core.Communication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Filters;
 
+[ExcludeFromCodeCoverage]
 public class ExceptionFilter(IActionResultExecutor<ObjectResult> executor, ILogger<ExceptionFilter> logger) : IExceptionFilter
 {
     public void OnException(ExceptionContext context)

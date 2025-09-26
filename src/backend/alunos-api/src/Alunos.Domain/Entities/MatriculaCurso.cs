@@ -16,7 +16,7 @@ public class MatriculaCurso : Entidade
     public decimal Valor { get; }
     public DateTime DataMatricula { get; }
     public DateTime? DataConclusao { get; private set; }
-    public EstadoMatriculaCursoEnum EstadoMatricula { get; private set; }
+    public EstadoMatriculaCurso EstadoMatricula { get; private set; }
     public string Observacao { get; private set; }
 
     private readonly List<HistoricoAprendizado> _historicoAprendizado = [];
@@ -41,7 +41,7 @@ public class MatriculaCurso : Entidade
         NomeCurso = nomeCurso?.Trim() ?? string.Empty;
         Valor = valor;
         DataMatricula = DateTime.UtcNow;
-        EstadoMatricula = EstadoMatriculaCursoEnum.PendentePagamento;
+        EstadoMatricula = EstadoMatriculaCurso.PendentePagamento;
         Observacao = observacao;
 
         ValidarIntegridadeMatriculaCurso();
@@ -57,11 +57,11 @@ public class MatriculaCurso : Entidade
 
     public bool MatriculaCursoConcluido() => DataConclusao.HasValue;
 
-    internal bool MatriculaCursoDisponivel() => !DataConclusao.HasValue && EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado;
+    internal bool MatriculaCursoDisponivel() => !DataConclusao.HasValue && EstadoMatricula == EstadoMatriculaCurso.PagamentoRealizado;
 
-    internal bool PodeConcluirCurso() => EstadoMatricula == EstadoMatriculaCursoEnum.PagamentoRealizado && _historicoAprendizado.Count(h => !h.DataTermino.HasValue) == 0;
+    internal bool PodeConcluirCurso() => EstadoMatricula == EstadoMatriculaCurso.PagamentoRealizado && _historicoAprendizado.Count(h => !h.DataTermino.HasValue) == 0;
 
-    public bool PagamentoPodeSerRealizado() => EstadoMatricula == EstadoMatriculaCursoEnum.PendentePagamento || EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado;
+    public bool PagamentoPodeSerRealizado() => EstadoMatricula == EstadoMatriculaCurso.PendentePagamento || EstadoMatricula == EstadoMatriculaCurso.Abandonado;
 
     public decimal CalcularMediaFinalCurso()
     {
@@ -85,33 +85,33 @@ public class MatriculaCurso : Entidade
 
     internal void RegistrarPagamentoMatricula()
     {
-        ValidarIntegridadeMatriculaCurso(novoEstadoMatriculaCurso: EstadoMatriculaCursoEnum.PagamentoRealizado);
-        EstadoMatricula = EstadoMatriculaCursoEnum.PagamentoRealizado;
+        ValidarIntegridadeMatriculaCurso(novoEstadoMatriculaCurso: EstadoMatriculaCurso.PagamentoRealizado);
+        EstadoMatricula = EstadoMatriculaCurso.PagamentoRealizado;
     }
 
-    internal void RegistrarAbandonoMatricula()
-    {
-        ValidarIntegridadeMatriculaCurso(novoEstadoMatriculaCurso: EstadoMatriculaCursoEnum.Abandonado);
-        EstadoMatricula = EstadoMatriculaCursoEnum.Abandonado;
-    }
+    //internal void RegistrarAbandonoMatricula()
+    //{
+    //    ValidarIntegridadeMatriculaCurso(novoEstadoMatriculaCurso: EstadoMatriculaCurso.Abandonado);
+    //    EstadoMatricula = EstadoMatriculaCurso.Abandonado;
+    //}
 
     internal void ConcluirCurso()
     {
-        if (EstadoMatricula == EstadoMatriculaCursoEnum.Abandonado) { throw new DomainException("Não é possível concluir um curso com estado de pagamento abandonado"); }
-        if (!PodeConcluirCurso()) { throw new DomainException("Não é possível concluir o curso, existem aulas não finalizadas"); }
+        if (EstadoMatricula == EstadoMatriculaCurso.Abandonado) { throw new DomainException("Não é possível concluir um curso com estado de pagamento abandonado"); }
+        if (EstadoMatricula != EstadoMatriculaCurso.Concluido && !PodeConcluirCurso()) { throw new DomainException("Não é possível concluir o curso, existem aulas não finalizadas"); }
         if (MatriculaCursoConcluido()) { throw new DomainException("Curso já foi concluído"); }
 
         var dataAtual = DateTime.Now;
         ValidarIntegridadeMatriculaCurso(novaDataConclusao: dataAtual);
         DataConclusao = dataAtual;
-        EstadoMatricula = EstadoMatriculaCursoEnum.Concluido;
+        EstadoMatricula = EstadoMatriculaCurso.Concluido;
     }
 
-    internal void AtualizarObservacoes(string observacao)
-    {
-        ValidarIntegridadeMatriculaCurso(novaObservacao: observacao ?? string.Empty);
-        Observacao = observacao;
-    }
+    //internal void AtualizarObservacoes(string observacao)
+    //{
+    //    ValidarIntegridadeMatriculaCurso(novaObservacao: observacao ?? string.Empty);
+    //    Observacao = observacao;
+    //}
 
     internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
@@ -137,31 +137,31 @@ public class MatriculaCurso : Entidade
         Certificado = new Certificado(Id, NomeCurso, DateTime.UtcNow, null, QuantidadeTotalCargaHoraria(), notaFinal, pathCertificado, nomeInstrutor);
     }
 
-    internal void ComunicarDataEmissaoCertificado(DateTime dataEmissao)
-    {
-        VerificarSeCertificadoExiste();
-        if (Certificado.DataEmissao.HasValue) { throw new DomainException("Data de emissão do certificado já foi informada"); }
+    //internal void ComunicarDataEmissaoCertificado(DateTime dataEmissao)
+    //{
+    //    VerificarSeCertificadoExiste();
+    //    if (Certificado.DataEmissao.HasValue) { throw new DomainException("Data de emissão do certificado já foi informada"); }
 
-        Certificado.AtualizarDataEmissao(dataEmissao);
-    }
+    //    Certificado.AtualizarDataEmissao(dataEmissao);
+    //}
 
-    internal void AtualizarCargaHoraria(short cargaHoraria)
-    {
-        VerificarSeCertificadoExiste();
-        Certificado.AtualizarCargaHoraria(cargaHoraria);
-    }
+    //internal void AtualizarCargaHoraria(short cargaHoraria)
+    //{
+    //    VerificarSeCertificadoExiste();
+    //    Certificado.AtualizarCargaHoraria(cargaHoraria);
+    //}
 
-    internal void AtualizarPathCertificado(string path)
-    {
-        VerificarSeCertificadoExiste();
-        Certificado.AtualizarPathCertificado(path ?? string.Empty);
-    }
+    //internal void AtualizarPathCertificado(string path)
+    //{
+    //    VerificarSeCertificadoExiste();
+    //    Certificado.AtualizarPathCertificado(path ?? string.Empty);
+    //}
 
-    internal void AtualizarNomeInstrutor(string nomeInstrutor)
-    {
-        VerificarSeCertificadoExiste();
-        Certificado.AtualizarNomeInstrutor(nomeInstrutor ?? string.Empty);
-    }
+    //internal void AtualizarNomeInstrutor(string nomeInstrutor)
+    //{
+    //    VerificarSeCertificadoExiste();
+    //    Certificado.AtualizarNomeInstrutor(nomeInstrutor ?? string.Empty);
+    //}
 
     private void VerificarSeCertificadoExiste()
     {
@@ -170,7 +170,7 @@ public class MatriculaCurso : Entidade
 
     private void ValidarIntegridadeMatriculaCurso(int? novaNotaFinal = null,
         DateTime? novaDataConclusao = null,
-        EstadoMatriculaCursoEnum? novoEstadoMatriculaCurso = null,
+        EstadoMatriculaCurso? novoEstadoMatriculaCurso = null,
         string novaObservacao = null)
     {
         novaDataConclusao ??= DataConclusao;
@@ -206,22 +206,22 @@ public class MatriculaCurso : Entidade
         {
             switch (EstadoMatricula)
             {
-                case EstadoMatriculaCursoEnum.PagamentoRealizado:
+                case EstadoMatriculaCurso.PagamentoRealizado:
                     ValidacaoData.DeveSerValido(dataConclusao.Value, "Data de conclusão deve ser informada", validacao);
                     ValidacaoData.DeveTerRangeValido(DataMatricula, dataConclusao.Value, "Data de conclusão não pode ser anterior a data de matrícula", validacao);
                     break;
 
-                case EstadoMatriculaCursoEnum.PendentePagamento:
-                case EstadoMatriculaCursoEnum.Abandonado:
+                case EstadoMatriculaCurso.PendentePagamento:
+                case EstadoMatriculaCurso.Abandonado:
                     validacao.AdicionarErro($"Não é possível concluir um curso com estado de pagamento {EstadoMatricula.ObterDescricao()}");
                     break;
             }
         }
     }
 
-    private void ValidarEstadoParaAbandono(EstadoMatriculaCursoEnum? novoEstado, DateTime? dataConclusao, ResultadoValidacao<MatriculaCurso> validacao)
+    private void ValidarEstadoParaAbandono(EstadoMatriculaCurso? novoEstado, DateTime? dataConclusao, ResultadoValidacao<MatriculaCurso> validacao)
     {
-        if (novoEstado.HasValue && novoEstado == EstadoMatriculaCursoEnum.Abandonado && dataConclusao.HasValue)
+        if (novoEstado.HasValue && novoEstado == EstadoMatriculaCurso.Abandonado && dataConclusao.HasValue)
         {
             validacao.AdicionarErro("Não é possível alterar o estado da matrícula para pagamento abandonado com o curso concluído");
         }

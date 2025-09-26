@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace BFF.API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class JsonExtensions
 {
     public static readonly JsonSerializerOptions GlobalJsonOptions = new()

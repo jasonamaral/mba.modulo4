@@ -1,8 +1,10 @@
 using Microsoft.OpenApi.Models;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Conteudo.API.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class SwaggerConfiguration
 {
     public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)

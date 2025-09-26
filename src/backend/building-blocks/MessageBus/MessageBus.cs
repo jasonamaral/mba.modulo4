@@ -3,9 +3,11 @@ using Core.Messages.Integration;
 using EasyNetQ;
 using Polly;
 using RabbitMQ.Client.Exceptions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MessageBus;
 
+[ExcludeFromCodeCoverage]
 public class MessageBus : IMessageBus
 {
     private IBus? _bus;

@@ -39,6 +39,16 @@ namespace Conteudo.Application.Commands.PublicarAula
 
         private async Task<bool> ValidarRequisicao(PublicarAulaCommand request)
         {
+            request.DefinirValidacao(new PublicarAulaCommandValidator().Validate(request));
+            if (!request.EhValido())
+            {
+                foreach (var erro in request.Erros)
+                {
+                    mediatorHandler.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(Aula), erro)).GetAwaiter().GetResult();
+                }
+                return false;
+            }
+
             var aula = await aulaRepository.ObterPorIdAsync(request.CursoId, request.Id);
             if (aula == null)
             {

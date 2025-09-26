@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class CategoriaDto
 {
     public string Id { get; set; }

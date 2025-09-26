@@ -2,9 +2,11 @@ using Alunos.Domain.Entities;
 using Alunos.Infrastructure.Configurations;
 using Core.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Alunos.Infrastructure.Data;
 
+[ExcludeFromCodeCoverage]
 public class AlunoDbContext(DbContextOptions<AlunoDbContext> options) : DbContext(options), IUnitOfWork
 {
     public DbSet<Aluno> Alunos { get; set; }

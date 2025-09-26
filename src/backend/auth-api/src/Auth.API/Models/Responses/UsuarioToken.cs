@@ -1,5 +1,8 @@
-﻿namespace Auth.API.Models.Responses;
+using System.Diagnostics.CodeAnalysis;
 
+namespace Auth.API.Models.Responses;
+
+[ExcludeFromCodeCoverage]
 public class UsuarioToken
 {
     public string Id { get; set; }

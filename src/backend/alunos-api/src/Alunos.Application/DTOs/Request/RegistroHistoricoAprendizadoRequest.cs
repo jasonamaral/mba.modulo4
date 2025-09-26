@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Alunos.Application.DTOs.Request;
 
+[ExcludeFromCodeCoverage]
 public class RegistroHistoricoAprendizadoRequest
 {
     public Guid AlunoId { get; set; }

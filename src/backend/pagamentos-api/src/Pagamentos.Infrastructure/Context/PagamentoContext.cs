@@ -1,20 +1,21 @@
 using Core.Data;
-using Core.Mediator;
 using Core.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Pagamentos.Domain.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Pagamentos.Infrastructure.Context
 {
+    [ExcludeFromCodeCoverage]
     public class PagamentoContext : DbContext, IUnitOfWork
     {
-        private readonly IMediatorHandler _mediatorHandler;
+        //private readonly IMediatorHandler _mediatorHandler;
 
-        public PagamentoContext(DbContextOptions<PagamentoContext> options, IMediatorHandler rebusHandler)
+        public PagamentoContext(DbContextOptions<PagamentoContext> options) //, IMediatorHandler rebusHandler)
             : base(options)
         {
-            _mediatorHandler = rebusHandler ?? throw new ArgumentNullException(nameof(rebusHandler));
+            //_mediatorHandler = rebusHandler ?? throw new ArgumentNullException(nameof(rebusHandler));
         }
 
         public DbSet<Pagamento> Pagamentos { get; set; }

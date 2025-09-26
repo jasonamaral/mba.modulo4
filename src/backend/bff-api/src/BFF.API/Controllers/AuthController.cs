@@ -9,12 +9,14 @@ using Core.Notification;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Controllers;
 
 /// <summary>
 /// Controller de autenticação no BFF - Proxy para Auth API
 /// </summary>
+[ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController(

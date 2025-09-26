@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class CursoPopularDto
 {
     public Guid Id { get; set; }

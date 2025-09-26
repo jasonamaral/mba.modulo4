@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Conteudo.Application.DTOs;
 
+[ExcludeFromCodeCoverage]
 public class CadastroCategoriaDto
 {
     [Required(ErrorMessage = "Nome é obrigatório")]
@@ -21,6 +23,7 @@ public class CadastroCategoriaDto
     public int Ordem { get; set; } = 0;
 }
 
+[ExcludeFromCodeCoverage]
 public class AtualizarCategoriaDto
 {
     [Required(ErrorMessage = "ID é obrigatório")]
@@ -43,6 +46,7 @@ public class AtualizarCategoriaDto
     public int Ordem { get; set; } = 0;
 }
 
+[ExcludeFromCodeCoverage]
 public class CategoriaDto
 {
     public Guid Id { get; set; }

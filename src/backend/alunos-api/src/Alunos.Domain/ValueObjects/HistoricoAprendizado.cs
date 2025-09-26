@@ -13,6 +13,7 @@ public class HistoricoAprendizado
     public DateTime DataInicio { get; }
     public DateTime? DataTermino { get; }
 
+    // EF Compatibility
     protected HistoricoAprendizado()
     { }
 
@@ -40,6 +41,7 @@ public class HistoricoAprendizado
     {
         var validacao = new ResultadoValidacao<HistoricoAprendizado>();
 
+        ValidacaoGuid.DeveSerValido(MatriculaCursoId, "Identifição da matrícula não pode ser vazio", validacao);
         ValidacaoGuid.DeveSerValido(CursoId, "Identifição do curso não pode ser vazio", validacao);
         ValidacaoGuid.DeveSerValido(AulaId, "Identifição da aula não pode ser vazio", validacao);
         ValidacaoTexto.DevePossuirConteudo(NomeAula, "Nome da aula não pode ser vazio", validacao);

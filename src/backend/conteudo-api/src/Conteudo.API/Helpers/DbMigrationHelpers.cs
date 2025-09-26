@@ -2,9 +2,11 @@ using Conteudo.Domain.Entities;
 using Conteudo.Domain.ValueObjects;
 using Conteudo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Conteudo.API.Helpers;
 
+[ExcludeFromCodeCoverage]
 public static class DbMigrationHelpers
 {
     public static void UseDbMigrationHelper(this WebApplication app)

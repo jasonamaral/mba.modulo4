@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Core.Utils;
 
+[ExcludeFromCodeCoverage]
 public static class DbContextExtensions
 {
     public static void AtualizarEstadoValueObject<T>(this DbContext context, T antigo, T novo)

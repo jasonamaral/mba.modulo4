@@ -1,9 +1,11 @@
 using Auth.API.Models.Requests;
 using Core.Messages.Integration;
 using Mapster;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Auth.API.Configuration;
 
+[ExcludeFromCodeCoverage]
 public class AuthApiMappingConfig : IRegister
 {
     public void Register(TypeAdapterConfig config)
