@@ -47,7 +47,7 @@ public class CadastrarAlunoCommandHandler(IAlunoRepository alunoRepository, IMed
     private async Task<bool> ValidarRequisicao(CadastrarAlunoCommand request)
     {
         request.DefinirValidacao(new CadastrarAlunoCommandValidator().Validate(request));
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

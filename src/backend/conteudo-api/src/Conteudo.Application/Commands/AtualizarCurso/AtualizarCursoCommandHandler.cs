@@ -50,7 +50,7 @@ public class AtualizarCursoCommandHandler(IMediatorHandler mediatorHandler
     {
         request.DefinirValidacao(new AtualizarCursoCommandValidator().Validate(request));
 
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.AtualizarMaterial
 {
-    public class AtualizarMaterialCommand : CommandRaiz, IRequest<CommandResult>
+    public class AtualizarMaterialCommand : RaizCommand, IRequest<CommandResult>
     {
         public Guid CursoId { get; private set; }
         public Guid Id { get; private set; }

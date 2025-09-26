@@ -34,7 +34,7 @@ namespace Conteudo.Application.Commands.ExcluirMaterial
         {
             request.DefinirValidacao(new ExcluirMaterialCommandValidator().Validate(request));
 
-            if (!request.EhValido())
+            if (!request.EstaValido())
             {
                 foreach (var erro in request.Erros)
                 {

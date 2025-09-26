@@ -19,7 +19,7 @@ public class RegistrarProblemaHistoricoAprendizadoEventHandler(IMediatorHandler 
     private bool ValidarRequisicao(RegistrarProblemaHistoricoAprendizadoEvent notification)
     {
         notification.DefinirValidacao(new RegistrarProblemaHistoricoAprendizadoEventValidator().Validate(notification));
-        if (!notification.EhValido())
+        if (!notification.EstaValido())
         {
             foreach (var erro in notification.Erros)
             {

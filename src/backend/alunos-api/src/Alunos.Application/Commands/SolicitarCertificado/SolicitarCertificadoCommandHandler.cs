@@ -39,7 +39,7 @@ public class SolicitarCertificadoCommandHandler(IAlunoRepository alunoRepository
     {
         request.DefinirValidacao(new SolicitarCertificadoCommandValidator().Validate(request));
 
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Conteudo.Application.Commands.PublicarAula
 {
-    public class PublicarAulaCommand : CommandRaiz
+    public class PublicarAulaCommand : RaizCommand
     {
         public Guid CursoId { get; set; }
         public Guid Id { get; private set; }

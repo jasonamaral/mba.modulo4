@@ -28,7 +28,7 @@ public class AtualizarPagamentoMatriculaCommandHandler(IAlunoRepository alunoRep
     private bool ValidarRequisicao(AtualizarPagamentoMatriculaCommand request)
     {
         request.DefinirValidacao(new AtualizarPagamentoMatriculaCommandValidator().Validate(request));
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

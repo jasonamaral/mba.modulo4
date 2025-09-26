@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.ExcluirAula
 {
-    public class ExcluirAulaCommand : CommandRaiz, IRequest<CommandResult>
+    public class ExcluirAulaCommand : RaizCommand, IRequest<CommandResult>
     {
         public Guid CursoId { get; set; }
         public Guid Id { get; }

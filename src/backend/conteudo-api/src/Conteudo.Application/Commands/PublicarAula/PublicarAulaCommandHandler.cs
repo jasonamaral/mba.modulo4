@@ -40,7 +40,7 @@ namespace Conteudo.Application.Commands.PublicarAula
         private async Task<bool> ValidarRequisicao(PublicarAulaCommand request)
         {
             request.DefinirValidacao(new PublicarAulaCommandValidator().Validate(request));
-            if (!request.EhValido())
+            if (!request.EstaValido())
             {
                 foreach (var erro in request.Erros)
                 {

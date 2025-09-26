@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Conteudo.Application.Commands.AtualizarCategoria;
 
-public class AtualizarCategoriaCommand : CommandRaiz
+public class AtualizarCategoriaCommand : RaizCommand
 {
     public Guid Id { get; set; }
     public string Nome { get; set; } = string.Empty;

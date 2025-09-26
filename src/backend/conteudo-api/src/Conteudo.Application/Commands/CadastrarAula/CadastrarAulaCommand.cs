@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.CadastrarAula
 {
-    public class CadastrarAulaCommand : CommandRaiz, IRequest<CommandResult>
+    public class CadastrarAulaCommand : RaizCommand, IRequest<CommandResult>
     {
         public Guid CursoId { get; private set; }
         public string Nome { get; private set; }

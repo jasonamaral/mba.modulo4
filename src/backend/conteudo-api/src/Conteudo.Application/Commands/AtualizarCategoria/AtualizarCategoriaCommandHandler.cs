@@ -40,7 +40,7 @@ public class AtualizarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
         request.DefinirRaizAgregacao(request.Id);
         request.DefinirValidacao(new AtualizarCategoriaCommandValidator().Validate(request));
 
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
                 await mediator.PublicarNotificacaoDominio(new DomainNotificacaoRaiz(_raizAgregacao, nameof(AtualizarCategoriaCommand), erro));

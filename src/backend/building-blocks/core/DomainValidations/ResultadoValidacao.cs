@@ -1,11 +1,11 @@
-﻿using Plataforma.Educacao.Core.Exceptions;
+using Plataforma.Educacao.Core.Exceptions;
 
 namespace Core.DomainValidations;
 
 public class ResultadoValidacao<T> where T : class
 {
     private readonly IList<string> _erros;
-    private bool _ehValido => _erros.Count == 0;
+    private bool _estaValido => _erros.Count == 0;
 
     public ResultadoValidacao()
     {
@@ -20,6 +20,6 @@ public class ResultadoValidacao<T> where T : class
 
     public void DispararExcecaoDominioSeInvalido()
     {
-        if (!_ehValido) { throw new DomainException(_erros); }
+        if (!_estaValido) { throw new DomainException(_erros); }
     }
 }

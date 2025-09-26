@@ -44,7 +44,7 @@ namespace Conteudo.Application.Commands.AtualizarAula
         private async Task<bool> ValidarRequisicao(AtualizarAulaCommand request, Aula aula)
         {
             request.DefinirValidacao(new AtualizarAulaCommandValidator().Validate(request));
-            if (!request.EhValido())
+            if (!request.EstaValido())
             {
                 foreach (var erro in request.Erros)
                 {

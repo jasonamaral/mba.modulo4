@@ -5,13 +5,13 @@ namespace Core.Tests.Messages;
 
 public class CommandRaizTests 
 {
-    private class ComandoTeste : CommandRaiz
+    private class ComandoTeste : RaizCommand
     {
         public string Nome { get; set; } = string.Empty;
     }
 
     [Fact]
-    public void CommandRaiz_DeveCriarComPropriedadesPadrao()
+    public void RaizCommand_DeveCriarComPropriedadesPadrao()
     {
         // Arrange & Act
         var comando = new ComandoTeste();
@@ -23,11 +23,11 @@ public class CommandRaizTests
         comando.Validacao.Should().NotBeNull();
         comando.Resultado.Should().NotBeNull();
         comando.Erros.Should().BeEmpty();
-        comando.EhValido().Should().BeTrue();
+        comando.EstaValido().Should().BeTrue();
     }
 
     [Fact]
-    public void CommandRaiz_DeveDefinirRaizAgregacao()
+    public void RaizCommand_DeveDefinirRaizAgregacao()
     {
         // Arrange
         var comando = new ComandoTeste();
@@ -41,7 +41,7 @@ public class CommandRaizTests
     }
 
     [Fact]
-    public void CommandRaiz_DeveDefinirValidacao()
+    public void RaizCommand_DeveDefinirValidacao()
     {
         // Arrange
         var comando = new ComandoTeste();
@@ -55,22 +55,22 @@ public class CommandRaizTests
         comando.Validacao.Should().Be(validacao);
         comando.Resultado.ObterValidationResult().Should().Be(validacao);
         comando.Erros.Should().Contain("Erro de teste");
-        comando.EhValido().Should().BeFalse();
+        comando.EstaValido().Should().BeFalse();
     }
 
     [Fact]
-    public void CommandRaiz_DeveSerValidoSemErros()
+    public void RaizCommand_DeveSerValidoSemErros()
     {
         // Arrange
         var comando = new ComandoTeste();
 
         // Act & Assert
-        comando.EhValido().Should().BeTrue();
+        comando.EstaValido().Should().BeTrue();
         comando.Erros.Should().BeEmpty();
     }
 
     [Fact]
-    public void CommandRaiz_DeveSerInvalidoComErros()
+    public void RaizCommand_DeveSerInvalidoComErros()
     {
         // Arrange
         var comando = new ComandoTeste();
@@ -82,14 +82,14 @@ public class CommandRaizTests
         comando.DefinirValidacao(validacao);
 
         // Assert
-        comando.EhValido().Should().BeFalse();
+        comando.EstaValido().Should().BeFalse();
         comando.Erros.Should().HaveCount(2);
         comando.Erros.Should().Contain("Erro 1");
         comando.Erros.Should().Contain("Erro 2");
     }
 
     [Fact]
-    public void CommandRaiz_DeveManterDataHoraOriginal()
+    public void RaizCommand_DeveManterDataHoraOriginal()
     {
         // Arrange
         var comando = new ComandoTeste();
@@ -104,7 +104,7 @@ public class CommandRaizTests
     }
 
     [Fact]
-    public void CommandRaiz_DevePermitirValidacaoNull()
+    public void RaizCommand_DevePermitirValidacaoNull()
     {
         // Arrange
         var comando = new ComandoTeste();
@@ -115,7 +115,7 @@ public class CommandRaizTests
         // Assert
         comando.Validacao.Should().BeNull();
         comando.Erros.Should().BeEmpty();
-        comando.EhValido().Should().BeTrue();
+        comando.EstaValido().Should().BeTrue();
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class CommandRaizTests
         cmd.DataHora.Should().BeOnOrAfter(antes).And.BeOnOrBefore(depois);
         cmd.Resultado.Should().NotBeNull();
         cmd.Erros.Should().BeEmpty();
-        cmd.EhValido().Should().BeTrue(); // Validacao.IsValid == true por padrão
+        cmd.EstaValido().Should().BeTrue(); // Validacao.IsValid == true por padrão
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class CommandRaizTests
 
         cmd.Validacao.Should().BeSameAs(invalido);
         cmd.Resultado.ObterValidationResult().Should().BeSameAs(invalido);
-        cmd.EhValido().Should().BeFalse();
+        cmd.EstaValido().Should().BeFalse();
         cmd.Erros.Should().Contain("b");
     }
 
@@ -161,6 +161,6 @@ public class CommandRaizTests
     {
         var cmd = new ComandoTeste();
         cmd.DefinirValidacao(null!); // força null
-        cmd.EhValido().Should().BeTrue();
+        cmd.EstaValido().Should().BeTrue();
     }
 }
