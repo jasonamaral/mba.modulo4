@@ -1,8 +1,8 @@
 # 🎓 Plataforma Educacional Distribuída
 
-Uma plataforma educacional moderna baseada em arquitetura de **microserviços**, desenvolvida com **.NET 8**, **Angular 18**, **RabbitMQ**, **SQL Server** e **Redis**, totalmente containerizada com **Docker**.
+Uma plataforma educacional moderna baseada em arquitetura de **microserviços**, desenvolvida com **.NET 9**, **Angular 18**, **RabbitMQ**, **SQL Server** e **Redis**, totalmente containerizada com **Docker**.
 
-![.NET](https://img.shields.io/badge/.NET-8.0-blue)
+![.NET](https://img.shields.io/badge/.NET-9.0-blue)
 ![Angular](https://img.shields.io/badge/Angular-18-red)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3-orange)
@@ -16,16 +16,22 @@ Uma plataforma educacional moderna baseada em arquitetura de **microserviços**,
 
 ## 📋 Índice
 
-- [Arquitetura do Sistema](#-arquitetura-do-sistema)
+- [Arquitetura do Sistema](#️-arquitetura-do-sistema)
 - [Pré-requisitos](#-pré-requisitos)
 - [Execução Rápida](#-execução-rápida)
 - [Microserviços](#-microserviços)
-- [Infraestrutura](#-infraestrutura)
+- [Infraestrutura](#%EF%B8%8F-infraestrutura)
 - [URLs de Acesso](#-urls-de-acesso)
-- [Desenvolvimento](#-desenvolvimento)
+- [Desenvolvimento](#%EF%B8%8F-desenvolvimento)
+- [Testes](#-testes)
+- [Building Blocks](#-building-blocks)
+- [Script](#-scripts)
+- [Usuários de Exemplo](#-usuários-de-exemplo)
 - [Monitoramento](#-monitoramento)
 - [Solução de Problemas](#-solução-de-problemas)
-- [Contribuição](#-contribuição)
+- [Segurança](#-segurança)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Licença](#-licença)
 
 ## 🏗️ Arquitetura do Sistema
 
@@ -237,7 +243,7 @@ docker-compose up -d rabbitmq redis
 Start-Sleep -Seconds 120
 
 # Iniciar microserviços
-docker-compose up -d auth-api conteudo-api alunos-api pagamentos-api
+docker compose up -d auth-api conteudo-api alunos-api pagamentos-api
 
 # Aguardar APIs (aguarde ~1 minuto)
 Start-Sleep -Seconds 60
@@ -289,9 +295,12 @@ Após ~5 minutos de inicialização:
 **Responsabilidade**: Processamento financeiro
 - ✅ Processamento de pagamentos
 - ✅ Consulta de status
-- ✅ Webhooks de confirmação
 - ✅ Emissão de eventos
 - ✅ Histórico de transações
+- 🔄 Camada Anti-Corrupção (Pagamentos API)
+     Responsável por isolar integrações externas (gateways de pagamento) do domínio principal.
+     Evita que dependências externas contaminem as regras de negócio.
+     Implementada em src/backend/pagamentos-api/Pagamentos.AntiCorruption.
 - 📁 **Estrutura**: API → Application → Domain → Infrastructure
 - 📊 **Swagger**: https://localhost:5004/swagger
 
@@ -324,7 +333,7 @@ Após ~5 minutos de inicialização:
 | 🔗 **BFF API** | http://localhost:5000 | Gateway para frontend |
 
 ### APIs (Swagger)
-| API | HTTPS | HTTP | Descrição |
+| API | HTTP | Descrição |
 |-----|-------|------|-----------|
 | 🔐 **Auth** | http://localhost:5001 | Autenticação |
 | 📚 **Conteudo** | http://localhost:5002 | Cursos e aulas |
@@ -379,6 +388,63 @@ docker-compose up -d [service-name]
 docker-compose build auth-api
 docker-compose up -d auth-api
 ```
+
+## 🧪 Testes
+Cada microserviço possui testes automatizados:
+
+- **UnitTests** → Validação de regras de negócio isoladas.  
+- **IntegrationTests** → Testam endpoints reais com banco de dados em memória ou SQL local.
+
+### Executando os testes
+```bash
+# Testes unitários
+dotnet test src/backend/auth-api/tests/Auth.UnitTests
+dotnet test src/backend/pagamentos-api/tests/Pagamentos.UnitTests
+
+# Testes de integração
+dotnet test src/backend/alunos-api/tests/Alunos.IntegrationTests
+```
+
+> Framework utilizado: **xUnit**  
+> Cobertura recomendada: **80%+** (utilizando **Coverlet + ReportGenerator**)
+
+
+## 🧩 Building Blocks
+A pasta `building-blocks/` contém componentes reutilizáveis entre microserviços:
+
+- **Core** (`Core.csproj`)  
+  - Communication (mensagens entre serviços)  
+  - DomainObjects (objetos base de domínio)  
+  - DomainValidations (validações reutilizáveis)  
+  - Exceptions (exceções customizadas)  
+  - Mediator (implementação do padrão Mediator)  
+  - Notification (notificações de domínio)  
+  - SharedDtos (DTOs comuns)  
+  - Utils (funções auxiliares)  
+
+- **MessageBus** (`MessageBus.csproj`)  
+  - Implementação de **comunicação assíncrona** via RabbitMQ  
+  - Base para publicação e consumo de eventos entre microserviços
+  
+
+## 📜 Scripts
+Na pasta `scripts/` existem automações úteis:
+
+- `start-all.ps1` → Inicializa toda a plataforma (infra + serviços)  
+- `stop-all.ps1` → Para todos os containers  
+- `setup-rabbitmq.sh` → Configura filas e exchanges no RabbitMQ  
+- `rebuild-service.ps1` → Rebuild de um serviço específico  
+- `clean.ps1` → Remove containers, imagens e volumes antigos  
+
+## 👤 Usuários de Exemplo
+A aplicação já possui usuários pré-configurados para testes:
+
+| Usuário | Senha | Perfil |
+|---------|-------|--------|
+| `admin@auth.api` | `Teste@123` | Administrador |
+| `aluno1@auth.api` | `Teste@123` | Aluno |
+
+
 
 ## 📊 Monitoramento
 
@@ -511,9 +577,8 @@ As configurações atuais são para **desenvolvimento/demonstração**:
 - Certificados auto-assinados
 - Configurações de desenvolvimento
 
-## 🤝 Contribuição
+## Estrutura do Projeto
 
-### Estrutura do Projeto
 ```
 mba.modulo4/
 ├── src/backend/                    # Microserviços .NET
@@ -551,7 +616,7 @@ mba.modulo4/
 │   │   │   ├── Pagamentos.Application/ # Application Layer
 │   │   │   ├── Pagamentos.Domain/  # Domain Layer
 │   │   │   ├── Pagamentos.Infrastructure/ # Infrastructure Layer
-│   │   │   └── Pagamento.AntiCorruption/ # Camada anti-corrupção
+│   │   │   └── Pagamentos.AntiCorruption/ # Camada anti-corrupção
 │   │   └── tests/
 │   │       ├── Pagamentos.UnitTests/ # Testes unitários
 │   │       └── Pagamentos.IntegrationTests/ # Testes de integração
@@ -564,7 +629,7 @@ mba.modulo4/
 │   │   └── tests/
 │   │       ├── BFF.UnitTests/      # Testes unitários
 │   │       └── BFF.IntegrationTests/ # Testes de integração
-│   └── building-blocks/            # Componentes compartilhados
+│   └── building-blocks/             # Componentes compartilhados
 │       ├── core/                    # Core.csproj - Funcionalidades base
 │       │   ├── Communication/       # Comunicação entre serviços
 │       │   ├── Data/                # Abstrações de dados
@@ -576,12 +641,14 @@ mba.modulo4/
 │       │   ├── Messages/            # Mensagens e comandos
 │       │   ├── Notification/        # Sistema de notificações
 │       │   ├── Services/            # Serviços base
-│       │   ├── SharedDtos/         # DTOs compartilhados
+│       │   ├── SharedDtos/          # DTOs compartilhados
 │       │   ├── Utils/               # Utilitários gerais
 │       │   └── Tests/               # Core.Tests.csproj
 │       └── MessageBus/              # MessageBus.csproj - Comunicação assíncrona
 ├── src/frontend/                    # Angular 18 SPA
 ├── scripts/                         # Scripts de automação PowerShell
+├── infra/                           # (separar configs de infraestrutura, se aplicável)
+├── docs/                            # Documentação extra
 ├── docker/                          # Configurações Docker
 ├── docker-compose.yml               # Orquestração Docker
 ├── docker-compose-infra.yml         # Infraestrutura apenas
