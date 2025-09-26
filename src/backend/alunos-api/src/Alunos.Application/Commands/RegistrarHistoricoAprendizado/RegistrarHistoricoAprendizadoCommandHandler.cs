@@ -50,7 +50,7 @@ public class RegistrarHistoricoAprendizadoCommandHandler(IAlunoRepository alunoR
     {
         request.DefinirValidacao(new RegistrarHistoricoAprendizadoCommandValidator().Validate(request));
 
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

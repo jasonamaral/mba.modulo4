@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Conteudo.Application.Commands.ExcluirCurso;
 
-public class ExcluirCursoCommand : CommandRaiz
+public class ExcluirCursoCommand : RaizCommand
 {
     public Guid Id { get; }
 

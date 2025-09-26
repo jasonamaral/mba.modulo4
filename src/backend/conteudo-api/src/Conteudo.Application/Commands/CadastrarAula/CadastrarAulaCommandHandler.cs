@@ -41,7 +41,7 @@ namespace Conteudo.Application.Commands.CadastrarAula
         private async Task<bool> ValidarRequisicao(CadastrarAulaCommand request)
         {
             request.DefinirValidacao(new CadastrarAulaCommandValidator().Validate(request));
-            if (!request.EhValido())
+            if (!request.EstaValido())
             {
                 foreach (var erro in request.Erros)
                 {

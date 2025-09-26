@@ -35,7 +35,7 @@ public class CadastrarCategoriaCommandHandler(ICategoriaRepository categoriaRepo
     private async Task<bool> ValidarRequisicao(CadastrarCategoriaCommand request)
     {
         request.DefinirValidacao(new CadastrarCategoriaCommandValidator().Validate(request));
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

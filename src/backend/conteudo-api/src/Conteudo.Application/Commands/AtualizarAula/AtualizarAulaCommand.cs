@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Conteudo.Application.Commands.AtualizarAula
 {
-    public class AtualizarAulaCommand : CommandRaiz, IRequest<CommandResult>
+    public class AtualizarAulaCommand : RaizCommand, IRequest<CommandResult>
     {
         public Guid Id { get; private set; }
         public Guid CursoId { get; private set; }

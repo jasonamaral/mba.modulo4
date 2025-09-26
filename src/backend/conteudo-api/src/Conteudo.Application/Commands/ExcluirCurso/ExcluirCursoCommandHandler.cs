@@ -32,7 +32,7 @@ public class ExcluirCursoCommandHandler(ICursoRepository cursoRepository
     {
         request.DefinirValidacao(new ExcluirCursoCommandValidator().Validate(request));
 
-        if (!request.EhValido())
+        if (!request.EstaValido())
         {
             foreach (var erro in request.Erros)
             {

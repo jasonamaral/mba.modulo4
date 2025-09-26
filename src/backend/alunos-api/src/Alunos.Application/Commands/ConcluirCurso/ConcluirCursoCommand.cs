@@ -3,7 +3,7 @@ using Core.SharedDtos.Conteudo;
 
 namespace Alunos.Application.Commands.ConcluirCurso;
 
-public class ConcluirCursoCommand : CommandRaiz
+public class ConcluirCursoCommand : RaizCommand
 {
     public Guid AlunoId { get; init; }
     public Guid MatriculaCursoId { get; init; }

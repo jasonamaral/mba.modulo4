@@ -1,10 +1,10 @@
-﻿using Core.Communication;
+using Core.Communication;
 using FluentValidation.Results;
 using MediatR;
 
 namespace Core.Messages;
 
-public abstract class CommandRaiz : IRequest<CommandResult>
+public abstract class RaizCommand : IRequest<CommandResult>
 {
     private readonly CommandResult _resultado;
 
@@ -14,7 +14,7 @@ public abstract class CommandRaiz : IRequest<CommandResult>
 
     public CommandResult Resultado => _resultado;
 
-    protected CommandRaiz()
+    protected RaizCommand()
     {
         _resultado = new CommandResult(Validacao);
     }
@@ -29,5 +29,5 @@ public abstract class CommandRaiz : IRequest<CommandResult>
 
     public IEnumerable<string> Erros => Validacao?.Errors?.Select(e => e.ErrorMessage) ?? Enumerable.Empty<string>();
 
-    public bool EhValido() => Validacao?.IsValid != false;
+    public bool EstaValido() => Validacao?.IsValid != false;
 }

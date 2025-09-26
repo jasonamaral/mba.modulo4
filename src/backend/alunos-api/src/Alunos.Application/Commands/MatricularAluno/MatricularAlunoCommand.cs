@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Alunos.Application.Commands.MatricularAluno;
 
-public class MatricularAlunoCommand : CommandRaiz
+public class MatricularAlunoCommand : RaizCommand
 {
     public Guid AlunoId { get; init; }
     public Guid CursoId { get; init; }

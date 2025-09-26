@@ -52,7 +52,7 @@ namespace Conteudo.Application.Commands.CadastrarMaterial
         private async Task<bool> ValidarRequisicao(CadastrarMaterialCommand request)
         {
             request.DefinirValidacao(new CadastrarMaterialCommandValidator().Validate(request));
-            if (!request.EhValido())
+            if (!request.EstaValido())
             {
                 foreach (var erro in request.Erros)
                 {

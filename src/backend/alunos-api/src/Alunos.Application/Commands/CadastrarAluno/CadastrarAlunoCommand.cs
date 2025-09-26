@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Alunos.Application.Commands.CadastrarAluno;
 
-public class CadastrarAlunoCommand : CommandRaiz, IRequest<CommandResult>
+public class CadastrarAlunoCommand : RaizCommand, IRequest<CommandResult>
 {
     public Guid Id { get; private set; }
     public string Nome { get; private set; }

@@ -2,7 +2,7 @@ using Core.Messages;
 
 namespace Alunos.Application.Commands.RegistrarHistoricoAprendizado;
 
-public class RegistrarHistoricoAprendizadoCommand : CommandRaiz
+public class RegistrarHistoricoAprendizadoCommand : RaizCommand
 {
     public Guid AlunoId { get; private set; }
     public Guid MatriculaCursoId { get; private set; }

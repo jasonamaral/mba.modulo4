@@ -22,7 +22,7 @@ public class EventRaizTests
         evento.DataHora.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
         evento.Validacao.Should().BeNull();
         evento.Erros.Should().BeEmpty();
-        evento.EhValido().Should().BeTrue();
+        evento.EstaValido().Should().BeTrue();
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class EventRaizTests
         // Assert
         evento.Validacao.Should().Be(validacao);
         evento.Erros.Should().Contain("Erro de teste");
-        evento.EhValido().Should().BeFalse();
+        evento.EstaValido().Should().BeFalse();
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class EventRaizTests
         var evento = new EventoTeste();
 
         // Act & Assert
-        evento.EhValido().Should().BeTrue();
+        evento.EstaValido().Should().BeTrue();
         evento.Erros.Should().BeEmpty();
     }
 
@@ -78,7 +78,7 @@ public class EventRaizTests
         evento.DefinirValidacao(validacao);
 
         // Assert
-        evento.EhValido().Should().BeTrue();
+        evento.EstaValido().Should().BeTrue();
         evento.Erros.Should().BeEmpty();
     }
 
@@ -95,7 +95,7 @@ public class EventRaizTests
         evento.DefinirValidacao(validacao);
 
         // Assert
-        evento.EhValido().Should().BeFalse();
+        evento.EstaValido().Should().BeFalse();
         evento.Erros.Should().HaveCount(2);
         evento.Erros.Should().Contain("Erro 1");
         evento.Erros.Should().Contain("Erro 2");
@@ -128,7 +128,7 @@ public class EventRaizTests
         // Assert
         evento.Validacao.Should().BeNull();
         evento.Erros.Should().BeEmpty();
-        evento.EhValido().Should().BeTrue();
+        evento.EstaValido().Should().BeTrue();
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class EventRaizTests
 
         e.RaizAgregacao.Should().Be(id);
         e.Validacao.Should().BeSameAs(vr);
-        e.EhValido().Should().BeTrue();
+        e.EstaValido().Should().BeTrue();
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class EventRaizTests
         var e = new EventoTeste();
         e.DefinirValidacao(new ValidationResult(new[] { new ValidationFailure("x", "y") }));
 
-        e.EhValido().Should().BeFalse();
+        e.EstaValido().Should().BeFalse();
         e.Erros.Should().Contain("y");
     }
 }
