@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.Settings;
 
+[ExcludeFromCodeCoverage]
 public class CacheSettings
 {
     public TimeSpan DashboardExpiration { get; set; } = TimeSpan.FromMinutes(10);

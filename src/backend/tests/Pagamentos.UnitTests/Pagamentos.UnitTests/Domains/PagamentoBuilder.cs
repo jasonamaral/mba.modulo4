@@ -1,5 +1,3 @@
-using Pagamentos.Domain.Entities;
-
 namespace Pagamentos.UnitTests.Domains;
 public class PagamentoBuilder
 {

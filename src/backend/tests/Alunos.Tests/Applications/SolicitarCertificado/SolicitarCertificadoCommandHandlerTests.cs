@@ -1,21 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Alunos.Application.Commands.SolicitarCertificado;
 using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
-using Core.Communication; // DomainNotificacaoRaiz
 using Core.Data;
 using Core.Mediator;
 using FluentAssertions;
 using Moq;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 using Core.Messages;
 
 namespace Alunos.Tests.Applications.SolicitarCertificado;

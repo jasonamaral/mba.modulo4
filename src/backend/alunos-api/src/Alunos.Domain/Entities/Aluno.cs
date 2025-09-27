@@ -56,42 +56,10 @@ public class Aluno : Entidade, IRaizAgregacao
 
     public void InativarAluno() => Ativo = false;
 
-    //internal void AtualizarNomeAluno(string nome)
-    //{
-    //    ValidarIntegridadeAluno(novoNome: nome ?? string.Empty);
-    //    Nome = nome.Trim();
-    //}
-
-    //internal void AtualizarEmailAluno(string email)
-    //{
-    //    ValidarIntegridadeAluno(novoEmail: email ?? string.Empty);
-    //    Email = email.Trim().ToLowerInvariant();
-    //}
-
-    //internal void AtualizarContatoAluno(string contato)
-    //{
-    //    ValidarIntegridadeAluno(novoContato: contato ?? string.Empty);
-    //    Telefone = contato.Trim();
-    //}
-
-    //public void AtualizarDataNascimento(DateTime dataNascimento)
-    //{
-    //    ValidarIntegridadeAluno(novaDataNascimento: dataNascimento);
-    //    DataNascimento = dataNascimento;
-    //}
-
     public int ObterQuantidadeAulasPendenteMatriculaCurso(Guid cursoId)
     {
         return _matriculasCursos.Count(m => m.CursoId == cursoId && m.PodeConcluirCurso() == false);
     }
-
-    //public MatriculaCurso ObterMatriculaCursoPeloCurso(Guid cursoId)
-    //{
-    //    var matriculaCurso = _matriculasCursos.FirstOrDefault(m => m.CursoId == cursoId);
-    //    if (matriculaCurso == null) { throw new DomainException("Matrícula pelo Curso não foi localizada"); }
-
-    //    return matriculaCurso;
-    //}
 
     public MatriculaCurso ObterMatriculaCursoPeloId(Guid matriculaCursoId)
     {
@@ -112,35 +80,17 @@ public class Aluno : Entidade, IRaizAgregacao
         return novaMatricula;
     }
 
-    //internal void AtualizarNotaFinalCurso(Guid matriculaCursoId, byte notaFinal)
-    //{
-    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
-    //    matriculaCurso.AtualizarNotaFinalCurso(notaFinal);
-    //}
-
     public void AtualizarPagamentoMatricula(Guid matriculaCursoId)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.RegistrarPagamentoMatricula();
     }
 
-    //public void AtualizarAbandonoMatricula(Guid matriculaCursoId)
-    //{
-    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
-    //    matriculaCurso.RegistrarAbandonoMatricula();
-    //}
-
     public void ConcluirCurso(Guid matriculaCursoId)
     {
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.ConcluirCurso();
     }
-
-    //internal void AtualizarObservacoes(Guid matriculaCursoId, string observacao)
-    //{
-    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
-    //    matriculaCurso.AtualizarObservacoes(observacao);
-    //}
 
     public void RegistrarHistoricoAprendizado(Guid matriculaCursoId, Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
@@ -167,30 +117,6 @@ public class Aluno : Entidade, IRaizAgregacao
         MatriculaCurso matriculaCurso = ObterMatriculaCursoPeloId(matriculaCursoId);
         matriculaCurso.RequisitarCertificadoConclusao(notaFinal, pathCertificado, nomeInstrutor);
     }
-
-    //public void ComunicarDataEmissaoCertificado(Guid matriculaCursoId, DateTime dataEmissao)
-    //{
-    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
-    //    matriculaCurso.ComunicarDataEmissaoCertificado(dataEmissao);
-    //}
-
-    //public void AtualizarCargaHoraria(Guid matriculaCursoId, short cargaHoraria)
-    //{
-    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
-    //    matriculaCurso.AtualizarCargaHoraria(cargaHoraria);
-    //}
-
-    //public void AtualizarPathCertificado(Guid matriculaCursoId, string path)
-    //{
-    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
-    //    matriculaCurso.AtualizarPathCertificado(path);
-    //}
-
-    //public void AtualizarNomeInstrutor(Guid matriculaCursoId, string nomeInstrutor)
-    //{
-    //    MatriculaCurso matriculaCurso = ObterMatriculaCurso(matriculaCursoId);
-    //    matriculaCurso.AtualizarNomeInstrutor(nomeInstrutor);
-    //}
 
     private void ValidarIntegridadeAluno(string novoNome = null,
         string novoEmail = null,

@@ -3,25 +3,11 @@ using Alunos.Application.Events.RegistrarProblemaHistorico;
 using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
 using Alunos.Domain.ValueObjects;
-using Core.Communication; // DomainNotificacaoRaiz
 using Core.Data;
 using Core.Mediator;
 using Core.Messages;
 using FluentAssertions;
-using global::Alunos.Application.Commands.RegistrarHistoricoAprendizado;
-using global::Alunos.Domain.Entities;
-using global::Alunos.Domain.Interfaces;
-using global::Alunos.Domain.ValueObjects;
 using Moq;
-using System;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace Alunos.Tests.Applications.RegistrarHistoricoAprendizado;
 public class RegistrarHistoricoAprendizadoCommandHandlerTests

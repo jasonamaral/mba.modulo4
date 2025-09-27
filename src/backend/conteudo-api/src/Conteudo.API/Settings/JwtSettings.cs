@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Conteudo.API.Settings;
 
+[ExcludeFromCodeCoverage]
 public class JwtSettings
 {
     public string SecretKey { get; set; } = string.Empty;

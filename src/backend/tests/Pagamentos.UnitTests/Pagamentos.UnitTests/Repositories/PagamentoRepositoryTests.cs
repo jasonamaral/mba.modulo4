@@ -1,9 +1,9 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Enum;
 using Pagamentos.Infrastructure.Context;
 using Pagamentos.Infrastructure.Repositories;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Pagamentos.UnitTests.Repositories.Infra;
 
 namespace Pagamentos.UnitTests.Repositories;
@@ -27,7 +27,7 @@ public class PagamentoRepositoryTests : IDisposable
         Guid? alunoId = null,
         string status = "Criado",
         decimal valor = 123.45m)
-    => new Domain.Entities.Pagamento
+    => new()
     {
         CobrancaCursoId = cobrancaId ?? Guid.NewGuid(),
         AlunoId = alunoId ?? Guid.NewGuid(),
@@ -40,7 +40,7 @@ public class PagamentoRepositoryTests : IDisposable
     };
 
     private static Transacao NovaTransacao(Guid pagamentoId, Guid? cobrancaId = null, decimal total = 123.45m, int status = 1)
-    => new Transacao
+    => new()
     {
         PagamentoId = pagamentoId,
         CobrancaCursoId = cobrancaId ?? Guid.NewGuid(),
@@ -105,6 +105,10 @@ public class PagamentoRepositoryTests : IDisposable
         _ctx.ChangeTracker.Entries().Should().NotContain(x => x.State != EntityState.Unchanged);
     }
 
-    public void Dispose() => _conn.Dispose();
+    public void Dispose()
+    {
+        _conn.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }
 

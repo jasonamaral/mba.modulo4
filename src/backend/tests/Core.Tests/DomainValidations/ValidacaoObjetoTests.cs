@@ -1,9 +1,4 @@
 using Core.DomainValidations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Tests.DomainValidations;
 public class ValidacaoObjetoTests

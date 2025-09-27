@@ -53,6 +53,7 @@ public class CadastroCursoDto
     public string Bibliografia { get; set; } = string.Empty;
 }
 
+[ExcludeFromCodeCoverage]
 public class AtualizarCursoDto
 {
     [Required(ErrorMessage = "ID é obrigatório")]

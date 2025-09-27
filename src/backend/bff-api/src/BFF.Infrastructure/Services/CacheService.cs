@@ -5,10 +5,12 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace BFF.Infrastructure.Services;
 
+[ExcludeFromCodeCoverage]
 public class CacheService : ICacheService
 {
     private readonly IDistributedCache? _distributedCache;

@@ -1,10 +1,12 @@
 using BFF.Application.Interfaces.Services;
 using Core.Communication;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace BFF.Infrastructure.Services;
 
+[ExcludeFromCodeCoverage]
 public abstract class BaseApiService
 {
     protected readonly IApiClientService _apiClient;

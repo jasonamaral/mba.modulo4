@@ -77,11 +77,6 @@ namespace Conteudo.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        //public async Task<bool> ExisteAsync(Guid id)
-        //{
-        //    return await _aula.AnyAsync(a => a.Id == id);
-        //}
-
         public async Task<bool> ExistePorNumeroAsync(Guid cursoId, int numero, Guid? excludeId = null)
         {
             return await _aula.AnyAsync(a =>
@@ -134,21 +129,6 @@ namespace Conteudo.Infrastructure.Repositories
                 await Task.CompletedTask;
             }
         }
-
-        //public async Task<int> ContarAulasAsync()
-        //{
-        //    return await _aula.CountAsync();
-        //}
-
-        //public async Task<int> ContarAulasPorCursoAsync(Guid cursoId)
-        //{
-        //    return await _aula.CountAsync(a => a.CursoId == cursoId);
-        //}
-
-        //public async Task<int> ContarAulasPublicadasAsync()
-        //{
-        //    return await _aula.CountAsync(a => a.IsPublicada);
-        //}
 
         public void Dispose()
         {

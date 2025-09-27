@@ -110,40 +110,6 @@ public class Curso : Entidade, IRaizAgregacao
         AtualizarDataModificacao();
     }
 
-    //public void Ativar()
-    //{
-    //    Ativo = true;
-    //    AtualizarDataModificacao();
-    //}
-
-    //public void Desativar()
-    //{
-    //    Ativo = false;
-    //    AtualizarDataModificacao();
-    //}
-
-    //public void AdicionarAula(Aula aula)
-    //{
-    //    if (aula == null)
-    //        throw new DomainException("Aula não pode ser nula");
-
-    //    if (_aulas.Any(a => a.Numero == aula.Numero))
-    //        throw new DomainException($"Já existe uma aula com o número {aula.Numero}");
-
-    //    _aulas.Add(aula);
-    //    AtualizarDataModificacao();
-    //}
-
-    //public void RemoverAula(Guid aulaId)
-    //{
-    //    var aula = _aulas.FirstOrDefault(a => a.Id == aulaId);
-    //    if (aula != null)
-    //    {
-    //        _aulas.Remove(aula);
-    //        AtualizarDataModificacao();
-    //    }
-    //}
-
     public void AdicionarMatricula()
     {
         if (VagasOcupadas >= VagasMaximas)
@@ -152,15 +118,6 @@ public class Curso : Entidade, IRaizAgregacao
         VagasOcupadas++;
         AtualizarDataModificacao();
     }
-
-    //public void RemoverMatricula()
-    //{
-    //    if (VagasOcupadas > 0)
-    //    {
-    //        VagasOcupadas--;
-    //        AtualizarDataModificacao();
-    //    }
-    //}
 
     public bool TemVagasDisponiveis => VagasOcupadas < VagasMaximas;
     public int VagasDisponiveis => VagasMaximas - VagasOcupadas;

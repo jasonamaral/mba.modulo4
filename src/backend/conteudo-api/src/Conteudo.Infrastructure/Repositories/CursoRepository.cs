@@ -86,28 +86,6 @@ public class CursoRepository(ConteudoDbContext dbContext) : ICursoRepository
             .ToListAsync();
     }
 
-    //public async Task<IEnumerable<Curso>> ObterAtivosAsync(bool includeAulas = false)
-    //{
-    //    var query = _curso
-    //        .Where(c => c.Ativo)
-    //        .AsNoTracking();
-
-    //    if (includeAulas)
-    //        query = query.Include(c => c.Aulas);
-
-    //    return await query.ToListAsync();
-    //}
-
-    //public Task<IEnumerable<Curso>> ObterPorPesquisaAsync(string searchTerm, bool includeAulas = false)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    //public async Task<bool> ExistePorIdAsync(Guid id)
-    //{
-    //    return await _curso.AnyAsync(c => c.Id == id);
-    //}
-
     public async Task<bool> ExistePorNomeAsync(string nome, Guid? excludeId = null)
     {
         return await _curso.AnyAsync(c => c.Nome == nome && (excludeId == null || c.Id != excludeId));
@@ -129,21 +107,6 @@ public class CursoRepository(ConteudoDbContext dbContext) : ICursoRepository
         _curso.Remove(curso);
         await Task.CompletedTask;
     }
-
-    //public async Task<int> ContarAsync()
-    //{
-    //    return await _curso.CountAsync();
-    //}
-
-    //public async Task<int> ContarAtivosAsync()
-    //{
-    //    return await _curso.CountAsync(c => c.Ativo);
-    //}
-
-    //public async Task<int> ContarPorCategoriaAsync(Guid categoriaId)
-    //{
-    //    return await _curso.CountAsync(c => c.CategoriaId == categoriaId);
-    //}
 
     public void Dispose()
     {

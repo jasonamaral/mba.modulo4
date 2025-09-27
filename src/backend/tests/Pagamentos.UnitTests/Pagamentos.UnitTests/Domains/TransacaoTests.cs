@@ -1,4 +1,3 @@
-using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Enum;
 
 namespace Pagamentos.UnitTests.Domains;

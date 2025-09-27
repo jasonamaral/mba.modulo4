@@ -1,10 +1,5 @@
 using Alunos.Application.Commands.RegistrarHistoricoAprendizado;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Alunos.Tests.Applications.RegistrarHistoricoAprendizado;
 public class RegistrarHistoricoAprendizadoCommandTests

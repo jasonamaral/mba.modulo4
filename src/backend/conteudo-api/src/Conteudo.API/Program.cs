@@ -1,6 +1,8 @@
 using Conteudo.API.Configuration;
 using Conteudo.API.Helpers;
+using System.Diagnostics.CodeAnalysis;
 
+[ExcludeFromCodeCoverage]
 public class Program
 {
     private static void Main(string[] args)

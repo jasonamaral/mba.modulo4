@@ -1,20 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
-using Core.Communication; // DomainNotificacaoRaiz
 using Core.Data;
 using Core.Mediator;
 using FluentAssertions;
 using Moq;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 using Alunos.Application.Commands.AtualizarPagamento;
 using Core.Messages;
 
@@ -77,7 +66,7 @@ public class AtualizarPagamentoMatriculaCommandHandlerTests
         var aluno = NovoAluno();
         var matricula = aluno.MatriculasCursos.FirstOrDefault();
 
-        var cmd = new AtualizarPagamentoMatriculaCommand(aluno.Id, matricula.Id);
+        var cmd = new AtualizarPagamentoMatriculaCommand(aluno.Id, matricula?.Id ?? Guid.Empty);
 
         var sut = CriarSut();
         _alunos.Setup(r => r.ObterPorIdAsync(cmd.AlunoId, true)).ReturnsAsync(aluno);
@@ -99,7 +88,7 @@ public class AtualizarPagamentoMatriculaCommandHandlerTests
         var aluno = NovoAluno();
         var matricula = aluno.MatriculasCursos.FirstOrDefault();
 
-        var cmd = new AtualizarPagamentoMatriculaCommand(aluno.Id, matricula.Id);
+        var cmd = new AtualizarPagamentoMatriculaCommand(aluno.Id, matricula?.Id ?? Guid.Empty);
         var sut = CriarSut();
 
         _alunos.Setup(r => r.ObterPorIdAsync(cmd.AlunoId, true)).ReturnsAsync(aluno);

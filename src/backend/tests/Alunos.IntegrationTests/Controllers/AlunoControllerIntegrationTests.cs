@@ -5,12 +5,12 @@ namespace Alunos.IntegrationTests.Controllers;
 
 public class AlunoControllerIntegrationTests : IDisposable
 {
-    private readonly HttpClient _client;
+    //private readonly HttpClient _client;
 
     public AlunoControllerIntegrationTests()
     {
         // Testes simples sem WebApplicationFactory para evitar conflitos de banco
-        _client = null;
+        //_client = null;
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class AlunoControllerIntegrationTests : IDisposable
 
     void IDisposable.Dispose()
     {
-        _client?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
 
@@ -119,23 +119,21 @@ public class MockAlunoQueryService : IAlunoQueryService
             Nome = "João Silva (Mock)",
             Email = "joao.mock@teste.com",
             DataNascimento = DateTime.Now.AddYears(-25),
-            MatriculasCursos = new List<EvolucaoMatriculaCursoDto>
-            {
-                new EvolucaoMatriculaCursoDto
-                {
+            MatriculasCursos =
+            [
+                new() {
                     Id = Guid.NewGuid(),
                     CursoId = Guid.NewGuid(),
                     NomeCurso = "Curso 1",
                     EstadoMatricula = "Concluído"
                 },
-                new EvolucaoMatriculaCursoDto
-                {
+                new() {
                     Id = Guid.NewGuid(),
                     CursoId = Guid.NewGuid(),
                     NomeCurso = "Curso 2",
                     EstadoMatricula = "Em Andamento"
                 }
-            }
+            ]
         };
 
         return Task.FromResult(evolucao);
@@ -145,8 +143,7 @@ public class MockAlunoQueryService : IAlunoQueryService
     {
         var matriculas = new List<MatriculaCursoDto>
         {
-            new MatriculaCursoDto
-            {
+            new() {
                 Id = Guid.NewGuid(),
                 AlunoId = alunoId,
                 CursoId = Guid.NewGuid(),
@@ -154,8 +151,7 @@ public class MockAlunoQueryService : IAlunoQueryService
                 DataMatricula = DateTime.Now.AddDays(-30),
                 EstadoMatricula = "Em Andamento"
             },
-            new MatriculaCursoDto
-            {
+            new() {
                 Id = Guid.NewGuid(),
                 AlunoId = alunoId,
                 CursoId = Guid.NewGuid(),
@@ -204,7 +200,7 @@ public class MockAlunoQueryService : IAlunoQueryService
     {
         var aulas = new List<AulaCursoDto>
         {
-            new AulaCursoDto
+            new()
             {
                 AulaId = Guid.NewGuid(),
                 CursoId = Guid.NewGuid(),
@@ -213,7 +209,7 @@ public class MockAlunoQueryService : IAlunoQueryService
                 Ativo = true,
                 DataTermino = DateTime.Now.AddDays(-1)
             },
-            new AulaCursoDto
+            new()
             {
                 AulaId = Guid.NewGuid(),
                 CursoId = Guid.NewGuid(),
@@ -231,16 +227,14 @@ public class MockAlunoQueryService : IAlunoQueryService
     {
         var certificados = new List<CertificadosDto>
         {
-            new CertificadosDto
-            {
+            new() {
                 Id = Guid.NewGuid(),
                 NomeCurso = "Curso de Teste 1 (Mock)",
                 DataEmissao = DateTime.Now.AddDays(-10),
                 Codigo = "CERT-123456",
                 Url = "http://localhost/certificados/cert-mock-001.pdf"
             },
-            new CertificadosDto
-            {
+            new() {
                 Id = Guid.NewGuid(),
                 NomeCurso = "Curso de Teste 2 (Mock)",
                 DataEmissao = DateTime.Now.AddDays(-5),

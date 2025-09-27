@@ -89,12 +89,6 @@ public class MatriculaCurso : Entidade
         EstadoMatricula = EstadoMatriculaCurso.PagamentoRealizado;
     }
 
-    //internal void RegistrarAbandonoMatricula()
-    //{
-    //    ValidarIntegridadeMatriculaCurso(novoEstadoMatriculaCurso: EstadoMatriculaCurso.Abandonado);
-    //    EstadoMatricula = EstadoMatriculaCurso.Abandonado;
-    //}
-
     internal void ConcluirCurso()
     {
         if (EstadoMatricula == EstadoMatriculaCurso.Abandonado) { throw new DomainException("Não é possível concluir um curso com estado de pagamento abandonado"); }
@@ -106,12 +100,6 @@ public class MatriculaCurso : Entidade
         DataConclusao = dataAtual;
         EstadoMatricula = EstadoMatriculaCurso.Concluido;
     }
-
-    //internal void AtualizarObservacoes(string observacao)
-    //{
-    //    ValidarIntegridadeMatriculaCurso(novaObservacao: observacao ?? string.Empty);
-    //    Observacao = observacao;
-    //}
 
     internal void RegistrarHistoricoAprendizado(Guid aulaId, string nomeAula, int cargaHoraria, DateTime? dataTermino = null)
     {
@@ -136,32 +124,6 @@ public class MatriculaCurso : Entidade
 
         Certificado = new Certificado(Id, NomeCurso, DateTime.UtcNow, null, QuantidadeTotalCargaHoraria(), notaFinal, pathCertificado, nomeInstrutor);
     }
-
-    //internal void ComunicarDataEmissaoCertificado(DateTime dataEmissao)
-    //{
-    //    VerificarSeCertificadoExiste();
-    //    if (Certificado.DataEmissao.HasValue) { throw new DomainException("Data de emissão do certificado já foi informada"); }
-
-    //    Certificado.AtualizarDataEmissao(dataEmissao);
-    //}
-
-    //internal void AtualizarCargaHoraria(short cargaHoraria)
-    //{
-    //    VerificarSeCertificadoExiste();
-    //    Certificado.AtualizarCargaHoraria(cargaHoraria);
-    //}
-
-    //internal void AtualizarPathCertificado(string path)
-    //{
-    //    VerificarSeCertificadoExiste();
-    //    Certificado.AtualizarPathCertificado(path ?? string.Empty);
-    //}
-
-    //internal void AtualizarNomeInstrutor(string nomeInstrutor)
-    //{
-    //    VerificarSeCertificadoExiste();
-    //    Certificado.AtualizarNomeInstrutor(nomeInstrutor ?? string.Empty);
-    //}
 
     private void VerificarSeCertificadoExiste()
     {

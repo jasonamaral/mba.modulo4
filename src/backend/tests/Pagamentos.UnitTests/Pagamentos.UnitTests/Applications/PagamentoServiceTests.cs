@@ -1,28 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Core.Communication; // DomainNotificacaoRaiz
 using Core.Data;
 using Core.Mediator;
 using Core.Messages.Integration;
-using FluentAssertions;
 using global::Pagamentos.Domain.Entities;
 using global::Pagamentos.Domain.Enum;
 using global::Pagamentos.Domain.Interfaces;
 using global::Pagamentos.Domain.Models;
-using Moq;
-using Pagamentos.Domain.Entities;
-using Pagamentos.Domain.Enum;
-using Pagamentos.Domain.Interfaces;
-using Pagamentos.Domain.Models;
 using Pagamentos.Domain.Services;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
 using Core.Messages;
 
 namespace Pagamentos.UnitTests.Applications;

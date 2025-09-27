@@ -1,6 +1,8 @@
 using Alunos.API.Configurations;
 using Alunos.API.Helpers;
+using System.Diagnostics.CodeAnalysis;
 
+[ExcludeFromCodeCoverage]
 public class Program
 {
     private static void Main(string[] args)

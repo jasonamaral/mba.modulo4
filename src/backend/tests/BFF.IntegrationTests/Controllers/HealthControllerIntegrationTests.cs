@@ -5,7 +5,6 @@ using Core.Notification;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace BFF.IntegrationTests.Controllers;
 

@@ -147,13 +147,6 @@ public static class ApiConfiguration
             .AddPolicyHandler(GetRetryPolicy(resilienceSettings))
             .AddPolicyHandler(GetCircuitBreakerPolicy(resilienceSettings));
 
-        //services.AddHttpClient("ApiClient", c => { /* ... */ })
-        //    .AddPolicyHandler((sp, req) =>
-        //        Policy.WrapAsync(
-        //            GetCircuitBreakerPolicy(sp.GetRequiredService<IOptions<ResilienceSettings>>().Value),
-        //            GetRetryPolicy(sp.GetRequiredService<IOptions<ResilienceSettings>>().Value)
-        //        ));
-
         return builder;
     }
 

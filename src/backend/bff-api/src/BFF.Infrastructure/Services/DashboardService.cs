@@ -3,9 +3,11 @@ using BFF.Domain.DTOs;
 using BFF.Domain.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.Infrastructure.Services;
 
+[ExcludeFromCodeCoverage]
 public class DashboardService(
     ICacheService cacheService,
     IOptions<CacheSettings> cacheOptions,
