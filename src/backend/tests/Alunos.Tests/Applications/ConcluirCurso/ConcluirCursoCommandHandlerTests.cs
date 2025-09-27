@@ -1,28 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Alunos.Application.Commands.ConcluirCurso;
 using Alunos.Domain.Entities;
 using Alunos.Domain.Interfaces;
-using Core.Communication; // DomainNotificacaoRaiz
 using Core.Data;
 using Core.Mediator;
 using Core.SharedDtos.Conteudo;
 using FluentAssertions;
-using global::Alunos.Application.Commands.ConcluirCurso;
-using global::Alunos.Domain.Entities;
-using global::Alunos.Domain.Interfaces;
 using Moq;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 using Core.Messages;
-using System.Runtime.InteropServices;
 
 namespace Alunos.Tests.Applications.ConcluirCurso;
 public class ConcluirCursoCommandHandlerTests
@@ -87,7 +71,7 @@ public class ConcluirCursoCommandHandlerTests
         var matricula = aluno.MatriculasCursos.FirstOrDefault();
 
         // CursoDto com 2 aulas ativas e aluno com 0 registros -> dispara regra "não iniciadas"
-        var cmd = new ConcluirCursoCommand(aluno.Id, matricula.Id, new CursoDto { Id = Guid.NewGuid(), Aulas = [new(), new()] });
+        var cmd = new ConcluirCursoCommand(aluno.Id, matricula?.Id ?? Guid.Empty, new CursoDto { Id = Guid.NewGuid(), Aulas = [new(), new()] });
         var sut = CriarSut();
 
         _repo.Setup(r => r.ObterPorIdAsync(cmd.AlunoId, true)).ReturnsAsync(aluno);
@@ -107,7 +91,7 @@ public class ConcluirCursoCommandHandlerTests
         var matricula = aluno.MatriculasCursos.FirstOrDefault();
 
         // CursoDto sem aulas → passa nas duas verificações
-        var cmd = new ConcluirCursoCommand(aluno.Id, matricula.Id, new CursoDto { Id = Guid.NewGuid(), Aulas = [] });
+        var cmd = new ConcluirCursoCommand(aluno.Id, matricula?.Id ?? Guid.Empty, new CursoDto { Id = Guid.NewGuid(), Aulas = [] });
         var sut = CriarSut();
 
         _repo.Setup(r => r.ObterPorIdAsync(cmd.AlunoId, true)).ReturnsAsync(aluno);
@@ -127,7 +111,7 @@ public class ConcluirCursoCommandHandlerTests
         var aluno = NovoAluno();
         var matricula = aluno.MatriculasCursos.FirstOrDefault();
 
-        var cmd = new ConcluirCursoCommand(aluno.Id, matricula.Id, new CursoDto { Id = Guid.NewGuid(), Aulas = [] });
+        var cmd = new ConcluirCursoCommand(aluno.Id, matricula?.Id ?? Guid.Empty, new CursoDto { Id = Guid.NewGuid(), Aulas = [] });
         var sut = CriarSut();
 
         _repo.Setup(r => r.ObterPorIdAsync(cmd.AlunoId, true)).ReturnsAsync(aluno);

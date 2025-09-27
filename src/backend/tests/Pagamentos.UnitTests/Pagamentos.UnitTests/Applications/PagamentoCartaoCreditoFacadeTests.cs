@@ -1,13 +1,7 @@
-using System;
-using FluentAssertions;
-using Moq;
 using Pagamento.AntiCorruption.Interfaces;
 using Pagamento.AntiCorruption.Services;
-using Pagamentos.Domain.Entities;
 using Pagamentos.Domain.Enum;
-using Pagamentos.Domain.Interfaces;
 using Pagamentos.Domain.Models;
-using Xunit;
 
 namespace Pagamentos.UnitTests.Applications;
 public class PagamentoCartaoCreditoFacadeTests

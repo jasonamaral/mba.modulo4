@@ -12,8 +12,6 @@ public interface IAlunoRepository : IRepository<Aluno>
 
     Task<Aluno> ObterPorCodigoUsuarioAsync(Guid codigoUsuario, bool noTracked = true);
 
-    //Task<bool> ExisteEmailAsync(string email);
-
     Task AdicionarAsync(Aluno aluno);
 
     Task AtualizarAsync(Aluno aluno);
@@ -27,7 +25,4 @@ public interface IAlunoRepository : IRepository<Aluno>
     //Task<MatriculaCurso> ObterMatriculaPorAlunoECursoAsync(Guid alunoId, Guid cursoId);
 
     Task AtualizarEstadoHistoricoAprendizadoAsync(HistoricoAprendizado historicoAntigo, HistoricoAprendizado historicoNovo);
-
-    //Task<Certificado> ObterCertificadoPorMatriculaAsync(Guid matriculaId);
-
 }

@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Auth.API.Configuration;
 
+[ExcludeFromCodeCoverage]
 public class DatabaseSettings
 {
     public string DefaultConnection { get; set; } = string.Empty;

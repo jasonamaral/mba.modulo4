@@ -19,22 +19,10 @@ namespace Conteudo.Application.Services
             return aula?.Adapt<AulaDto>();
         }
 
-        //public async Task<IEnumerable<AulaDto>> ObterPorCursoIdAsync(Guid cursoId, bool includeMateriais = false)
-        //{
-        //    var aulas = await aulaRepository.ObterPorCursoIdAsync(cursoId, includeMateriais);
-        //    return aulas.Adapt<IEnumerable<AulaDto>>();
-        //}
-
         public async Task<IEnumerable<AulaDto>> ObterPublicadasAsync(bool includeMateriais = false)
         {
             var aulas = await aulaRepository.ObterPublicadasAsync(includeMateriais);
             return aulas.Adapt<IEnumerable<AulaDto>>();
         }
-
-        //public async Task<IEnumerable<AulaDto>> ObterPublicadasPorCursoIdAsync(Guid cursoId, bool includeMateriais = false)
-        //{
-        //    var aulas = await aulaRepository.ObterPublicadasPorCursoIdAsync(cursoId, includeMateriais);
-        //    return aulas.Adapt<IEnumerable<AulaDto>>();
-        //}
     }
 }

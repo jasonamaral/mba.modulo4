@@ -8,9 +8,5 @@ public interface IAulaAppService
 
     Task<AulaDto?> ObterPorIdAsync(Guid cursoId, Guid id, bool includeMateriais = false);
 
-    //Task<IEnumerable<AulaDto>> ObterPorCursoIdAsync(Guid cursoId, bool includeMateriais = false);
-
     Task<IEnumerable<AulaDto>> ObterPublicadasAsync(bool includeMateriais = false);
-
-    //Task<IEnumerable<AulaDto>> ObterPublicadasPorCursoIdAsync(Guid cursoId, bool includeMateriais = false);
 }

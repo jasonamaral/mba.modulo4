@@ -17,23 +17,11 @@ public interface IMaterialRepository : IRepository<Material>
 
     Task<IEnumerable<Material>> ObterObrigatoriosPorAulaIdAsync(Guid aulaId);
 
-    //Task<bool> ExisteAsync(Guid id);
-
     Task<bool> ExistePorNomeAsync(Guid aulaId, string nome, Guid? excludeId = null);
 
     Task<Material> CadastrarMaterialAsync(Material material);
 
     Task<Material> AtualizarMaterialAsync(Material material);
 
-    //Task AtivarMaterialAsync(Guid id);
-
-    //Task DesativarMaterialAsync(Guid id);
-
     Task ExcluirMaterialAsync(Guid id);
-
-    //Task<int> ContarMateriaisAsync();
-
-    //Task<int> ContarMateriaisPorAulaAsync(Guid aulaId);
-
-    //Task<int> ContarMateriaisAtivosPorAulaAsync(Guid aulaId);
 }

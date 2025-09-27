@@ -1,10 +1,5 @@
 using Alunos.Application.Commands.SolicitarCertificado;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Alunos.Tests.Applications.SolicitarCertificado;
 public class SolicitarCertificadoCommandTests

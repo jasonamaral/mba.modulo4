@@ -15,12 +15,6 @@ public class CursoQueryService(ICursoRepository cursoRepository) : ICursoQuery
         return cursos.Adapt<PagedResult<CursoDto>>();
     }
 
-    //public async Task<IEnumerable<CursoDto>> ObterTodosAsync(bool includeAulas = false)
-    //{
-    //    var cursos = await cursoRepository.ObterTodosAsync(includeAulas);
-    //    return cursos.Adapt<IEnumerable<CursoDto>>();
-    //}
-
     public async Task<CursoDto?> ObterPorIdAsync(Guid id, bool includeAulas = false)
     {
         var curso = await cursoRepository.ObterPorIdAsync(id, includeAulas);

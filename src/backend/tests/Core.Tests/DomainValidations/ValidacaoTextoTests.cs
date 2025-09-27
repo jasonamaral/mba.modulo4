@@ -1,9 +1,4 @@
 using Core.DomainValidations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Tests.DomainValidations;
 public class ValidacaoTextoTests
@@ -14,7 +9,7 @@ public class ValidacaoTextoTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void DevePossuirConteudo_deve_falhar_em_branco(string v)
+    public void DevePossuirConteudo_deve_falhar_em_branco(string? v)
     {
         var r = new ResultadoValidacao<Dummy>();
         ValidacaoTexto.DevePossuirConteudo(v!, "sem conteúdo", r);

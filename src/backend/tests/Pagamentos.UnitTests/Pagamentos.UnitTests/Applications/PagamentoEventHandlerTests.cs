@@ -1,22 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Core.Messages.Integration;
-using FluentAssertions;
 using global::Pagamentos.Domain.Events;
 using global::Pagamentos.Domain.Models;
-using MediatR;
-using Moq;
-using Pagamentos.Domain.Events;
 using Pagamentos.Domain.Interfaces;
-using Pagamentos.Domain.Models;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace Pagamentos.UnitTests.Applications;
 public class PagamentoEventHandlerTests

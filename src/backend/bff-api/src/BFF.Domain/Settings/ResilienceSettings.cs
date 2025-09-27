@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.Domain.Settings;
 
+[ExcludeFromCodeCoverage]
 public class ResilienceSettings
 {
     public int RetryCount { get; set; } = 3;

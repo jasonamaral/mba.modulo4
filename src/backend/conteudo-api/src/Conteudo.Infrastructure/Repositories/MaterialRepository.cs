@@ -55,11 +55,6 @@ public class MaterialRepository(ConteudoDbContext dbContext) : IMaterialReposito
             .ToListAsync();
     }
 
-    //public async Task<bool> ExisteAsync(Guid id)
-    //{
-    //    return await _material.AnyAsync(m => m.Id == id);
-    //}
-
     public async Task<bool> ExistePorNomeAsync(Guid aulaId, string nome, Guid? excludeId = null)
     {
         return await _material.AnyAsync(m =>
@@ -81,28 +76,6 @@ public class MaterialRepository(ConteudoDbContext dbContext) : IMaterialReposito
         return material;
     }
 
-    //public async Task AtivarMaterialAsync(Guid id)
-    //{
-    //    var material = await ObterPorIdAsync(id);
-    //    if (material != null)
-    //    {
-    //        material.Ativar();
-    //        _material.Update(material);
-    //        await Task.CompletedTask;
-    //    }
-    //}
-
-    //public async Task DesativarMaterialAsync(Guid id)
-    //{
-    //    var material = await ObterPorIdAsync(id);
-    //    if (material != null)
-    //    {
-    //        material.Desativar();
-    //        _material.Update(material);
-    //        await Task.CompletedTask;
-    //    }
-    //}
-
     public async Task ExcluirMaterialAsync(Guid id)
     {
         var material = await ObterPorIdAsync(id);
@@ -112,21 +85,6 @@ public class MaterialRepository(ConteudoDbContext dbContext) : IMaterialReposito
             await Task.CompletedTask;
         }
     }
-
-    //public async Task<int> ContarMateriaisAsync()
-    //{
-    //    return await _material.CountAsync();
-    //}
-
-    //public async Task<int> ContarMateriaisPorAulaAsync(Guid aulaId)
-    //{
-    //    return await _material.CountAsync(m => m.AulaId == aulaId);
-    //}
-
-    //public async Task<int> ContarMateriaisAtivosPorAulaAsync(Guid aulaId)
-    //{
-    //    return await _material.CountAsync(m => m.AulaId == aulaId && m.IsAtivo);
-    //}
 
     public void Dispose()
     {

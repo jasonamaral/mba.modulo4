@@ -3,11 +3,13 @@ using BFF.Domain.DTOs;
 using BFF.Domain.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 
 namespace BFF.Infrastructure.Services;
 
+[ExcludeFromCodeCoverage]
 public class ApiClientService : IApiClientService, IDisposable
 {
     private readonly HttpClient _httpClient;

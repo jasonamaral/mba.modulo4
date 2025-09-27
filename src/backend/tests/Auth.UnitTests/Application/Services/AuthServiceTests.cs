@@ -1,34 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
-using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
 using Auth.Application.Services;
 using Auth.Application.Settings;
 using Auth.Domain.Entities;
-using FluentAssertions;
-using global::Auth.Application.Interfaces;
-using global::Auth.Application.Services;
-using global::Auth.Application.Settings;
-using global::Auth.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Moq;
 using NetDevPack.Security.Jwt.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace Auth.UnitTests.Application.Services;
 public class AuthServiceTests
@@ -37,14 +18,13 @@ public class AuthServiceTests
     // Helpers de infraestrutura
     // ---------------------------
 
-    private class FakeEfContext : DbContext
+    private class FakeEfContext(DbContextOptions<AuthServiceTests.FakeEfContext> options) : DbContext(options)
     {
-        public FakeEfContext(DbContextOptions<FakeEfContext> options) : base(options) { }
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     }
 
     // Cria um AuthService com dependências mockadas e um DbContext InMemory por trás do IAuthDbContext
-    private AuthService CriarSut(
+    private static AuthService CriarSut(
         out Mock<UserManager<ApplicationUser>> userManager,
         out Mock<SignInManager<ApplicationUser>> signInManager,
         out Mock<IJwtService> jwt,
@@ -114,19 +94,19 @@ public class AuthServiceTests
         var user = new ApplicationUser { Id = Guid.NewGuid().ToString(), Email = email };
 
         // pré-carrega tokens antigos do mesmo usuário para garantir remoção
-        ef.RefreshTokens.AddRange(new[]
-        {
+        ef.RefreshTokens.AddRange(
+        [
             new RefreshToken { Username = email, ExpirationDate = DateTime.UtcNow.AddHours(1) },
             new RefreshToken { Username = email, ExpirationDate = DateTime.UtcNow.AddHours(2) },
             new RefreshToken { Username = "outro@x.com", ExpirationDate = DateTime.UtcNow.AddHours(2) }
-        });
+        ]);
         await ef.SaveChangesAsync();
 
         // UserManager: usuário, claims iniciais e roles
         var baseClaims = new List<Claim> { new("custom", "v1") };
         um.Setup(m => m.FindByEmailAsync(email)).ReturnsAsync(user);
         um.Setup(m => m.GetClaimsAsync(user)).ReturnsAsync(baseClaims);
-        um.Setup(m => m.GetRolesAsync(user)).ReturnsAsync(new List<string> { "Admin", "Student" });
+        um.Setup(m => m.GetRolesAsync(user)).ReturnsAsync(["Admin", "Student"]);
 
         // Act
         var dto = await sut.GerarJwt(email);
@@ -158,7 +138,7 @@ public class AuthServiceTests
     public async Task ObterRefreshToken_deve_retornar_token_quando_nao_expirado()
     {
         // Arrange
-        var sut = CriarSut(out var um, out var sm, out var jwt, out var authDb, out var ef, out var accessor);
+        var sut = CriarSut(out var _, out var _, out var _, out var _, out var ef, out _);
 
         var token = new RefreshToken
         {
@@ -180,7 +160,7 @@ public class AuthServiceTests
     public async Task ObterRefreshToken_deve_retornar_null_quando_expirado()
     {
         // Arrange
-        var sut = CriarSut(out var um, out var sm, out var jwt, out var authDb, out var ef, out var accessor);
+        var sut = CriarSut(out var _, out var _, out var _, out var _, out var ef, out var _);
 
         var token = new RefreshToken
         {

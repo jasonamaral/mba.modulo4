@@ -1,10 +1,5 @@
 using Alunos.Application.Commands.AtualizarPagamento;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Alunos.Tests.Applications.AtualizarPagamento;
 public class AtualizarPagamentoMatriculaCommandTests

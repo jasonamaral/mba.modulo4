@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BFF.API.Settings;
 
+[ExcludeFromCodeCoverage]
 public class ApiSettings
 {
     public string AuthApiUrl { get; set; } = string.Empty;

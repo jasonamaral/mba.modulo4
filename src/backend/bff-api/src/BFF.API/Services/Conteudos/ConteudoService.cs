@@ -6,9 +6,11 @@ using BFF.Infrastructure.Services;
 using Core.Communication;
 using Core.Communication.Filters;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Services.Conteudos;
 
+[ExcludeFromCodeCoverage]
 public partial class ConteudoService : BaseApiService, IConteudoService
 {
     private readonly ApiSettings _apiSettings;

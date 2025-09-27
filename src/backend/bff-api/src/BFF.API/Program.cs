@@ -1,6 +1,8 @@
 using BFF.API.Configuration;
 using BFF.API.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
+[ExcludeFromCodeCoverage]
 internal class Program
 {
     private static void Main(string[] args)

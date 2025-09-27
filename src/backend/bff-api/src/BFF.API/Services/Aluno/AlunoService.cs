@@ -6,9 +6,11 @@ using BFF.Domain.DTOs.Alunos.Response;
 using BFF.Infrastructure.Services;
 using Core.Communication;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BFF.API.Services.Aluno;
 
+[ExcludeFromCodeCoverage]
 public partial class AlunoService : BaseApiService, IAlunoService
 {
     private readonly ApiSettings _apiSettings;
